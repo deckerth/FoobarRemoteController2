@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="Rectangle">
+        <attr name="markerColor" format="integer" />
+    </declare-styleable>
+    <declare-styleable name="Circle">
+        <attr name="circleColor" format="integer" />
+    </declare-styleable>
+
+</resources>

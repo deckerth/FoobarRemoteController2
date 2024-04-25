@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/title_detail_container"
@@ -8,60 +8,198 @@
     tools:context=".TitleDetailHostActivity"
     tools:ignore="MergeRootFrame">
 
-    <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/app_bar"
+    <ImageView
+        android:id="@+id/artwork"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="20dp"
+        android:textAlignment="center"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toTopOf="@id/composer"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/composer"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/app_bar_height"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="8dp"
+        android:textAlignment="center"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@id/album"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/artwork" />
 
-        <com.google.android.material.appbar.CollapsingToolbarLayout
-            android:id="@+id/toolbar_layout"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:contentScrim="?attr/colorPrimary"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed"
-            app:toolbarId="@+id/toolbar">
-
-            <androidx.appcompat.widget.Toolbar
-                android:id="@+id/detail_toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                app:layout_collapseMode="pin"
-                app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
-
-        </com.google.android.material.appbar.CollapsingToolbarLayout>
-
-    </com.google.android.material.appbar.AppBarLayout>
-
-    <androidx.core.widget.NestedScrollView
-        android:id="@+id/title_detail_scroll_view"
+    <TextView
+        android:id="@+id/album"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:textAlignment="center"
+        android:textSize="20sp"
+        android:textStyle="italic"
+        app:layout_constraintBottom_toTopOf="@id/title"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/composer" />
 
-        <TextView
-            android:id="@+id/title_detail"
-            style="?android:attr/textAppearanceLarge"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:paddingStart="@dimen/container_horizontal_margin"
-            android:paddingTop="16dp"
-            android:paddingEnd="@dimen/container_horizontal_margin"
-            android:paddingBottom="16dp"
-            android:textIsSelectable="true"
-            tools:context="com.deckerth.thomas.foobarremotecontroller2.TitleDetailFragment" />
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:textAlignment="center"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toTopOf="@id/artist"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/album" />
 
-    </androidx.core.widget.NestedScrollView>
+    <TextView
+        android:id="@+id/artist"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:textAlignment="center"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toTopOf="@id/playback_progress"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/title" />
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab"
+    <ProgressBar
+        android:id="@+id/playback_progress"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintBottom_toTopOf="@id/disc_number"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/artist" />
+
+    <TextView
+        android:id="@+id/disc_number"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical|start"
-        android:layout_marginEnd="@dimen/fab_margin"
-        android:layout_marginBottom="16dp"
-        app:layout_anchor="@+id/title_detail_scroll_view"
-        app:layout_anchorGravity="top|end"
-        app:srcCompat="@android:drawable/stat_notify_chat" />
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="20dp"
+        android:layout_marginEnd="8dp"
+        android:textAlignment="center"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toTopOf="@id/play_background"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/artist" />
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+    <TextView
+        android:id="@+id/track"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="20dp"
+        android:layout_marginEnd="8dp"
+        android:textAlignment="center"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toTopOf="@id/play_background"
+        app:layout_constraintStart_toEndOf="@id/disc_number"
+        app:layout_constraintTop_toBottomOf="@id/artist" />
+
+    <TextView
+        android:id="@+id/playback_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="20dp"
+        android:layout_marginEnd="8dp"
+        android:textAlignment="center"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toTopOf="@id/play_background"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/artist" />
+
+    <TextView
+        android:id="@+id/length"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="20dp"
+        android:layout_marginEnd="8dp"
+        android:textAlignment="center"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toTopOf="@id/play_background"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/artist" />
+
+    <ImageButton
+        android:id="@+id/back"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAlignment="center"
+        android:textSize="25sp"
+        android:background="?android:colorBackground"
+        android:src="@android:drawable/ic_media_previous"
+        app:layout_constraintTop_toBottomOf="@id/artist"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/play"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <com.deckerth.thomas.foobarremotecontroller2.controls.Circle
+        android:id="@+id/play_background"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:background="?android:colorBackground"
+        app:circleColor="?android:colorForeground"
+        app:layout_constraintTop_toBottomOf="@id/artist"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"/>
+
+
+    <ImageButton
+        android:id="@+id/play"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAlignment="center"
+        android:textSize="20sp"
+        android:background="?android:colorForeground"
+        app:tint="?attr/colorOnPrimary"
+        android:src="@android:drawable/ic_media_play"
+        app:layout_constraintTop_toBottomOf="@id/artist"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/next"
+        app:layout_constraintStart_toEndOf="@id/back"/>
+
+    <ImageButton
+        android:id="@+id/next"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAlignment="center"
+        android:textSize="25sp"
+        android:background="?android:colorBackground"
+        android:src="@android:drawable/ic_media_next"
+        app:layout_constraintTop_toBottomOf="@id/artist"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/play"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

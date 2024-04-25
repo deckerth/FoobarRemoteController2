@@ -8,14 +8,193 @@
     android:layout_marginStart="@dimen/container_horizontal_margin"
     android:layout_marginEnd="@dimen/container_horizontal_margin">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/title_list"
-        android:name="com.deckerth.thomas.foobarremotecontroller2.TitleListFragment"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/now_playing"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        app:layoutManager="LinearLayoutManager"
-        tools:context="com.deckerth.thomas.foobarremotecontroller2.TitleDetailHostActivity"
-        tools:listitem="@layout/title_list_content" />
+        android:layout_height="200dp"
+        android:layout_marginStart="@dimen/container_horizontal_margin"
+        android:layout_marginEnd="@dimen/container_horizontal_margin"
+        app:layout_constraintBottom_toTopOf="@id/swipe_refresh_layout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_begin="120dp" />
+
+        <ImageView
+            android:id="@+id/artwork"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="8dp"
+
+            app:layout_constraintRight_toLeftOf="@id/guideline"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/composer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:textAlignment="center"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@id/album"
+            app:layout_constraintLeft_toRightOf="@id/guideline"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/album"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:textAlignment="center"
+            android:textSize="12sp"
+            android:textStyle="italic"
+            app:layout_constraintBottom_toTopOf="@id/title"
+            app:layout_constraintLeft_toRightOf="@id/guideline"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/composer" />
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:textAlignment="center"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toTopOf="@id/artist"
+            app:layout_constraintLeft_toRightOf="@id/guideline"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/album" />
+
+        <TextView
+            android:id="@+id/artist"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="8dp"
+            android:textAlignment="center"
+            android:textSize="10sp"
+            app:layout_constraintBottom_toTopOf="@id/playback_time"
+            app:layout_constraintLeft_toRightOf="@id/guideline"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/title" />
+
+        <TextView
+            android:id="@+id/disc_number"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:textAlignment="center"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toTopOf="@id/playback_progress"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toLeftOf="@id/guideline"
+            app:layout_constraintTop_toBottomOf="@id/artwork" />
+
+        <ProgressBar
+            android:id="@+id/playback_progress"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+             app:layout_constraintBottom_toTopOf="@id/track"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintLeft_toRightOf="@id/guideline"
+            app:layout_constraintTop_toBottomOf="@id/disc_number" />
+
+        <TextView
+            android:id="@+id/track"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:textAlignment="center"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toTopOf="@id/playback_time"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toLeftOf="@id/guideline"
+            app:layout_constraintTop_toBottomOf="@id/disc_number" />
+
+        <TextView
+            android:id="@+id/playback_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:textAlignment="center"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toLeftOf="@id/guideline"
+            app:layout_constraintTop_toBottomOf="@id/disc_number" />
+
+        <ImageButton
+            android:id="@+id/back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?android:colorBackground"
+            android:src="@android:drawable/ic_media_previous"
+            android:textAlignment="center"
+            android:textSize="20sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toRightOf="@id/guideline"
+            app:layout_constraintRight_toLeftOf="@id/play"
+            app:layout_constraintTop_toBottomOf="@id/track" />
+
+        <ImageButton
+            android:id="@+id/play"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?android:colorBackground"
+            android:src="@android:drawable/ic_media_play"
+            android:textAlignment="center"
+            android:textSize="20sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/next"
+            app:layout_constraintStart_toEndOf="@id/back"
+            app:layout_constraintTop_toBottomOf="@id/track" />
+
+        <ImageButton
+            android:id="@+id/next"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?android:colorBackground"
+            android:src="@android:drawable/ic_media_next"
+            android:textAlignment="center"
+            android:textSize="20sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/play"
+            app:layout_constraintTop_toBottomOf="@id/track" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_refresh_layout"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/now_playing">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/title_list"
+            android:name="com.deckerth.thomas.foobarremotecontroller2.TitleListFragment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            app:layoutManager="LinearLayoutManager"
+            tools:context="com.deckerth.thomas.foobarremotecontroller2.TitleDetailHostActivity"
+            tools:listitem="@layout/title_list_content" />
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

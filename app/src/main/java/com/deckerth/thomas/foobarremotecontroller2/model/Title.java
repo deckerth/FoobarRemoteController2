@@ -1,34 +1,63 @@
 package com.deckerth.thomas.foobarremotecontroller2.model;
 
+import android.graphics.Bitmap;
+
+import java.time.format.ResolverStyle;
+
 public class Title implements ITitle {
 
-    private final String mCatalog;
-    private final String mPlaylistId;
-    private final String mIndex;
-    private final String mComposer;
-    private final String mAlbum;
+    // mPlaylistId, mCatalog, mIndex, mComposer, mAlbum, mArtist
+    protected final String mCatalog;
+    protected final String mPlaylistId;
+    protected final String mIndex;
+    protected final String mComposer;
+    protected final String mAlbum;
     private final String mTitle;
-    private final String mArtist;
+    protected String mArtist;
     private final String mDiscNumber;
     private final String mTrack;
     private final String mPlaybackTime;
+    private final Double mDuration;
+    private final Double mPosition;
+    protected Bitmap mArtwork;
+    private Boolean mIsCurrent = false;
 
-    public Title(String mPlaylistId, String mIndex, String mCatalog, String mComposer, String mAlbum, String mTitle, String mArtist, String mDiscNumber, String mTrack, String mPlaybackTime) {
-        this.mCatalog = mCatalog;
-        this.mPlaylistId = mPlaylistId;
-        this.mIndex = mIndex;
-        this.mComposer = mComposer;
-        this.mAlbum = mAlbum;
-        this.mTitle = mTitle;
-        this.mArtist = mArtist;
-        this.mDiscNumber = mDiscNumber;
-        this.mTrack = mTrack;
-        this.mPlaybackTime = mPlaybackTime;
+    protected String set(String v) {
+        if (v == null)
+            return "";
+        else
+            return v;
+    }
+
+    public Title(String mPlaylistId, String mIndex, String mCatalog, String mComposer, String mAlbum, String mTitle, String mArtist, String mDiscNumber, String mTrack, String mPlaybackTime, String duration, String position) {
+        this.mCatalog = set(mCatalog);
+        this.mPlaylistId = set(mPlaylistId);
+        this.mIndex = set(mIndex);
+        this.mComposer = set(mComposer);
+        this.mAlbum = set(mAlbum);
+        this.mTitle = set(mTitle);
+        this.mArtist = set(mArtist);
+        this.mDiscNumber = set(mDiscNumber);
+        this.mTrack = set(mTrack);
+        this.mPlaybackTime = set(mPlaybackTime);
+        Double value;
+        try {
+            value = Double.parseDouble(duration);
+        } catch (NumberFormatException e) {
+            value = 0.0;
+        }
+        mDuration = value;
+        try {
+            value = Double.parseDouble(position);
+        } catch (NumberFormatException e) {
+            value = 0.0;
+        }
+        mPosition = value;
     }
 
     @Override
     public String getCatalog() {
-        return null;
+        return mCatalog;
     }
 
     @Override
@@ -48,7 +77,12 @@ public class Title implements ITitle {
 
     @Override
     public String getAlbum() {
-        return null;
+        return mAlbum;
+    }
+
+    @Override
+    public void clearArtist() {
+        mArtist = "";
     }
 
     @Override
@@ -74,5 +108,48 @@ public class Title implements ITitle {
     @Override
     public String getPlaybackTime() {
         return mPlaybackTime;
+    }
+
+    @Override
+    public Double getDuration() {
+        return mDuration;
+    }
+
+    @Override
+    public Double getPosition() {
+        return mPosition;
+    }
+
+    @Override
+    public Boolean getIsAlbum() {
+        return false;
+    }
+
+    @Override
+    public Bitmap getArtwork() {
+        return mArtwork;
+    }
+
+    @Override
+    public void setArtwork(Bitmap artwork) {
+        mArtwork = artwork;
+    }
+
+    @Override
+    public Boolean isCurrentTitle() {
+        return mIsCurrent;
+    }
+
+    @Override
+    public void setIsCurrentTitle(Boolean isCurrentTitle) {
+        mIsCurrent = isCurrentTitle;
+    }
+
+    @Override
+    public ITitle clone() {
+        ITitle result = new Title(mPlaylistId, mIndex, mCatalog, mComposer, mAlbum, mTitle, mArtist, mDiscNumber, mTrack, mPlaybackTime, mDuration.toString(), mPosition.toString());
+        result.setArtwork(mArtwork);
+        result.setIsCurrentTitle(mIsCurrent);
+        return result;
     }
 }

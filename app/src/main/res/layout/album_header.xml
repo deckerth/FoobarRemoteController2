@@ -16,68 +16,66 @@
         android:layout_marginEnd="8dp"
         android:minHeight="50dp"
         android:orientation="horizontal"
+        android:backgroundTint="?android:colorBackground"
         app:cardUseCompatPadding="true">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
 
-            <androidx.constraintlayout.widget.Guideline
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/guideline"
-                app:layout_constraintGuide_begin="10dp"
-                android:orientation="vertical"/>
 
-            <com.deckerth.thomas.foobarremotecontroller2.controls.Rectangle
-                android:id="@+id/marker"
-                android:layout_width="5dp"
-                android:layout_height="match_parent"
-                android:layout_marginLeft="5dp"
-                app:markerColor="?attr/colorPrimaryVariant"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toLeftOf="@id/guideline"
+            <ImageView
+                android:id="@+id/artwork"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:textAlignment="center"
+                android:textSize="20sp"
+                app:layout_constraintEnd_toStartOf="@id/composer"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"/>
 
             <TextView
-                android:id="@+id/track"
+                android:id="@+id/catalog"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="8dp"
-                android:text="@{title.getTrack()}"
+                android:text="@{title.getCatalog()}"
+                android:textAlignment="textStart"
+                android:textSize="8sp"
+                app:layout_constraintStart_toEndOf="@id/artwork"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/composer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:text="@{title.getComposer()}"
                 android:textAlignment="textStart"
                 android:textSize="8sp"
                 android:textStyle="bold"
-                app:layout_constraintLeft_toRightOf="@id/guideline"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"/>
+                app:layout_constraintStart_toEndOf="@id/artwork"
+                app:layout_constraintTop_toBottomOf="@id/catalog" />
 
             <TextView
                 android:id="@+id/album"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
                 android:layout_marginStart="8dp"
                 android:text="@{title.getAlbum()}"
                 android:textAlignment="textStart"
                 android:textSize="8sp"
                 android:textStyle="italic"
-                app:layout_constraintStart_toEndOf="@id/track"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <TextView
-                android:id="@+id/title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:text="@{title.getTitle()}"
-                android:textAlignment="textStart"
-                android:textSize="8sp"
-                app:layout_constraintStart_toEndOf="@id/track"
-                app:layout_constraintTop_toBottomOf="@id/album" />
+                app:layout_constraintStart_toEndOf="@id/artwork"
+                app:layout_constraintTop_toBottomOf="@id/composer" />
 
             <TextView
                 android:id="@+id/artist"
@@ -88,11 +86,10 @@
                 android:text="@{title.getArtist()}"
                 android:textAlignment="textStart"
                 android:maxLines="4"
-                android:ellipsize="end"
                 android:textSize="8sp"
-                app:layout_constraintStart_toEndOf="@id/track"
+                app:layout_constraintStart_toEndOf="@id/artwork"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/title" />
+                app:layout_constraintTop_toBottomOf="@id/album" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>

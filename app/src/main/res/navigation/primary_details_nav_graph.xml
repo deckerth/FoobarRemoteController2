@@ -8,7 +8,7 @@
     <fragment
         android:id="@+id/title_list_fragment"
         android:name="com.deckerth.thomas.foobarremotecontroller2.TitleListFragment"
-        android:label="TitleListFragment">
+        android:label="@string/title_title_list">
         <action
             android:id="@+id/show_title_detail"
             app:destination="@id/title_detail_fragment" />
@@ -16,7 +16,7 @@
     <fragment
         android:id="@+id/title_detail_fragment"
         android:name="com.deckerth.thomas.foobarremotecontroller2.TitleDetailFragment"
-        android:label="title_detail"
+        android:label="@string/title_title_detail"
         tools:layout="@layout/fragment_title_detail">
         <argument
             android:name="item_id"

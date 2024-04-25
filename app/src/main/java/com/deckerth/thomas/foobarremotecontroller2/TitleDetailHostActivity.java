@@ -3,12 +3,16 @@ package com.deckerth.thomas.foobarremotecontroller2;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
+import androidx.appcompat.widget.Toolbar;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
+import com.deckerth.thomas.foobarremotecontroller2.connector.PlayerAccess;
+import com.deckerth.thomas.foobarremotecontroller2.connector.PlaylistAccess;
 import com.deckerth.thomas.foobarremotecontroller2.databinding.ActivityTitleDetailBinding;
 
 public class TitleDetailHostActivity extends AppCompatActivity {
@@ -17,8 +21,22 @@ public class TitleDetailHostActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+
         ActivityTitleDetailBinding binding = ActivityTitleDetailBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        // assigning ID of the toolbar to a variable
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+
+        // using toolbar as ActionBar
+        setSupportActionBar(toolbar);
+
+        PlaylistAccess playlistAccess = PlaylistAccess.getInstance();
+        playlistAccess.getCurrentPlaylist(this);
+
+        PlayerAccess playerAccess = PlayerAccess.getInstance(this);
+        playerAccess.startPlayerObserver();
 
         NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.nav_host_fragment_title_detail);

@@ -19,7 +19,7 @@ public class PlaylistMediatorViewModel extends ViewModel {
         mPlaylist = new MediatorLiveData<>();
         mPlaylist.setValue(null);
 
-        // observe the changes  from the database and forward them
+        // observe the changes  from the web api and forward them
         LiveData<List<ITitle>> playlist = PlaylistViewModel.getInstance().getPlaylist();
         mPlaylist.addSource(playlist, mPlaylist::setValue);
 

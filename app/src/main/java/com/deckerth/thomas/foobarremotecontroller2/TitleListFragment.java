@@ -1,26 +1,28 @@
 package com.deckerth.thomas.foobarremotecontroller2;
 
-import android.content.ClipData;
-import android.content.ClipDescription;
-import android.os.Build;
+import static com.deckerth.thomas.foobarremotecontroller2.viewmodel.PlayerViewModel.PlaybackState.PAUSED;
+
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
-import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
+import com.deckerth.thomas.foobarremotecontroller2.adapter.TitleAdapter;
+import com.deckerth.thomas.foobarremotecontroller2.connector.PlayerAccess;
+import com.deckerth.thomas.foobarremotecontroller2.connector.PlaylistAccess;
 import com.deckerth.thomas.foobarremotecontroller2.databinding.FragmentTitleListBinding;
-import com.deckerth.thomas.foobarremotecontroller2.databinding.TitleListContentBinding;
 
 import com.deckerth.thomas.foobarremotecontroller2.model.ITitle;
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.PlayerMediatorViewModel;
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.PlayerViewModel;
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.PlaylistMediatorViewModel;
 
 import java.util.List;
@@ -38,7 +40,12 @@ public class TitleListFragment extends Fragment {
     private FragmentTitleListBinding mBinding;
 
     private PlaylistMediatorViewModel mViewModel;
-    private SimpleItemRecyclerViewAdapter mTitleAdapter;
+
+    private PlayerViewModel mPlayerViewModel;
+
+    private PlayerAccess mPlayerAccess;
+
+    private TitleAdapter mTitleAdapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -52,15 +59,93 @@ public class TitleListFragment extends Fragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        RecyclerView recyclerView = mBinding.titleList;
+        if (mViewModel == null)
+            mViewModel = new ViewModelProvider(this).get(PlaylistMediatorViewModel.class);
 
-        // Leaving this not using view binding as it relies on if the view is visible the current
-        // layout configuration (layout, layout-sw600dp)
+        RecyclerView recyclerView = mBinding.titleList;
         View itemDetailFragmentContainer = view.findViewById(R.id.title_detail_nav_container);
 
-        mViewModel = new ViewModelProvider(this).get(PlaylistMediatorViewModel.class);
-
         setupRecyclerView(recyclerView, itemDetailFragmentContainer);
+
+        mPlayerViewModel = PlayerViewModel.getInstance();
+        mPlayerViewModel.getArtwork().observe(getViewLifecycleOwner(), mBinding.artwork::setImageBitmap);
+        mPlayerViewModel.getComposer().observe(getViewLifecycleOwner(), mBinding.composer::setText);
+        mPlayerViewModel.getAlbum().observe(getViewLifecycleOwner(), mBinding.album::setText);
+        mPlayerViewModel.getTitle().observe(getViewLifecycleOwner(), mBinding.title::setText);
+        mPlayerViewModel.getArtist().observe(getViewLifecycleOwner(), mBinding.artist::setText);
+        mPlayerViewModel.getDiscNumber().observe(getViewLifecycleOwner(), mBinding.discNumber::setText);
+        mPlayerViewModel.getTrack().observe(getViewLifecycleOwner(), mBinding.track::setText);
+        mPlayerViewModel.getPlaybackTime().observe(getViewLifecycleOwner(), mBinding.playbackTime::setText);
+        mPlayerViewModel.getAlbum().observe(getViewLifecycleOwner(), mBinding.album::setText);
+        mPlayerViewModel.getPercentPlayed().observe(getViewLifecycleOwner(), mBinding.playbackProgress::setProgress);
+
+        mPlayerViewModel.getPlaybackState().observe(getViewLifecycleOwner(), new Observer<PlayerViewModel.PlaybackState>() {
+            @Override
+            public void onChanged(PlayerViewModel.PlaybackState state) {
+                switch (state) {
+                    case STOPPED:
+                        //stopButton.setEnabled(false);
+                        mBinding.play.setImageDrawable(getContext().getDrawable(android.R.drawable.ic_media_play));
+                    case PAUSED:
+                        mBinding.play.setImageDrawable(getContext().getDrawable(android.R.drawable.ic_media_play));
+                        break;
+                    case PLAYING:
+                        mBinding.play.setImageDrawable(getContext().getDrawable(android.R.drawable.ic_media_pause));
+                        break;
+                }
+            }
+        });
+
+        mPlayerAccess = PlayerAccess.getInstance(getActivity());
+        mBinding.back.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mPlayerAccess.PreviousTrack();
+            }
+        });
+
+        mBinding.next.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mPlayerAccess.NextTrack();
+            }
+        });
+
+        mBinding.play.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                switch (mPlayerViewModel.getPlaybackState().getValue()) {
+                    case STOPPED:
+                    case PAUSED:
+                        mPlayerAccess.StartPlayback();
+                        break;
+                    case PLAYING:
+                        mPlayerAccess.PausePlayback();
+                        break;
+                }
+            }
+        });
+
+        mBinding.swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                PlaylistAccess.getInstance().getCurrentPlaylist(getActivity());
+            }
+        });
+
+        mBinding.nowPlaying.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!mPlayerViewModel.getCatalog().getValue().isEmpty()) {
+                    Navigation.findNavController(v).navigate(R.id.show_title_detail);
+                }
+            }
+        });
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
     }
 
     private void setupRecyclerView(
@@ -68,114 +153,24 @@ public class TitleListFragment extends Fragment {
             View itemDetailFragmentContainer
     ) {
 
-        mTitleAdapter = new SimpleItemRecyclerViewAdapter( itemDetailFragmentContainer );
+        mTitleAdapter = new TitleAdapter(itemDetailFragmentContainer);
         recyclerView.setAdapter(mTitleAdapter);
+
+        if (mViewModel.getPlaylist().getValue() != null)
+            mTitleAdapter.setPlaylist(mViewModel.getPlaylist().getValue());
 
         mViewModel.getPlaylist().observe(getViewLifecycleOwner(), new Observer<List<ITitle>>() {
             @Override
             public void onChanged(List<ITitle> titles) {
                 if (titles != null) mTitleAdapter.setPlaylist(titles);
+                mBinding.swipeRefreshLayout.setRefreshing(false);
             }
         });
-
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         mBinding = null;
-    }
-
-    public static class SimpleItemRecyclerViewAdapter
-            extends RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder> {
-
-        List<? extends ITitle> mPlaylist;
-        private final View mItemDetailFragmentContainer;
-
-        public void setPlaylist(final List<? extends ITitle> playlist) {
-            if (mPlaylist == null) {
-                mPlaylist = playlist;
-                notifyItemRangeInserted(0, playlist.size());
-            } else {
-                DiffUtil.DiffResult result = DiffUtil.calculateDiff(new DiffUtil.Callback() {
-                    @Override
-                    public int getOldListSize() {
-                        return mPlaylist.size();
-                    }
-
-                    @Override
-                    public int getNewListSize() {
-                        return playlist.size();
-                    }
-
-                    @Override
-                    public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
-                        return ( mPlaylist.get(oldItemPosition).getComposer().contentEquals(playlist.get(newItemPosition).getComposer()) &&
-                                mPlaylist.get(oldItemPosition).getAlbum().contentEquals(playlist.get(newItemPosition).getAlbum()) &&
-                                mPlaylist.get(oldItemPosition).getTitle().contentEquals(playlist.get(newItemPosition).getTitle()) &&
-                                mPlaylist.get(oldItemPosition).getArtist().contentEquals(playlist.get(newItemPosition).getArtist()) );
-                    }
-
-                    @Override
-                    public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
-                        return areItemsTheSame(oldItemPosition, newItemPosition);
-                    }
-                });
-                mPlaylist = playlist;
-                result.dispatchUpdatesTo(this);
-            }
-        }
-
-        SimpleItemRecyclerViewAdapter(View itemDetailFragmentContainer) {
-            mItemDetailFragmentContainer = itemDetailFragmentContainer;
-        }
-
-        @Override
-        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-
-            TitleListContentBinding binding =
-                    TitleListContentBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
-            return new ViewHolder(binding);
-
-        }
-
-        @Override
-        public void onBindViewHolder(final ViewHolder holder, int position) {
-            holder.mIdView.setText(mPlaylist.get(position).getAlbum());
-            holder.mContentView.setText(mPlaylist.get(position).getTitle());
-
-            holder.itemView.setTag(mPlaylist.get(position));
-            holder.itemView.setOnClickListener(itemView -> {
-                ITitle item = (ITitle) itemView.getTag();
-                Bundle arguments = new Bundle();
-                arguments.putString(TitleDetailFragment.ARG_ITEM_ID, item.getIndex());
-                if (mItemDetailFragmentContainer != null) {
-                    Navigation.findNavController(mItemDetailFragmentContainer)
-                            .navigate(R.id.fragment_title_detail, arguments);
-                } else {
-                    Navigation.findNavController(itemView).navigate(R.id.show_title_detail, arguments);
-                }
-            });
-        }
-
-        @Override
-        public int getItemCount() {
-            if (mPlaylist == null)
-                return 0;
-            else
-                return mPlaylist.size();
-        }
-
-        class ViewHolder extends RecyclerView.ViewHolder {
-            final TextView mIdView;
-            final TextView mContentView;
-
-            ViewHolder(TitleListContentBinding binding) {
-                super(binding.getRoot());
-                mIdView = binding.idText;
-                mContentView = binding.content;
-            }
-
-        }
     }
 }

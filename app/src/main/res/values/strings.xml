@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">FoobarRemoteController2</string>
     <string name="title_activity_title_detail_host">TitleDetailHostActivity</string>
-    <string name="title_title_list">Playlist</string>
-    <string name="title_title_detail">Title Detail</string>
+    <string name="title_title_list">foobar2000 Remote Controller</string>
+    <string name="title_title_detail">Currently playing</string>
 </resources>

@@ -70,7 +70,6 @@ public class TitleDetailFragment extends Fragment {
         mPlayerViewModel.getTrack().observe(getViewLifecycleOwner(), mBinding.track::setText);
         mPlayerViewModel.getPlaybackTime().observe(getViewLifecycleOwner(), mBinding.playbackTime::setText);
         mPlayerViewModel.getLength().observe(getViewLifecycleOwner(), mBinding.length::setText);
-        mPlayerViewModel.getAlbum().observe(getViewLifecycleOwner(), mBinding.album::setText);
         mPlayerViewModel.getPercentPlayed().observe(getViewLifecycleOwner(), mBinding.playbackProgress::setProgress);
 
         mPlayerViewModel.getPlaybackState().observe(getViewLifecycleOwner(), new Observer<PlayerViewModel.PlaybackState>() {

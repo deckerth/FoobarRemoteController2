@@ -1,6 +1,10 @@
 package com.deckerth.thomas.foobarremotecontroller2;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.ImageButton;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
@@ -28,9 +32,18 @@ public class TitleDetailHostActivity extends AppCompatActivity {
 
         // assigning ID of the toolbar to a variable
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-
         // using toolbar as ActionBar
         setSupportActionBar(toolbar);
+
+        ImageButton settings = findViewById(R.id.settings);
+        Activity activity = this;
+        settings.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent settingsIntent = new Intent(activity, SettingsActivity.class);
+                startActivity(settingsIntent);
+            }
+        });
 
         PlaylistAccess playlistAccess = PlaylistAccess.getInstance();
         playlistAccess.getCurrentPlaylist(this);

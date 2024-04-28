@@ -3,6 +3,8 @@ package com.deckerth.thomas.foobarremotecontroller2.connector;
 import android.app.Activity;
 import android.graphics.Bitmap;
 
+import androidx.preference.PreferenceManager;
+
 import com.deckerth.thomas.foobarremotecontroller2.model.ITitle;
 import com.deckerth.thomas.foobarremotecontroller2.model.Playlist;
 import com.deckerth.thomas.foobarremotecontroller2.model.PlaylistEntity;
@@ -32,12 +34,10 @@ public class PlaylistAccess {
     private HTTPConnector mConnector;
     private Activity mActivity;
 
-    private PlaylistAccess() {
-        mConnector = new HTTPConnector();
-    }
-
     public void getCurrentPlaylist(Activity activity) {
         mActivity = activity;
+        if (mConnector == null)
+            this.mConnector = new HTTPConnector(PreferenceManager.getDefaultSharedPreferences(mActivity.getBaseContext()));
         new Thread(() -> {
             String response = queryPlaylists();
             Playlists playlists = parsePlaylists(response);

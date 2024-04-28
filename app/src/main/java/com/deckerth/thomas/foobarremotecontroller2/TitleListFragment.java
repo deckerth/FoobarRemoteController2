@@ -1,13 +1,13 @@
 package com.deckerth.thomas.foobarremotecontroller2;
 
-import static com.deckerth.thomas.foobarremotecontroller2.viewmodel.PlayerViewModel.PlaybackState.PAUSED;
-
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
+import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
@@ -20,6 +20,7 @@ import com.deckerth.thomas.foobarremotecontroller2.connector.PlayerAccess;
 import com.deckerth.thomas.foobarremotecontroller2.connector.PlaylistAccess;
 import com.deckerth.thomas.foobarremotecontroller2.databinding.FragmentTitleListBinding;
 
+import com.deckerth.thomas.foobarremotecontroller2.databinding.StubTitleListTitleClassicalBinding;
 import com.deckerth.thomas.foobarremotecontroller2.model.ITitle;
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.PlayerMediatorViewModel;
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.PlayerViewModel;
@@ -66,6 +67,11 @@ public class TitleListFragment extends Fragment {
         View itemDetailFragmentContainer = view.findViewById(R.id.title_detail_nav_container);
 
         setupRecyclerView(recyclerView, itemDetailFragmentContainer);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity().getBaseContext());
+/*
+        if (!prefs.getBoolean("show_composer", false))
+            mBinding.composer.setVisibility(View.GONE);
+*/
 
         mPlayerViewModel = PlayerViewModel.getInstance();
         mPlayerViewModel.getArtwork().observe(getViewLifecycleOwner(), mBinding.artwork::setImageBitmap);

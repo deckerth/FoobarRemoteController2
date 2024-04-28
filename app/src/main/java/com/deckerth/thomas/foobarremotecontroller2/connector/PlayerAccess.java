@@ -1,7 +1,10 @@
 package com.deckerth.thomas.foobarremotecontroller2.connector;
 
 import android.app.Activity;
+import android.content.Context;
 import android.graphics.Bitmap;
+
+import androidx.preference.PreferenceManager;
 
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.PlayerViewModel;
 
@@ -9,7 +12,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -21,6 +27,7 @@ public class PlayerAccess {
     public static PlayerAccess getInstance() {
         return INSTANCE;
     }
+
     public static PlayerAccess getInstance(Activity activity) {
         if (INSTANCE == null)
             INSTANCE = new PlayerAccess(activity);
@@ -34,12 +41,25 @@ public class PlayerAccess {
     public PlayerAccess(Activity mActivity) {
         this.mPlayerViewModel = PlayerViewModel.getInstance();
         this.mActivity = mActivity;
-        this.mConnector = new HTTPConnector();
+        this.mConnector = new HTTPConnector(PreferenceManager.getDefaultSharedPreferences(mActivity.getBaseContext()));
+    }
+
+    public Future<Boolean> ping() {
+        Callable<Boolean> pingTask = () -> {
+            HTTPConnector connector = new HTTPConnector(PreferenceManager.getDefaultSharedPreferences(mActivity.getBaseContext()));
+            return connector.ping("player?columns=%25catalog%25");
+        };
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        Future<Boolean> future = executor.submit(pingTask);
+        return future;
     }
 
     private String mLastPlayerState;
+    private Boolean mObserverIsRunning = false;
 
     public void startPlayerObserver() {
+
+        if (mObserverIsRunning) return;
 
         ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
@@ -49,6 +69,7 @@ public class PlayerAccess {
                 mActivity.runOnUiThread(() -> {
                     parsePlayerState(mLastPlayerState);
                     getArtwork();
+                    mObserverIsRunning = true;
                 });
             }
         };
@@ -90,7 +111,7 @@ public class PlayerAccess {
                         "columns": [
                             "7353 72726",
                             "Franck, César (1822-1890)",
-                            "Klavierquintett f-Moll",
+                            "Klavierquintett f-Moll", !! OPTIONAL may be just ""
                             "1. Molto moderato quasi lento - Allegro",
                             "Khatia Buniatishvili, Klavier / Gidon Kremer & Marija Nemanytė, Violine / Maxim Rysanov, Viola / Giedrė Dirvanauskaitė, Cello",
                             "?",
@@ -112,13 +133,17 @@ public class PlayerAccess {
                 mPlayerViewModel.setComposer(column);
                 column = columns.getString(2);
                 mPlayerViewModel.setAlbum(column);
-                column = columns.getString(3);
-                mPlayerViewModel.setTitle(column);
+                String title = columns.getString(3);
                 column = columns.getString(4);
                 mPlayerViewModel.setArtist(column);
                 column = columns.getString(5);
                 mPlayerViewModel.setDiscNumber(column);
                 column = columns.getString(6);
+                String track = columns.getString(6);
+                if (!title.equals(track))
+                    mPlayerViewModel.setTitle(title);
+                else
+                    mPlayerViewModel.setTitle("");
                 mPlayerViewModel.setTrack(column);
                 column = columns.getString(7);
                 mPlayerViewModel.setPlaybackTime(column);
@@ -127,7 +152,7 @@ public class PlayerAccess {
                 mPlayerViewModel.setIndex(activeItemObject.getString("index"));
                 mPlayerViewModel.setDuration(activeItemObject.getString("duration"));
                 mPlayerViewModel.setPosition(activeItemObject.getString("position"));
-             }
+            }
             mCurrentPlaylistId = activeItemObject.getString("playlistId");
             mCurrentIndex = activeItemObject.getString("index");
 
@@ -152,16 +177,20 @@ public class PlayerAccess {
 
     private String mCurrentCatalog = "";
     private String mLastCatalog = "";
+    private Bitmap mLastArtwork = null;
 
     private void getArtwork() {
         String currentCatalog = mPlayerViewModel.getCatalog().getValue();
+        Bitmap currentArtwork = mPlayerViewModel.getArtwork().getValue();
+        // monitor also the artwork so that it gets reloaded after a restart of the activity
         if (!currentCatalog.isEmpty() &&
-                !currentCatalog.equals(mLastCatalog)) {
+                (!currentCatalog.equals(mLastCatalog) || currentArtwork != mLastArtwork)) {
             mLastCatalog = mPlayerViewModel.getCatalog().getValue();
             new Thread(() -> {
                 Bitmap artwork = mConnector.getImage("artwork/" + mCurrentPlaylistId + "/" + mCurrentIndex);
                 mActivity.runOnUiThread(() -> {
                     mPlayerViewModel.setArtwork(artwork);
+                    mLastArtwork = artwork;
                 });
             }).start();
         }
@@ -203,7 +232,7 @@ public class PlayerAccess {
 
     public void PlayTrack(String playlistId, String index) {
         new Thread(() -> {
-            mConnector.postData("player/play/"+playlistId+"/"+index);
+            mConnector.postData("player/play/" + playlistId + "/" + index);
             getPlayerState();
         }).start();
     }

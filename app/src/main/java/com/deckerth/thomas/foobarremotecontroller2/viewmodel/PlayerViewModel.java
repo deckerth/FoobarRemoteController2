@@ -180,9 +180,16 @@ public class PlayerViewModel extends ViewModel {
             if (mPosition > 0 && mDuration > 0)
                 mPercentPlayed.setValue((int)(mPosition / mDuration * 100));
             if (mDuration > 0) {
-                Integer minutes = (int)(mDuration % 60);
-                Integer seconds = (int)(mDuration / 60);
-                mLength.setValue(minutes.toString()+":"+seconds.toString());
+                int duration = mDuration.intValue();
+                Integer seconds = (int)(duration % 60);
+                Integer minutes = (int)(duration / 60);
+                String secondsStr;
+                if (seconds<9)
+                    secondsStr = "0"+seconds.toString();
+                else {
+                    secondsStr = seconds.toString();
+                }
+                mLength.setValue(minutes.toString()+":"+secondsStr);
             } else
                 mLength.setValue("");
         } catch (NumberFormatException e) {

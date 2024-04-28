@@ -2,10 +2,11 @@ package com.deckerth.thomas.foobarremotecontroller2.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class Playlists {
 
-    private List<PlaylistEntity> mPlaylists = new ArrayList<>();
+    private final List<PlaylistEntity> mPlaylists = new ArrayList<>();
 
     public void clear() {
         mPlaylists.clear();
@@ -23,11 +24,11 @@ public class Playlists {
         if (mPlaylists == null)
             return "";
         else {
-            PlaylistEntity entity =  mPlaylists.stream().filter(entry -> entry.getIsCurrent()).findFirst().get();
-            if (entity == null)
+            Optional<PlaylistEntity> entity =  mPlaylists.stream().filter(entry -> entry.getIsCurrent()).findFirst();
+            if (!entity.isPresent())
                 return "";
             else
-                return entity.getPlaylistId();
+                return entity.get().getPlaylistId();
         }
     }
 

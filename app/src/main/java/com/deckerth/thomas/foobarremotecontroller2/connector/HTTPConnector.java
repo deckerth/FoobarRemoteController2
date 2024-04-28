@@ -1,7 +1,11 @@
 package com.deckerth.thomas.foobarremotecontroller2.connector;
 
+import android.app.Activity;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+
+import androidx.preference.PreferenceManager;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -10,6 +14,38 @@ import java.net.URL;
 
 public class HTTPConnector {
 
+    private SharedPreferences mPreferences;
+
+    public HTTPConnector(SharedPreferences preferences) {
+        this.mPreferences = preferences;
+    }
+
+    private String getServerAddress() {
+        return "http://"+mPreferences.getString("ip_address", "localhost")+":8880/api/";
+    }
+
+    public Boolean ping(String endpoint) {
+        try {
+            URL url;
+            HttpURLConnection urlConnection = null;
+            try {
+                url = new URL(getServerAddress() + endpoint);
+                //open a URL coonnection
+                urlConnection = (HttpURLConnection) url.openConnection();
+                InputStream in = urlConnection.getInputStream();
+                return true;
+            } catch (Exception e) {
+                return false;
+            } finally {
+                if (urlConnection != null) {
+                    urlConnection.disconnect();
+                }
+            }
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     public String getData(String endpoint) {
         // Fetch data from the API in the background.
         String result = "";
@@ -17,7 +53,7 @@ public class HTTPConnector {
             URL url;
             HttpURLConnection urlConnection = null;
             try {
-                url = new URL("http://192.168.178.137:8880/api/" + endpoint);
+                url = new URL(getServerAddress() + endpoint);
                 //open a URL coonnection
                 urlConnection = (HttpURLConnection) url.openConnection();
                 InputStream in = urlConnection.getInputStream();
@@ -51,7 +87,7 @@ public class HTTPConnector {
             URL url;
             HttpURLConnection urlConnection = null;
             try {
-                url = new URL("http://192.168.178.137:8880/api/" + endpoint);
+                url = new URL(getServerAddress() + endpoint);
                 //open a URL coonnection
                 urlConnection = (HttpURLConnection) url.openConnection();
                 InputStream in = urlConnection.getInputStream();
@@ -80,7 +116,7 @@ public class HTTPConnector {
             URL url;
             HttpURLConnection urlConnection = null;
             try {
-                url = new URL("http://192.168.178.137:8880/api/" + endpoint);
+                url = new URL(getServerAddress() + endpoint);
                 //open a URL coonnection
                 urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("POST");

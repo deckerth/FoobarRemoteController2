@@ -1,37 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?><!-- Adding the same root's ID for view binding as other layout configurations -->
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/title_list_container"
+<androidx.constraintlayout.widget.ConstraintLayout
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="200dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_marginStart="@dimen/container_horizontal_margin"
-    android:layout_marginEnd="@dimen/container_horizontal_margin">
-
-<!--
-    <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/now_playing"
-        android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:layout_marginStart="@dimen/container_horizontal_margin"
-        android:layout_marginEnd="@dimen/container_horizontal_margin"
-        app:layout_constraintBottom_toTopOf="@id/swipe_refresh_layout"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:layout="@layout/stub_title_list_title_classical" />
--->
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/now_playing"
-        android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:layout_marginStart="@dimen/container_horizontal_margin"
-        android:layout_marginEnd="@dimen/container_horizontal_margin"
-        app:layout_constraintBottom_toTopOf="@id/swipe_refresh_layout"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+    android:layout_marginEnd="@dimen/container_horizontal_margin"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline"
@@ -122,7 +96,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-             app:layout_constraintBottom_toTopOf="@id/track"
+            app:layout_constraintBottom_toTopOf="@id/track"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintLeft_toRightOf="@id/guideline"
             app:layout_constraintTop_toBottomOf="@id/disc_number" />
@@ -189,30 +163,5 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/play"
             app:layout_constraintTop_toBottomOf="@id/track" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-        android:id="@+id/swipe_refresh_layout"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginTop="@dimen/container_margin"
-        android:layout_marginBottom="@dimen/container_margin"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/now_playing">
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/title_list"
-            android:name="com.deckerth.thomas.foobarremotecontroller2.TitleListFragment"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="16dp"
-            android:layout_marginRight="16dp"
-            app:layoutManager="LinearLayoutManager"
-            tools:context="com.deckerth.thomas.foobarremotecontroller2.TitleDetailHostActivity"
-            tools:listitem="@layout/title_list_content" />
-    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

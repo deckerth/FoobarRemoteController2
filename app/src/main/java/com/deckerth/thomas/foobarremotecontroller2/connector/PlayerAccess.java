@@ -1,7 +1,7 @@
 package com.deckerth.thomas.foobarremotecontroller2.connector;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.Context;
 import android.graphics.Bitmap;
 
 import androidx.preference.PreferenceManager;
@@ -12,15 +12,13 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class PlayerAccess {
 
+    @SuppressLint("StaticFieldLeak")
     private static PlayerAccess INSTANCE;
 
 
@@ -34,24 +32,14 @@ public class PlayerAccess {
         return INSTANCE;
     }
 
-    private PlayerViewModel mPlayerViewModel;
-    private Activity mActivity;
-    private HTTPConnector mConnector;
+    private final PlayerViewModel mPlayerViewModel;
+    private final Activity mActivity;
+    private final HTTPConnector mConnector;
 
     public PlayerAccess(Activity mActivity) {
         this.mPlayerViewModel = PlayerViewModel.getInstance();
         this.mActivity = mActivity;
         this.mConnector = new HTTPConnector(PreferenceManager.getDefaultSharedPreferences(mActivity.getBaseContext()));
-    }
-
-    public Future<Boolean> ping() {
-        Callable<Boolean> pingTask = () -> {
-            HTTPConnector connector = new HTTPConnector(PreferenceManager.getDefaultSharedPreferences(mActivity.getBaseContext()));
-            return connector.ping("player?columns=%25catalog%25");
-        };
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        Future<Boolean> future = executor.submit(pingTask);
-        return future;
     }
 
     private String mLastPlayerState;
@@ -63,15 +51,13 @@ public class PlayerAccess {
 
         ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
-        final Runnable task = new Runnable() {
-            public void run() {
-                mLastPlayerState = mConnector.getData("player?columns=%25catalog%25,%25composer%25,%25album%25,%25title%25,%25artist%25,%25discnumber%25,%25track%25,%25playback_time%25");
-                mActivity.runOnUiThread(() -> {
-                    parsePlayerState(mLastPlayerState);
-                    getArtwork();
-                    mObserverIsRunning = true;
-                });
-            }
+        final Runnable task = () -> {
+            mLastPlayerState = mConnector.getData("player?columns=%25catalog%25,%25composer%25,%25album%25,%25title%25,%25artist%25,%25discnumber%25,%25track%25,%25playback_time%25");
+            mActivity.runOnUiThread(() -> {
+                parsePlayerState(mLastPlayerState);
+                getArtwork();
+                mObserverIsRunning = true;
+            });
         };
 
         // Schedule the task to run with an initial delay and then periodically
@@ -101,7 +87,6 @@ public class PlayerAccess {
 
             if (columns.length() == 0) {
                 mPlayerViewModel.ClearPlaybackState();
-                mCurrentCatalog = "";
                 mLastCatalog = "";
             } else {
 
@@ -128,7 +113,6 @@ public class PlayerAccess {
 
                 String column = columns.getString(0);
                 mPlayerViewModel.setCatalog(column);
-                mCurrentCatalog = column;
                 column = columns.getString(1);
                 mPlayerViewModel.setComposer(column);
                 column = columns.getString(2);
@@ -175,7 +159,6 @@ public class PlayerAccess {
         }
     }
 
-    private String mCurrentCatalog = "";
     private String mLastCatalog = "";
     private Bitmap mLastArtwork = null;
 
@@ -183,7 +166,7 @@ public class PlayerAccess {
         String currentCatalog = mPlayerViewModel.getCatalog().getValue();
         Bitmap currentArtwork = mPlayerViewModel.getArtwork().getValue();
         // monitor also the artwork so that it gets reloaded after a restart of the activity
-        if (!currentCatalog.isEmpty() &&
+        if (currentCatalog != null && !currentCatalog.isEmpty() &&
                 (!currentCatalog.equals(mLastCatalog) || currentArtwork != mLastArtwork)) {
             mLastCatalog = mPlayerViewModel.getCatalog().getValue();
             new Thread(() -> {
@@ -210,13 +193,6 @@ public class PlayerAccess {
         }).start();
     }
 
-    public void StopPlayback() {
-        new Thread(() -> {
-            mConnector.postData("player/stop");
-            getPlayerState();
-        }).start();
-    }
-
     public void PreviousTrack() {
         new Thread(() -> {
             mConnector.postData("player/previous");
@@ -225,9 +201,7 @@ public class PlayerAccess {
     }
 
     public void NextTrack() {
-        new Thread(() -> {
-            mConnector.postData("player/next");
-        }).start();
+        new Thread(() -> mConnector.postData("player/next")).start();
     }
 
     public void PlayTrack(String playlistId, String index) {

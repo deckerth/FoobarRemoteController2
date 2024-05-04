@@ -1,0 +1,24 @@
+<resources>
+    <string name="app_name">Foobar2000 Remote Controller</string>
+    <string name="title_activity_title_detail_host">Remote Controller</string>
+    <string name="title_title_list">Remote Controller</string>
+    <string name="title_title_detail">Wiedergabe</string>
+    <string name="title_activity_settings">SettingsActivity</string>
+
+    <string name="connection_header">Verbindung</string>
+    <string name="ip_address">IP-Adresse</string>
+    <string name="display_options">Ansicht</string>
+    <string name="theme_title">Thema</string>
+    <string name="title_layout_title">Albumlayout</string>
+    <string name="value_not_set">Nicht gesetzt</string>
+    <string name="contemporary_title">Künstler, Album, Komponist</string>
+    <string name="classical_title">Komponist, Album, Künstler</string>
+    <string name="restart_app">Die Layoutänderung wird erst nach dem Neustart der App vollständig wirksam.</string>
+    <string name="playlist">Playlist:</string>
+    <string name="settings">Einstellungen</string>
+    <string name="icons8"><![CDATA[Icons von <a href=\\\"https://icons8.com/\\\">Icons8]]></string>
+    <string name="light">Hell</string>
+    <string name="dark">Dunkel</string>
+    <string name="contemporary">Modern</string>
+    <string name="classical">Klassisch</string>
+</resources>

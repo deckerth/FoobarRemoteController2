@@ -2,7 +2,7 @@ package com.deckerth.thomas.foobarremotecontroller2.model;
 
 import android.graphics.Bitmap;
 
-import java.time.format.ResolverStyle;
+import androidx.annotation.NonNull;
 
 public class Title implements ITitle {
 
@@ -11,7 +11,7 @@ public class Title implements ITitle {
     protected final String mPlaylistId;
     protected final String mIndex;
     protected final String mComposer;
-    protected final String mAlbum;
+    protected String mAlbum;
     private final String mTitle;
     protected String mArtist;
     private final String mDiscNumber;
@@ -40,7 +40,7 @@ public class Title implements ITitle {
         this.mDiscNumber = set(mDiscNumber);
         this.mTrack = set(mTrack);
         this.mPlaybackTime = set(mPlaybackTime);
-        Double value;
+        double value;
         try {
             value = Double.parseDouble(duration);
         } catch (NumberFormatException e) {
@@ -96,6 +96,9 @@ public class Title implements ITitle {
     }
 
     @Override
+    public void clearAlbum() { mAlbum = ""; }
+
+    @Override
     public String getDiscNumber() {
         return mDiscNumber;
     }
@@ -145,6 +148,7 @@ public class Title implements ITitle {
         mIsCurrent = isCurrentTitle;
     }
 
+    @NonNull
     @Override
     public ITitle clone() {
         ITitle result = new Title(mPlaylistId, mIndex, mCatalog, mComposer, mAlbum, mTitle, mArtist, mDiscNumber, mTrack, mPlaybackTime, mDuration.toString(), mPosition.toString());

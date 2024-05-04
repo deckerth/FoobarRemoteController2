@@ -6,6 +6,8 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import java.util.Objects;
+
 public class PlayerViewModel extends ViewModel {
 
     private static PlayerViewModel INSTANCE = null;
@@ -83,7 +85,8 @@ public class PlayerViewModel extends ViewModel {
         mLength.setValue("");
     }
 
-    public LiveData<PlaybackState> getPlaybackState() {return mPlaybackState; };
+    public LiveData<PlaybackState> getPlaybackState() {return mPlaybackState; }
+
     public LiveData<String> getCatalog() { return mCatalog; }
     public LiveData<String> getComposer() { return mComposer; }
     public LiveData<String> getAlbum() { return mAlbum; }
@@ -171,7 +174,7 @@ public class PlayerViewModel extends ViewModel {
 
     public void setIndex(String value) {
         mIndex.setValue(value);
-        PlaylistViewModel.getInstance().setCurrentTitleIndex(mPlaylistId.getValue(), value);
+        Objects.requireNonNull(PlaylistViewModel.getInstance()).setCurrentTitleIndex(mPlaylistId.getValue(), value);
     }
 
     public void setDuration(String value) {
@@ -181,15 +184,15 @@ public class PlayerViewModel extends ViewModel {
                 mPercentPlayed.setValue((int)(mPosition / mDuration * 100));
             if (mDuration > 0) {
                 int duration = mDuration.intValue();
-                Integer seconds = (int)(duration % 60);
-                Integer minutes = (int)(duration / 60);
+                int seconds = duration % 60;
+                Integer minutes = duration / 60;
                 String secondsStr;
                 if (seconds<9)
-                    secondsStr = "0"+seconds.toString();
+                    secondsStr = "0"+ seconds;
                 else {
-                    secondsStr = seconds.toString();
+                    secondsStr = Integer.toString(seconds);
                 }
-                mLength.setValue(minutes.toString()+":"+secondsStr);
+                mLength.setValue(minutes +":"+secondsStr);
             } else
                 mLength.setValue("");
         } catch (NumberFormatException e) {

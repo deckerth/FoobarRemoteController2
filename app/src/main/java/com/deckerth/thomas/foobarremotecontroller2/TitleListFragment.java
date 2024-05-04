@@ -1,8 +1,10 @@
 package com.deckerth.thomas.foobarremotecontroller2;
 
+import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
@@ -14,19 +16,23 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.widget.PopupWindow;
 
+import com.deckerth.thomas.foobarremotecontroller2.adapter.PlaylistAdapter;
 import com.deckerth.thomas.foobarremotecontroller2.adapter.TitleAdapter;
 import com.deckerth.thomas.foobarremotecontroller2.connector.PlayerAccess;
 import com.deckerth.thomas.foobarremotecontroller2.connector.PlaylistAccess;
 import com.deckerth.thomas.foobarremotecontroller2.databinding.FragmentTitleListBinding;
 
-import com.deckerth.thomas.foobarremotecontroller2.databinding.StubTitleListTitleClassicalBinding;
 import com.deckerth.thomas.foobarremotecontroller2.model.ITitle;
-import com.deckerth.thomas.foobarremotecontroller2.viewmodel.PlayerMediatorViewModel;
+import com.deckerth.thomas.foobarremotecontroller2.model.PlaylistEntity;
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.PlayerViewModel;
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.PlaylistMediatorViewModel;
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.PlaylistViewModel;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * A fragment representing a list of Playlist. This fragment
@@ -40,16 +46,14 @@ public class TitleListFragment extends Fragment {
 
     private FragmentTitleListBinding mBinding;
 
-    private PlaylistMediatorViewModel mViewModel;
+    private PlaylistMediatorViewModel mPlaylistViewModel;
 
     private PlayerViewModel mPlayerViewModel;
-
-    private PlayerAccess mPlayerAccess;
 
     private TitleAdapter mTitleAdapter;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         mBinding = FragmentTitleListBinding.inflate(inflater, container, false);
         return mBinding.getRoot();
@@ -57,120 +61,79 @@ public class TitleListFragment extends Fragment {
     }
 
     @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+    public void onStart() {
+        super.onStart();
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(requireActivity().getBaseContext());
+        if (prefs.getString("title_layout", "contemporary").equals("classical"))
+            getParentFragmentManager().beginTransaction()
+                    .replace(R.id.now_playing, new TitleListClassicalTitleFragment())
+                    .commit();
+        else
+            getParentFragmentManager().beginTransaction()
+                    .replace(R.id.now_playing, new TitleListPopTitleFragment())
+                    .commit();
 
-        if (mViewModel == null)
-            mViewModel = new ViewModelProvider(this).get(PlaylistMediatorViewModel.class);
-
-        RecyclerView recyclerView = mBinding.titleList;
-        View itemDetailFragmentContainer = view.findViewById(R.id.title_detail_nav_container);
-
-        setupRecyclerView(recyclerView, itemDetailFragmentContainer);
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity().getBaseContext());
-/*
-        if (!prefs.getBoolean("show_composer", false))
-            mBinding.composer.setVisibility(View.GONE);
-*/
-
-        mPlayerViewModel = PlayerViewModel.getInstance();
-        mPlayerViewModel.getArtwork().observe(getViewLifecycleOwner(), mBinding.artwork::setImageBitmap);
-        mPlayerViewModel.getComposer().observe(getViewLifecycleOwner(), mBinding.composer::setText);
-        mPlayerViewModel.getAlbum().observe(getViewLifecycleOwner(), mBinding.album::setText);
-        mPlayerViewModel.getTitle().observe(getViewLifecycleOwner(), mBinding.title::setText);
-        mPlayerViewModel.getArtist().observe(getViewLifecycleOwner(), mBinding.artist::setText);
-        mPlayerViewModel.getDiscNumber().observe(getViewLifecycleOwner(), mBinding.discNumber::setText);
-        mPlayerViewModel.getTrack().observe(getViewLifecycleOwner(), mBinding.track::setText);
-        mPlayerViewModel.getPlaybackTime().observe(getViewLifecycleOwner(), mBinding.playbackTime::setText);
-        mPlayerViewModel.getAlbum().observe(getViewLifecycleOwner(), mBinding.album::setText);
-        mPlayerViewModel.getPercentPlayed().observe(getViewLifecycleOwner(), mBinding.playbackProgress::setProgress);
-
-        mPlayerViewModel.getPlaybackState().observe(getViewLifecycleOwner(), new Observer<PlayerViewModel.PlaybackState>() {
-            @Override
-            public void onChanged(PlayerViewModel.PlaybackState state) {
-                switch (state) {
-                    case STOPPED:
-                        //stopButton.setEnabled(false);
-                        mBinding.play.setImageDrawable(getContext().getDrawable(android.R.drawable.ic_media_play));
-                    case PAUSED:
-                        mBinding.play.setImageDrawable(getContext().getDrawable(android.R.drawable.ic_media_play));
-                        break;
-                    case PLAYING:
-                        mBinding.play.setImageDrawable(getContext().getDrawable(android.R.drawable.ic_media_pause));
-                        break;
-                }
-            }
-        });
-
-        mPlayerAccess = PlayerAccess.getInstance(getActivity());
-        mBinding.back.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mPlayerAccess.PreviousTrack();
-            }
-        });
-
-        mBinding.next.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mPlayerAccess.NextTrack();
-            }
-        });
-
-        mBinding.play.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                switch (mPlayerViewModel.getPlaybackState().getValue()) {
-                    case STOPPED:
-                    case PAUSED:
-                        mPlayerAccess.StartPlayback();
-                        break;
-                    case PLAYING:
-                        mPlayerAccess.PausePlayback();
-                        break;
-                }
-            }
-        });
-
-        mBinding.swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                PlaylistAccess.getInstance().getCurrentPlaylist(getActivity());
-            }
-        });
-
-        mBinding.nowPlaying.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!mPlayerViewModel.getCatalog().getValue().isEmpty()) {
-                    Navigation.findNavController(v).navigate(R.id.show_title_detail);
-                }
-            }
-        });
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
+    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        if (mPlaylistViewModel == null)
+            mPlaylistViewModel = new ViewModelProvider(this).get(PlaylistMediatorViewModel.class);
+
+        RecyclerView recyclerView = mBinding.titleList;
+
+        setupRecyclerView(recyclerView);
+
+        mPlayerViewModel = PlayerViewModel.getInstance();
+
+        Objects.requireNonNull(mBinding.swipeRefreshLayout).setOnRefreshListener(() -> PlaylistAccess.getInstance().getCurrentPlaylist(getActivity()));
+
+        Objects.requireNonNull(PlaylistViewModel.getInstance()).getDisplayedPlaylist().observe(getViewLifecycleOwner(), playlist -> {
+            if (playlist != null)
+                Objects.requireNonNull(mBinding.playlistName).setText(playlist.getName());
+        });
+
+        Objects.requireNonNull(mBinding.choosePlaylist).setOnClickListener(this::showPlaylistsPopup);
+
+        Objects.requireNonNull(mBinding.nowPlaying).setOnClickListener(v -> {
+            if (!Objects.requireNonNull(mPlayerViewModel.getCatalog().getValue()).isEmpty()) {
+                Navigation.findNavController(v).navigate(R.id.show_title_detail);
+            }
+        });
     }
 
-    private void setupRecyclerView(
-            RecyclerView recyclerView,
-            View itemDetailFragmentContainer
-    ) {
+    private void showPlaylistsPopup(View anchorView) {
+        @SuppressLint("InflateParams") View popupView = getLayoutInflater().inflate(R.layout.playlist_chooser, null);
+        PopupWindow popupWindow = new PopupWindow(popupView,
+                WindowManager.LayoutParams.WRAP_CONTENT,
+                WindowManager.LayoutParams.WRAP_CONTENT,
+                true); // Focusable
 
-        mTitleAdapter = new TitleAdapter(itemDetailFragmentContainer);
+        RecyclerView playlistsView = popupView.findViewById(R.id.playlists);
+
+        PlaylistAdapter playlistAdapter = new PlaylistAdapter(popupWindow);
+        playlistAdapter.setPlaylists(Objects.requireNonNull(PlaylistViewModel.getInstance()).getPlaylists().getValue());
+
+        playlistsView.setAdapter(playlistAdapter);
+
+        // Show the popup anchored to the button
+        popupWindow.showAsDropDown(anchorView);
+    }
+
+    private void setupRecyclerView( RecyclerView recyclerView ) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(requireContext());
+
+        mTitleAdapter = new TitleAdapter(prefs.getString("title_layout", "classical").equals("classical"));
         recyclerView.setAdapter(mTitleAdapter);
 
-        if (mViewModel.getPlaylist().getValue() != null)
-            mTitleAdapter.setPlaylist(mViewModel.getPlaylist().getValue());
+        if (mPlaylistViewModel.getPlaylist().getValue() != null)
+            mTitleAdapter.setPlaylist(mPlaylistViewModel.getPlaylist().getValue());
 
-        mViewModel.getPlaylist().observe(getViewLifecycleOwner(), new Observer<List<ITitle>>() {
-            @Override
-            public void onChanged(List<ITitle> titles) {
-                if (titles != null) mTitleAdapter.setPlaylist(titles);
-                mBinding.swipeRefreshLayout.setRefreshing(false);
-            }
+        mPlaylistViewModel.getPlaylist().observe(getViewLifecycleOwner(), titles -> {
+            if (titles != null) mTitleAdapter.setPlaylist(titles);
+            Objects.requireNonNull(mBinding.swipeRefreshLayout).setRefreshing(false);
         });
     }
 

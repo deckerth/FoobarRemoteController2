@@ -13,16 +13,32 @@ public class PlaylistMediatorViewModel extends ViewModel {
 
     private final MediatorLiveData<List<ITitle>> mPlaylist;
 
-    private PlaylistEntity mPlaylistId;
+    private final MediatorLiveData<PlaylistEntity> mDisplayedPlaylist;
+
+    private final MediatorLiveData<List<PlaylistEntity>> mPlaylists;
 
     public PlaylistMediatorViewModel() {
         mPlaylist = new MediatorLiveData<>();
         mPlaylist.setValue(null);
 
+        mDisplayedPlaylist = new MediatorLiveData<>();
+        mDisplayedPlaylist.setValue(null);
+
+        mPlaylists = new MediatorLiveData<>();
+        mPlaylists.setValue(null);
+
+        PlaylistViewModel viewModel = PlaylistViewModel.getInstance();
+
         // observe the changes  from the web api and forward them
-        LiveData<List<ITitle>> playlist = PlaylistViewModel.getInstance().getPlaylist();
+        assert viewModel != null;
+        LiveData<List<ITitle>> playlist = viewModel.getPlaylist();
         mPlaylist.addSource(playlist, mPlaylist::setValue);
 
+        LiveData<PlaylistEntity> displayedPlaylist = viewModel.getDisplayedPlaylist();
+        mDisplayedPlaylist.addSource(displayedPlaylist, mDisplayedPlaylist::setValue);
+
+        LiveData<List<PlaylistEntity>> playlists = viewModel.getPlaylists();
+        mPlaylists.addSource(playlists, mPlaylists::setValue);
     }
 
     public LiveData<List<ITitle>> getPlaylist() {

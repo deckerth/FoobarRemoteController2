@@ -7,7 +7,7 @@ public class Playlist {
 
     private final PlaylistEntity mPlaylistEntity;
 
-    private List<ITitle> mTitles = new ArrayList<ITitle>();
+    private final List<ITitle> mTitles = new ArrayList<>();
 
     public Playlist(PlaylistEntity mPlaylistEntity) {
         this.mPlaylistEntity = mPlaylistEntity;

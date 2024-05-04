@@ -8,7 +8,6 @@
     android:layout_marginStart="@dimen/container_horizontal_margin"
     android:layout_marginEnd="@dimen/container_horizontal_margin">
 
-<!--
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/now_playing"
         android:layout_width="match_parent"
@@ -19,178 +18,42 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:layout="@layout/stub_title_list_title_classical" />
--->
+        tools:layout="@layout/fragment_title_list_title_classical" />
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/now_playing"
-        android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:layout_marginStart="@dimen/container_horizontal_margin"
-        android:layout_marginEnd="@dimen/container_horizontal_margin"
+    <TextView
+        android:id="@+id/playlist"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/playlist"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="@dimen/container_margin"
         app:layout_constraintBottom_toTopOf="@id/swipe_refresh_layout"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/now_playing"/>
 
-        <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/guideline"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            app:layout_constraintGuide_begin="120dp" />
+    <TextView
+        android:id="@+id/playlist_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/container_margin"
+        android:layout_marginStart="@dimen/container_margin"
+        android:layout_marginBottom="@dimen/container_margin"
+        app:layout_constraintBottom_toTopOf="@id/swipe_refresh_layout"
+        app:layout_constraintLeft_toRightOf="@id/playlist"
+        app:layout_constraintTop_toBottomOf="@id/now_playing"/>
 
-        <ImageView
-            android:id="@+id/artwork"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="20dp"
-            android:layout_marginEnd="8dp"
-
-            app:layout_constraintRight_toLeftOf="@id/guideline"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/composer"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:textAlignment="center"
-            android:textSize="12sp"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toTopOf="@id/album"
-            app:layout_constraintLeft_toRightOf="@id/guideline"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/album"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginTop="8dp"
-            android:textAlignment="center"
-            android:textSize="12sp"
-            android:textStyle="italic"
-            app:layout_constraintBottom_toTopOf="@id/title"
-            app:layout_constraintLeft_toRightOf="@id/guideline"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/composer"
-            app:layout_goneMarginTop="16dp"/>
-
-        <TextView
-            android:id="@+id/title"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginTop="8dp"
-            android:textAlignment="center"
-            android:textSize="12sp"
-            app:layout_constraintBottom_toTopOf="@id/artist"
-            app:layout_constraintLeft_toRightOf="@id/guideline"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/album" />
-
-        <TextView
-            android:id="@+id/artist"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
-            android:textAlignment="center"
-            android:textSize="11sp"
-            app:layout_constraintBottom_toTopOf="@id/playback_time"
-            app:layout_constraintLeft_toRightOf="@id/guideline"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/title" />
-
-        <TextView
-            android:id="@+id/disc_number"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:textAlignment="center"
-            android:textSize="12sp"
-            app:layout_constraintBottom_toTopOf="@id/playback_progress"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toLeftOf="@id/guideline"
-            app:layout_constraintTop_toBottomOf="@id/artwork" />
-
-        <ProgressBar
-            android:id="@+id/playback_progress"
-            style="?android:attr/progressBarStyleHorizontal"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-             app:layout_constraintBottom_toTopOf="@id/track"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintLeft_toRightOf="@id/guideline"
-            app:layout_constraintTop_toBottomOf="@id/disc_number" />
-
-        <TextView
-            android:id="@+id/track"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:textAlignment="center"
-            android:textSize="12sp"
-            app:layout_constraintBottom_toTopOf="@id/playback_time"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toLeftOf="@id/guideline"
-            app:layout_constraintTop_toBottomOf="@id/disc_number" />
-
-        <TextView
-            android:id="@+id/playback_time"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:textAlignment="center"
-            android:textSize="12sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toLeftOf="@id/guideline"
-            app:layout_constraintTop_toBottomOf="@id/disc_number" />
-
-        <ImageButton
-            android:id="@+id/back"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="?android:colorBackground"
-            android:src="@android:drawable/ic_media_previous"
-            android:textAlignment="center"
-            android:textSize="20sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toRightOf="@id/guideline"
-            app:layout_constraintRight_toLeftOf="@id/play"
-            app:layout_constraintTop_toBottomOf="@id/track" />
-
-        <ImageButton
-            android:id="@+id/play"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="?android:colorBackground"
-            android:src="@android:drawable/ic_media_play"
-            android:textAlignment="center"
-            android:textSize="20sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/next"
-            app:layout_constraintStart_toEndOf="@id/back"
-            app:layout_constraintTop_toBottomOf="@id/track" />
-
-        <ImageButton
-            android:id="@+id/next"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="?android:colorBackground"
-            android:src="@android:drawable/ic_media_next"
-            android:textAlignment="center"
-            android:textSize="20sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/play"
-            app:layout_constraintTop_toBottomOf="@id/track" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    <ImageButton
+        android:id="@+id/choose_playlist"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/container_margin"
+        android:layout_marginStart="@dimen/container_margin"
+        android:layout_marginBottom="@dimen/container_margin"
+        android:background="?android:colorBackground"
+        android:src="@android:drawable/ic_menu_more"
+        app:layout_constraintBottom_toTopOf="@id/swipe_refresh_layout"
+        app:layout_constraintLeft_toRightOf="@id/playlist_name"
+        app:layout_constraintTop_toBottomOf="@id/now_playing"/>
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipe_refresh_layout"
@@ -201,7 +64,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/now_playing">
+        app:layout_constraintTop_toBottomOf="@id/playlist">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/title_list"

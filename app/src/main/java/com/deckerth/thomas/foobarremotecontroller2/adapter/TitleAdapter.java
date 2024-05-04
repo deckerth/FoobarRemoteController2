@@ -1,23 +1,18 @@
 package com.deckerth.thomas.foobarremotecontroller2.adapter;
 
-import android.graphics.Bitmap;
-import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.TextView;
 
-import androidx.databinding.DataBindingUtil;
-import androidx.navigation.Navigation;
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.deckerth.thomas.foobarremotecontroller2.R;
-import com.deckerth.thomas.foobarremotecontroller2.TitleDetailFragment;
 import com.deckerth.thomas.foobarremotecontroller2.connector.PlayerAccess;
 import com.deckerth.thomas.foobarremotecontroller2.controls.Rectangle;
-import com.deckerth.thomas.foobarremotecontroller2.databinding.AlbumHeaderBinding;
+import com.deckerth.thomas.foobarremotecontroller2.databinding.AlbumHeaderClassicalBinding;
+import com.deckerth.thomas.foobarremotecontroller2.databinding.AlbumHeaderPopBinding;
 import com.deckerth.thomas.foobarremotecontroller2.databinding.TitleListContentBinding;
 import com.deckerth.thomas.foobarremotecontroller2.model.ITitle;
 
@@ -30,16 +25,12 @@ public class TitleAdapter
     private static final int TYPE_TRACK = 2;
 
     List<? extends ITitle> mPlaylist;
-    private final View mItemDetailFragmentContainer;
+
+    private final Boolean mClassicalLayout;
 
     private Boolean compare(String a, String b) {
-        if (a == null || b == null)
-            return true;
-        else if (a != null && b != null && a.equals(b))
-            return true;
-        else
-            return false;
-    }
+        return (a == null && b == null) || (a != null && a.equals(b));
+   }
 
     public void setPlaylist(final List<? extends ITitle> playlist) {
         if (mPlaylist == null) {
@@ -72,14 +63,10 @@ public class TitleAdapter
                 public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
                     ITitle oldTitle = mPlaylist.get(oldItemPosition);
                     ITitle newTitle = playlist.get(newItemPosition);
-                    Boolean same = areItemsTheSame(oldItemPosition, newItemPosition) && (
+                    return areItemsTheSame(oldItemPosition, newItemPosition) && (
                             (oldTitle.getArtwork() == null && newTitle.getArtwork() == null) ||
                                     (oldTitle.getArtwork() != null && newTitle.getArtwork() != null)) &&
                             oldTitle.isCurrentTitle() == newTitle.isCurrentTitle();
-                    if (same)
-                        return true;
-                    else
-                        return false;
                 }
             });
             mPlaylist = playlist;
@@ -87,8 +74,8 @@ public class TitleAdapter
         }
     }
 
-    public TitleAdapter(View itemDetailFragmentContainer) {
-        mItemDetailFragmentContainer = itemDetailFragmentContainer;
+    public TitleAdapter(Boolean isClassicalLayout) {
+        mClassicalLayout = isClassicalLayout;
     }
 
     @Override
@@ -99,33 +86,29 @@ public class TitleAdapter
             return TYPE_TRACK;
     }
 
+    @NonNull
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-/*
-        TitleListContentBinding binding;
-        if (viewType == TYPE_ALBUM)
-            binding = DataBindingUtil
-                    .inflate(LayoutInflater.from(parent.getContext()), R.layout.title_list_content,
-                            parent, false);
-        else
-            binding = DataBindingUtil
-                    .inflate(LayoutInflater.from(parent.getContext()), R.layout.title_list_content,
-                            parent, false);
-*/
-
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         if (viewType == TYPE_TRACK) {
             TitleListContentBinding titleBinding =
                     TitleListContentBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
-            return new TitleAdapter.TitleViewHolder(titleBinding);
+            return new TitleViewHolder(titleBinding);
         } else {
-            AlbumHeaderBinding albumBinding =
-                    AlbumHeaderBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
-            return new TitleAdapter.AlbumViewHolder(albumBinding);
+            if (mClassicalLayout) {
+                AlbumHeaderClassicalBinding albumBinding =
+                        AlbumHeaderClassicalBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
+                return new ClassicalAlbumViewHolder(albumBinding);
+            } else {
+                AlbumHeaderPopBinding albumBinding =
+                        AlbumHeaderPopBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
+                return new PopAlbumViewHolder(albumBinding);
+            }
+
         }
     }
 
     @Override
-    public void onBindViewHolder(final RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final RecyclerView.ViewHolder holder, int position) {
 
         int viewType = getItemViewType(position);
 
@@ -133,10 +116,17 @@ public class TitleAdapter
 
         switch (viewType) {
             case TYPE_ALBUM:
-                AlbumViewHolder albumHolder = (AlbumViewHolder) holder;
-                albumHolder.mBinding.setTitle(title);
-                if (title.getArtwork() != null)
-                    albumHolder.mArtwork.setImageBitmap(title.getArtwork());
+                if (mClassicalLayout) {
+                    ClassicalAlbumViewHolder albumHolder = (ClassicalAlbumViewHolder) holder;
+                    albumHolder.mBinding.setTitle(title);
+                    if (title.getArtwork() != null)
+                        albumHolder.mArtwork.setImageBitmap(title.getArtwork());
+                } else {
+                    PopAlbumViewHolder albumHolder = (PopAlbumViewHolder) holder;
+                    albumHolder.mBinding.setTitle(title);
+                    if (title.getArtwork() != null)
+                        albumHolder.mArtwork.setImageBitmap(title.getArtwork());
+                }
                 break;
             case TYPE_TRACK:
                 TitleViewHolder titleHolder = (TitleViewHolder) holder;
@@ -145,7 +135,6 @@ public class TitleAdapter
                     titleHolder.mMarker.setVisibility(View.VISIBLE);
                 else
                     titleHolder.mMarker.setVisibility(View.GONE);
-                break;
         }
 
         holder.itemView.setTag(mPlaylist.get(position));
@@ -153,16 +142,6 @@ public class TitleAdapter
             ITitle item = (ITitle) itemView.getTag();
             if (!item.getIsAlbum())
                 PlayerAccess.getInstance().PlayTrack(item.getPlaylistId(), item.getIndex());
-/*
-            Bundle arguments = new Bundle();
-            arguments.putString(TitleDetailFragment.ARG_ITEM_ID, item.getIndex());
-            if (mItemDetailFragmentContainer != null) {
-                Navigation.findNavController(mItemDetailFragmentContainer)
-                        .navigate(R.id.fragment_title_detail, arguments);
-            } else {
-                Navigation.findNavController(itemView).navigate(R.id.show_title_detail, arguments);
-            }
-*/
         });
     }
 
@@ -174,7 +153,7 @@ public class TitleAdapter
             return mPlaylist.size();
     }
 
-    class TitleViewHolder extends RecyclerView.ViewHolder {
+    static class TitleViewHolder extends RecyclerView.ViewHolder {
         final TitleListContentBinding mBinding;
         final Rectangle mMarker;
 
@@ -185,16 +164,26 @@ public class TitleAdapter
         }
     }
 
-    class AlbumViewHolder extends RecyclerView.ViewHolder {
-        final AlbumHeaderBinding mBinding;
+    static class ClassicalAlbumViewHolder extends RecyclerView.ViewHolder {
+        final AlbumHeaderClassicalBinding mBinding;
         final ImageView mArtwork;
 
-        AlbumViewHolder(AlbumHeaderBinding binding) {
+        ClassicalAlbumViewHolder(AlbumHeaderClassicalBinding binding) {
             super(binding.getRoot());
             mBinding = binding;
             mArtwork = binding.artwork;
         }
+    }
 
+    static class PopAlbumViewHolder extends RecyclerView.ViewHolder {
+        final AlbumHeaderPopBinding mBinding;
+        final ImageView mArtwork;
+
+        PopAlbumViewHolder(AlbumHeaderPopBinding binding) {
+            super(binding.getRoot());
+            mBinding = binding;
+            mArtwork = binding.artwork;
+        }
     }
 
 }

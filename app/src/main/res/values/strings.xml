@@ -1,27 +1,23 @@
 <resources>
-    <string name="app_name">FoobarRemoteController2</string>
-    <string name="title_activity_title_detail_host">TitleDetailHostActivity</string>
+    <string name="app_name">Foobar2000 Remote Controller</string>
+    <string name="title_activity_title_detail_host">Remote Controller</string>
     <string name="title_title_list">Remote Controller</string>
     <string name="title_title_detail">Currently playing</string>
     <string name="title_activity_settings">SettingsActivity</string>
-
-    <!-- Preference Titles -->
-    <string name="messages_header">Messages</string>
-    <string name="sync_header">Sync</string>
-
-    <!-- Messages Preferences -->
-    <string name="signature_title">Your signature</string>
-    <string name="reply_title">Default reply action</string>
-
-    <!-- Sync Preferences -->
-    <string name="sync_title">Sync email periodically</string>
-    <string name="attachment_title">Download incoming attachments</string>
-    <string name="attachment_summary_on">Automatically download attachments for incoming emails
-    </string>
-    <string name="attachment_summary_off">Only download attachments when manually requested</string>
     <string name="connection_header">Connection</string>
     <string name="ip_address">IP Address</string>
     <string name="display_options">View options</string>
-    <string name="show_composer">Display composer</string>
     <string name="theme_title">Theme</string>
+    <string name="title_layout_title">Album layout</string>
+    <string name="value_not_set">Not set</string>
+    <string name="contemporary_title">Artist, album, composer</string>
+    <string name="classical_title">Composer, album, artist</string>
+    <string name="restart_app">Restart app to change the title layout</string>
+    <string name="playlist">Playlist:</string>
+    <string name="settings">Settings</string>
+    <string name="icons8"><![CDATA[Icons by <a href=\\\"https://icons8.com/\\\">Icons8]]></string>
+    <string name="light">Light</string>
+    <string name="dark">Dark</string>
+    <string name="contemporary">Contemporary</string>
+    <string name="classical">Classical</string>
 </resources>

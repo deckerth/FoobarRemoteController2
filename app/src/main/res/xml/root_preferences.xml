@@ -10,13 +10,16 @@
     </PreferenceCategory>
 
     <PreferenceCategory app:title="@string/display_options">
-        <SwitchPreferenceCompat
-            app:defaultValue="true"
-            app:key="show_composer"
-            app:title="@string/show_composer"
-            app:useSimpleSummaryProvider="true" />
 
-         <ListPreference
+        <ListPreference
+            app:defaultValue="contemporary"
+            app:entries="@array/title_layout_entries"
+            app:entryValues="@array/title_layout_values"
+            app:key="title_layout"
+            app:title="@string/title_layout_title"
+            app:useSimpleSummaryProvider="false" />
+
+        <ListPreference
             app:defaultValue="dark"
             app:entries="@array/theme_entries"
             app:entryValues="@array/theme_values"

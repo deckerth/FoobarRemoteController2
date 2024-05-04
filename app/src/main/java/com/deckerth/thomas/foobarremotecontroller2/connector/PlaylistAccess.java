@@ -1,5 +1,6 @@
 package com.deckerth.thomas.foobarremotecontroller2.connector;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.graphics.Bitmap;
 
@@ -20,9 +21,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class PlaylistAccess {
 
+    @SuppressLint("StaticFieldLeak")
     private static PlaylistAccess INSTANCE;
 
     public static PlaylistAccess getInstance() {
@@ -38,24 +41,39 @@ public class PlaylistAccess {
         mActivity = activity;
         if (mConnector == null)
             this.mConnector = new HTTPConnector(PreferenceManager.getDefaultSharedPreferences(mActivity.getBaseContext()));
-        new Thread(() -> {
-            String response = queryPlaylists();
-            Playlists playlists = parsePlaylists(response);
-            String current = playlists.getCurrentPlaylist();
-            if (!current.isEmpty()) {
-                getPlaylist(new PlaylistEntity(current, true));
-            }
-        }).start();
+        PlaylistEntity displayedPlaylist = Objects.requireNonNull(PlaylistViewModel.getInstance()).getDisplayedPlaylist().getValue();
+        if (displayedPlaylist == null)
+            new Thread(() -> {
+                String response = queryPlaylists();
+                Playlists playlists = parsePlaylists(response);
+                PlaylistEntity current = playlists.getCurrentPlaylist();
+                if (current != null) {
+                    getPlaylist(current);
+                }
+
+                try {
+                    mActivity.runOnUiThread(() -> {
+                        PlaylistViewModel viewModel = PlaylistViewModel.getInstance();
+                        viewModel.setPlaylists(playlists.getPlaylists());
+                    });
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }).start();
+        else
+            new Thread(() -> getPlaylist(displayedPlaylist)).start();
     }
 
-    private void getPlaylist(PlaylistEntity playlistEntity) {
+    public void getPlaylist(PlaylistEntity playlistEntity) {
         new Thread(() -> {
             String response = mConnector.getData("playlists/" + playlistEntity.getPlaylistId() +
                     "/items/0%3A100?columns=%25catalog%25,%25composer%25,%25album%25,%25title%25,%25artist%25,%25discnumber%25,%25track%25,%25length%25");
             try {
                 mActivity.runOnUiThread(() -> {
                     Playlist playlist = parsePlaylist(response, playlistEntity);
-                    PlaylistViewModel.getInstance().setPlaylist(playlist);
+                    PlaylistViewModel viewModel = PlaylistViewModel.getInstance();
+                    Objects.requireNonNull(viewModel).setDisplayedPlaylist(playlistEntity);
+                    viewModel.setPlaylist(playlist);
                 });
             } catch (Exception e) {
                 e.printStackTrace();
@@ -70,7 +88,7 @@ public class PlaylistAccess {
             JSONObject playlistItemsObject = contentObject.getJSONObject("playlistItems");
             JSONArray itemsArray = playlistItemsObject.getJSONArray("items");
 
-            for (int i=0; i<itemsArray.length(); i++){
+            for (int i = 0; i < itemsArray.length(); i++) {
                 JSONObject itemObject = itemsArray.getJSONObject(i);
                 JSONArray columnsArray = itemObject.getJSONArray("columns");
                       /*
@@ -131,7 +149,7 @@ public class PlaylistAccess {
         try {
             JSONObject playlistsObject = new JSONObject(input);
             JSONArray playlistArray = playlistsObject.getJSONArray("playlists");
-            for (int i=0; i<playlistArray.length(); i++){
+            for (int i = 0; i < playlistArray.length(); i++) {
                 JSONObject playlistObject = playlistArray.getJSONObject(i);
       /*                "id": "p1",
                         "index": 0,
@@ -139,28 +157,27 @@ public class PlaylistAccess {
                         "itemCount": 12,
                         "title": "Default Playlist",
                         "totalTime": 0 */
-                result.addPlaylistEntity(new PlaylistEntity(playlistObject.getString("id"), playlistObject.getBoolean("isCurrent")));
+                result.addPlaylistEntity(new PlaylistEntity(playlistObject.getString("id"), playlistObject.getString("title"), playlistObject.getBoolean("isCurrent")));
             }
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        return  result;
+        return result;
     }
 
-    private Map<String, Bitmap> mCoverCache = new HashMap<>();
+    private final Map<String, Bitmap> mCoverCache = new HashMap<>();
 
     public void getCovers(List<ITitle> playlist) {
         new Thread(() -> {
             List<ITitle> playlistWithCovers = new ArrayList<>();
-            Boolean coversChanged = false;
+            boolean coversChanged = false;
             for (ITitle title : playlist) {
                 if (title.getIsAlbum() && title.getArtwork() == null) {
                     ITitle clonedTitle = title.clone();
                     if (mCoverCache.containsKey(title.getCatalog())) {
                         clonedTitle.setArtwork(mCoverCache.get(title.getCatalog()));
                         coversChanged = true;
-                    }
-                    else {
+                    } else {
                         Bitmap cover = mConnector.getImage("artwork/" + title.getPlaylistId() + "/" + title.getIndex());
                         mCoverCache.put(title.getCatalog(), cover);
                         if (cover != null) {
@@ -169,13 +186,11 @@ public class PlaylistAccess {
                         }
                     }
                     playlistWithCovers.add(clonedTitle);
-                }
-                else
+                } else
                     playlistWithCovers.add(title);
             }
             if (coversChanged)
-                mActivity.runOnUiThread(() -> {
-                    PlaylistViewModel.getInstance().setCovers(playlistWithCovers); });
-                }).start();
+                mActivity.runOnUiThread(() -> Objects.requireNonNull(PlaylistViewModel.getInstance()).setCovers(playlistWithCovers));
+        }).start();
     }
 }

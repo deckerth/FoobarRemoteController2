@@ -2,7 +2,6 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/title_detail_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".TitleDetailHostActivity"
@@ -12,73 +11,28 @@
         android:id="@+id/artwork"
         android:layout_width="300dp"
         android:layout_height="300dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginEnd="20dp"
+        android:layout_marginStart="@dimen/container_horizontal_margin"
+        android:layout_marginEnd="@dimen/container_horizontal_margin"
+        android:layout_marginTop="@dimen/container_margin"
         android:textAlignment="center"
         android:textSize="20sp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/composer" />
+        app:layout_constraintBottom_toTopOf="@id/detail_holder" />
 
-    <TextView
-        android:id="@+id/composer"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginEnd="8dp"
-        android:textAlignment="center"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        app:layout_constraintTop_toBottomOf="@id/artwork"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/album"/>
-
-    <TextView
-        android:id="@+id/album"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:textAlignment="center"
-        android:textSize="20sp"
-        android:textStyle="italic"
-        app:layout_constraintTop_toBottomOf="@id/composer"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/title"/>
-
-    <TextView
-        android:id="@+id/title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:textAlignment="center"
-        android:textSize="20sp"
-        app:layout_constraintTop_toBottomOf="@id/album"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/artist" />
-
-    <TextView
-        android:id="@+id/artist"
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/detail_holder"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:textAlignment="center"
-        android:textSize="18sp"
-        app:layout_constraintTop_toBottomOf="@id/title"
+        android:layout_marginStart="@dimen/container_horizontal_margin"
+        android:layout_marginEnd="@dimen/container_horizontal_margin"
+        app:layout_constraintBottom_toTopOf="@id/playback_progress"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/playback_progress"/>
+        app:layout_constraintTop_toBottomOf="@id/artwork"
+        tools:layout="@layout/fragment_title_list_title_classical" />
 
     <ProgressBar
         android:id="@+id/playback_progress"
@@ -88,7 +42,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
-        app:layout_constraintTop_toBottomOf="@id/artist"
+        app:layout_constraintTop_toBottomOf="@id/detail_holder"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintBottom_toTopOf="@id/disc_number"/>
@@ -98,57 +52,45 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="12dp"
-        android:layout_marginBottom="20dp"
         android:layout_marginEnd="8dp"
         android:textAlignment="center"
         android:textSize="12sp"
-        app:layout_constraintBottom_toTopOf="@id/play_background"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/artist" />
+        app:layout_constraintTop_toBottomOf="@id/playback_progress" />
 
     <TextView
         android:id="@+id/track"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="12dp"
-        android:layout_marginBottom="20dp"
         android:layout_marginEnd="8dp"
         android:textAlignment="center"
         android:textSize="12sp"
-        app:layout_constraintBottom_toTopOf="@id/play_background"
         app:layout_constraintStart_toEndOf="@id/disc_number"
-        app:layout_constraintTop_toBottomOf="@id/artist" />
+        app:layout_constraintTop_toBottomOf="@id/playback_progress" />
 
     <TextView
         android:id="@+id/playback_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="12dp"
-        android:layout_marginBottom="20dp"
         android:layout_marginEnd="8dp"
         android:textAlignment="center"
         android:textSize="12sp"
-        app:layout_constraintBottom_toTopOf="@id/play_background"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/artist" />
+        app:layout_constraintTop_toBottomOf="@id/playback_progress" />
 
     <TextView
         android:id="@+id/length"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="12dp"
-        android:layout_marginBottom="20dp"
         android:layout_marginEnd="8dp"
         android:textAlignment="center"
         android:textSize="12sp"
-        app:layout_constraintBottom_toTopOf="@id/play_background"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/artist" />
+        app:layout_constraintTop_toBottomOf="@id/playback_progress" />
 
     <ImageButton
         android:id="@+id/back"
@@ -158,18 +100,19 @@
         android:textSize="25sp"
         android:background="?android:colorBackground"
         android:src="@android:drawable/ic_media_previous"
-        app:layout_constraintTop_toBottomOf="@id/playback_progress"
+        app:layout_constraintTop_toBottomOf="@id/disc_number"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/play"
         app:layout_constraintStart_toStartOf="parent"/>
 
     <com.deckerth.thomas.foobarremotecontroller2.controls.Circle
-        android:id="@+id/play_background"
         android:layout_width="70dp"
         android:layout_height="70dp"
         android:background="?android:colorBackground"
         app:circleColor="?android:colorForeground"
-        app:layout_constraintTop_toBottomOf="@id/playback_progress"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintTop_toBottomOf="@id/disc_number"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>
@@ -184,7 +127,9 @@
         android:background="?android:colorForeground"
         app:tint="?attr/colorOnPrimary"
         android:src="@android:drawable/ic_media_play"
-        app:layout_constraintTop_toBottomOf="@id/playback_progress"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintTop_toBottomOf="@id/disc_number"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"/>
@@ -197,7 +142,7 @@
         android:textSize="25sp"
         android:background="?android:colorBackground"
         android:src="@android:drawable/ic_media_next"
-        app:layout_constraintTop_toBottomOf="@id/playback_progress"
+        app:layout_constraintTop_toBottomOf="@id/disc_number"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/play"/>

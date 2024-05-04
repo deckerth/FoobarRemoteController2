@@ -2,7 +2,6 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/nav_graph"
     app:startDestination="@id/title_list_fragment">
 
     <fragment
@@ -18,9 +17,5 @@
         android:name="com.deckerth.thomas.foobarremotecontroller2.TitleDetailFragment"
         android:label="@string/title_title_detail"
         tools:layout="@layout/fragment_title_detail">
-        <argument
-            android:name="item_id"
-            android:defaultValue=""
-            app:argType="string" />
     </fragment>
 </navigation>

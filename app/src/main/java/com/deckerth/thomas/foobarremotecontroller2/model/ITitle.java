@@ -2,6 +2,8 @@ package com.deckerth.thomas.foobarremotecontroller2.model;
 
 import android.graphics.Bitmap;
 
+import androidx.annotation.NonNull;
+
 public interface ITitle {
 
     String getCatalog();
@@ -40,5 +42,8 @@ public interface ITitle {
 
     void setIsCurrentTitle(Boolean isCurrentTitle);
 
+    @NonNull
     ITitle clone();
+
+    void clearAlbum();
 }

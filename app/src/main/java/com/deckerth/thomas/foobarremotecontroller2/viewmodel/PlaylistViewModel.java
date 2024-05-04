@@ -1,5 +1,7 @@
 package com.deckerth.thomas.foobarremotecontroller2.viewmodel;
 
+import android.app.Activity;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -9,7 +11,6 @@ import com.deckerth.thomas.foobarremotecontroller2.model.Album;
 import com.deckerth.thomas.foobarremotecontroller2.model.ITitle;
 import com.deckerth.thomas.foobarremotecontroller2.model.Playlist;
 import com.deckerth.thomas.foobarremotecontroller2.model.PlaylistEntity;
-import com.deckerth.thomas.foobarremotecontroller2.model.Title;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,24 +36,38 @@ public class PlaylistViewModel extends ViewModel {
 
     private final MutableLiveData<List<ITitle>> mPlaylist;
 
-    private PlaylistEntity mPlaylistId;
+    private final MutableLiveData<PlaylistEntity> mDisplayedPlaylist;
+
+    private final MutableLiveData<List<PlaylistEntity>> mPlaylists;
 
     public PlaylistViewModel() {
 
         mPlaylist = new MutableLiveData<>();
         mPlaylist.setValue(null);
 
-/*
-        List<ITitle> init = new ArrayList<ITitle>();
-        init.add(new Title("p4", "1", "catalog", "composer", "artist", "title", "artist"
-                , "", "01", "10"));
-        mPlaylist.setValue(init);
-*/
+        mDisplayedPlaylist = new MutableLiveData<>();
+        mDisplayedPlaylist.setValue(null);
 
+        mPlaylists = new MutableLiveData<>();
+        mPlaylists.setValue(null);
     }
 
     public LiveData<List<ITitle>> getPlaylist() {
         return mPlaylist;
+    }
+
+    public LiveData<PlaylistEntity> getDisplayedPlaylist() { return mDisplayedPlaylist; }
+
+    public LiveData<List<PlaylistEntity>> getPlaylists() {
+        return mPlaylists;
+    }
+
+    public void refreshPlaylist(Boolean fromScratch, Activity activity) {
+        if (fromScratch) {
+            mPlaylist.setValue(null);
+            return;
+        }
+        PlaylistAccess.getInstance().getCurrentPlaylist(activity);
     }
 
     public void setPlaylist(Playlist value) {
@@ -60,7 +75,6 @@ public class PlaylistViewModel extends ViewModel {
             List<ITitle> augmentedList = insertAlbumEntries(value.getPlaylist());
             PlaylistAccess.getInstance().getCovers(augmentedList);
             mPlaylist.setValue(augmentedList);
-            mPlaylistId = value.getPlaylistEntity();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -73,7 +87,7 @@ public class PlaylistViewModel extends ViewModel {
             }
         }
         mPlaylist.setValue(covers);
-        if (currentTitleIndex != UNDEFINED)
+        if (!currentTitleIndex.equals(UNDEFINED))
             setCurrentTitleIndex(currentPlaylistId, currentTitleIndex);
     }
 
@@ -85,8 +99,8 @@ public class PlaylistViewModel extends ViewModel {
         List<ITitle> currentPlaylist = mPlaylist.getValue();
         if (currentPlaylist != null) {
             List<ITitle> updatedPlaylist = new ArrayList<>();
-            Boolean updated = false;
-            for(ITitle title : currentPlaylist) {
+            boolean updated = false;
+            for (ITitle title : currentPlaylist) {
                 if (title.getIsAlbum())
                     updatedPlaylist.add(title);
                 else if (title.isCurrentTitle()) {
@@ -103,7 +117,7 @@ public class PlaylistViewModel extends ViewModel {
                     updated = true;
                 } else
                     updatedPlaylist.add(title);
-              }
+            }
 
             if (updated)
                 mPlaylist.setValue(updatedPlaylist);
@@ -125,9 +139,15 @@ public class PlaylistViewModel extends ViewModel {
             }
             if (title.getArtist().equals(lastArtist))
                 title.clearArtist();
+            if (title.getAlbum().equals(lastAlbum))
+                title.clearAlbum();
             result.add(title);
         }
         return result;
     }
+
+    public void setPlaylists(List<PlaylistEntity> playlists) { mPlaylists.setValue(playlists); }
+
+    public void setDisplayedPlaylist(PlaylistEntity playlist) { mDisplayedPlaylist.setValue(playlist); }
 
 }

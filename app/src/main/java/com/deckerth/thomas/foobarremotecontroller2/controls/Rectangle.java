@@ -8,16 +8,14 @@ import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.view.View;
 
-import androidx.core.content.ContextCompat;
+import androidx.annotation.NonNull;
 
 import com.deckerth.thomas.foobarremotecontroller2.R;
 
 public class Rectangle extends View {
 
     private static final int WIDTH = 10;
-    private Paint paint;
-
-    public int color;
+    private final Paint paint;
 
     public Rectangle(Context context, AttributeSet attributeSet) {
         super(context, attributeSet);
@@ -27,7 +25,7 @@ public class Rectangle extends View {
                 R.styleable.Rectangle,
                 0, 0);
 
-        int color = Color.GREEN;
+        int color;
 
         try {
              color = a.getInteger(R.styleable.Rectangle_markerColor, Color.GREEN);
@@ -46,7 +44,7 @@ public class Rectangle extends View {
     }
 
     @Override
-    protected void onDraw(Canvas canvas) {
+    protected void onDraw(@NonNull Canvas canvas) {
         super.onDraw(canvas);
         int height = getHeight();
         // Draw a rectangle with the specified left, top, right, bottom coordinates

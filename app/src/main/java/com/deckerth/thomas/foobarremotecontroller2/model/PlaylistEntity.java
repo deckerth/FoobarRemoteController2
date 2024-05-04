@@ -4,12 +4,15 @@ public class PlaylistEntity {
 
     private final String mPlaylistId;
 
+    private final String mName;
+
     private final Boolean mIsCurrent;
 
 
-    public PlaylistEntity(String playlistId, Boolean isCurrent) {
+    public PlaylistEntity(String playlistId, String name, Boolean isCurrent) {
         this.mPlaylistId = playlistId;
         this.mIsCurrent = isCurrent;
+        this.mName = name;
     }
 
     public String getPlaylistId() {
@@ -19,5 +22,7 @@ public class PlaylistEntity {
     public Boolean getIsCurrent() {
         return mIsCurrent;
     }
+
+    public String getName() { return mName; }
 
 }

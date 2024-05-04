@@ -2,18 +2,21 @@ package com.deckerth.thomas.foobarremotecontroller2;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.ImageButton;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
-import androidx.navigation.fragment.NavHostFragment;
+import androidx.core.content.ContextCompat;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
+import androidx.preference.PreferenceManager;
 
 import com.deckerth.thomas.foobarremotecontroller2.connector.PlayerAccess;
 import com.deckerth.thomas.foobarremotecontroller2.connector.PlaylistAccess;
@@ -21,29 +24,26 @@ import com.deckerth.thomas.foobarremotecontroller2.databinding.ActivityTitleDeta
 
 public class TitleDetailHostActivity extends AppCompatActivity {
 
+    private
+    ActivityTitleDetailBinding mBinding;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+        mBinding = ActivityTitleDetailBinding.inflate(getLayoutInflater());
+        setContentView(mBinding.getRoot());
 
-        ActivityTitleDetailBinding binding = ActivityTitleDetailBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
+        Activity activity = this;
+        mBinding.settings.setOnClickListener(v -> {
+            Intent settingsIntent = new Intent(activity, SettingsActivity.class);
+            startActivity(settingsIntent);
+        });
 
         // assigning ID of the toolbar to a variable
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         // using toolbar as ActionBar
         setSupportActionBar(toolbar);
-
-        ImageButton settings = findViewById(R.id.settings);
-        Activity activity = this;
-        settings.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent settingsIntent = new Intent(activity, SettingsActivity.class);
-                startActivity(settingsIntent);
-            }
-        });
 
         PlaylistAccess playlistAccess = PlaylistAccess.getInstance();
         playlistAccess.getCurrentPlaylist(this);
@@ -53,12 +53,41 @@ public class TitleDetailHostActivity extends AppCompatActivity {
 
         NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.nav_host_fragment_title_detail);
-        NavController navController = navHostFragment.getNavController();
-        AppBarConfiguration appBarConfiguration = new AppBarConfiguration.
-                Builder(navController.getGraph())
-                .build();
+        NavController navController = null;
+        if (navHostFragment != null) {
+            navController = navHostFragment.getNavController();
+        }
+        AppBarConfiguration appBarConfiguration = null;
+        if (navController != null) {
+            appBarConfiguration = new AppBarConfiguration.
+                    Builder(navController.getGraph())
+                    .build();
+        }
 
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        if (prefs.getString("theme", "dark").equals("dark")) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+            try {
+                Drawable logo = ContextCompat.getDrawable(getBaseContext(), R.drawable.foobar2000white);
+                mBinding.foobarLogo.setImageDrawable(logo);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+            try {
+                Drawable logo = ContextCompat.getDrawable(getBaseContext(), R.drawable.foobar2000);
+                mBinding.foobarLogo.setImageDrawable(logo);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override

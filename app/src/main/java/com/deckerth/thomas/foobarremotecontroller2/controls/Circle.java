@@ -8,13 +8,13 @@ import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.view.View;
 
+import androidx.annotation.NonNull;
+
 import com.deckerth.thomas.foobarremotecontroller2.R;
 
 public class Circle extends View {
 
-    private Paint paint;
-
-    public int color;
+    private final Paint paint;
 
     public Circle(Context context, AttributeSet attributeSet) {
         super(context, attributeSet);
@@ -24,7 +24,7 @@ public class Circle extends View {
                 R.styleable.Circle,
                 0, 0);
 
-        int color = Color.GREEN;
+        int color;
 
         try {
             color = a.getInteger(R.styleable.Circle_circleColor, Color.GREEN);
@@ -43,11 +43,11 @@ public class Circle extends View {
     }
 
     @Override
-    protected void onDraw(Canvas canvas) {
+    protected void onDraw(@NonNull Canvas canvas) {
         super.onDraw(canvas);
         int height = getHeight();
         // Draw a rectangle with the specified left, top, right, bottom coordinates
-        canvas.drawCircle(height/2, height/2, height/2, paint);
+        canvas.drawCircle((float) height /2, (float) height /2, (float) height /2, paint);
         //canvas.drawCircle(0, 0, 20, paint);
     }
 }

@@ -8,10 +8,6 @@ public class Playlists {
 
     private final List<PlaylistEntity> mPlaylists = new ArrayList<>();
 
-    public void clear() {
-        mPlaylists.clear();
-    }
-
     public void addPlaylistEntity(PlaylistEntity playlistEntity) {
         mPlaylists.add(playlistEntity);
     }
@@ -20,16 +16,9 @@ public class Playlists {
         return  mPlaylists;
     }
 
-    public String getCurrentPlaylist() {
-        if (mPlaylists == null)
-            return "";
-        else {
-            Optional<PlaylistEntity> entity =  mPlaylists.stream().filter(entry -> entry.getIsCurrent()).findFirst();
-            if (!entity.isPresent())
-                return "";
-            else
-                return entity.get().getPlaylistId();
-        }
+    public PlaylistEntity getCurrentPlaylist() {
+        Optional<PlaylistEntity> entity = mPlaylists.stream().filter(PlaylistEntity::getIsCurrent).findFirst();
+        return entity.orElse(null);
     }
 
 }

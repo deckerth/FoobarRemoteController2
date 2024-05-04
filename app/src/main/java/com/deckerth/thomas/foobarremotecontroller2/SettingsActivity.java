@@ -9,11 +9,9 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.Spanned;
-import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;

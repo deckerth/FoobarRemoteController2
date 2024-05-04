@@ -7,7 +7,6 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 
 import com.deckerth.thomas.foobarremotecontroller2.connector.PlayerAccess;
 import com.deckerth.thomas.foobarremotecontroller2.databinding.FragmentTitleListTitlePopBinding;

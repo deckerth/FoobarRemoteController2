@@ -11,8 +11,6 @@ import androidx.fragment.app.Fragment;
 import com.deckerth.thomas.foobarremotecontroller2.databinding.FragmentTitleDetailPopBinding;
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.PlayerViewModel;
 
-import java.util.Objects;
-
 /**
  * A fragment representing a single Title detail screen.
  * This fragment is either contained in a {@link TitleListFragment}

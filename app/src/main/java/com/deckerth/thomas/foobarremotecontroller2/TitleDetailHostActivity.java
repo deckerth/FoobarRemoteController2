@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
@@ -64,7 +63,9 @@ public class TitleDetailHostActivity extends AppCompatActivity {
                     .build();
         }
 
-        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
+        if (navController != null) {
+            NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
+        }
     }
 
     @Override

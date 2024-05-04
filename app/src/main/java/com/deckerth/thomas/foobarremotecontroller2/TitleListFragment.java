@@ -3,35 +3,27 @@ package com.deckerth.thomas.foobarremotecontroller2;
 import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.navigation.Navigation;
-import androidx.preference.PreferenceManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.PopupWindow;
 
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
+import androidx.preference.PreferenceManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.deckerth.thomas.foobarremotecontroller2.adapter.PlaylistAdapter;
 import com.deckerth.thomas.foobarremotecontroller2.adapter.TitleAdapter;
-import com.deckerth.thomas.foobarremotecontroller2.connector.PlayerAccess;
 import com.deckerth.thomas.foobarremotecontroller2.connector.PlaylistAccess;
 import com.deckerth.thomas.foobarremotecontroller2.databinding.FragmentTitleListBinding;
-
-import com.deckerth.thomas.foobarremotecontroller2.model.ITitle;
-import com.deckerth.thomas.foobarremotecontroller2.model.PlaylistEntity;
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.PlayerViewModel;
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.PlaylistMediatorViewModel;
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.PlaylistViewModel;
 
-import java.util.List;
 import java.util.Objects;
 
 /**

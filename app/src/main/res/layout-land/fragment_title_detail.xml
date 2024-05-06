@@ -30,7 +30,7 @@
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/detail_holder"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
         app:layout_constraintBottom_toTopOf="@id/playback_progress"
@@ -49,18 +49,18 @@
         android:layout_marginEnd="8dp"
         app:layout_constraintBottom_toTopOf="@id/disc_number"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintLeft_toRightOf="@id/guideline"
-        app:layout_constraintTop_toBottomOf="@id/detail_holder" />
+        app:layout_constraintLeft_toRightOf="@id/guideline" />
 
     <TextView
         android:id="@+id/disc_number"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
+        android:layout_marginBottom="@dimen/container_margin"
         android:textAlignment="center"
         android:textSize="12sp"
         app:layout_constraintStart_toEndOf="@id/guideline"
-        app:layout_constraintTop_toBottomOf="@id/playback_progress" />
+        app:layout_constraintBottom_toTopOf="@id/play_background" />
 
     <TextView
         android:id="@+id/track"
@@ -68,6 +68,7 @@
         android:layout_height="wrap_content"
         android:textAlignment="center"
         android:textSize="12sp"
+        android:layout_marginStart="8dp"
         app:layout_constraintStart_toEndOf="@id/disc_number"
         app:layout_constraintTop_toBottomOf="@id/playback_progress" />
 
@@ -99,17 +100,18 @@
         android:textSize="25sp"
         android:background="?android:colorBackground"
         android:src="@android:drawable/ic_media_previous"
-        app:layout_constraintTop_toBottomOf="@id/playback_time"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="@id/play_background"
+        app:layout_constraintBottom_toBottomOf="@id/play_background"
         app:layout_constraintEnd_toStartOf="@id/play"
         app:layout_constraintStart_toEndOf="@id/guideline" />
 
     <com.deckerth.thomas.foobarremotecontroller2.controls.Circle
+        android:id="@+id/play_background"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:background="?android:colorBackground"
+        android:layout_marginBottom="@dimen/container_horizontal_margin"
         app:circleColor="?android:colorForeground"
-        app:layout_constraintTop_toBottomOf="@id/playback_time"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toRightOf="@id/guideline"
         app:layout_constraintRight_toRightOf="parent"/>
@@ -124,10 +126,10 @@
         android:background="?android:colorForeground"
         app:tint="?attr/colorOnPrimary"
         android:src="@android:drawable/ic_media_play"
-        app:layout_constraintTop_toBottomOf="@id/playback_time"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toRightOf="@id/guideline"
-        app:layout_constraintRight_toRightOf="parent"/>
+        app:layout_constraintTop_toTopOf="@id/play_background"
+        app:layout_constraintBottom_toBottomOf="@id/play_background"
+        app:layout_constraintLeft_toLeftOf="@id/play_background"
+        app:layout_constraintRight_toRightOf="@id/play_background"/>
 
     <ImageButton
         android:id="@+id/next"
@@ -137,8 +139,8 @@
         android:textSize="25sp"
         android:background="?android:colorBackground"
         android:src="@android:drawable/ic_media_next"
-        app:layout_constraintTop_toBottomOf="@id/playback_time"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="@id/play_background"
+        app:layout_constraintBottom_toBottomOf="@id/play_background"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/play"/>
 

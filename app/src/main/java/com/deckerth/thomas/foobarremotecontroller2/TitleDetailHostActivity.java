@@ -51,7 +51,7 @@ public class TitleDetailHostActivity extends AppCompatActivity {
         playerAccess.startPlayerObserver();
 
         NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.nav_host_fragment_title_detail);
+                .findFragmentById(R.id.nav_host_fragment);
         NavController navController = null;
         if (navHostFragment != null) {
             navController = navHostFragment.getNavController();
@@ -93,7 +93,7 @@ public class TitleDetailHostActivity extends AppCompatActivity {
 
     @Override
     public boolean onSupportNavigateUp() {
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_title_detail);
+        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         return navController.navigateUp() || super.onSupportNavigateUp();
     }
 }

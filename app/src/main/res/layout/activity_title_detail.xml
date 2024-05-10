@@ -27,13 +27,14 @@
                 android:minHeight="?attr/actionBarSize"
                 android:theme="?attr/actionBarTheme"
                 app:layout_constraintRight_toLeftOf="@id/settings"
-                app:layout_constraintLeft_toRightOf="@id/foobar_logo"
+                app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:title="  Foobar2000 Remote"
                 tools:layout_editor_absoluteX="0dp"
                 tools:layout_editor_absoluteY="0dp" />
 
             <!-- Logo on the left-->
+<!--
             <ImageView
                 android:id="@+id/foobar_logo"
                 android:layout_width="30dp"
@@ -44,6 +45,7 @@
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 />
+-->
 
             <!-- Right most ImageButton -->
             <ImageButton

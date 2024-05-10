@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.Html;
@@ -15,7 +14,6 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.content.ContextCompat;
 import androidx.preference.EditTextPreference;
 import androidx.preference.ListPreference;
 import androidx.preference.Preference;
@@ -84,6 +82,7 @@ public class SettingsActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+/*
         if (prefs.getString("theme", "dark").equals("dark")) {
             try {
                 Drawable logo = ContextCompat.getDrawable(getBaseContext(), R.drawable.foobar2000white);
@@ -99,6 +98,7 @@ public class SettingsActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
+*/
     }
 
     public static class SettingsFragment extends PreferenceFragmentCompat {

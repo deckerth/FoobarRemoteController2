@@ -3,13 +3,11 @@ package com.deckerth.thomas.foobarremotecontroller2;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.content.ContextCompat;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
@@ -74,20 +72,24 @@ public class TitleDetailHostActivity extends AppCompatActivity {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         if (prefs.getString("theme", "dark").equals("dark")) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+/*
             try {
                 Drawable logo = ContextCompat.getDrawable(getBaseContext(), R.drawable.foobar2000white);
                 mBinding.foobarLogo.setImageDrawable(logo);
             } catch (Exception e) {
                 e.printStackTrace();
             }
+*/
         } else {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+/*
             try {
                 Drawable logo = ContextCompat.getDrawable(getBaseContext(), R.drawable.foobar2000);
                 mBinding.foobarLogo.setImageDrawable(logo);
             } catch (Exception e) {
                 e.printStackTrace();
             }
+*/
         }
     }
 

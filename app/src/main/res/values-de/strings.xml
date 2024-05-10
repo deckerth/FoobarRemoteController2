@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Foobar2000 Remote Controller</string>
-    <string name="title_activity_title_detail_host">Remote Controller</string>
-    <string name="title_title_list">Remote Controller</string>
+    <string name="title_activity_title_detail_host">fb2k Remote Controller</string>
+    <string name="title_title_list">fb2k Remote Controller</string>
     <string name="title_title_detail">Wiedergabe</string>
     <string name="title_activity_settings">SettingsActivity</string>
 

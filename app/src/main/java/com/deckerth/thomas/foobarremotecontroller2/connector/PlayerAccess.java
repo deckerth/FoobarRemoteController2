@@ -6,12 +6,16 @@ import android.graphics.Bitmap;
 
 import androidx.preference.PreferenceManager;
 
+import com.deckerth.thomas.foobarremotecontroller2.model.VolumeControl;
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.PlayerViewModel;
+import com.google.gson.Gson;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -83,6 +87,7 @@ public class PlayerAccess {
             JSONObject contentObject = new JSONObject(input);
             JSONObject playerObject = contentObject.getJSONObject("player");
             JSONObject activeItemObject = playerObject.getJSONObject("activeItem");
+            JSONObject volumeObject = playerObject.getJSONObject("volume");
             JSONArray columns = activeItemObject.getJSONArray("columns");
 
             if (columns.length() == 0) {
@@ -109,7 +114,14 @@ public class PlayerAccess {
                         "playlistIndex": 3,
                         "position": 28.9795
                   },
-                */
+                 "volume": {
+                    "isMuted": false,
+                    "max": 0,
+                    "min": -100,
+                    "type": "db",
+                    "value": 0
+                }
+               */
 
                 String column = columns.getString(0);
                 mPlayerViewModel.setCatalog(column);
@@ -137,6 +149,7 @@ public class PlayerAccess {
                 mPlayerViewModel.setDuration(activeItemObject.getString("duration"));
                 mPlayerViewModel.setPosition(activeItemObject.getString("position"));
             }
+
             mCurrentPlaylistId = activeItemObject.getString("playlistId");
             mCurrentIndex = activeItemObject.getString("index");
 
@@ -151,6 +164,17 @@ public class PlayerAccess {
                 case "paused":
                     mPlayerViewModel.setPlaybackState(PlayerViewModel.PlaybackState.PAUSED);
                     break;
+            }
+
+            if (volumeObject != null) {
+                VolumeControl volumeControl = mPlayerViewModel.getVolumeControlViewModel().getVolumeControl();
+                mPlayerViewModel.getVolumeControlViewModel().setIsMuted(volumeObject.getBoolean("isMuted"));
+
+                volumeControl.setMin(volumeObject.getInt("min"));
+                volumeControl.setMax(volumeObject.getInt("max"));
+                volumeControl.setType(volumeObject.getString("type"));
+
+                mPlayerViewModel.getVolumeControlViewModel().setVolume(volumeObject.getInt("value"));
             }
 
         } catch (JSONException e) {
@@ -179,34 +203,45 @@ public class PlayerAccess {
         }
     }
 
-    public void StartPlayback() {
+    public void startPlayback() {
         new Thread(() -> {
             mConnector.postData("player/play");
             getPlayerState();
         }).start();
     }
 
-    public void PausePlayback() {
+    public void pausePlayback() {
         new Thread(() -> {
             mConnector.postData("player/pause");
             getPlayerState();
         }).start();
     }
 
-    public void PreviousTrack() {
+    public void previousTrack() {
         new Thread(() -> {
             mConnector.postData("player/previous");
             getPlayerState();
         }).start();
     }
 
-    public void NextTrack() {
+    public void nextTrack() {
         new Thread(() -> mConnector.postData("player/next")).start();
     }
 
-    public void PlayTrack(String playlistId, String index) {
+    public void playTrack(String playlistId, String index) {
         new Thread(() -> {
             mConnector.postData("player/play/" + playlistId + "/" + index);
+            getPlayerState();
+        }).start();
+    }
+
+    public void setVolume(Integer value) {
+        new Thread(() -> {
+            Map<String, Integer> postData = new HashMap<>();
+            postData.put("volume", value);
+            Gson gson = new Gson();
+            String jsonString = gson.toJson(postData);
+            mConnector.postData("player/", jsonString);
             getPlayerState();
         }).start();
     }

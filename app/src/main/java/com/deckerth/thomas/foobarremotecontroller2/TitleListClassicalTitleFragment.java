@@ -58,18 +58,18 @@ public class TitleListClassicalTitleFragment extends Fragment {
         });
 
         mPlayerAccess = PlayerAccess.getInstance(getActivity());
-        mBinding.back.setOnClickListener(v -> mPlayerAccess.PreviousTrack());
+        mBinding.back.setOnClickListener(v -> mPlayerAccess.previousTrack());
 
-        mBinding.next.setOnClickListener(v -> mPlayerAccess.NextTrack());
+        mBinding.next.setOnClickListener(v -> mPlayerAccess.nextTrack());
 
         mBinding.play.setOnClickListener(v -> {
             switch (Objects.requireNonNull(mPlayerViewModel.getPlaybackState().getValue())) {
                 case STOPPED:
                 case PAUSED:
-                    mPlayerAccess.StartPlayback();
+                    mPlayerAccess.startPlayback();
                     break;
                 case PLAYING:
-                    mPlayerAccess.PausePlayback();
+                    mPlayerAccess.pausePlayback();
                     break;
             }
         });

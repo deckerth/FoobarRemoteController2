@@ -141,7 +141,7 @@ public class TitleAdapter
         holder.itemView.setOnClickListener(itemView -> {
             ITitle item = (ITitle) itemView.getTag();
             if (!item.getIsAlbum())
-                PlayerAccess.getInstance().PlayTrack(item.getPlaylistId(), item.getIndex());
+                PlayerAccess.getInstance().playTrack(item.getPlaylistId(), item.getIndex());
         });
     }
 

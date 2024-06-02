@@ -20,4 +20,6 @@
     <string name="dark">Dark</string>
     <string name="contemporary">Contemporary</string>
     <string name="classical">Classical</string>
+    <string name="integration">Integration</string>
+    <string name="volume_control">Volume buttons control the volume of foobar</string>
 </resources>

@@ -71,18 +71,18 @@ public class TitleDetailFragment extends Fragment {
         });
 
         mPlayerAccess = PlayerAccess.getInstance(getActivity());
-        Objects.requireNonNull(mBinding.back).setOnClickListener(v -> mPlayerAccess.PreviousTrack());
+        Objects.requireNonNull(mBinding.back).setOnClickListener(v -> mPlayerAccess.previousTrack());
 
-        Objects.requireNonNull(mBinding.next).setOnClickListener(v -> mPlayerAccess.NextTrack());
+        Objects.requireNonNull(mBinding.next).setOnClickListener(v -> mPlayerAccess.nextTrack());
 
         Objects.requireNonNull(mBinding.play).setOnClickListener(v -> {
             switch (Objects.requireNonNull(mPlayerViewModel.getPlaybackState().getValue())) {
                 case STOPPED:
                 case PAUSED:
-                    mPlayerAccess.StartPlayback();
+                    mPlayerAccess.startPlayback();
                     break;
                 case PLAYING:
-                    mPlayerAccess.PausePlayback();
+                    mPlayerAccess.pausePlayback();
                     break;
             }
         });

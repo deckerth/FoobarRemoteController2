@@ -21,4 +21,6 @@
     <string name="dark">Dunkel</string>
     <string name="contemporary">Modern</string>
     <string name="classical">Klassisch</string>
+    <string name="integration">Integration</string>
+    <string name="volume_control">Mit den Lautstärkeknöpfen die Lautstärke von foobar steuern</string>
 </resources>

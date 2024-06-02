@@ -6,5 +6,8 @@
     <declare-styleable name="Circle">
         <attr name="circleColor" format="integer" />
     </declare-styleable>
-
+    <declare-styleable name="VolumeBar">
+        <attr name="volumeBackgroundColor" format="integer" />
+        <attr name="volumeForegroundColor" format="integer" />
+    </declare-styleable>
 </resources>

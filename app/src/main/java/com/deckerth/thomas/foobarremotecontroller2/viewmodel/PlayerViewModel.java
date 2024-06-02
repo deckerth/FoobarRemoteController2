@@ -39,6 +39,8 @@ public class PlayerViewModel extends ViewModel {
     private final MutableLiveData<Integer> mPercentPlayed;
     private final MutableLiveData<String> mLength;
 
+    private final VolumeControlViewModel mVolumeControl;
+
     private Double mDuration = 0.0;
     private Double mPosition = 0.0;
 
@@ -83,10 +85,11 @@ public class PlayerViewModel extends ViewModel {
 
         mLength = new MutableLiveData<>();
         mLength.setValue("");
+
+        mVolumeControl = new VolumeControlViewModel();
     }
 
     public LiveData<PlaybackState> getPlaybackState() {return mPlaybackState; }
-
     public LiveData<String> getCatalog() { return mCatalog; }
     public LiveData<String> getComposer() { return mComposer; }
     public LiveData<String> getAlbum() { return mAlbum; }
@@ -100,6 +103,10 @@ public class PlayerViewModel extends ViewModel {
     public LiveData<String> getPlaylistId() { return mPlaylistId; }
     public LiveData<Integer> getPercentPlayed() {return mPercentPlayed; }
     public LiveData<String> getLength() { return mLength; }
+
+    public VolumeControlViewModel getVolumeControlViewModel() {
+        return mVolumeControl;
+    }
 
     public void setCatalog(String value) {
         if (value == null)

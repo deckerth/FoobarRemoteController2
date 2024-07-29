@@ -49,9 +49,6 @@ fun PlaylistPage() {
 @Composable
 fun TitleCard(title: ITitle) {
     var isExpanded by remember { mutableStateOf(false) }
-
-
-    defaultPreferenceFlow().value.get<String>("ip_address_preference")
     val surfaceColor by animateColorAsState(
         if (isExpanded) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceContainer,
     )

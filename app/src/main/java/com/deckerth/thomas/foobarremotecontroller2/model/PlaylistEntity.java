@@ -16,13 +16,15 @@ public class PlaylistEntity {
     }
 
     public String getPlaylistId() {
-        return  mPlaylistId;
+        return mPlaylistId;
     }
 
     public Boolean getIsCurrent() {
         return mIsCurrent;
     }
 
-    public String getName() { return mName; }
+    public String getName() {
+        return mName;
+    }
 
 }

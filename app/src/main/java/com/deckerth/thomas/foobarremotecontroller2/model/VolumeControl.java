@@ -27,28 +27,13 @@ public class VolumeControl implements IVolumeControl {
     }
 
     @Override
-    public Integer getMin() {
-        return min;
-    }
-
-    @Override
-    public Integer getMax() {
-        return max;
-    }
-
-    @Override
-    public String getType() {
-        return type;
-    }
-
-    @Override
-    public Integer getValue() {
-        return value;
-    }
-
-    @Override
     public void setMuted(Boolean isMuted) {
         this.isMuted = isMuted;
+    }
+
+    @Override
+    public Integer getMin() {
+        return min;
     }
 
     @Override
@@ -57,13 +42,28 @@ public class VolumeControl implements IVolumeControl {
     }
 
     @Override
+    public Integer getMax() {
+        return max;
+    }
+
+    @Override
     public void setMax(Integer max) {
         this.max = max;
     }
 
     @Override
+    public String getType() {
+        return type;
+    }
+
+    @Override
     public void setType(String type) {
         this.type = type;
+    }
+
+    @Override
+    public Integer getValue() {
+        return value;
     }
 
     @Override
@@ -79,15 +79,15 @@ public class VolumeControl implements IVolumeControl {
         d = Pow(100,1-p)*(-1) = -100/Pow(10,2*p),
         p = (-1)*Log10(-d)/2+1
 */
-        double p = (double)percent / 100.0;
+        double p = (double) percent / 100.0;
         if (p < 0) p = 0;
         if (p > 1) p = 1;
 
         // convert 0..1 -> -100..-1
-        double d = -100.0/pow(10,2*p);
+        double d = -100.0 / pow(10, 2 * p);
 
         // convert -100..-1 -> -99..0 -> -100..0
-        int result = (int) Math.round((d+1.0)/99.0 * 100.0);
+        int result = (int) Math.round((d + 1.0) / 99.0 * 100.0);
 
         if (result < -100) result = -100;
         if (result > 0) result = 0;
@@ -111,9 +111,9 @@ public class VolumeControl implements IVolumeControl {
         if (d >= -1)
             return 100;
 
-        double p = -log10(-d)/2.0 + 1.0;
+        double p = -log10(-d) / 2.0 + 1.0;
 
-        int result = (int)Math.round(p * 100);
+        int result = (int) Math.round(p * 100);
         if (result < 0) result = 0;
         if (result > 100) result = 100;
         return result;
@@ -124,7 +124,7 @@ public class VolumeControl implements IVolumeControl {
         int modifiedPercent = getCurrentValuePercent() + deltaPercent;
         if (modifiedPercent > 100) modifiedPercent = 100;
         if (modifiedPercent < 0) modifiedPercent = 0;
-        return  modifiedPercent;
+        return modifiedPercent;
     }
 
     @Override

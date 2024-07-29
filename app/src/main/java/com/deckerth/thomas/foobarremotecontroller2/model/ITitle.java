@@ -35,9 +35,10 @@ public interface ITitle {
     Boolean getIsAlbum();
 
     Bitmap getArtwork();
-    String getArtworkUrl();
 
     void setArtwork(Bitmap artwork);
+
+    String getArtworkUrl();
 
     Boolean isCurrentTitle();
 

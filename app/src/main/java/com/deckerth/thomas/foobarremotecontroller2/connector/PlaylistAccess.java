@@ -1,10 +1,7 @@
 package com.deckerth.thomas.foobarremotecontroller2.connector;
 
 import android.annotation.SuppressLint;
-import android.graphics.Bitmap;
 
-
-import com.deckerth.thomas.foobarremotecontroller2.model.ITitle;
 import com.deckerth.thomas.foobarremotecontroller2.model.Playlist;
 import com.deckerth.thomas.foobarremotecontroller2.model.PlaylistEntity;
 import com.deckerth.thomas.foobarremotecontroller2.model.Playlists;
@@ -14,23 +11,17 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 public class PlaylistAccess {
 
     @SuppressLint("StaticFieldLeak")
     private static PlaylistAccess INSTANCE;
+    private HTTPConnector mConnector;
 
     public static PlaylistAccess getInstance() {
         if (INSTANCE == null)
             INSTANCE = new PlaylistAccess();
         return INSTANCE;
     }
-
-    private HTTPConnector mConnector;
 
     public Playlist getCurrentPlaylist() {
         if (mConnector == null)
@@ -47,7 +38,7 @@ public class PlaylistAccess {
     public Playlist getPlaylist(PlaylistEntity playlistEntity) {
         String response = mConnector.getData("playlists/" + playlistEntity.getPlaylistId() +
                 "/items/0%3A100?columns=%25catalog%25,%25composer%25,%25album%25,%25title%25,%25artist%25,%25discnumber%25,%25track%25,%25length%25");
-        return parsePlaylist(response,playlistEntity);
+        return parsePlaylist(response, playlistEntity);
 //        try {
 //                mActivity.runOnUiThread(() -> {
 //                    Playlist playlist = parsePlaylist(response, playlistEntity);
@@ -110,7 +101,7 @@ public class PlaylistAccess {
                                 discNumber,
                                 track,
                                 length, "", "",
-                                mConnector.getServerAddress()+ "artwork/" + playlistEntity.getPlaylistId() + "/" + i));
+                                mConnector.getServerAddress() + "artwork/" + playlistEntity.getPlaylistId() + "/" + i));
             }
         } catch (JSONException e) {
             e.printStackTrace();

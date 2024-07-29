@@ -13,7 +13,7 @@ public class Playlists {
     }
 
     public List<PlaylistEntity> getPlaylists() {
-        return  mPlaylists;
+        return mPlaylists;
     }
 
     public PlaylistEntity getCurrentPlaylist() {

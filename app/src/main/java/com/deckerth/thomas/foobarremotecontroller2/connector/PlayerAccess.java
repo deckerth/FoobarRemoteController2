@@ -1,38 +1,28 @@
 package com.deckerth.thomas.foobarremotecontroller2.connector;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.graphics.Bitmap;
 
 import com.deckerth.thomas.foobarremotecontroller2.model.PlaybackState;
 import com.deckerth.thomas.foobarremotecontroller2.model.Player;
-import com.deckerth.thomas.foobarremotecontroller2.model.VolumeControl;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-
 public class PlayerAccess {
 
     @SuppressLint("StaticFieldLeak")
     private static PlayerAccess INSTANCE;
+    private final HTTPConnector mConnector;
+
+    public PlayerAccess() {
+        this.mConnector = new HTTPConnector();
+    }
 
     public static PlayerAccess getInstance() {
         if (INSTANCE == null)
             INSTANCE = new PlayerAccess();
         return INSTANCE;
-    }
-
-    private final HTTPConnector mConnector;
-
-    public PlayerAccess() {
-        this.mConnector = new HTTPConnector();
     }
 
 //    public void startPlayerObserver() {
@@ -119,7 +109,7 @@ public class PlayerAccess {
                     activeItemObject.getString("index"),
                     activeItemObject.getString("duration"),
                     activeItemObject.getString("position"),
-                    mConnector.getServerAddress()+ "artwork/" + activeItemObject.getString("playlistId") + "/" + activeItemObject.getString("index"),
+                    mConnector.getServerAddress() + "artwork/" + activeItemObject.getString("playlistId") + "/" + activeItemObject.getString("index"),
                     playbackState
             );
             return player;

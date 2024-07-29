@@ -1,6 +1,6 @@
 package com.deckerth.thomas.foobarremotecontroller2.model
 
-enum class PlaybackState{
+enum class PlaybackState {
     STOPPED,
     PLAYING,
     PAUSED
@@ -21,4 +21,11 @@ data class Player(
     val position: String,
     val artworkUrl: String,
     val playbackState: PlaybackState
-)
+) {
+
+    fun getPos(): Float {
+        val duration = this.duration.toFloat()
+        val position = this.position.toFloat()
+        return position / duration * 1f
+    }
+}

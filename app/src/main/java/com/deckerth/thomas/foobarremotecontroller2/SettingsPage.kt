@@ -11,7 +11,7 @@ import me.zhanghai.compose.preference.listPreference
 import me.zhanghai.compose.preference.textFieldPreference
 
 @Composable
-fun SettingsPage(){
+fun SettingsPage() {
     ProvidePreferenceLocals {
         LazyColumn(modifier = Modifier.fillMaxSize()) {
             textFieldPreference(

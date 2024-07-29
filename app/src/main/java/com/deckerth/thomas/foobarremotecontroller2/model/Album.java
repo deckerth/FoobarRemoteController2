@@ -12,7 +12,9 @@ public class Album extends Title {
         return true;
     }
 
-    /** @noinspection MethodDoesntCallSuperMethod*/
+    /**
+     * @noinspection MethodDoesntCallSuperMethod
+     */
     @NonNull
     @Override
     public ITitle clone() {

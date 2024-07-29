@@ -1,150 +1,146 @@
-package com.deckerth.thomas.foobarremotecontroller2.connector;
+package com.deckerth.thomas.foobarremotecontroller2.connector
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import com.deckerth.thomas.foobarremotecontroller2.ip_address
+import java.io.IOException
+import java.io.InputStreamReader
+import java.net.HttpURLConnection
+import java.net.URL
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
+/** @noinspection BlockingMethodInNonBlockingContext
+ */
+class HTTPConnector {
+    val serverAddress: String
+        get() {
+            if (ip_address != null) {
+                return "http://$ip_address:8880/api/"
+            }
+            return ""
+        }
 
-/** @noinspection BlockingMethodInNonBlockingContext*/
-public class HTTPConnector {
-    public String getServerAddress() {
-        return "http://obsidian.fritz.box:8880/api/";
-    }
-
-    public String getData(String endpoint) {
+    fun getData(endpoint: String): String {
         // Fetch data from the API in the background.
-        StringBuilder result = new StringBuilder();
+        val result = StringBuilder()
         try {
-            URL url;
-            HttpURLConnection urlConnection = null;
+            val url: URL
+            var urlConnection: HttpURLConnection? = null
             try {
-                url = new URL(getServerAddress() + endpoint);
+                url = URL(serverAddress + endpoint)
                 //open a URL coonnection
-                urlConnection = (HttpURLConnection) url.openConnection();
-                InputStream in = urlConnection.getInputStream();
-                InputStreamReader isw = new InputStreamReader(in);
-                int data = isw.read();
+                urlConnection = url.openConnection() as HttpURLConnection
+                val `in` = urlConnection.inputStream
+                val isw = InputStreamReader(`in`)
+                var data = isw.read()
                 while (data != -1) {
-                    result.append((char) data);
-                    data = isw.read();
+                    result.append(data.toChar())
+                    data = isw.read()
                 }
 
                 // return the data to onPostExecute method
-                return result.toString();
-            } catch (Exception e) {
-                e.printStackTrace();
+                return result.toString()
+            } catch (e: Exception) {
+                e.printStackTrace()
             } finally {
-                if (urlConnection != null) {
-                    urlConnection.disconnect();
-                }
+                urlConnection?.disconnect()
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "Exception: " + e.getMessage();
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return "Exception: " + e.message
         }
-        return result.toString();
+        return result.toString()
     }
 
-    public Bitmap getImage(String endpoint) {
+    fun getImage(endpoint: String): Bitmap? {
         // Fetch data from the API in the background.
-        Bitmap result;
+        val result: Bitmap
         try {
-            URL url;
-            HttpURLConnection urlConnection = null;
+            val url: URL
+            var urlConnection: HttpURLConnection? = null
             try {
-                url = new URL(getServerAddress() + endpoint);
+                url = URL(serverAddress + endpoint)
                 //open a URL coonnection
-                urlConnection = (HttpURLConnection) url.openConnection();
-                InputStream in = urlConnection.getInputStream();
+                urlConnection = url.openConnection() as HttpURLConnection
+                val `in` = urlConnection.inputStream
 
-                result = BitmapFactory.decodeStream(in);
+                result = BitmapFactory.decodeStream(`in`)
 
                 // return the data to onPostExecute method
-                return result;
-            } catch (Exception e) {
-                e.printStackTrace();
+                return result
+            } catch (e: Exception) {
+                e.printStackTrace()
             } finally {
-                if (urlConnection != null) {
-                    urlConnection.disconnect();
-                }
+                urlConnection?.disconnect()
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return null
         }
-        return null;
+        return null
     }
 
-    public void postData(String endpoint) {
-        StringBuilder result = new StringBuilder();
+    fun postData(endpoint: String) {
+        val result = StringBuilder()
         try {
-            URL url;
-            HttpURLConnection urlConnection = null;
+            val url: URL
+            var urlConnection: HttpURLConnection? = null
             try {
-                url = new URL(getServerAddress() + endpoint);
+                url = URL(serverAddress + endpoint)
                 //open a URL coonnection
-                urlConnection = (HttpURLConnection) url.openConnection();
-                urlConnection.setRequestMethod("POST");
-                urlConnection.setDoOutput(true);
-                urlConnection.setRequestProperty("Accept", "*/*");
-                urlConnection.connect();
-                InputStream in = urlConnection.getInputStream();
-                InputStreamReader isw = new InputStreamReader(in);
-                int data = isw.read();
+                urlConnection = url.openConnection() as HttpURLConnection
+                urlConnection.requestMethod = "POST"
+                urlConnection.doOutput = true
+                urlConnection.setRequestProperty("Accept", "*/*")
+                urlConnection.connect()
+                val `in` = urlConnection.inputStream
+                val isw = InputStreamReader(`in`)
+                var data = isw.read()
                 while (data != -1) {
-                    result.append((char) data);
-                    data = isw.read();
+                    result.append(data.toChar())
+                    data = isw.read()
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
+            } catch (e: Exception) {
+                e.printStackTrace()
             } finally {
-                if (urlConnection != null) {
-                    urlConnection.disconnect();
-                }
+                urlConnection?.disconnect()
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 
-    public void postData(String endpoint, String data) {
-        StringBuilder result = new StringBuilder();
+    fun postData(endpoint: String, data: String) {
+        val result = StringBuilder()
         try {
-            URL url;
-            HttpURLConnection urlConnection = null;
+            val url: URL
+            var urlConnection: HttpURLConnection? = null
             try {
-                url = new URL(getServerAddress() + endpoint);
+                url = URL(serverAddress + endpoint)
                 //open a URL coonnection
-                urlConnection = (HttpURLConnection) url.openConnection();
-                urlConnection.setRequestMethod("POST");
-                urlConnection.setDoOutput(true);
+                urlConnection = url.openConnection() as HttpURLConnection
+                urlConnection.requestMethod = "POST"
+                urlConnection.doOutput = true
                 //urlConnection.setRequestProperty("Accept", "*/*");
-                urlConnection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
-                urlConnection.connect();
-                urlConnection.getOutputStream().write(data.getBytes());
+                urlConnection.setRequestProperty("Content-Type", "application/json; charset=UTF-8")
+                urlConnection.connect()
+                urlConnection.outputStream.write(data.toByteArray())
                 try {  // try to read the response
-                    InputStream in = urlConnection.getInputStream();
-                    InputStreamReader isw = new InputStreamReader(in);
-                    int responseData = isw.read();
+                    val `in` = urlConnection.inputStream
+                    val isw = InputStreamReader(`in`)
+                    var responseData = isw.read()
                     while (responseData != -1) {
-                        result.append((char) responseData);
-                        responseData = isw.read();
+                        result.append(responseData.toChar())
+                        responseData = isw.read()
                     }
-                } catch (IOException io) { }
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
-                if (urlConnection != null) {
-                    urlConnection.disconnect();
+                } catch (io: IOException) {
                 }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            } finally {
+                urlConnection?.disconnect()
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
-
 }

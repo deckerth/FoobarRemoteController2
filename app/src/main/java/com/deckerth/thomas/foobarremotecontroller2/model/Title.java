@@ -11,24 +11,17 @@ public class Title implements ITitle {
     protected final String mPlaylistId;
     protected final String mIndex;
     protected final String mComposer;
-    protected String mAlbum;
     private final String mTitle;
-    protected String mArtist;
     private final String mDiscNumber;
     private final String mTrack;
     private final String mPlaybackTime;
     private final Double mDuration;
     private final Double mPosition;
     private final String mArtworkUrl;
+    protected String mAlbum;
+    protected String mArtist;
     protected Bitmap mArtwork;
     private Boolean mIsCurrent = false;
-
-    protected String set(String v) {
-        if (v == null)
-            return "";
-        else
-            return v;
-    }
 
     public Title(String mPlaylistId, String mIndex, String mCatalog, String mComposer, String mAlbum, String mTitle, String mArtist, String mDiscNumber, String mTrack, String mPlaybackTime, String duration, String position, String mArtworkUrl) {
         this.mCatalog = set(mCatalog);
@@ -55,6 +48,13 @@ public class Title implements ITitle {
             value = 0.0;
         }
         mPosition = value;
+    }
+
+    protected String set(String v) {
+        if (v == null)
+            return "";
+        else
+            return v;
     }
 
     @Override
@@ -98,7 +98,9 @@ public class Title implements ITitle {
     }
 
     @Override
-    public void clearAlbum() { mAlbum = ""; }
+    public void clearAlbum() {
+        mAlbum = "";
+    }
 
     @Override
     public String getDiscNumber() {
@@ -136,13 +138,13 @@ public class Title implements ITitle {
     }
 
     @Override
-    public String getArtworkUrl() {
-        return mArtworkUrl;
+    public void setArtwork(Bitmap artwork) {
+        mArtwork = artwork;
     }
 
     @Override
-    public void setArtwork(Bitmap artwork) {
-        mArtwork = artwork;
+    public String getArtworkUrl() {
+        return mArtworkUrl;
     }
 
     @Override

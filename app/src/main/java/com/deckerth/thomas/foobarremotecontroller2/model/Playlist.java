@@ -26,7 +26,7 @@ public class Playlist {
     }
 
     public List<ITitle> getPlaylist() {
-        return  mTitles;
+        return mTitles;
     }
 
 }

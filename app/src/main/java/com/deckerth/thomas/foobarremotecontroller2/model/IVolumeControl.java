@@ -12,18 +12,28 @@ public interface IVolumeControl {
 */
 
     Boolean getMuted();
-    Integer getMin();
-    Integer getMax();
-    String getType();
-    Integer getValue();
 
     void setMuted(Boolean isMuted);
+
+    Integer getMin();
+
     void setMin(Integer min);
+
+    Integer getMax();
+
     void setMax(Integer max);
+
+    String getType();
+
     void setType(String type);
+
+    Integer getValue();
+
     void setValue(Integer value);
 
     Integer getModifiedValuePercent(Integer deltaPercent);
+
     Integer getCurrentValuePercent();
+
     Integer getDecibelValue(Integer percent);
 }

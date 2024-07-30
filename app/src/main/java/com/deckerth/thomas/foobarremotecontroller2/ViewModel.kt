@@ -4,39 +4,53 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import com.deckerth.thomas.foobarremotecontroller2.connector.HTTPConnector
 import com.deckerth.thomas.foobarremotecontroller2.connector.PlayerAccess
 import com.deckerth.thomas.foobarremotecontroller2.connector.PlaylistAccess
 import com.deckerth.thomas.foobarremotecontroller2.model.ITitle
 import com.deckerth.thomas.foobarremotecontroller2.model.Player
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.subscribe
 import me.zhanghai.compose.preference.Preferences
 import java.util.concurrent.Executors
+import java.util.concurrent.ScheduledFuture
 import java.util.concurrent.TimeUnit
 
-private var observerRunning = false
-
+var preferences: Preferences? = null
 var ip_address: String? = null
+var valid = false
+val connector = HTTPConnector()
 
 fun updatePreferences(preferenceFlow: MutableStateFlow<Preferences>) {
-    var value = preferenceFlow.value
-    var ip: String? = value["ip_address_preference"]
-    if (ip != null) {
-        ip_address = ip
-        updateList()
-        startPlayerObserver()
-    }
+    preferences = preferenceFlow.value
+    val ip:String? = preferences!!["ip_address_preference"]
+    Thread{
+        if (ip != null) {
+            valid = connector.checkConnection(ip)
+            println("FOOB $ip valid:$valid")
+            ip_address = ip
+            observer?.cancel(true)
+            if (valid){
+                startPlayerObserver()
+            }
+        }
+    }.start()
 }
 
+var playlistId: String? = null;
 val list = mutableStateListOf<ITitle>()
-var loadingList by mutableStateOf(true)
+var loadingList by mutableStateOf(false)
 
 fun updateList() {
     loadingList = true
     list.clear()
     Thread {
         val currentPlaylist = PlaylistAccess.getInstance().currentPlaylist
+        playlistId = currentPlaylist.playlistEntity.playlistId
         var playlist: List<ITitle> =
             if (currentPlaylist != null) currentPlaylist.playlist else return@Thread
+        list.clear()
         list.addAll(playlist)
         loadingList = false
     }.start()
@@ -68,9 +82,15 @@ private fun updatePlayer() {
 //        scheduler.scheduleWithFixedDelay(task, 0, 1, TimeUnit.SECONDS);
 //    }
 
+private var observer: ScheduledFuture<*>? = null
+
 fun startPlayerObserver() {
-    if (observerRunning)
-        return
-    var scheduler = Executors.newSingleThreadScheduledExecutor()
-    scheduler.scheduleWithFixedDelay(::updatePlayer, 0, 1, TimeUnit.SECONDS)
+    if (observer != null && !observer!!.isDone)
+        observer!!.cancel(true)
+    val scheduler = Executors.newSingleThreadScheduledExecutor()
+    observer = scheduler.scheduleWithFixedDelay({
+        updatePlayer()
+        if (!loadingList && PlaylistAccess.getInstance().currentPlaylistID != playlistId)
+            updateList()
+    }, 0, 1, TimeUnit.SECONDS)
 }

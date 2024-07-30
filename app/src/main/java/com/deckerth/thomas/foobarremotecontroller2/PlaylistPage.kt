@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
@@ -24,16 +25,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.deckerth.thomas.foobarremotecontroller2.connector.PlayerAccess
+import com.deckerth.thomas.foobarremotecontroller2.connector.PlaylistAccess
 import com.deckerth.thomas.foobarremotecontroller2.model.ITitle
 import com.deckerth.thomas.foobarremotecontroller2.model.Title
 import com.deckerth.thomas.foobarremotecontroller2.ui.theme.Foobar2000RemoteControllerTheme
-import me.zhanghai.compose.preference.defaultPreferenceFlow
+import kotlinx.coroutines.launch
 
 @Composable
 fun PlaylistPage() {
@@ -48,9 +52,13 @@ fun PlaylistPage() {
 
 @Composable
 fun TitleCard(title: ITitle) {
-    var isExpanded by remember { mutableStateOf(false) }
+    var isSelected = false
+    if (player != null){
+        isSelected = player!!.index == title.index
+    }
+
     val surfaceColor by animateColorAsState(
-        if (isExpanded) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceContainer,
+        if (isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceContainer,
     )
     ElevatedCard(
         colors = CardDefaults.cardColors(
@@ -59,8 +67,13 @@ fun TitleCard(title: ITitle) {
         modifier = Modifier
             .animateContentSize()
             .fillMaxWidth()
+            .clip(CardDefaults.elevatedShape)
             .padding(vertical = 4.dp, horizontal = 8.dp)
-            .clickable { isExpanded = !isExpanded }
+            .clickable {
+                PlayerAccess
+                    .getInstance()
+                    .playTrack(title.playlistId, title.index)
+            }
     ) {
         Row(modifier = Modifier.padding(all = 8.dp)) {
             AsyncImage(
@@ -79,19 +92,19 @@ fun TitleCard(title: ITitle) {
             ) {
                 Text(
                     text = title.album,
-                    maxLines = if (isExpanded) Int.MAX_VALUE else 1,
+                    maxLines = if (isSelected) Int.MAX_VALUE else 1,
                     style = MaterialTheme.typography.titleMedium
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = title.title,
-                    maxLines = if (isExpanded) Int.MAX_VALUE else 1,
+                    maxLines = if (isSelected) Int.MAX_VALUE else 1,
                     style = MaterialTheme.typography.bodyMedium
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = title.artist,
-                    maxLines = if (isExpanded) Int.MAX_VALUE else 1,
+                    maxLines = if (isSelected) Int.MAX_VALUE else 1,
                     style = MaterialTheme.typography.bodyMedium
                 )
             }
@@ -122,12 +135,17 @@ fun TitleCardPreview() {
 
 @Composable
 fun Playlist(titles: List<ITitle>) {
-    LazyColumn {
+    var index = 0;
+    if (player != null)
+        index = player!!.index.toInt()
+    val listState = rememberLazyListState(initialFirstVisibleItemIndex = index,)
+    LazyColumn(state = listState) {
         items(titles) { title ->
             TitleCard(title)
         }
     }
 }
+
 
 @Preview(
     showBackground = true,

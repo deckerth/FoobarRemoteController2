@@ -37,7 +37,7 @@ public class PlaylistAccess {
 
     public Playlist getPlaylist(PlaylistEntity playlistEntity) {
         String response = mConnector.getData("playlists/" + playlistEntity.getPlaylistId() +
-                "/items/0%3A100?columns=%25catalog%25,%25composer%25,%25album%25,%25title%25,%25artist%25,%25discnumber%25,%25track%25,%25length%25");
+                "/items/0%3A1000?columns=%25catalog%25,%25composer%25,%25album%25,%25title%25,%25artist%25,%25discnumber%25,%25track%25,%25length%25");
         return parsePlaylist(response, playlistEntity);
 //        try {
 //                mActivity.runOnUiThread(() -> {
@@ -108,6 +108,23 @@ public class PlaylistAccess {
         }
 
         return playlist;
+    }
+
+    public String getCurrentPlaylistID(){
+        if (mConnector == null)
+            this.mConnector = new HTTPConnector();
+        String response = queryPlaylists();
+        try {
+            JSONArray array = new JSONObject(response).getJSONArray("playlists");
+            for (int i = 0; i < array.length(); i++) {
+                JSONObject playlist = array.getJSONObject(i);
+                if (playlist.getBoolean("isCurrent"))
+                    return playlist.getString("id");
+            }
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+        return null;
     }
 
     private String queryPlaylists() {

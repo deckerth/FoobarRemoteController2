@@ -29,6 +29,7 @@ class HTTPConnector {
                 url = URL(serverAddress + endpoint)
                 //open a URL coonnection
                 urlConnection = url.openConnection() as HttpURLConnection
+                println("FOOB response:"+urlConnection.responseCode+" Message:"+urlConnection.responseMessage)
                 val `in` = urlConnection.inputStream
                 val isw = InputStreamReader(`in`)
                 var data = isw.read()
@@ -51,6 +52,22 @@ class HTTPConnector {
         return result.toString()
     }
 
+    fun checkConnection(ip:String): Boolean{
+        try {
+            val url = URL("http://$ip:8880/api/playlists")
+            println("FOOB \"http://$ip:8880/api/playlists\"")
+            //open a URL connection
+            val urlConnection = url.openConnection() as HttpURLConnection
+            val response = urlConnection.responseCode
+            val message = urlConnection.responseMessage
+            println("FOOB respone: $response message:$message")
+            return response == 200 && message == "OK"
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return false
+        }
+    }
+
     fun getImage(endpoint: String): Bitmap? {
         // Fetch data from the API in the background.
         val result: Bitmap
@@ -59,7 +76,7 @@ class HTTPConnector {
             var urlConnection: HttpURLConnection? = null
             try {
                 url = URL(serverAddress + endpoint)
-                //open a URL coonnection
+                //open a URL connection
                 urlConnection = url.openConnection() as HttpURLConnection
                 val `in` = urlConnection.inputStream
 

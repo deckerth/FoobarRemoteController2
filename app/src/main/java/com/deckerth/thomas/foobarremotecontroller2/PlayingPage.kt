@@ -1,6 +1,8 @@
 package com.deckerth.thomas.foobarremotecontroller2
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,18 +18,21 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.deckerth.thomas.foobarremotecontroller2.connector.PlayerAccess
 import com.deckerth.thomas.foobarremotecontroller2.model.PlaybackState
 import com.deckerth.thomas.foobarremotecontroller2.model.Player
+import com.deckerth.thomas.foobarremotecontroller2.ui.theme.Foobar2000RemoteControllerTheme
 
 @Composable
 fun PlayingPage() {
@@ -80,12 +85,44 @@ fun PlayerCard(player: Player) {
             style = MaterialTheme.typography.bodySmall
         )
         Spacer(modifier = Modifier.height(8.dp))
-        LinearProgressIndicator(
-            modifier = Modifier
-                .clip(MaterialTheme.shapes.large)
-                .fillMaxWidth(),
-            progress = { player.getPos() }
-        )
+
+        @Composable
+        fun ProgressIndicator(){
+            Column {
+                Box {
+                    Text(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        text = player.playbackTime,
+                        style = MaterialTheme.typography.labelSmall
+                    )
+                    Text(
+                        textAlign = TextAlign.Right,
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        text = player.getNiceDuration(),
+                        style = MaterialTheme.typography.labelSmall
+                    )
+                }
+
+                LinearProgressIndicator(
+                    modifier = Modifier
+                        .clip(MaterialTheme.shapes.large)
+                        .fillMaxWidth(),
+                    progress = { player.getPos() }
+                )
+
+                Text(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    text = "Disc ${player.discNumber} Track ${player.track}",
+                    style = MaterialTheme.typography.labelSmall
+                )
+            }
+
+        }
+        ProgressIndicator()
+
         Spacer(modifier = Modifier.height(32.dp))
         Row {
             IconButton(
@@ -153,27 +190,41 @@ fun PlayerCard(player: Player) {
     }
 }
 
+
+
 @Preview(
-    showBackground = true
+    name = "light mode",
+    showBackground = true,
+    uiMode = Configuration.UI_MODE_NIGHT_NO
+)
+@Preview(
+    name = "dark mode",
+    showBackground = true,
+    uiMode = Configuration.UI_MODE_NIGHT_YES
 )
 @Composable
 fun PlayerCardPreview() {
-    PlayerCard(
-        player = Player(
-            "",
-            "",
-            "Album",
-            "Title",
-            "Artist",
-            "0",
-            "",
-            "",
-            "",
-            "",
-            "1",
-            "0.5",
-            "",
-            PlaybackState.PLAYING
-        )
-    )
+    Foobar2000RemoteControllerTheme {
+        Surface {
+            PlayerCard(
+                player = Player(
+                    "xyz",
+                    "",
+                    "Album",
+                    "Title",
+                    "Artist",
+                    "0",
+                    "02",
+                    "0:28",
+                    "",
+                    "",
+                    "955.8266666666667",
+                    "28.9795",
+                    "",
+                    PlaybackState.PLAYING
+                )
+            )
+        }
+
+    }
 }

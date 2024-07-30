@@ -42,13 +42,13 @@ var playlistId: String? = null;
 val list = mutableStateListOf<ITitle>()
 var loadingList by mutableStateOf(false)
 
-fun updateList() {
+private fun updateList() {
     loadingList = true
-    list.clear()
+    //list.clear()
     Thread {
         val currentPlaylist = PlaylistAccess.getInstance().currentPlaylist
         playlistId = currentPlaylist.playlistEntity.playlistId
-        var playlist: List<ITitle> =
+        val playlist: List<ITitle> =
             if (currentPlaylist != null) currentPlaylist.playlist else return@Thread
         list.clear()
         list.addAll(playlist)

@@ -28,4 +28,11 @@ data class Player(
         val position = this.position.toFloat()
         return position / duration * 1f
     }
+
+    fun getNiceDuration(): String{
+        val duration = duration.toFloat().toInt()
+        val minutes:Int = duration/60
+        val seconds:Int = duration%60
+        return String.format("%02d:%02d", minutes, seconds)
+    }
 }

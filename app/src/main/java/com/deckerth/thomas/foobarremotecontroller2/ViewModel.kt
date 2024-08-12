@@ -9,10 +9,12 @@ import com.deckerth.thomas.foobarremotecontroller2.connector.PlayerAccess
 import com.deckerth.thomas.foobarremotecontroller2.connector.PlaylistAccess
 import com.deckerth.thomas.foobarremotecontroller2.model.ITitle
 import com.deckerth.thomas.foobarremotecontroller2.model.Player
+import com.deckerth.thomas.foobarremotecontroller2.model.Playlist
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.subscribe
 import me.zhanghai.compose.preference.Preferences
+import okhttp3.internal.notifyAll
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledFuture
 import java.util.concurrent.TimeUnit
@@ -39,19 +41,16 @@ fun updatePreferences(preferenceFlow: MutableStateFlow<Preferences>) {
 }
 
 var playlistId: String? = null;
-val list = mutableStateListOf<ITitle>()
+var playlist by mutableStateOf<Playlist?>(null)
 var loadingList by mutableStateOf(false)
 
 private fun updateList() {
     loadingList = true
     //list.clear()
     Thread {
-        val currentPlaylist = PlaylistAccess.getInstance().currentPlaylist
+        val currentPlaylist = PlaylistAccess.getInstance().currentPlaylist ?: return@Thread
         playlistId = currentPlaylist.playlistEntity.playlistId
-        val playlist: List<ITitle> =
-            if (currentPlaylist != null) currentPlaylist.playlist else return@Thread
-        list.clear()
-        list.addAll(playlist)
+        playlist = currentPlaylist
         loadingList = false
     }.start()
 }

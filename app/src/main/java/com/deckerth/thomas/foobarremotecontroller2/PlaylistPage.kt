@@ -2,124 +2,213 @@ package com.deckerth.thomas.foobarremotecontroller2
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
-import androidx.compose.foundation.border
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.deckerth.thomas.foobarremotecontroller2.connector.PlayerAccess
-import com.deckerth.thomas.foobarremotecontroller2.connector.PlaylistAccess
+import com.deckerth.thomas.foobarremotecontroller2.model.Album
 import com.deckerth.thomas.foobarremotecontroller2.model.ITitle
+import com.deckerth.thomas.foobarremotecontroller2.model.Playlist
+import com.deckerth.thomas.foobarremotecontroller2.model.PlaylistEntity
+import com.deckerth.thomas.foobarremotecontroller2.model.Playlists
 import com.deckerth.thomas.foobarremotecontroller2.model.Title
 import com.deckerth.thomas.foobarremotecontroller2.ui.theme.Foobar2000RemoteControllerTheme
-import kotlinx.coroutines.launch
 
 @Composable
 fun PlaylistPage() {
-    if (loadingList)
+    if (loadingList || playlist == null)
         LinearProgressIndicator(
             modifier = Modifier
                 .fillMaxWidth()
         )
-    Playlist(titles = list)
+    if (playlist == null)
+        return
+    Playlist(playlist!!)
 }
 
-
 @Composable
-fun TitleCard(title: ITitle) {
-    var isSelected = false
-    if (player != null){
-        isSelected = player!!.index == title.index
+fun AlbumCard(album: Album) {
+    var isSelected by rememberSaveable {
+        mutableStateOf(false)
     }
+//    if (player != null){
+//        isSelected = album.hasIndex(player!!.index)
+//    }
 
     val surfaceColor by animateColorAsState(
         if (isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceContainer,
     )
     ElevatedCard(
-        colors = CardDefaults.cardColors(
-            containerColor = surfaceColor
-        ),
         modifier = Modifier
             .animateContentSize()
             .fillMaxWidth()
-            .clip(CardDefaults.elevatedShape)
             .padding(vertical = 4.dp, horizontal = 8.dp)
-            .clickable {
-                PlayerAccess
-                    .getInstance()
-                    .playTrack(title.playlistId, title.index)
-            }
+//            .clickable {
+//                PlayerAccess
+//                    .getInstance()
+//                    .playTrack(album.playlistId, album.index)
+//            }
     ) {
-        Row(modifier = Modifier.padding(all = 8.dp)) {
-            AsyncImage(
-                model = title.artworkUrl,
-                //placeholder = painterResource(R.drawable.album),
-                contentDescription = "Album Picture",
-                modifier = Modifier
-                    .size(80.dp)
-                    .clip(RoundedCornerShape(4.dp))
-                    .border(1.5.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(4.dp))
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Column(
-                modifier = Modifier
-                    .padding(1.dp)
-            ) {
-                Text(
-                    text = title.album,
-                    maxLines = if (isSelected) Int.MAX_VALUE else 1,
-                    style = MaterialTheme.typography.titleMedium
+        Column{
+            Row {
+                AsyncImage(
+                    model = album.originalTitle.artworkUrl,
+                    placeholder = painterResource(R.drawable.ic_launcher_background),
+                    contentDescription = "Album Picture",
+                    modifier = Modifier
+                        .size(80.dp)
                 )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = title.title,
-                    maxLines = if (isSelected) Int.MAX_VALUE else 1,
-                    style = MaterialTheme.typography.bodyMedium
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = title.artist,
-                    maxLines = if (isSelected) Int.MAX_VALUE else 1,
-                    style = MaterialTheme.typography.bodyMedium
-                )
+                Column(
+                    verticalArrangement = Arrangement.Center,
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp)
+                        .height(80.dp)
+                ) {
+                    Text(
+                        text = album.originalTitle.album,
+                        maxLines = 1,
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                    Text(
+                        text = album.originalTitle.artist,
+                        maxLines = 1,
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                    if (album.originalTitle.composer != "" && album.originalTitle.composer != "?" && album.originalTitle.composer != album.originalTitle.artist) {
+                        Text(
+                            text = album.originalTitle.composer,
+                            maxLines = 1,
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                }
+
+
             }
+            if (album.titles.size > 1){
+                HorizontalDivider()
+                Box {
+                    TextButton(
+                        modifier = Modifier
+                            .padding(horizontal = 8.dp, vertical = 2.dp),
+                        onClick = { isSelected = !isSelected }
+                    ) {
+                        if (isSelected) {
+                            Text(text = "Collapse")
+                        } else {
+                            Text(text = "Expand")
+                        }
+                    }
+                    Text(
+                        modifier = Modifier
+                            .padding(horizontal = 16.dp)
+                            .fillMaxWidth()
+                            .align(Alignment.Center),
+                        textAlign = TextAlign.Right,
+                        style = MaterialTheme.typography.bodySmall,
+                        text = "${album.titles.size} Titles"
+                    )
+                }
+
+                if (isSelected) {
+                    Column {
+                        album.titles.forEach { title ->
+                            TitleEntry(title = title)
+                        }
+                    }
+                }
+            }else{
+                TitleEntry(title = album.titles[0])
+            }
+
+        }
+    }
+
+}
+
+@Composable
+fun TitleEntry(title: ITitle){
+    var titleSelected = false
+    if (player != null)
+        titleSelected = title.index == player!!.index && title.playlistId == player!!.playlistId
+    var modifier = Modifier
+        .clickable {
+            PlayerAccess.getInstance().playTrack(title.playlistId,title.index)
+        }
+    println("FOOB selected: $titleSelected")
+    if (titleSelected)
+        modifier = modifier.background(MaterialTheme.colorScheme.primaryContainer)
+    Column(
+        modifier = modifier
+    ) {
+        HorizontalDivider()
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+        ) {
+            Text(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                text = title.title,
+                maxLines = 1,
+                style = MaterialTheme.typography.titleMedium
+            )
+            Text(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                text = title.artist,
+                maxLines = 1,
+                style = MaterialTheme.typography.bodySmall
+            )
         }
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-fun TitleCardPreview() {
-    var title = Title(
+fun AlbumCardPreview() {
+    val title = Title(
         "",
         "",
         "",
-        "",
+        "Composer",
         "Ibrahim Ferrer (Buena Vista Social Club Presents)",
         "Mamí Me Gustó",
         "Ibrahim Ferrer",
@@ -130,20 +219,123 @@ fun TitleCardPreview() {
         "",
         "",
     )
-    TitleCard(title)
+    val album = Album(title)
+    album.titles.add(title)
+    album.titles.add(title)
+    album.titles.add(title)
+    album.titles.add(title)
+    album.titles.add(title)
+    AlbumCard(album)
 }
 
 @Composable
-fun Playlist(titles: List<ITitle>) {
+fun Playlist(playlist: Playlist) {
     var index = 0;
     if (player != null)
         index = player!!.index.toInt()
-    val listState = rememberLazyListState(initialFirstVisibleItemIndex = index,)
+    val listState = rememberLazyListState(initialFirstVisibleItemIndex = index)
     LazyColumn(state = listState) {
-        items(titles) { title ->
-            TitleCard(title)
+        items(playlist.albums) { album ->
+            AlbumCard(album)
         }
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun PlaylistSwitcher(playlists: Playlists, selected: Int){
+    var expanded by remember {
+        mutableStateOf(false)
+    }
+    var selectedIndex by remember {
+        mutableIntStateOf(selected)
+    }
+    ExposedDropdownMenuBox(
+        modifier = Modifier
+            .padding(8.dp)
+            .fillMaxWidth(),
+        expanded = expanded,
+        onExpandedChange = { expanded = !expanded }
+    ){
+        OutlinedTextField(
+            modifier = Modifier
+                .fillMaxWidth()
+                .menuAnchor(),
+            label = { Text(text = "Playlists") },
+            readOnly = true,
+            value = playlists.playlists[selectedIndex].name,
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+            onValueChange = {s: String ->
+
+            }
+        )
+        DropdownMenu(
+            modifier = Modifier
+                .exposedDropdownSize(),
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            playlists.playlists.forEachIndexed { index, playlistEntity ->
+                DropdownMenuItem(
+                    text = {
+                        Text(text = playlistEntity.name)
+                    },
+                    contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
+                    onClick = {
+                        selectedIndex = index
+                        expanded = false
+                    },
+                    trailingIcon = {
+                        if (playlistEntity.isCurrent) {
+                            Icon(painter = painterResource(id = R.drawable.equalizer), contentDescription = "Playing")
+                        }
+                    }
+                )
+            }
+        }
+    }
+
+}
+
+@Preview(
+    showBackground = true
+)
+@Composable
+fun PlaylistSwitcherPreview(){
+//    var text by remember {
+//        mutableStateOf("text")
+//    }
+//    OutlinedTextField(
+//        value = text,
+//        onValueChange = {s: String ->
+//            text = s
+//        },
+//        label = {
+//            Text(text = "Playlist")
+//        }
+//    )
+    val playlists = Playlists()
+    playlists.addPlaylistEntity(PlaylistEntity(
+        "p1",
+        "name1",
+        false
+    ))
+    playlists.addPlaylistEntity(PlaylistEntity(
+        "p2",
+        "name2",
+        false
+    ))
+    playlists.addPlaylistEntity(PlaylistEntity(
+        "p3",
+        "name3",
+        true
+    ))
+    playlists.addPlaylistEntity(PlaylistEntity(
+        "p4",
+        "name4",
+        false
+    ))
+    PlaylistSwitcher(playlists = playlists, selected = 0)
 }
 
 
@@ -153,11 +345,11 @@ fun Playlist(titles: List<ITitle>) {
 @Composable
 fun PlaylistPreview() {
     Foobar2000RemoteControllerTheme {
-        var title = Title(
+        val title = Title(
             "",
             "",
             "",
-            "",
+            "Composer",
             "Ibrahim Ferrer (Buena Vista Social Club Presents)",
             "Mamí Me Gustó",
             "Ibrahim Ferrer",
@@ -166,13 +358,22 @@ fun PlaylistPreview() {
             "",
             "",
             "",
-            ""
+            "",
         )
-        var titles: List<ITitle> = listOf(title, title, title, title)
+        val playlist = Playlist(PlaylistEntity("p4","main",true))
+        playlist.addTitle(title)
+        playlist.addTitle(title)
+        playlist.addTitle(title)
+        playlist.addTitle(title)
+        playlist.addTitle(title)
+        playlist.addTitle(title)
 //        var titles = PlaylistAccess().getCurrentPlaylist();
 //        if (titles == null) {
 //            return@ComposePlaylistTheme
 //        }
-        Playlist(titles = titles)
+        Column {
+            PlaylistSwitcherPreview()
+            Playlist(playlist)
+        }
     }
 }

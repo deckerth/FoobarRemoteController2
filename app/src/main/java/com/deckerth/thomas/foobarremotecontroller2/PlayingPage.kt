@@ -58,26 +58,25 @@ fun PlayerCard(player: Player) {
             model = player.artworkUrl,
             //placeholder = painterResource(R.drawable.album),
             contentDescription = "Album Picture",
+            placeholder = painterResource(id = R.drawable.icon),
             modifier = Modifier
                 .aspectRatio(1f)
                 .size(320.dp)
                 .clip(MaterialTheme.shapes.medium)
         )
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(16.dp))
         Text(
             modifier = Modifier.fillMaxWidth(),
             maxLines = 1,
             text = player.title,
             style = MaterialTheme.typography.titleLarge
         )
-        Spacer(modifier = Modifier.height(8.dp))
         Text(
             modifier = Modifier.fillMaxWidth(),
             maxLines = 1,
             text = player.album,
             style = MaterialTheme.typography.bodySmall
         )
-        Spacer(modifier = Modifier.height(4.dp))
         Text(
             modifier = Modifier.fillMaxWidth(),
             maxLines = 1,
@@ -104,19 +103,19 @@ fun PlayerCard(player: Player) {
                         style = MaterialTheme.typography.labelSmall
                     )
                 }
-
+                Spacer(modifier = Modifier.height(2.dp))
                 LinearProgressIndicator(
                     modifier = Modifier
                         .clip(MaterialTheme.shapes.large)
                         .fillMaxWidth(),
                     progress = { player.getPos() }
                 )
-
+                Spacer(modifier = Modifier.height(2.dp))
                 Text(
                     modifier = Modifier
                         .fillMaxWidth(),
                     text = "Disc ${player.discNumber} Track ${player.track}",
-                    style = MaterialTheme.typography.labelSmall
+                    style = MaterialTheme.typography.bodySmall
                 )
             }
 

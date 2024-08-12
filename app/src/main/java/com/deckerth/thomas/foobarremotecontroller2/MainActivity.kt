@@ -47,7 +47,6 @@ data class BottomNavigationItem(
     val unselectedIcon: ImageVector,
 )
 
-
 class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {

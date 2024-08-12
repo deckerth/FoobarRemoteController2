@@ -1,32 +1,36 @@
-package com.deckerth.thomas.foobarremotecontroller2.model;
+package com.deckerth.thomas.foobarremotecontroller2.model
 
-import java.util.ArrayList;
-import java.util.List;
+class Playlist(val playlistEntity: PlaylistEntity) {
+    private val mTitles = mutableListOf<ITitle>()
 
-public class Playlist {
-
-    private final PlaylistEntity mPlaylistEntity;
-
-    private final List<ITitle> mTitles = new ArrayList<>();
-
-    public Playlist(PlaylistEntity mPlaylistEntity) {
-        this.mPlaylistEntity = mPlaylistEntity;
+    fun clear() {
+        mTitles.clear()
     }
 
-    public PlaylistEntity getPlaylistEntity() {
-        return mPlaylistEntity;
+    fun addTitle(title: ITitle) {
+        mTitles.add(title)
     }
 
-    public void clear() {
-        mTitles.clear();
-    }
+    val albums: List<Album>
+        get() {
+            if (mTitles.isNotEmpty()) {
+                val albums = mutableListOf<Album>()
+                var currentAlbum = Album(mTitles[0])
+                albums.add(currentAlbum)
+                playlist.forEach { iTitle ->
+                    if (iTitle.album == currentAlbum.originalTitle.album){
+                        currentAlbum.titles.add(iTitle)
+                    }else{
+                        currentAlbum = Album(iTitle)
+                        currentAlbum.titles.add(iTitle)
+                        albums.add(currentAlbum)
+                    }
+                }
+                return albums
+            }else
+                return listOf()
+        }
 
-    public void addTitle(ITitle title) {
-        mTitles.add(title);
-    }
-
-    public List<ITitle> getPlaylist() {
-        return mTitles;
-    }
-
+    val playlist: List<ITitle>
+        get() = mTitles
 }

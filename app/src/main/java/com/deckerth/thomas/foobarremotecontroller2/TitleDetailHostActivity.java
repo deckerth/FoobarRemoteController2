@@ -11,6 +11,8 @@ import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
@@ -25,16 +27,22 @@ import com.deckerth.thomas.foobarremotecontroller2.connector.PlayerAccess;
 import com.deckerth.thomas.foobarremotecontroller2.connector.PlaylistAccess;
 import com.deckerth.thomas.foobarremotecontroller2.databinding.ActivityTitleDetailBinding;
 import com.deckerth.thomas.foobarremotecontroller2.model.VolumeControl;
+import com.deckerth.thomas.foobarremotecontroller2.phone_integration.TelephoneListener;
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.PlayerViewModel;
 
 import java.util.Objects;
+import java.util.concurrent.Executor;
 
 public class TitleDetailHostActivity extends AppCompatActivity {
 
     private ActivityTitleDetailBinding mBinding;
     private TitleDetailHostActivity mActivity;
-
+    private TelephoneListener mTelephoneListener;
     public static Bitmap FOOBAR_BITMAP;
+
+    public enum GrantedState { UNKNOWN, GRANTED, NOT_GRANTED };
+
+    private GrantedState mGrantedState = GrantedState.UNKNOWN;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +73,27 @@ public class TitleDetailHostActivity extends AppCompatActivity {
         PlayerViewModel playerViewModel = PlayerViewModel.getInstance();
         playerViewModel.getVolumeControlViewModel().getVolume().observe(this, Objects.requireNonNull(mBinding.volumeControl)::setVolumePercent);
 
+/*
+        ActivityResultLauncher<String> requestSinglePermissionLauncher = registerForActivityResult(
+                new ActivityResultContracts.RequestPermission(),
+                isGranted -> {
+                    if (isGranted) {
+                        mGrantedState = GrantedState.GRANTED;
+                        // Permission granted, handle accordingly
+                        // You can perform the action that requires the permission here
+                    } else {
+                        mGrantedState = GrantedState.NOT_GRANTED;
+                        // Permission denied, handle accordingly
+                        // You might show a message or take other actions
+                    }
+                }
+        );
+
+
+        mTelephoneListener = new TelephoneListener(requestSinglePermissionLauncher, this);
+        mTelephoneListener.register(getBaseContext());
+*/
+
         NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.nav_host_fragment);
         NavController navController = null;
@@ -83,6 +112,9 @@ public class TitleDetailHostActivity extends AppCompatActivity {
         }
     }
 
+    public GrantedState getGrantedState() {
+        return mGrantedState;
+    }
     private int startedWaits = 0;
 
     void changeVolumePercent(int delta) {

@@ -13,3 +13,11 @@
 .externalNativeBuild
 .cxx
 local.properties
+.idea/vcs.xml
+.idea/other.xml
+.idea/misc.xml
+.idea/migrations.xml
+.idea/inspectionProfiles/Project_Default.xml
+.idea/deploymentTargetSelector.xml
+.idea/deploymentTargetDropDown.xml
+.idea/compiler.xml

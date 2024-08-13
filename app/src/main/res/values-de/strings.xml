@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Foobar Link</string>
+    <string name="tab_playlist">Playlist</string>
+    <string name="tab_now_playing">Jetzt läuft</string>
+    <string name="tab_settings">Einstellungen</string>
+    <string name="desc_album_picture">Album Bild</string>
+    <string name="info_disc_track">Disc %1$s Track %2$s</string>
+    <string name="desc_skip_previous">Zurückspulen</string>
+    <string name="desc_play">Play</string>
+    <string name="desc_pause">Pause</string>
+    <string name="desc_skip_next">Überspringen</string>
+    <string name="button_collapse">Weniger anzeigen</string>
+    <string name="button_expand">Mehr anzeigen</string>
+    <string name="info_titles">%1$s Titel</string>
+    <string name="button_playlist_switcher">Playlisten</string>
+    <string name="title_setup_screen">Foobar Link Einrichten</string>
+</resources>

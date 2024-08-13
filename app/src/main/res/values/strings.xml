@@ -1,3 +1,17 @@
 <resources>
     <string name="app_name">Foobar Link</string>
+    <string name="tab_playlist">Playlist</string>
+    <string name="tab_now_playing">Now Playing</string>
+    <string name="tab_settings">Settings</string>
+    <string name="desc_album_picture">Album Picture</string>
+    <string name="info_disc_track">Disc %1$s Track %2$s</string>
+    <string name="desc_skip_previous">Skip Previous</string>
+    <string name="desc_play">Play</string>
+    <string name="desc_pause">Pause</string>
+    <string name="desc_skip_next">Skip Next</string>
+    <string name="button_collapse">Collapse</string>
+    <string name="button_expand">Expand</string>
+    <string name="info_titles">%1$s Titles</string>
+    <string name="button_playlist_switcher">Playlists</string>
+    <string name="title_setup_screen">Setup Foobar Link</string>
 </resources>

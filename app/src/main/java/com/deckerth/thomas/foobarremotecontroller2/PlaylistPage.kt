@@ -38,6 +38,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -91,7 +92,7 @@ fun AlbumCard(album: Album) {
                 AsyncImage(
                     model = album.originalTitle.artworkUrl,
                     placeholder = painterResource(R.drawable.ic_launcher_background),
-                    contentDescription = "Album Picture",
+                    contentDescription = stringResource(id = R.string.desc_album_picture),
                     modifier = Modifier
                         .size(80.dp)
                 )
@@ -131,9 +132,9 @@ fun AlbumCard(album: Album) {
                         onClick = { isSelected = !isSelected }
                     ) {
                         if (isSelected) {
-                            Text(text = "Collapse")
+                            Text(text = stringResource(R.string.button_collapse))
                         } else {
-                            Text(text = "Expand")
+                            Text(text = stringResource(R.string.button_expand))
                         }
                     }
                     Text(
@@ -143,7 +144,7 @@ fun AlbumCard(album: Album) {
                             .align(Alignment.Center),
                         textAlign = TextAlign.Right,
                         style = MaterialTheme.typography.bodySmall,
-                        text = "${album.titles.size} Titles"
+                        text = stringResource(R.string.info_titles, album.titles.size)
                     )
                 }
 
@@ -261,7 +262,7 @@ fun PlaylistSwitcher(playlists: Playlists, selected: Int){
             modifier = Modifier
                 .fillMaxWidth()
                 .menuAnchor(),
-            label = { Text(text = "Playlists") },
+            label = { Text(text = stringResource(R.string.button_playlist_switcher)) },
             readOnly = true,
             value = playlists.playlists[selectedIndex].name,
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },

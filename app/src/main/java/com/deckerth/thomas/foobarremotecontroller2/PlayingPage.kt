@@ -25,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -57,7 +58,7 @@ fun PlayerCard(player: Player) {
         AsyncImage(
             model = player.artworkUrl,
             //placeholder = painterResource(R.drawable.album),
-            contentDescription = "Album Picture",
+            contentDescription = stringResource(R.string.desc_album_picture),
             placeholder = painterResource(id = R.drawable.icon),
             modifier = Modifier
                 .aspectRatio(1f)
@@ -114,7 +115,7 @@ fun PlayerCard(player: Player) {
                 Text(
                     modifier = Modifier
                         .fillMaxWidth(),
-                    text = "Disc ${player.discNumber} Track ${player.track}",
+                    text = stringResource(R.string.info_disc_track, player.discNumber, player.track),
                     style = MaterialTheme.typography.bodySmall
                 )
             }
@@ -133,7 +134,7 @@ fun PlayerCard(player: Player) {
             ) {
                 Icon(
                     painter = painterResource(R.drawable.skip_previous),
-                    contentDescription = "Skip Previous",
+                    contentDescription = stringResource(R.string.desc_skip_previous),
                     modifier = Modifier
                         .padding(5.dp)
                         .fillMaxSize()
@@ -153,7 +154,7 @@ fun PlayerCard(player: Player) {
                 if (player.playbackState == PlaybackState.PAUSED) {
                     Icon(
                         painter = painterResource(R.drawable.play),
-                        contentDescription = "Play",
+                        contentDescription = stringResource(R.string.desc_play),
                         modifier = Modifier
                             .padding(5.dp)
                             .fillMaxSize()
@@ -161,7 +162,7 @@ fun PlayerCard(player: Player) {
                 } else {
                     Icon(
                         painter = painterResource(R.drawable.pause),
-                        contentDescription = "Pause",
+                        contentDescription = stringResource(R.string.desc_pause),
                         modifier = Modifier
                             .padding(5.dp)
                             .fillMaxSize()
@@ -179,7 +180,7 @@ fun PlayerCard(player: Player) {
             ) {
                 Icon(
                     painter = painterResource(R.drawable.skip_next),
-                    contentDescription = "Skip Next",
+                    contentDescription = stringResource(R.string.desc_skip_next),
                     modifier = Modifier
                         .padding(5.dp)
                         .fillMaxSize()

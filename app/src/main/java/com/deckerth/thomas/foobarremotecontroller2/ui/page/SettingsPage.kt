@@ -1,4 +1,4 @@
-package com.deckerth.thomas.foobarremotecontroller2
+package com.deckerth.thomas.foobarremotecontroller2.ui.page
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -30,6 +30,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.deckerth.thomas.foobarremotecontroller2.ui.mainActivity
 import me.zhanghai.compose.preference.ProvidePreferenceLocals
 import me.zhanghai.compose.preference.footerPreference
 import me.zhanghai.compose.preference.listPreference

@@ -50,6 +50,7 @@ import com.deckerth.thomas.foobarremotecontroller2.ui.startPlayerObserver
 import com.deckerth.thomas.foobarremotecontroller2.ui.theme.Foobar2000RemoteControllerTheme
 import com.deckerth.thomas.foobarremotecontroller2.ui.updatePlayer
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlayingPage() {
     val pullToRefreshState = rememberPullToRefreshState()

@@ -50,7 +50,7 @@ var playlistId: String? = null;
 var playlist by mutableStateOf<Playlist?>(null)
 var loadingList by mutableStateOf(false)
 
-private fun updateList() {
+fun updateList() {
     loadingList = true
     //list.clear()
     Thread {
@@ -63,7 +63,7 @@ private fun updateList() {
 
 var player by mutableStateOf<Player?>(null)
 
-private fun updatePlayer() {
+fun updatePlayer() {
     player = PlayerAccess.getInstance().playerState
     if (mediaSession != null && player != null) {
         val state = when (player!!.playbackState){
@@ -132,7 +132,7 @@ private fun getBitmapFromURL(src: String?): Bitmap? {
 //        scheduler.scheduleWithFixedDelay(task, 0, 1, TimeUnit.SECONDS);
 //    }
 
-private var observer: ScheduledFuture<*>? = null
+var observer: ScheduledFuture<*>? = null
 
 fun startPlayerObserver() {
     if (observer != null && !observer!!.isDone)

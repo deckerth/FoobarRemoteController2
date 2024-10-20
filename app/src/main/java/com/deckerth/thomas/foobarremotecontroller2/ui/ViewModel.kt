@@ -1,4 +1,4 @@
-package com.deckerth.thomas.foobarremotecontroller2
+package com.deckerth.thomas.foobarremotecontroller2.ui
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -10,6 +10,8 @@ import androidx.compose.runtime.setValue
 import com.deckerth.thomas.foobarremotecontroller2.connector.HTTPConnector
 import com.deckerth.thomas.foobarremotecontroller2.connector.PlayerAccess
 import com.deckerth.thomas.foobarremotecontroller2.connector.PlaylistAccess
+import com.deckerth.thomas.foobarremotecontroller2.foobarMediaService
+import com.deckerth.thomas.foobarremotecontroller2.mediaSession
 import com.deckerth.thomas.foobarremotecontroller2.model.PlaybackState
 import com.deckerth.thomas.foobarremotecontroller2.model.Player
 import com.deckerth.thomas.foobarremotecontroller2.model.Playlist

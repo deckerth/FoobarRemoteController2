@@ -2,7 +2,7 @@ package com.deckerth.thomas.foobarremotecontroller2.connector
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import com.deckerth.thomas.foobarremotecontroller2.ip_address
+import com.deckerth.thomas.foobarremotecontroller2.ui.ip_address
 import java.io.IOException
 import java.io.InputStreamReader
 import java.net.HttpURLConnection

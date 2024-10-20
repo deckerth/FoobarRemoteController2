@@ -1,4 +1,4 @@
-package com.deckerth.thomas.foobarremotecontroller2
+package com.deckerth.thomas.foobarremotecontroller2.ui
 
 import android.content.Intent
 import android.os.Bundle
@@ -38,6 +38,12 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.deckerth.thomas.foobarremotecontroller2.FoobarMediaService
+import com.deckerth.thomas.foobarremotecontroller2.R
+import com.deckerth.thomas.foobarremotecontroller2.ui.page.DeviceSelectionPage
+import com.deckerth.thomas.foobarremotecontroller2.ui.page.PlayingPage
+import com.deckerth.thomas.foobarremotecontroller2.ui.page.PlaylistPage
+import com.deckerth.thomas.foobarremotecontroller2.ui.page.SettingsPage
 import com.deckerth.thomas.foobarremotecontroller2.ui.theme.Foobar2000RemoteControllerTheme
 import me.zhanghai.compose.preference.defaultPreferenceFlow
 

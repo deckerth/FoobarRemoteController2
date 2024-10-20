@@ -14,6 +14,7 @@ import androidx.core.app.NotificationCompat
 import androidx.media.VolumeProviderCompat
 import androidx.media.app.NotificationCompat.MediaStyle
 import com.deckerth.thomas.foobarremotecontroller2.connector.PlayerAccess
+import com.deckerth.thomas.foobarremotecontroller2.ui.foobVolumeControl
 
 var mediaSession: MediaSessionCompat? = null
 var foobarMediaService: FoobarMediaService? = null

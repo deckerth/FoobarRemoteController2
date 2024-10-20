@@ -2,17 +2,14 @@ package com.deckerth.thomas.foobarremotecontroller2.connector;
 
 import android.annotation.SuppressLint;
 
-import com.deckerth.thomas.foobarremotecontroller2.ViewModelKt;
 import com.deckerth.thomas.foobarremotecontroller2.model.PlaybackState;
 import com.deckerth.thomas.foobarremotecontroller2.model.Player;
 import com.deckerth.thomas.foobarremotecontroller2.model.VolumeControl;
+import com.deckerth.thomas.foobarremotecontroller2.ui.ViewModelKt;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class PlayerAccess {
 

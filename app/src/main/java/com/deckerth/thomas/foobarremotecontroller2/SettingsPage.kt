@@ -34,7 +34,7 @@ fun SettingsPage() {
     Column {
         Title("Connectivity")
         PreferenceItem("IP Address", summary = "http://0.0.0.0", onClick = {
-            navController.navigate("DeviceSelectionPage")
+            mainActivity.navController.navigate("DeviceSelectionPage")
         })
 
         PreferenceItem("IP Address", summary = "http://0.0.0.0", onClick = {

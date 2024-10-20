@@ -37,6 +37,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.deckerth.thomas.foobarremotecontroller2.FoobarMediaService
 import com.deckerth.thomas.foobarremotecontroller2.R
@@ -61,6 +62,11 @@ class MainActivity : ComponentActivity() {
     private var _navController: NavController? = null
     val navController get() = _navController!!
 
+    private var _appBarLabel by mutableStateOf("Foobar Link")
+    val appBarLabel get() = _appBarLabel
+
+    private lateinit var appLabel: String
+
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,10 +74,11 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             // Read ip address and start observer
-            updatePreferences(defaultPreferenceFlow())
+            UpdatePreferences()
             Foobar2000RemoteControllerTheme {
                 val navController = rememberNavController()
                 _navController = navController
+                appLabel = stringResource(R.string.app_name)
                 val items = listOf(
                     BottomNavigationItem(
                         title = stringResource(R.string.tab_playlist),
@@ -97,10 +104,8 @@ class MainActivity : ComponentActivity() {
                 }
                 Scaffold(
                     topBar = {
-                        val context = LocalContext.current
-                        val appLabel = context.applicationInfo.loadLabel(context.packageManager).toString()
                         TopAppBar(
-                            title = { Text(text = appLabel) },
+                            title = { Text(text = _appBarLabel ) },
                             modifier = Modifier.fillMaxWidth(),
                             actions = {
                                 if (selectedItemIndex == 0)
@@ -119,27 +124,29 @@ class MainActivity : ComponentActivity() {
                         )
                     },
                     bottomBar = {
-                        NavigationBar {
-                            items.forEachIndexed { index, item ->
-                                NavigationBarItem(
-                                    selected = selectedItemIndex == index,
-                                    onClick = {
-                                        selectedItemIndex = index
-                                        navController.navigate(item.key)
-                                    },
-                                    label = {
-                                        Text(text = item.title)
-                                    },
-                                    alwaysShowLabel = true,
-                                    icon = {
-                                        Icon(
-                                            imageVector = if (index == selectedItemIndex) {
-                                                item.selectedIcon
-                                            } else item.unselectedIcon,
-                                            contentDescription = item.title
-                                        )
-                                    }
-                                )
+                        if (navController.currentBackStackEntryAsState().value?.destination?.route in items.map { it.key }){
+                            NavigationBar {
+                                items.forEachIndexed { index, item ->
+                                    NavigationBarItem(
+                                        selected = selectedItemIndex == index,
+                                        onClick = {
+                                            selectedItemIndex = index
+                                            navigateTo(item.key)
+                                        },
+                                        label = {
+                                            Text(text = item.title)
+                                        },
+                                        alwaysShowLabel = true,
+                                        icon = {
+                                            Icon(
+                                                imageVector = if (index == selectedItemIndex) {
+                                                    item.selectedIcon
+                                                } else item.unselectedIcon,
+                                                contentDescription = item.title
+                                            )
+                                        }
+                                    )
+                                }
                             }
                         }
                     },
@@ -167,42 +174,16 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
-//        val mediaSession = MediaSessionCompat(this , "FoobarActivity").apply {
-//            // Set the initial playback state
-//            setPlaybackState(
-//                PlaybackStateCompat.Builder()
-//                    .setState(PlaybackStateCompat.STATE_PLAYING, 0, 1f)
-//                    .setActions(
-//                        PlaybackStateCompat.ACTION_PLAY or
-//                                PlaybackStateCompat.ACTION_PLAY_PAUSE
-//                    )
-//                    .build()
-//            )
-//
-//            val volumeProvider = object : VolumeProviderCompat(
-//                VolumeProviderCompat.VOLUME_CONTROL_ABSOLUTE,
-//                100, // Max volume level
-//                50   // Initial volume level
-//            ) {
-//                override fun onSetVolumeTo(volume: Int) {
-//
-//                }
-//
-//                override fun onAdjustVolume(direction: Int) {
-//                }
-//            }
-//
-//            setPlaybackToRemote(volumeProvider)
-//        }
-//        mediaSession.isActive = true
-////        val audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
-////        audioManager.requestAudioFocus(
-////            AudioManager.OnAudioFocusChangeListener { focusChange ->
-////
-////            },
-////            AudioManager.STREAM_MUSIC,
-////            AudioManager.AUDIOFOCUS_GAIN
-////        )
+    }
+
+    fun navigateTo(route: String, label: String) {
+        navController.navigate(route)
+        _appBarLabel = label
+    }
+
+    fun navigateTo(route: String) {
+        navController.navigate(route)
+        _appBarLabel = appLabel
     }
 
     override fun onStart() {

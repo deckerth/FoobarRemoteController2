@@ -33,6 +33,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -86,16 +87,14 @@ fun PlayingPage() {
                         style = MaterialTheme.typography.bodyLarge
                     )
                 }
-                return
             }else if (player == null) {
                 LinearProgressIndicator(
                     modifier = Modifier.fillMaxWidth()
                 )
                 return
+            }else{
+                PlayerCard(player = player!!)
             }
-
-
-            PlayerCard(player = player!!)
             if (pullToRefreshState.isRefreshing) {
                 LaunchedEffect(true) {
                     onRefresh()

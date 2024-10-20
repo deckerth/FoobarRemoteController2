@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.PlaybackStateCompat
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -11,6 +12,7 @@ import com.deckerth.thomas.foobarremotecontroller2.connector.HTTPConnector
 import com.deckerth.thomas.foobarremotecontroller2.connector.PlayerAccess
 import com.deckerth.thomas.foobarremotecontroller2.connector.PlaylistAccess
 import com.deckerth.thomas.foobarremotecontroller2.foobarMediaService
+import com.deckerth.thomas.foobarremotecontroller2.getIpAddress
 import com.deckerth.thomas.foobarremotecontroller2.mediaSession
 import com.deckerth.thomas.foobarremotecontroller2.model.PlaybackState
 import com.deckerth.thomas.foobarremotecontroller2.model.Player
@@ -32,14 +34,13 @@ var valid = false
 val connector = HTTPConnector()
 val foobVolumeControl: VolumeControl = VolumeControl(false, 0, 1, "db", 0)
 
-fun updatePreferences(preferenceFlow: MutableStateFlow<Preferences>) {
-    preferences = preferenceFlow.value
-    val ip:String? = preferences!!["ip_address_preference"]
+@Composable
+fun UpdatePreferences() {
+    ip_address = getIpAddress()
     Thread{
-        if (ip != null) {
-            valid = connector.checkConnection(ip)
-            println("FOOB $ip valid:$valid")
-            ip_address = ip
+        if (ip_address != null) {
+            valid = connector.checkConnection(ip_address!!)
+            println("FOOB $ip_address valid:$valid")
             observer?.cancel(true)
             if (valid){
                 startPlayerObserver()

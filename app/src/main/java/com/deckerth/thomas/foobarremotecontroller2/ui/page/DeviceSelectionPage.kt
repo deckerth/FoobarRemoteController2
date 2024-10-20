@@ -55,36 +55,20 @@ fun DeviceSelectionPage(){
             scanForFoobarServers(8880)
         }
     }.start()
-
-    Foobar2000RemoteControllerTheme {
-        Scaffold(
-            topBar = {
-                TopAppBar(
-                    title = {
-                        Text(text = stringResource(R.string.title_setup_screen))
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = TopAppBarDefaults.topAppBarColors().scrolledContainerColor
-                    )
-                )
-            }
-        ) { padding ->
-            Column(modifier = Modifier.padding(padding)){
-                if (loading) {
-                    LinearProgressIndicator(
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
-                DeviceList(devices = devices)
-            }
+    Column{
+        if (loading) {
+            LinearProgressIndicator(
+                modifier = Modifier.fillMaxWidth()
+            )
         }
+        DeviceList(devices = devices)
     }
 
 }
 
 
 suspend fun scanForFoobarServers(port: Int, timeout: Int = 1000) {
+    loading = true
     val baseIp = getLocalIpBase()
 
     coroutineScope {
@@ -158,7 +142,7 @@ fun DeviceEntry(device: Device){
             modifier = Modifier
                 .clickable {
                     saveIpAddress(device.ipAddress, mainActivity)
-                    mainActivity.navController.navigate("Settings")
+                    mainActivity.navigateTo("Settings")
                 }
                 .padding(16.dp)
                 .height(40.dp),

@@ -46,7 +46,7 @@ val devices = mutableStateListOf<Device>()
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DeviceSelectionPage(context: Context?){
+fun DeviceSelectionPage(){
     devices.clear()
     Thread{
         runBlocking {
@@ -74,7 +74,7 @@ fun DeviceSelectionPage(context: Context?){
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
-                DeviceList(devices = devices, context = context)
+                DeviceList(devices = devices)
             }
         }
     }
@@ -142,21 +142,21 @@ private fun getHostName(ip: String): String? {
 
 
 @Composable
-fun DeviceList(devices: List<Device>, context: Context?){
+fun DeviceList(devices: List<Device>){
     LazyColumn {
         items(devices) { device ->
-            DeviceEntry(device,context)
+            DeviceEntry(device)
         }
     }
 }
 
 @Composable
-fun DeviceEntry(device: Device, context: Context?){
+fun DeviceEntry(device: Device){
         Column(
             modifier = Modifier
                 .clickable {
-                    saveIpAddress(device.ipAddress,context!!)
-                    navController.navigate("Settings")
+                    saveIpAddress(device.ipAddress, mainActivity)
+                    mainActivity.navController.navigate("Settings")
                 }
                 .padding(16.dp)
                 .height(40.dp),
@@ -202,7 +202,7 @@ fun DevicePreview(){
         "obsidian.fritz.box",
         "192.168.178.103:8880"
     )
-    DeviceEntry(device = device, context = null)
+    DeviceEntry(device = device)
 }
 
 @Preview(
@@ -220,12 +220,12 @@ fun DeviceListPreview(){
         device,
         device
     )
-    DeviceList(devices,null)
+    DeviceList(devices)
 
 }
 
 @Preview
 @Composable
 fun DeviceSelectionPagePreview(){
-    DeviceSelectionPage(null)
+    DeviceSelectionPage()
 }

@@ -48,18 +48,24 @@ data class BottomNavigationItem(
     val unselectedIcon: ImageVector,
 )
 
-lateinit var navController: NavController
+lateinit var mainActivity: MainActivity
 
 class MainActivity : ComponentActivity() {
+
+    private var _navController: NavController? = null
+    val navController get() = _navController!!
+
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        mainActivity = this
         enableEdgeToEdge()
         setContent {
             // Read ip address and start observer
             updatePreferences(defaultPreferenceFlow())
             Foobar2000RemoteControllerTheme {
-                navController = rememberNavController()
+                val navController = rememberNavController()
+                _navController = navController
                 val items = listOf(
                     BottomNavigationItem(
                         title = stringResource(R.string.tab_playlist),
@@ -148,7 +154,7 @@ class MainActivity : ComponentActivity() {
                             SettingsPage()
                         }
                         composable("DeviceSelectionPage") {
-                            DeviceSelectionPage(this@MainActivity)
+                            DeviceSelectionPage()
                         }
 
                     }

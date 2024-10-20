@@ -1,11 +1,7 @@
 package com.deckerth.thomas.foobarremotecontroller2
 
-import android.content.Context
 import android.content.Intent
-import android.media.AudioManager
 import android.os.Bundle
-import android.support.v4.media.session.MediaSessionCompat
-import android.support.v4.media.session.PlaybackStateCompat
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -35,7 +31,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.media.VolumeProviderCompat
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -49,6 +46,7 @@ data class BottomNavigationItem(
     val unselectedIcon: ImageVector,
 )
 
+lateinit var navController: NavController
 
 class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
@@ -56,9 +54,10 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
+            // Read ip address and start observer
             updatePreferences(defaultPreferenceFlow())
             Foobar2000RemoteControllerTheme {
-                val navController = rememberNavController()
+                navController = rememberNavController()
                 val items = listOf(
                     BottomNavigationItem(
                         title = stringResource(R.string.tab_playlist),
@@ -122,7 +121,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize()
                 ) { innerPadding ->
                     NavHost(
-                        navController = navController,
+                        navController = navController as NavHostController,
                         startDestination = "Now Playing",
                         modifier = Modifier.padding(innerPadding)
                     ) {
@@ -134,6 +133,9 @@ class MainActivity : ComponentActivity() {
                         }
                         composable("Settings") {
                             SettingsPage()
+                        }
+                        composable("DeviceSelectionPage") {
+                            DeviceSelectionPage(this@MainActivity)
                         }
 
                     }

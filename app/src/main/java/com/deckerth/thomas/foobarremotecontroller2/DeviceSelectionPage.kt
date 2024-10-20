@@ -1,14 +1,12 @@
 package com.deckerth.thomas.foobarremotecontroller2
 
-import android.net.http.HttpResponseCache.install
+import android.content.Context
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -23,7 +21,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -34,7 +31,6 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withTimeout
 import java.net.HttpURLConnection
 import java.net.InetAddress
 import java.net.NetworkInterface
@@ -50,7 +46,7 @@ val devices = mutableStateListOf<Device>()
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DeviceSelectionPage(){
+fun DeviceSelectionPage(context: Context?){
     devices.clear()
     Thread{
         runBlocking {
@@ -78,7 +74,7 @@ fun DeviceSelectionPage(){
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
-                DeviceList(devices = devices)
+                DeviceList(devices = devices, context = context)
             }
         }
     }
@@ -146,19 +142,21 @@ private fun getHostName(ip: String): String? {
 
 
 @Composable
-fun DeviceList(devices: List<Device>){
+fun DeviceList(devices: List<Device>, context: Context?){
     LazyColumn {
         items(devices) { device ->
-            DeviceEntry(device)
+            DeviceEntry(device,context)
         }
     }
 }
 
 @Composable
-fun DeviceEntry(device: Device){
+fun DeviceEntry(device: Device, context: Context?){
         Column(
             modifier = Modifier
                 .clickable {
+                    saveIpAddress(device.ipAddress,context!!)
+                    navController.navigate("Settings")
                 }
                 .padding(16.dp)
                 .height(40.dp),
@@ -204,7 +202,7 @@ fun DevicePreview(){
         "obsidian.fritz.box",
         "192.168.178.103:8880"
     )
-    DeviceEntry(device = device)
+    DeviceEntry(device = device, context = null)
 }
 
 @Preview(
@@ -222,12 +220,12 @@ fun DeviceListPreview(){
         device,
         device
     )
-    DeviceList(devices)
+    DeviceList(devices,null)
 
 }
 
 @Preview
 @Composable
 fun DeviceSelectionPagePreview(){
-    DeviceSelectionPage()
+    DeviceSelectionPage(null)
 }

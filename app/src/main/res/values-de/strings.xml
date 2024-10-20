@@ -15,4 +15,5 @@
     <string name="info_titles">%1$s Titel</string>
     <string name="button_playlist_switcher">Playlisten</string>
     <string name="title_setup_screen">Foobar Link Einrichten</string>
+    <string name="info_no_track_playing">Wiedergabe ist gestoppt</string>
 </resources>

@@ -12,11 +12,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.automirrored.outlined.List
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
@@ -88,6 +90,17 @@ class MainActivity : ComponentActivity() {
                         TopAppBar(
                             title = { Text(text = appLabel) },
                             modifier = Modifier.fillMaxWidth(),
+                            actions = {
+                                if (selectedItemIndex == 0)
+                                    IconButton(onClick = {
+                                        updateList()
+                                    }) {
+                                        Icon(
+                                            imageVector = Icons.Default.Refresh,
+                                            contentDescription = "Refresh"
+                                        )
+                                    }
+                            },
                             colors = TopAppBarDefaults.topAppBarColors(
                                 containerColor = TopAppBarDefaults.topAppBarColors().scrolledContainerColor
                             )

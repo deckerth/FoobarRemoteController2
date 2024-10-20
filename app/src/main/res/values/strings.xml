@@ -14,4 +14,5 @@
     <string name="info_titles">%1$s Titles</string>
     <string name="button_playlist_switcher">Playlists</string>
     <string name="title_setup_screen">Setup Foobar Link</string>
+    <string name="info_no_track_playing">Player is Stopped</string>
 </resources>

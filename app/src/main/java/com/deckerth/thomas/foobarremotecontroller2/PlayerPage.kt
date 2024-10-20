@@ -1,6 +1,11 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.deckerth.thomas.foobarremotecontroller2
 
 import android.content.res.Configuration
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.rememberScrollableState
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,6 +18,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -20,10 +29,15 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
+import androidx.compose.material3.pulltorefresh.PullToRefreshState
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -37,13 +51,69 @@ import com.deckerth.thomas.foobarremotecontroller2.ui.theme.Foobar2000RemoteCont
 
 @Composable
 fun PlayingPage() {
-    if (player == null) {
-        LinearProgressIndicator(
-            modifier = Modifier.fillMaxWidth()
-        )
-        return
+    val pullToRefreshState = rememberPullToRefreshState()
+    Box(
+        modifier = Modifier
+            .nestedScroll(pullToRefreshState.nestedScrollConnection)
+            .fillMaxSize()
+    )
+    {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+        ) {
+            if (player == null && playlist != null) {
+                Column(
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                ){
+                    Icon(
+                        painter = painterResource(R.drawable.stop_circle),
+                        contentDescription = stringResource(R.string.desc_album_picture),
+                        modifier = Modifier
+                            .align(Alignment.CenterHorizontally)
+                            .size(180.dp)
+                            .clip(MaterialTheme.shapes.medium)
+                    )
+                    Text(
+                        modifier = Modifier.fillMaxWidth(),
+                        maxLines = 1,
+                        textAlign = TextAlign.Center,
+                        text = stringResource(R.string.info_no_track_playing),
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
+                return
+            }else if (player == null) {
+                LinearProgressIndicator(
+                    modifier = Modifier.fillMaxWidth()
+                )
+                return
+            }
+
+
+            PlayerCard(player = player!!)
+            if (pullToRefreshState.isRefreshing) {
+                LaunchedEffect(true) {
+                    onRefresh()
+                    pullToRefreshState.endRefresh()
+                }
+            }
+            PullToRefreshContainer(
+                state = pullToRefreshState,
+                modifier = Modifier
+                    .align(Alignment.TopCenter),
+
+                )
+        }
     }
-    PlayerCard(player = player!!)
+}
+
+fun onRefresh() {
+    updatePlayer()
+    observer?.cancel(true)
+    startPlayerObserver()
 }
 
 @Composable
@@ -87,7 +157,7 @@ fun PlayerCard(player: Player) {
         Spacer(modifier = Modifier.height(8.dp))
 
         @Composable
-        fun ProgressIndicator(){
+        fun ProgressIndicator() {
             Column {
                 Box {
                     Text(
@@ -115,7 +185,11 @@ fun PlayerCard(player: Player) {
                 Text(
                     modifier = Modifier
                         .fillMaxWidth(),
-                    text = stringResource(R.string.info_disc_track, player.discNumber, player.track),
+                    text = stringResource(
+                        R.string.info_disc_track,
+                        player.discNumber,
+                        player.track
+                    ),
                     style = MaterialTheme.typography.bodySmall
                 )
             }
@@ -189,7 +263,6 @@ fun PlayerCard(player: Player) {
         }
     }
 }
-
 
 
 @Preview(

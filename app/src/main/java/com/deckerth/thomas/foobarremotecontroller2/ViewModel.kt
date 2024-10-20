@@ -1,28 +1,34 @@
 package com.deckerth.thomas.foobarremotecontroller2
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.support.v4.media.MediaMetadataCompat
+import android.support.v4.media.session.PlaybackStateCompat
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.deckerth.thomas.foobarremotecontroller2.connector.HTTPConnector
 import com.deckerth.thomas.foobarremotecontroller2.connector.PlayerAccess
 import com.deckerth.thomas.foobarremotecontroller2.connector.PlaylistAccess
-import com.deckerth.thomas.foobarremotecontroller2.model.ITitle
+import com.deckerth.thomas.foobarremotecontroller2.model.PlaybackState
 import com.deckerth.thomas.foobarremotecontroller2.model.Player
 import com.deckerth.thomas.foobarremotecontroller2.model.Playlist
+import com.deckerth.thomas.foobarremotecontroller2.model.VolumeControl
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.subscribe
 import me.zhanghai.compose.preference.Preferences
-import okhttp3.internal.notifyAll
+import java.io.IOException
+import java.net.HttpURLConnection
+import java.net.URL
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledFuture
 import java.util.concurrent.TimeUnit
+import kotlin.math.floor
 
 var preferences: Preferences? = null
 var ip_address: String? = null
 var valid = false
 val connector = HTTPConnector()
+val foobVolumeControl: VolumeControl = VolumeControl(false, 0, 1, "db", 0)
 
 fun updatePreferences(preferenceFlow: MutableStateFlow<Preferences>) {
     preferences = preferenceFlow.value
@@ -59,6 +65,51 @@ var player by mutableStateOf<Player?>(null)
 
 private fun updatePlayer() {
     player = PlayerAccess.getInstance().playerState
+    if (mediaSession != null && player != null) {
+        val state = when (player!!.playbackState){
+            PlaybackState.STOPPED -> PlaybackStateCompat.STATE_STOPPED
+            PlaybackState.PLAYING -> PlaybackStateCompat.STATE_PLAYING
+            PlaybackState.PAUSED -> PlaybackStateCompat.STATE_PAUSED
+        }
+
+        mediaSession!!.setMetadata(
+            MediaMetadataCompat.Builder()
+                .putString(MediaMetadataCompat.METADATA_KEY_TITLE, player!!.title)
+                .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, player!!.artist)
+                .putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, getBitmapFromURL(player!!.artworkUrl))
+                .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, (floor(player!!.duration.toDouble()*1000)).toLong())
+                .build()
+        )
+        System.out.println("FOOB updatePlayer: ${player!!.position}")
+        mediaSession!!.setPlaybackState(
+            PlaybackStateCompat.Builder()
+                .setState(state, floor( player!!.position.toDouble()*1000).toLong(), 1f)
+                .setActions(
+                    (if (state == PlaybackStateCompat.STATE_PLAYING) PlaybackStateCompat.ACTION_PAUSE else PlaybackStateCompat.ACTION_PLAY) or
+                    PlaybackStateCompat.ACTION_PLAY_PAUSE or
+                    PlaybackStateCompat.ACTION_SKIP_TO_NEXT or
+                    PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS
+                )
+                .build()
+        )
+        foobarMediaService?.updateNotification()
+    }
+
+
+}
+
+private fun getBitmapFromURL(src: String?): Bitmap? {
+    return try {
+        val url = URL(src)
+        val connection = url.openConnection() as HttpURLConnection
+        connection.doInput = true
+        connection.connect()
+        val input = connection.inputStream
+        BitmapFactory.decodeStream(input)
+    } catch (e: IOException) {
+        e.printStackTrace()
+        null
+    }
 }
 
 //    public void startPlayerObserver() {

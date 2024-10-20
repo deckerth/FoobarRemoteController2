@@ -1,6 +1,11 @@
 package com.deckerth.thomas.foobarremotecontroller2
 
+import android.content.Context
+import android.content.Intent
+import android.media.AudioManager
 import android.os.Bundle
+import android.support.v4.media.session.MediaSessionCompat
+import android.support.v4.media.session.PlaybackStateCompat
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -30,6 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.media.VolumeProviderCompat
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -42,6 +48,7 @@ data class BottomNavigationItem(
     val selectedIcon: ImageVector,
     val unselectedIcon: ImageVector,
 )
+
 
 class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
@@ -133,5 +140,48 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+//        val mediaSession = MediaSessionCompat(this , "FoobarActivity").apply {
+//            // Set the initial playback state
+//            setPlaybackState(
+//                PlaybackStateCompat.Builder()
+//                    .setState(PlaybackStateCompat.STATE_PLAYING, 0, 1f)
+//                    .setActions(
+//                        PlaybackStateCompat.ACTION_PLAY or
+//                                PlaybackStateCompat.ACTION_PLAY_PAUSE
+//                    )
+//                    .build()
+//            )
+//
+//            val volumeProvider = object : VolumeProviderCompat(
+//                VolumeProviderCompat.VOLUME_CONTROL_ABSOLUTE,
+//                100, // Max volume level
+//                50   // Initial volume level
+//            ) {
+//                override fun onSetVolumeTo(volume: Int) {
+//
+//                }
+//
+//                override fun onAdjustVolume(direction: Int) {
+//                }
+//            }
+//
+//            setPlaybackToRemote(volumeProvider)
+//        }
+//        mediaSession.isActive = true
+////        val audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
+////        audioManager.requestAudioFocus(
+////            AudioManager.OnAudioFocusChangeListener { focusChange ->
+////
+////            },
+////            AudioManager.STREAM_MUSIC,
+////            AudioManager.AUDIOFOCUS_GAIN
+////        )
+    }
+
+    override fun onStart() {
+        super.onStart()
+        //start FoobarMediaSessionService
+        val intent = Intent(this, FoobarMediaService::class.java)
+        startForegroundService(intent)
     }
 }

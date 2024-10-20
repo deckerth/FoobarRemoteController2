@@ -2,12 +2,17 @@ package com.deckerth.thomas.foobarremotecontroller2.connector;
 
 import android.annotation.SuppressLint;
 
+import com.deckerth.thomas.foobarremotecontroller2.ViewModelKt;
 import com.deckerth.thomas.foobarremotecontroller2.model.PlaybackState;
 import com.deckerth.thomas.foobarremotecontroller2.model.Player;
+import com.deckerth.thomas.foobarremotecontroller2.model.VolumeControl;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class PlayerAccess {
 
@@ -112,6 +117,12 @@ public class PlayerAccess {
                     mConnector.getServerAddress() + "artwork/" + activeItemObject.getString("playlistId") + "/" + activeItemObject.getString("index"),
                     playbackState
             );
+            VolumeControl volumeControl = ViewModelKt.getFoobVolumeControl();
+            volumeControl.setMuted(volumeObject.getBoolean("isMuted"));
+            volumeControl.setMin(volumeObject.getInt("min"));
+            volumeControl.setMax(volumeObject.getInt("max"));
+            volumeControl.setType(volumeObject.getString("type"));
+            volumeControl.setValue(volumeObject.getInt("value"));
             return player;
 //
 //            String column = columns.getString(0);
@@ -145,16 +156,7 @@ public class PlayerAccess {
 //
 //
 //
-//            if (volumeObject != null) {
-//                VolumeControl volumeControl = mPlayerViewModel.getVolumeControlViewModel().getVolumeControl();
-//                mPlayerViewModel.getVolumeControlViewModel().setIsMuted(volumeObject.getBoolean("isMuted"));
-//
-//                volumeControl.setMin(volumeObject.getInt("min"));
-//                volumeControl.setMax(volumeObject.getInt("max"));
-//                volumeControl.setType(volumeObject.getString("type"));
-//
-//                mPlayerViewModel.getVolumeControlViewModel().setVolume(volumeObject.getInt("value"));
-//            }
+
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -194,15 +196,12 @@ public class PlayerAccess {
         }).start();
     }
 
-//    public void setVolume(Integer value) {
-//        new Thread(() -> {
-//            Map<String, Integer> postData = new HashMap<>();
-//            postData.put("volume", value);
-//            Gson gson = new Gson();
-//            String jsonString = gson.toJson(postData);
-//            mConnector.postData("player/", jsonString);
-//            getPlayerState();
-//        }).start();
-//    }
+    public void setVolume(Integer value) {
+        new Thread(() -> {
+            String jsonString = "{\"volume\":" + value + "}";
+            mConnector.postData("player/", jsonString);
+            getPlayerState();
+        }).start();
+    }
 
 }

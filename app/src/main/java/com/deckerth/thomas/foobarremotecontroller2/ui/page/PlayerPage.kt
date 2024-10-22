@@ -123,7 +123,35 @@ fun onRefresh() {
 @Composable
 fun PlayerButtons(player: Player) {
     Spacer(modifier = Modifier.height(32.dp))
-    Row {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    ) {
+        val space = 15.dp
+        IconButton(
+            onClick = {
+                when(player.playbackMode) {
+                    PlaybackMode.REPEAT_TRACK -> PlayerAccess.getInstance().setPlaybackMode(PlaybackMode.DEFAULT)
+                    PlaybackMode.REPEAT_PLAYLIST -> PlayerAccess.getInstance().setPlaybackMode(PlaybackMode.REPEAT_TRACK)
+                    else -> PlayerAccess.getInstance().setPlaybackMode(PlaybackMode.REPEAT_PLAYLIST)
+                }
+            },
+            modifier = Modifier
+                .size(40.dp)
+        ) {
+            Icon(
+                painter = when(player.playbackMode) {
+                    PlaybackMode.REPEAT_TRACK -> painterResource(R.drawable.repeat_one_on)
+                    PlaybackMode.REPEAT_PLAYLIST -> painterResource(R.drawable.repeat_on)
+                    else -> painterResource(R.drawable.repeat)
+                },
+                contentDescription = stringResource(R.string.desc_repeat),
+                modifier = Modifier
+                    .padding(5.dp)
+                    .fillMaxSize()
+            )
+        }
+        Spacer(modifier = Modifier.width(space))
         IconButton(
             onClick = {
                 PlayerAccess.getInstance().previousTrack()
@@ -139,7 +167,7 @@ fun PlayerButtons(player: Player) {
                     .fillMaxSize()
             )
         }
-        Spacer(modifier = Modifier.width(40.dp))
+        Spacer(modifier = Modifier.width(space))
         FilledIconButton(
             onClick = {
                 if (player.playbackState == PlaybackState.PLAYING)
@@ -169,7 +197,7 @@ fun PlayerButtons(player: Player) {
             }
 
         }
-        Spacer(modifier = Modifier.width(40.dp))
+        Spacer(modifier = Modifier.width(space))
         IconButton(
             onClick = {
                 PlayerAccess.getInstance().nextTrack()
@@ -185,9 +213,34 @@ fun PlayerButtons(player: Player) {
                     .fillMaxSize()
             )
         }
+        Spacer(modifier = Modifier.width(space))
+        IconButton(
+            onClick = {
+                when(player.playbackMode) {
+                    PlaybackMode.SHUFFLE_TRACKS -> PlayerAccess.getInstance().setPlaybackMode(PlaybackMode.DEFAULT)
+                    PlaybackMode.SHUFFLE_ALBUMS -> PlayerAccess.getInstance().setPlaybackMode(PlaybackMode.DEFAULT)
+                    PlaybackMode.SHUFFLE_FOLDERS -> PlayerAccess.getInstance().setPlaybackMode(PlaybackMode.DEFAULT)
+                    else -> PlayerAccess.getInstance().setPlaybackMode(PlaybackMode.SHUFFLE_TRACKS)
+                }
+            },
+            modifier = Modifier
+                .size(40.dp)
+        ) {
+            Icon(
+                painter = when(player.playbackMode) {
+                    PlaybackMode.SHUFFLE_TRACKS -> painterResource(R.drawable.shuffle_on)
+                    PlaybackMode.SHUFFLE_ALBUMS -> painterResource(R.drawable.shuffle_on)
+                    PlaybackMode.SHUFFLE_FOLDERS -> painterResource(R.drawable.shuffle_on)
+                    else -> painterResource(R.drawable.shuffle)
+                },
+                contentDescription = stringResource(R.string.desc_shuffle),
+                modifier = Modifier
+                    .padding(5.dp)
+                    .fillMaxSize()
+            )
+        }
     }
 }
-
 @Composable
 fun PlayerCard(player: Player) {
     Column(

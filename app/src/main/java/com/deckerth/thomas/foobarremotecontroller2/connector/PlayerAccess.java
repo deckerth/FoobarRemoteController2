@@ -2,6 +2,7 @@ package com.deckerth.thomas.foobarremotecontroller2.connector;
 
 import android.annotation.SuppressLint;
 
+import com.deckerth.thomas.foobarremotecontroller2.model.PlaybackMode;
 import com.deckerth.thomas.foobarremotecontroller2.model.PlaybackState;
 import com.deckerth.thomas.foobarremotecontroller2.model.Player;
 import com.deckerth.thomas.foobarremotecontroller2.model.VolumeControl;
@@ -112,7 +113,8 @@ public class PlayerAccess {
                     activeItemObject.getString("duration"),
                     activeItemObject.getString("position"),
                     mConnector.getServerAddress() + "artwork/" + activeItemObject.getString("playlistId") + "/" + activeItemObject.getString("index"),
-                    playbackState
+                    playbackState,
+                    PlaybackMode.getEntries().get(playerObject.getInt("playbackMode"))
             );
             VolumeControl volumeControl = ViewModelKt.getFoobVolumeControl();
             volumeControl.setMuted(volumeObject.getBoolean("isMuted"));
@@ -196,6 +198,14 @@ public class PlayerAccess {
     public void setVolume(Integer value) {
         new Thread(() -> {
             String jsonString = "{\"volume\":" + value + "}";
+            mConnector.postData("player/", jsonString);
+            getPlayerState();
+        }).start();
+    }
+
+    public void setPlaybackMode(PlaybackMode mode) {
+        new Thread(() -> {
+            String jsonString = "{\"options\":[{\"id\": \"playbackOrder\", \"value\": "+mode.ordinal()+"}]}";
             mConnector.postData("player/", jsonString);
             getPlayerState();
         }).start();

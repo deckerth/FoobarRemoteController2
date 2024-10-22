@@ -14,7 +14,7 @@ class HTTPConnector {
     val serverAddress: String
         get() {
             if (ip_address != null) {
-                return "http://$ip_address:8880/api/"
+                return "http://$ip_address/api/"
             }
             return ""
         }
@@ -54,8 +54,8 @@ class HTTPConnector {
 
     fun checkConnection(ip:String): Boolean{
         try {
-            val url = URL("http://$ip:8880/api/playlists")
-            println("FOOB \"http://$ip:8880/api/playlists\"")
+            val url = URL("http://$ip/api/playlists")
+            println("FOOB \"http://$ip/api/playlists\"")
             //open a URL connection
             val urlConnection = url.openConnection() as HttpURLConnection
             val response = urlConnection.responseCode

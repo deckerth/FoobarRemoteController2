@@ -15,4 +15,11 @@
     <string name="button_playlist_switcher">Playlists</string>
     <string name="title_setup_screen">Setup Foobar Link</string>
     <string name="info_no_track_playing">Player is Stopped</string>
+    <string name="title_device_selection">Select Device</string>
+    <string name="field_ip_address">IP Address</string>
+    <string name="field_port">Port</string>
+    <string name="button_save">Save</string>
+    <string name="button_check_connection">Check Connection</string>
+    <string name="desc_repeat">Repeat mode</string>
+    <string name="desc_shuffle">Shuffle mode</string>
 </resources>

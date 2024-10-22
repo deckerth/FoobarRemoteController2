@@ -6,6 +6,16 @@ enum class PlaybackState {
     PAUSED
 }
 
+enum class PlaybackMode {
+    DEFAULT,
+    REPEAT_PLAYLIST,
+    REPEAT_TRACK,
+    RANDOM,
+    SHUFFLE_TRACKS,
+    SHUFFLE_ALBUMS,
+    SHUFFLE_FOLDERS
+}
+
 data class Player(
     val catalog: String,
     val composer: String,
@@ -20,7 +30,8 @@ data class Player(
     val duration: String,
     val position: String,
     val artworkUrl: String,
-    val playbackState: PlaybackState
+    val playbackState: PlaybackState,
+    val playbackMode: PlaybackMode
 ) {
 
     fun getPos(): Float {

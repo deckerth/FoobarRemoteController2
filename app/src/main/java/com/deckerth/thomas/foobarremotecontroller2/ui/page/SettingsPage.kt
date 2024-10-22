@@ -51,7 +51,7 @@ fun SettingsPage() {
     Column {
         Title("Connectivity")
         PreferenceItem<Boolean>("IP Address", summary = getIpAddress(), onClick = {
-            mainActivity.navigateTo("DeviceSelectionPage","Select Device")
+            mainActivity.navigateTo("DeviceSelectionPage")
         })
 
         Title("Appearance")

@@ -16,4 +16,11 @@
     <string name="button_playlist_switcher">Playlisten</string>
     <string name="title_setup_screen">Foobar Link Einrichten</string>
     <string name="info_no_track_playing">Wiedergabe ist gestoppt</string>
+    <string name="title_device_selection">Gerät Auswählen</string>
+    <string name="field_ip_address">IP Adresse</string>
+    <string name="field_port">Port</string>
+    <string name="button_save">Speichern</string>
+    <string name="button_check_connection">Verbindung testen</string>
+    <string name="desc_repeat">Wiederholungs Modus</string>
+    <string name="desc_shuffle">Zufallswiedergabe</string>
 </resources>

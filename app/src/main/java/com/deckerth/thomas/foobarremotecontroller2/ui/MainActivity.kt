@@ -5,34 +5,46 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.automirrored.outlined.List
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -41,11 +53,14 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.deckerth.thomas.foobarremotecontroller2.FoobarMediaService
 import com.deckerth.thomas.foobarremotecontroller2.R
+import com.deckerth.thomas.foobarremotecontroller2.ui.page.CustomDevicePage
 import com.deckerth.thomas.foobarremotecontroller2.ui.page.DeviceSelectionPage
 import com.deckerth.thomas.foobarremotecontroller2.ui.page.PlayingPage
 import com.deckerth.thomas.foobarremotecontroller2.ui.page.PlaylistPage
 import com.deckerth.thomas.foobarremotecontroller2.ui.page.SettingsPage
+import com.deckerth.thomas.foobarremotecontroller2.ui.page.prepareDeviceSelectionPage
 import com.deckerth.thomas.foobarremotecontroller2.ui.theme.Foobar2000RemoteControllerTheme
+import kotlinx.coroutines.runBlocking
 import me.zhanghai.compose.preference.defaultPreferenceFlow
 
 data class BottomNavigationItem(
@@ -108,8 +123,8 @@ class MainActivity : ComponentActivity() {
                             title = { Text(text = _appBarLabel ) },
                             modifier = Modifier.fillMaxWidth(),
                             actions = {
-                                if (selectedItemIndex == 0)
-                                    IconButton(onClick = {
+                                when (getCurrentRoute(navController)) {
+                                    "Playlist" -> IconButton(onClick = {
                                         updateList()
                                     }) {
                                         Icon(
@@ -117,6 +132,28 @@ class MainActivity : ComponentActivity() {
                                             contentDescription = "Refresh"
                                         )
                                     }
+                                    "DeviceSelectionPage" -> Button(
+                                        onClick = {
+                                            navigateTo("CustomDevicePage")
+                                        }
+                                    ) {
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Icon(
+                                                painter = painterResource(R.drawable.tune),
+                                                contentDescription = stringResource(R.string.desc_play),
+                                                modifier = Modifier
+                                                    .size(24.dp)
+                                            )
+                                            Spacer(modifier = Modifier.width(5.dp).height(26.dp))
+                                            Text(
+                                                text = "Custom Device",
+                                                style = MaterialTheme.typography.labelSmall
+                                            )
+                                        }
+                                    }
+                                }
                             },
                             colors = TopAppBarDefaults.topAppBarColors(
                                 containerColor = TopAppBarDefaults.topAppBarColors().scrolledContainerColor
@@ -124,7 +161,7 @@ class MainActivity : ComponentActivity() {
                         )
                     },
                     bottomBar = {
-                        if (navController.currentBackStackEntryAsState().value?.destination?.route in items.map { it.key }){
+                        if (getCurrentRoute(navController) in items.map { it.key }){
                             NavigationBar {
                                 items.forEachIndexed { index, item ->
                                     NavigationBarItem(
@@ -158,16 +195,24 @@ class MainActivity : ComponentActivity() {
                         modifier = Modifier.padding(innerPadding)
                     ) {
                         composable("Playlist") {
+                            _appBarLabel = appLabel
                             PlaylistPage()
                         }
                         composable("Now Playing") {
+                            _appBarLabel = appLabel
                             PlayingPage()
                         }
                         composable("Settings") {
+                            _appBarLabel = appLabel
                             SettingsPage()
                         }
                         composable("DeviceSelectionPage") {
+                            _appBarLabel = stringResource(R.string.title_device_selection)
                             DeviceSelectionPage()
+                        }
+                        composable("CustomDevicePage") {
+                            _appBarLabel = stringResource(R.string.title_device_selection)
+                            CustomDevicePage()
                         }
 
                     }
@@ -176,14 +221,12 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    fun navigateTo(route: String, label: String) {
-        navController.navigate(route)
-        _appBarLabel = label
-    }
+    @Composable
+    fun getCurrentRoute(navController: NavHostController) =
+        navController.currentBackStackEntryAsState().value?.destination?.route
 
     fun navigateTo(route: String) {
         navController.navigate(route)
-        _appBarLabel = appLabel
     }
 
     override fun onStart() {

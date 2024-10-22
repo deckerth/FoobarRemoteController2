@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.deckerth.thomas.foobarremotecontroller2.R
 import com.deckerth.thomas.foobarremotecontroller2.connector.PlayerAccess
+import com.deckerth.thomas.foobarremotecontroller2.model.PlaybackMode
 import com.deckerth.thomas.foobarremotecontroller2.model.PlaybackState
 import com.deckerth.thomas.foobarremotecontroller2.model.Player
 import com.deckerth.thomas.foobarremotecontroller2.ui.components.LayoutComponent
@@ -384,7 +385,8 @@ fun PlayerCardPreview() {
                     "955.8266666666667",
                     "28.9795",
                     "",
-                    PlaybackState.PLAYING
+                    PlaybackState.PLAYING,
+                    PlaybackMode.DEFAULT
                 )
             )
         }

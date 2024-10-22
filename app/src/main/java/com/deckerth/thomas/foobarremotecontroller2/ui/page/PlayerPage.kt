@@ -44,6 +44,8 @@ import com.deckerth.thomas.foobarremotecontroller2.R
 import com.deckerth.thomas.foobarremotecontroller2.connector.PlayerAccess
 import com.deckerth.thomas.foobarremotecontroller2.model.PlaybackState
 import com.deckerth.thomas.foobarremotecontroller2.model.Player
+import com.deckerth.thomas.foobarremotecontroller2.ui.components.LayoutComponent
+import com.deckerth.thomas.foobarremotecontroller2.ui.layout.LayoutManager
 import com.deckerth.thomas.foobarremotecontroller2.ui.observer
 import com.deckerth.thomas.foobarremotecontroller2.ui.player
 import com.deckerth.thomas.foobarremotecontroller2.ui.playlist
@@ -87,7 +89,7 @@ fun PlayingPage() {
                         style = MaterialTheme.typography.bodyLarge
                     )
                 }
-            }else if (player == null) {
+            } else if (player == null) {
                 LinearProgressIndicator(
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -118,7 +120,94 @@ fun onRefresh() {
 }
 
 @Composable
+fun PlayerButtons(player: Player) {
+    Spacer(modifier = Modifier.height(32.dp))
+    Row {
+        IconButton(
+            onClick = {
+                PlayerAccess.getInstance().previousTrack()
+            },
+            modifier = Modifier
+                .size(60.dp)
+        ) {
+            Icon(
+                painter = painterResource(R.drawable.skip_previous),
+                contentDescription = stringResource(R.string.desc_skip_previous),
+                modifier = Modifier
+                    .padding(5.dp)
+                    .fillMaxSize()
+            )
+        }
+        Spacer(modifier = Modifier.width(40.dp))
+        FilledIconButton(
+            onClick = {
+                if (player.playbackState == PlaybackState.PLAYING)
+                    PlayerAccess.getInstance().pausePlayback()
+                else
+                    PlayerAccess.getInstance().startPlayback()
+            },
+            modifier = Modifier
+                .size(60.dp)
+        ) {
+            if (player.playbackState == PlaybackState.PAUSED) {
+                Icon(
+                    painter = painterResource(R.drawable.play),
+                    contentDescription = stringResource(R.string.desc_play),
+                    modifier = Modifier
+                        .padding(5.dp)
+                        .fillMaxSize()
+                )
+            } else {
+                Icon(
+                    painter = painterResource(R.drawable.pause),
+                    contentDescription = stringResource(R.string.desc_pause),
+                    modifier = Modifier
+                        .padding(5.dp)
+                        .fillMaxSize()
+                )
+            }
+
+        }
+        Spacer(modifier = Modifier.width(40.dp))
+        IconButton(
+            onClick = {
+                PlayerAccess.getInstance().nextTrack()
+            },
+            modifier = Modifier
+                .size(60.dp)
+        ) {
+            Icon(
+                painter = painterResource(R.drawable.skip_next),
+                contentDescription = stringResource(R.string.desc_skip_next),
+                modifier = Modifier
+                    .padding(5.dp)
+                    .fillMaxSize()
+            )
+        }
+    }
+}
+
+@Composable
 fun PlayerCard(player: Player) {
+    Column(
+        modifier = Modifier
+            .padding(40.dp)
+            .fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        val layoutManager = LayoutManager()
+        val layout = layoutManager.getLayout()
+
+        for(item in layout.playerLayout.items) {
+            LayoutComponent(player, item)
+        }
+        PlayerButtons(player)
+    }
+}
+
+@Composable
+fun PlayerCardOld(player: Player) {
     Column(
         modifier = Modifier
             .padding(40.dp)

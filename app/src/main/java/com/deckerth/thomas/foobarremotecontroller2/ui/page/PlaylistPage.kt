@@ -51,6 +51,8 @@ import com.deckerth.thomas.foobarremotecontroller2.model.Playlist
 import com.deckerth.thomas.foobarremotecontroller2.model.PlaylistEntity
 import com.deckerth.thomas.foobarremotecontroller2.model.Playlists
 import com.deckerth.thomas.foobarremotecontroller2.model.Title
+import com.deckerth.thomas.foobarremotecontroller2.ui.components.LayoutComponent
+import com.deckerth.thomas.foobarremotecontroller2.ui.layout.LayoutManager
 import com.deckerth.thomas.foobarremotecontroller2.ui.loadingList
 import com.deckerth.thomas.foobarremotecontroller2.ui.player
 import com.deckerth.thomas.foobarremotecontroller2.ui.playlist
@@ -70,6 +72,93 @@ fun PlaylistPage() {
 
 @Composable
 fun AlbumCard(album: Album) {
+    var isSelected by rememberSaveable {
+        mutableStateOf(false)
+    }
+//    if (player != null){
+//        isSelected = album.hasIndex(player!!.index)
+//    }
+
+    val surfaceColor by animateColorAsState(
+        if (isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceContainer,
+    )
+    ElevatedCard(
+        modifier = Modifier
+            .animateContentSize()
+            .fillMaxWidth()
+            .padding(vertical = 4.dp, horizontal = 8.dp)
+//            .clickable {
+//                PlayerAccess
+//                    .getInstance()
+//                    .playTrack(album.playlistId, album.index)
+//            }
+    ) {
+        Column{
+            Row {
+                AsyncImage(
+                    model = album.originalTitle.artworkUrl,
+                    placeholder = painterResource(R.drawable.ic_launcher_background),
+                    contentDescription = stringResource(id = R.string.desc_album_picture),
+                    modifier = Modifier
+                        .size(80.dp)
+                )
+                Column(
+                    verticalArrangement = Arrangement.Center,
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp)
+                        .height(80.dp)
+                ) {
+                    val layoutManager = LayoutManager()
+                    val layout = layoutManager.getLayout()
+
+                    for(item in layout.albumLayout.items) {
+                        LayoutComponent(album, item)
+                    }
+                }
+            }
+            if (album.titles.size > 1){
+                HorizontalDivider()
+                Box {
+                    TextButton(
+                        modifier = Modifier
+                            .padding(horizontal = 8.dp, vertical = 2.dp),
+                        onClick = { isSelected = !isSelected }
+                    ) {
+                        if (isSelected) {
+                            Text(text = stringResource(R.string.button_collapse))
+                        } else {
+                            Text(text = stringResource(R.string.button_expand))
+                        }
+                    }
+                    Text(
+                        modifier = Modifier
+                            .padding(horizontal = 16.dp)
+                            .fillMaxWidth()
+                            .align(Alignment.Center),
+                        textAlign = TextAlign.Right,
+                        style = MaterialTheme.typography.bodySmall,
+                        text = stringResource(R.string.info_titles, album.titles.size)
+                    )
+                }
+
+                if (isSelected) {
+                    Column {
+                        album.titles.forEach { title ->
+                            TitleEntry(title = title)
+                        }
+                    }
+                }
+            }else{
+                TitleEntry(title = album.titles[0])
+            }
+
+        }
+    }
+
+}
+
+@Composable
+fun AlbumCardOld(album: Album) {
     var isSelected by rememberSaveable {
         mutableStateOf(false)
     }
@@ -170,6 +259,36 @@ fun AlbumCard(album: Album) {
 
 @Composable
 fun TitleEntry(title: ITitle){
+    var titleSelected = false
+    if (player != null)
+        titleSelected = title.index == player!!.index && title.playlistId == player!!.playlistId
+    var modifier = Modifier
+        .clickable {
+            PlayerAccess.getInstance().playTrack(title.playlistId,title.index)
+        }
+    println("FOOB selected: $titleSelected")
+    if (titleSelected)
+        modifier = modifier.background(MaterialTheme.colorScheme.primaryContainer)
+    Column(
+        modifier = modifier
+    ) {
+        HorizontalDivider()
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+        ) {
+            val layoutManager = LayoutManager()
+            val layout = layoutManager.getLayout()
+
+            for(item in layout.titleLayout.items) {
+                LayoutComponent(title, item)
+            }
+        }
+    }
+}
+
+@Composable
+fun TitleEntryOld(title: ITitle){
     var titleSelected = false
     if (player != null)
         titleSelected = title.index == player!!.index && title.playlistId == player!!.playlistId

@@ -23,4 +23,14 @@
     <string name="button_check_connection">Verbindung testen</string>
     <string name="desc_repeat">Wiederholungs Modus</string>
     <string name="desc_shuffle">Zufallswiedergabe</string>
+    <string name="layout_item_medium">Medium</string>
+    <string name="layout_item_composer">Komponist</string>
+    <string name="layout_item_album">Album</string>
+    <string name="layout_item_title">Titel</string>
+    <string name="layout_item_artist">Künstler</string>
+    <string name="layout_item_progress_bar">Fortschrittsanzeige</string>
+    <string name="layout_item_cover">Cover</string>
+    <string name="layout_item_playlist_id">Playlist id</string>
+    <string name="layout_item_index">Index</string>
+    <string name="layout_item_smart_artist">Individueller Künstler eines Titels</string>
 </resources>

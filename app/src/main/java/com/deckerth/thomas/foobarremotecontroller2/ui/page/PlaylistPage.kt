@@ -144,12 +144,12 @@ fun AlbumCard(album: Album) {
                 if (isSelected) {
                     Column {
                         album.titles.forEach { title ->
-                            TitleEntry(title = title)
+                            TitleEntry(album = album, title = title)
                         }
                     }
                 }
             }else{
-                TitleEntry(title = album.titles[0])
+                TitleEntry(album = album, title = album.titles[0])
             }
 
         }
@@ -244,12 +244,12 @@ fun AlbumCardOld(album: Album) {
                 if (isSelected) {
                     Column {
                         album.titles.forEach { title ->
-                            TitleEntry(title = title)
+                            TitleEntry(album = album, title = title)
                         }
                     }
                 }
             }else{
-                TitleEntry(title = album.titles[0])
+                TitleEntry(album = album, title = album.titles[0])
             }
 
         }
@@ -258,7 +258,7 @@ fun AlbumCardOld(album: Album) {
 }
 
 @Composable
-fun TitleEntry(title: ITitle){
+fun TitleEntry(album: Album, title: ITitle){
     var titleSelected = false
     if (player != null)
         titleSelected = title.index == player!!.index && title.playlistId == player!!.playlistId
@@ -281,7 +281,7 @@ fun TitleEntry(title: ITitle){
             val layout = layoutManager.getLayout()
 
             for(item in layout.titleLayout.items) {
-                LayoutComponent(title, item)
+                LayoutComponent(album, title, layout.albumLayoutHasArtist, item)
             }
         }
     }

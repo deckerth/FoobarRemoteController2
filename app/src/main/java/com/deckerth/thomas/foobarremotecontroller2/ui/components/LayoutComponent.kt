@@ -43,10 +43,10 @@ fun LayoutComponent(player: Player, layoutItem: LayoutItem) {
         LayoutItems.ARTIST -> TextComponent(text = player.artist, item = layoutItem)
         LayoutItems.PROGRESS -> PlayerProgress(player)
         LayoutItems.COMPOSER ->
-            if (player.composer != "" && player.composer != "?" && player.composer != player.artist) {
+            if (player.composer != "" && player.composer != "?") {
                 TextComponent(text = player.composer, item = layoutItem)
             }
-        else -> Text("")
+        else -> Text("UNKNOWN ITEM")
     }
 }
 
@@ -56,20 +56,22 @@ fun LayoutComponent(album: Album, layoutItem: LayoutItem) {
         LayoutItems.ALBUM -> TextComponent(text = album.originalTitle.album, item = layoutItem)
         LayoutItems.ARTIST -> TextComponent(text = album.originalTitle.artist, item = layoutItem)
         LayoutItems.COMPOSER ->
-            if (album.originalTitle.composer != "" && album.originalTitle.composer != "?" && album.originalTitle.composer != album.originalTitle.artist) {
+            if (album.originalTitle.composer != "" && album.originalTitle.composer != "?") {
                 TextComponent(text = album.originalTitle.composer, item = layoutItem)
             }
-
-        else -> Text("")
+        else -> Text("UNKNOWN ITEM")
     }
 }
 
 @Composable
-fun LayoutComponent(title: ITitle, layoutItem: LayoutItem) {
+fun LayoutComponent(album: Album, title: ITitle, checkArtist: Boolean, layoutItem: LayoutItem) {
     when (layoutItem.item) {
         LayoutItems.TITLE -> TextComponent(text = title.title, item = layoutItem)
         LayoutItems.ARTIST -> TextComponent(text = title.artist, item = layoutItem)
-        else -> Text("")
+        LayoutItems.SMART_ARTIST ->
+            if (!checkArtist || !title.artist.equals(album.originalTitle.artist))
+                TextComponent(text = title.artist, item = layoutItem)
+        else -> Text("UNKNOWN ITEM")
     }
 }
 

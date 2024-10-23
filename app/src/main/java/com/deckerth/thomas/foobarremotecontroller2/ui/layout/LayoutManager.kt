@@ -34,7 +34,7 @@ class LayoutManager {
     private fun createModernTitleLayout(): LayoutDescription {
         val fields = LayoutDescription()
         fields.items.add(LayoutItem(LayoutItems.TITLE, Typography.TITLE_MEDIUM))
-        fields.items.add(LayoutItem(LayoutItems.ARTIST, Typography.BODY_SMALL))
+        fields.items.add(LayoutItem(LayoutItems.SMART_ARTIST, Typography.BODY_SMALL))
         return fields
     }
 
@@ -65,7 +65,7 @@ class LayoutManager {
     private fun createClassicTitleLayout(): LayoutDescription {
         val fields = LayoutDescription()
         fields.items.add(LayoutItem(LayoutItems.TITLE, Typography.TITLE_MEDIUM))
-        fields.items.add(LayoutItem(LayoutItems.ARTIST, Typography.BODY_SMALL))
+        fields.items.add(LayoutItem(LayoutItems.SMART_ARTIST, Typography.BODY_SMALL))
         return fields
     }
 

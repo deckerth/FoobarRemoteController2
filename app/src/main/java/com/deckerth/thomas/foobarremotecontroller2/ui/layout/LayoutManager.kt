@@ -1,6 +1,7 @@
 package com.deckerth.thomas.foobarremotecontroller2.ui.layout
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.text.font.FontStyle
 import com.deckerth.thomas.foobarremotecontroller2.getViewMode
 
 class LayoutManager {
@@ -16,25 +17,25 @@ class LayoutManager {
 
     private fun createModernPlayerLayout(): LayoutDescription {
         val fields = LayoutDescription()
-        fields.items.add(LayoutItem(LayoutItems.ARTWORK))
-        fields.items.add(LayoutItem(LayoutItems.TITLE, Typography.TITLE_LARGE))
-        fields.items.add(LayoutItem(LayoutItems.ALBUM, Typography.BODY_SMALL))
+        fields.items.add(LayoutItem(LayoutItems.ARTWORK, ItemSize.LARGE_COVER))
+        fields.items.add(LayoutItem(LayoutItems.TITLE, ItemSize.TITLE_LARGE))
+        fields.items.add(LayoutItem(LayoutItems.ALBUM, ItemSize.BODY_SMALL))
         fields.items.add(LayoutItem(LayoutItems.PROGRESS))
         return fields
     }
 
     private fun createModernAlbumLayout(): LayoutDescription {
         val fields = LayoutDescription()
-        fields.items.add(LayoutItem(LayoutItems.ALBUM, Typography.TITLE_MEDIUM))
-        fields.items.add(LayoutItem(LayoutItems.ARTIST, Typography.BODY_SMALL))
-        fields.items.add(LayoutItem(LayoutItems.COMPOSER, Typography.BODY_SMALL))
+        fields.items.add(LayoutItem(LayoutItems.ALBUM, ItemSize.TITLE_MEDIUM))
+        fields.items.add(LayoutItem(LayoutItems.ARTIST, ItemSize.BODY_SMALL))
+        fields.items.add(LayoutItem(LayoutItems.COMPOSER, ItemSize.BODY_SMALL))
         return fields
     }
 
     private fun createModernTitleLayout(): LayoutDescription {
         val fields = LayoutDescription()
-        fields.items.add(LayoutItem(LayoutItems.TITLE, Typography.TITLE_MEDIUM))
-        fields.items.add(LayoutItem(LayoutItems.SMART_ARTIST, Typography.BODY_SMALL))
+        fields.items.add(LayoutItem(LayoutItems.TITLE, ItemSize.TITLE_MEDIUM))
+        fields.items.add(LayoutItem(LayoutItems.SMART_ARTIST, ItemSize.BODY_SMALL))
         return fields
     }
 
@@ -46,26 +47,26 @@ class LayoutManager {
 
     private fun createClassicPlayerLayout(): LayoutDescription {
         val fields = LayoutDescription()
-        fields.items.add(LayoutItem(LayoutItems.ARTWORK))
-        fields.items.add(LayoutItem(LayoutItems.COMPOSER, Typography.TITLE_LARGE))
-        fields.items.add(LayoutItem(LayoutItems.ALBUM, Typography.TITLE_MEDIUM))
-        fields.items.add(LayoutItem(LayoutItems.ARTIST, Typography.BODY_SMALL))
+        fields.items.add(LayoutItem(LayoutItems.ARTWORK, ItemSize.MEDIUM_COVER))
+        fields.items.add(LayoutItem(LayoutItems.COMPOSER, ItemSize.TITLE_LARGE))
+        fields.items.add(LayoutItem(LayoutItems.ALBUM, ItemSize.TITLE_MEDIUM, fontStyle = FontStyle.Italic))
+        fields.items.add(LayoutItem(LayoutItems.ARTIST, ItemSize.BODY_SMALL, maxLines = 10))
         fields.items.add(LayoutItem(LayoutItems.PROGRESS))
         return fields
     }
 
     private fun createClassicAlbumLayout(): LayoutDescription {
         val fields = LayoutDescription()
-        fields.items.add(LayoutItem(LayoutItems.COMPOSER, Typography.TITLE_MEDIUM))
-        fields.items.add(LayoutItem(LayoutItems.ALBUM, Typography.BODY_MEDIUM))
-        fields.items.add(LayoutItem(LayoutItems.ARTIST, Typography.BODY_SMALL))
+        fields.items.add(LayoutItem(LayoutItems.COMPOSER, ItemSize.TITLE_MEDIUM))
+        fields.items.add(LayoutItem(LayoutItems.ALBUM, ItemSize.BODY_MEDIUM))
+        fields.items.add(LayoutItem(LayoutItems.ARTIST, ItemSize.BODY_SMALL))
         return fields
     }
 
     private fun createClassicTitleLayout(): LayoutDescription {
         val fields = LayoutDescription()
-        fields.items.add(LayoutItem(LayoutItems.TITLE, Typography.TITLE_MEDIUM))
-        fields.items.add(LayoutItem(LayoutItems.SMART_ARTIST, Typography.BODY_SMALL))
+        fields.items.add(LayoutItem(LayoutItems.TITLE, ItemSize.TITLE_MEDIUM))
+        fields.items.add(LayoutItem(LayoutItems.SMART_ARTIST, ItemSize.BODY_SMALL))
         return fields
     }
 

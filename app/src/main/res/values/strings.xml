@@ -32,4 +32,11 @@
     <string name="button_check_connection">Check Connection</string>
     <string name="desc_repeat">Repeat mode</string>
     <string name="desc_shuffle">Shuffle mode</string>
+    <string name="layout_modern">Modern</string>
+    <string name="layout_classic">Classic</string>
+    <string name="layout_custom">Custom</string>
+    <string name="settings_view_mode">View mode</string>
+    <string name="settings_appearance">Appearance</string>
+    <string name="settings_connectivity">Connectivity</string>
+    <string name="open_layout_editor">Open layout editor</string>
 </resources>

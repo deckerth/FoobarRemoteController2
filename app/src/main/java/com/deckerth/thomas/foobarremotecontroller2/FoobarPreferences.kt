@@ -17,6 +17,10 @@ val Context.dataStore by preferencesDataStore(name = "settings")
 private val IP_ADDRESS_KEY = stringPreferencesKey("ip_address")
 private val VIEW_MODE_KEY = stringPreferencesKey("view_mode")
 
+val LAYOUT_MODERN = "Modern"
+val LAYOUT_CLASSIC = "Classic"
+val LAYOUT_CUSTOM = "Custom"
+
 private fun <T> getFlow(context: Context,key: Preferences.Key<T>): Flow<T?> {
     return context.dataStore.data
         .map { preferences ->
@@ -58,5 +62,5 @@ fun saveViewMode(mode: String, context: Context) {
 
 @Composable
 fun getViewMode(): String {
-    return getValue(mainActivity, VIEW_MODE_KEY,"Modern")
+    return getValue(mainActivity, VIEW_MODE_KEY, LAYOUT_MODERN)
 }

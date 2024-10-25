@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -37,6 +38,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.deckerth.thomas.foobarremotecontroller2.LAYOUT_CLASSIC
+import com.deckerth.thomas.foobarremotecontroller2.LAYOUT_CUSTOM
+import com.deckerth.thomas.foobarremotecontroller2.LAYOUT_MODERN
+import com.deckerth.thomas.foobarremotecontroller2.R
 import com.deckerth.thomas.foobarremotecontroller2.getIpAddress
 import com.deckerth.thomas.foobarremotecontroller2.getViewMode
 import com.deckerth.thomas.foobarremotecontroller2.saveViewMode
@@ -49,21 +54,34 @@ import me.zhanghai.compose.preference.textFieldPreference
 @Composable
 fun SettingsPage() {
     Column {
-        Title("Connectivity")
+        Title(stringResource(R.string.settings_connectivity))
         PreferenceItem<Boolean>("IP Address", summary = getIpAddress(), onClick = {
             mainActivity.navigateTo("DeviceSelectionPage")
         })
 
-        Title("Appearance")
+        Title(stringResource(R.string.settings_appearance))
 
         var isOpen by remember { mutableStateOf(false) }
-        PreferenceItem<Boolean>("View mode", summary = getViewMode(), onClick = {
-            isOpen = true
-        })
+        val viewMode = getViewMode()
+        PreferenceItem<Boolean>(stringResource(R.string.settings_view_mode),
+            summary = when(viewMode) {
+                LAYOUT_MODERN -> stringResource(R.string.layout_modern)
+                LAYOUT_CLASSIC -> stringResource(R.string.layout_classic)
+                LAYOUT_CUSTOM -> stringResource(R.string.layout_custom)
+                else -> ""
+            },
+            showButton = viewMode == LAYOUT_CUSTOM,
+            buttonText = stringResource(R.string.open_layout_editor),
+            onClick = {
+                isOpen = true
+            })
         if (isOpen) {
             ListPreference(
-                values = listOf("Modern", "Classic", "Custom"),
-                title = "View mode",
+                values = listOf(
+                    stringResource(R.string.layout_modern),
+                    stringResource(R.string.layout_classic),
+                    stringResource(R.string.layout_custom)),
+                title = stringResource(R.string.settings_view_mode),
                 selectedItem = getViewMode(),
                 onClick = { mode: String? ->
                     if (mode != null) {
@@ -113,6 +131,9 @@ fun <T> PreferenceItem(
     onClick: (T) -> Unit = {},
     isChecked: Boolean = false,
     showToggle: Boolean = false,
+    showButton: Boolean = false,
+    buttonText: String = "",
+    onButtonClick: () -> Unit = {},
     optionList: List<String>? = null,
     isEnabled: Boolean = true
 ) {
@@ -122,13 +143,19 @@ fun <T> PreferenceItem(
         modifier = Modifier
             .fillMaxWidth()
             .clickable {
-                if(optionList == null)  { onClick(isChecked as T) } else { expanded = true }
+                if (optionList == null) {
+                    onClick(isChecked as T)
+                } else {
+                    expanded = true
+                }
             }
             .fillMaxWidth()
-            .padding(start = 17.dp,
-                     end = 17.dp,
+            .padding(
+                start = 17.dp,
+                end = 17.dp,
                 bottom = 12.dp,
-                top = 12.dp )
+                top = 12.dp
+            )
     ) {
         if (icon != null) {
             Icon(
@@ -175,6 +202,15 @@ fun <T> PreferenceItem(
                 onCheckedChange = { onClick(isChecked as T) },
                 modifier = Modifier.padding(start = 8.dp),
             )
+        }
+        if (showButton) {
+            Button(
+                enabled = isEnabled,
+                onClick = { onButtonClick() },
+                modifier = Modifier.padding(start = 30.dp),
+            ) {
+                Text(buttonText)
+            }
         }
     }
 }

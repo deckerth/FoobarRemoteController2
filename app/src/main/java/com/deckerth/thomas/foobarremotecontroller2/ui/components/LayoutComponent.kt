@@ -11,15 +11,15 @@ import com.deckerth.thomas.foobarremotecontroller2.model.ITitle
 import com.deckerth.thomas.foobarremotecontroller2.model.Player
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.LayoutItem
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.LayoutItems
-import com.deckerth.thomas.foobarremotecontroller2.ui.layout.Typography
+import com.deckerth.thomas.foobarremotecontroller2.ui.layout.ItemSize
 
 @Composable
-fun getTextStyle(typography: Typography): TextStyle {
-    when (typography) {
-        Typography.TITLE_LARGE -> return MaterialTheme.typography.titleLarge
-        Typography.TITLE_MEDIUM -> return MaterialTheme.typography.titleMedium
-        Typography.BODY_MEDIUM -> return MaterialTheme.typography.bodyMedium
-        Typography.BODY_SMALL -> return MaterialTheme.typography.bodySmall
+fun getTextStyle(itemSize: ItemSize): TextStyle {
+    when (itemSize) {
+        ItemSize.TITLE_LARGE -> return MaterialTheme.typography.titleLarge
+        ItemSize.TITLE_MEDIUM -> return MaterialTheme.typography.titleMedium
+        ItemSize.BODY_MEDIUM -> return MaterialTheme.typography.bodyMedium
+        ItemSize.BODY_SMALL -> return MaterialTheme.typography.bodySmall
         else -> return MaterialTheme.typography.bodySmall
     }
 }
@@ -30,14 +30,15 @@ fun TextComponent(text: String, item: LayoutItem) {
         modifier = Modifier
             .fillMaxWidth(),
         text = text,
-        style = getTextStyle(item.style)
+        style = getTextStyle(item.itemSize),
+        maxLines = item.maxLines
     )
 }
 
 @Composable
 fun LayoutComponent(player: Player, layoutItem: LayoutItem) {
     when (layoutItem.item) {
-        LayoutItems.ARTWORK -> ArtWork(player)
+        LayoutItems.ARTWORK -> ArtWork(player = player, item = layoutItem)
         LayoutItems.TITLE -> TextComponent(text = player.title, item = layoutItem)
         LayoutItems.ALBUM -> TextComponent(text = player.album, item = layoutItem)
         LayoutItems.ARTIST -> TextComponent(text = player.artist, item = layoutItem)

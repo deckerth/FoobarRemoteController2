@@ -14,9 +14,11 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.deckerth.thomas.foobarremotecontroller2.R
 import com.deckerth.thomas.foobarremotecontroller2.model.Player
+import com.deckerth.thomas.foobarremotecontroller2.ui.layout.ItemSize
+import com.deckerth.thomas.foobarremotecontroller2.ui.layout.LayoutItem
 
 @Composable
-fun ArtWork(player: Player) {
+fun ArtWork(player: Player, item: LayoutItem) {
     AsyncImage(
         model = player.artworkUrl,
         //placeholder = painterResource(R.drawable.album),
@@ -24,7 +26,13 @@ fun ArtWork(player: Player) {
         placeholder = painterResource(id = R.drawable.icon),
         modifier = Modifier
             .aspectRatio(1f)
-            .size(320.dp)
+            .size(
+                when(item.itemSize) {
+                    ItemSize.SMALL_COVER -> 120.dp
+                    ItemSize.MEDIUM_COVER -> 240.dp
+                    ItemSize.LARGE_COVER -> 320.dp
+                    else -> 240.dp
+                })
             .clip(MaterialTheme.shapes.medium)
     )
     Spacer(modifier = Modifier.height(16.dp))

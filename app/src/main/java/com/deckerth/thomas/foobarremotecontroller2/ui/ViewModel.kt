@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.PlaybackStateCompat
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -18,7 +19,6 @@ import com.deckerth.thomas.foobarremotecontroller2.model.PlaybackState
 import com.deckerth.thomas.foobarremotecontroller2.model.Player
 import com.deckerth.thomas.foobarremotecontroller2.model.Playlist
 import com.deckerth.thomas.foobarremotecontroller2.model.VolumeControl
-import kotlinx.coroutines.flow.MutableStateFlow
 import me.zhanghai.compose.preference.Preferences
 import java.io.IOException
 import java.net.HttpURLConnection
@@ -37,12 +37,24 @@ val foobVolumeControl: VolumeControl = VolumeControl(false, 0, 1, "db", 0)
 @Composable
 fun UpdatePreferences() {
     ip_address = getIpAddress()
-    Thread{
+    Thread {
         if (ip_address != null) {
-            valid = connector.checkConnection(ip_address!!)
+            var count = 0
+            do {
+                valid = connector.checkConnection(ip_address!!)
+                count++
+                if (!valid) {
+                    Thread.sleep(500)
+                }
+                if (count > 20) {
+                    break
+                }
+            } while (!valid)
+
             println("FOOB $ip_address valid:$valid")
+
             observer?.cancel(true)
-            if (valid){
+            if (valid) {
                 startPlayerObserver()
             }
         }
@@ -52,16 +64,37 @@ fun UpdatePreferences() {
 var playlistId: String? = null;
 var playlist by mutableStateOf<Playlist?>(null)
 var loadingList by mutableStateOf(false)
+var playlistState by mutableStateOf(LazyListState())
 
 fun updateList() {
     loadingList = true
     //list.clear()
     Thread {
-        val currentPlaylist = PlaylistAccess.getInstance().currentPlaylist ?: return@Thread
+        var currentPlaylist: Playlist? = null
+        if (player != null)
+            currentPlaylist = PlaylistAccess.getInstance().getCurrentPlaylist(player!!.playlistId, player!!.index) ?: return@Thread
+        else
+            currentPlaylist = PlaylistAccess.getInstance().currentPlaylist ?: return@Thread
         playlistId = currentPlaylist.playlistEntity.playlistId
         playlist = currentPlaylist
         loadingList = false
     }.start()
+}
+
+fun getCurrentAlbumIndex(): Int {
+    var index = 0;
+    if (player == null) return 0
+    if (player!!.getIndex() != -1)
+        for (album in playlist!!.albums) {
+            if (album.hasIndex(player!!.getIndex()))
+                break
+            index++
+        }
+    return index
+}
+
+suspend fun jumpToCurrentTitle() {
+    playlistState.scrollToItem(getCurrentAlbumIndex())
 }
 
 var player by mutableStateOf<Player?>(null)
@@ -69,7 +102,7 @@ var player by mutableStateOf<Player?>(null)
 fun updatePlayer() {
     player = PlayerAccess.getInstance().playerState
     if (mediaSession != null && player != null) {
-        val state = when (player!!.playbackState){
+        val state = when (player!!.playbackState) {
             PlaybackState.STOPPED -> PlaybackStateCompat.STATE_STOPPED
             PlaybackState.PLAYING -> PlaybackStateCompat.STATE_PLAYING
             PlaybackState.PAUSED -> PlaybackStateCompat.STATE_PAUSED
@@ -79,19 +112,25 @@ fun updatePlayer() {
             MediaMetadataCompat.Builder()
                 .putString(MediaMetadataCompat.METADATA_KEY_TITLE, player!!.title)
                 .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, player!!.artist)
-                .putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, getBitmapFromURL(player!!.artworkUrl))
-                .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, (floor(player!!.duration.toDouble()*1000)).toLong())
+                .putBitmap(
+                    MediaMetadataCompat.METADATA_KEY_ALBUM_ART,
+                    getBitmapFromURL(player!!.artworkUrl)
+                )
+                .putLong(
+                    MediaMetadataCompat.METADATA_KEY_DURATION,
+                    (floor(player!!.duration.toDouble() * 1000)).toLong()
+                )
                 .build()
         )
         System.out.println("FOOB updatePlayer: ${player!!.position}")
         mediaSession!!.setPlaybackState(
             PlaybackStateCompat.Builder()
-                .setState(state, floor( player!!.position.toDouble()*1000).toLong(), 1f)
+                .setState(state, floor(player!!.position.toDouble() * 1000).toLong(), 1f)
                 .setActions(
                     (if (state == PlaybackStateCompat.STATE_PLAYING) PlaybackStateCompat.ACTION_PAUSE else PlaybackStateCompat.ACTION_PLAY) or
-                    PlaybackStateCompat.ACTION_PLAY_PAUSE or
-                    PlaybackStateCompat.ACTION_SKIP_TO_NEXT or
-                    PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS
+                            PlaybackStateCompat.ACTION_PLAY_PAUSE or
+                            PlaybackStateCompat.ACTION_SKIP_TO_NEXT or
+                            PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS
                 )
                 .build()
         )

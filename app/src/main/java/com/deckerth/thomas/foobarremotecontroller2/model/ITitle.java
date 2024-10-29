@@ -10,7 +10,7 @@ public interface ITitle {
 
     String getPlaylistId();
 
-    String getIndex();
+    int getIndex();
 
     String getComposer();
 

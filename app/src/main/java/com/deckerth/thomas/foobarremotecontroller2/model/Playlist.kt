@@ -3,34 +3,29 @@ package com.deckerth.thomas.foobarremotecontroller2.model
 class Playlist(val playlistEntity: PlaylistEntity) {
     private val mTitles = mutableListOf<ITitle>()
 
+    var albums = mutableListOf<Album>()
+
     fun clear() {
         mTitles.clear()
+        albums.clear()
     }
 
     fun addTitle(title: ITitle) {
         mTitles.add(title)
-    }
 
-    val albums: List<Album>
-        get() {
-            if (mTitles.isNotEmpty()) {
-                val albums = mutableListOf<Album>()
-                var currentAlbum = Album(mTitles[0])
+        if (mTitles.count() == 1) {
+            val currentAlbum = Album(title)
+            albums.add(currentAlbum)
+            currentAlbum.addTitle(title)
+        } else {
+            var currentAlbum = albums[albums.count()-1]
+            if (title.album == currentAlbum.originalTitle.album){
+                currentAlbum.addTitle(title)
+            }else{
+                currentAlbum = Album(title)
+                currentAlbum.addTitle(title)
                 albums.add(currentAlbum)
-                playlist.forEach { iTitle ->
-                    if (iTitle.album == currentAlbum.originalTitle.album){
-                        currentAlbum.titles.add(iTitle)
-                    }else{
-                        currentAlbum = Album(iTitle)
-                        currentAlbum.titles.add(iTitle)
-                        albums.add(currentAlbum)
-                    }
-                }
-                return albums
-            }else
-                return listOf()
+            }
         }
-
-    val playlist: List<ITitle>
-        get() = mTitles
+    }
 }

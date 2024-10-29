@@ -55,11 +55,15 @@ import com.deckerth.thomas.foobarremotecontroller2.FoobarMediaService
 import com.deckerth.thomas.foobarremotecontroller2.R
 import com.deckerth.thomas.foobarremotecontroller2.ui.page.CustomDevicePage
 import com.deckerth.thomas.foobarremotecontroller2.ui.page.DeviceSelectionPage
+import com.deckerth.thomas.foobarremotecontroller2.ui.page.LayoutSelection
 import com.deckerth.thomas.foobarremotecontroller2.ui.page.PlayingPage
 import com.deckerth.thomas.foobarremotecontroller2.ui.page.PlaylistPage
 import com.deckerth.thomas.foobarremotecontroller2.ui.page.SettingsPage
 import com.deckerth.thomas.foobarremotecontroller2.ui.page.prepareDeviceSelectionPage
 import com.deckerth.thomas.foobarremotecontroller2.ui.theme.Foobar2000RemoteControllerTheme
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import me.zhanghai.compose.preference.defaultPreferenceFlow
 
@@ -124,13 +128,27 @@ class MainActivity : ComponentActivity() {
                             modifier = Modifier.fillMaxWidth(),
                             actions = {
                                 when (getCurrentRoute(navController)) {
-                                    "Playlist" -> IconButton(onClick = {
-                                        updateList()
-                                    }) {
-                                        Icon(
-                                            imageVector = Icons.Default.Refresh,
-                                            contentDescription = "Refresh"
-                                        )
+                                    "Playlist" -> Row(){
+                                        IconButton(onClick = {
+                                            CoroutineScope(Dispatchers.Main).launch {
+                                                jumpToCurrentTitle()
+                                            }})
+                                        {
+                                            Icon(
+                                                painter = painterResource(R.drawable.jump_to_element),
+                                                contentDescription = stringResource(R.string.desc_jump_to_title),
+                                                modifier = Modifier
+                                                    .size(24.dp)
+                                            )
+                                        }
+                                        IconButton(onClick = {
+                                            updateList()
+                                        }) {
+                                            Icon(
+                                                imageVector = Icons.Default.Refresh,
+                                                contentDescription = "Refresh"
+                                            )
+                                        }
                                     }
                                     "DeviceSelectionPage" -> Button(
                                         onClick = {
@@ -146,7 +164,9 @@ class MainActivity : ComponentActivity() {
                                                 modifier = Modifier
                                                     .size(24.dp)
                                             )
-                                            Spacer(modifier = Modifier.width(5.dp).height(26.dp))
+                                            Spacer(modifier = Modifier
+                                                .width(5.dp)
+                                                .height(26.dp))
                                             Text(
                                                 text = "Custom Device",
                                                 style = MaterialTheme.typography.labelSmall
@@ -190,7 +210,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize()
                 ) { innerPadding ->
                     NavHost(
-                        navController = navController as NavHostController,
+                        navController = navController,
                         startDestination = "Now Playing",
                         modifier = Modifier.padding(innerPadding)
                     ) {
@@ -213,6 +233,10 @@ class MainActivity : ComponentActivity() {
                         composable("CustomDevicePage") {
                             _appBarLabel = stringResource(R.string.title_device_selection)
                             CustomDevicePage()
+                        }
+                        composable("Layout selection") {
+                            _appBarLabel = stringResource(R.string.choose_layout_to_change)
+                            LayoutSelection()
                         }
 
                     }

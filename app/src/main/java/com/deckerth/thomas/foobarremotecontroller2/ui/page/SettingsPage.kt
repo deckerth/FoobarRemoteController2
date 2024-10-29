@@ -38,13 +38,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.deckerth.thomas.foobarremotecontroller2.LAYOUT_CLASSIC
-import com.deckerth.thomas.foobarremotecontroller2.LAYOUT_CUSTOM
-import com.deckerth.thomas.foobarremotecontroller2.LAYOUT_MODERN
 import com.deckerth.thomas.foobarremotecontroller2.R
 import com.deckerth.thomas.foobarremotecontroller2.getIpAddress
 import com.deckerth.thomas.foobarremotecontroller2.getViewMode
 import com.deckerth.thomas.foobarremotecontroller2.saveViewMode
+import com.deckerth.thomas.foobarremotecontroller2.ui.layout.Layouts
 import com.deckerth.thomas.foobarremotecontroller2.ui.mainActivity
 import me.zhanghai.compose.preference.ProvidePreferenceLocals
 import me.zhanghai.compose.preference.footerPreference
@@ -60,35 +58,28 @@ fun SettingsPage() {
         })
 
         Title(stringResource(R.string.settings_appearance))
-
         var isOpen by remember { mutableStateOf(false) }
         val viewMode = getViewMode()
         PreferenceItem<Boolean>(stringResource(R.string.settings_view_mode),
-            summary = when(viewMode) {
-                LAYOUT_MODERN -> stringResource(R.string.layout_modern)
-                LAYOUT_CLASSIC -> stringResource(R.string.layout_classic)
-                LAYOUT_CUSTOM -> stringResource(R.string.layout_custom)
-                else -> ""
-            },
-            showButton = viewMode == LAYOUT_CUSTOM,
+            summary = viewMode.text,
+            showButton = viewMode == Layouts.LAYOUT_CUSTOM,
             buttonText = stringResource(R.string.open_layout_editor),
+            onButtonClick = { mainActivity.navigateTo("Layout selection") },
             onClick = {
                 isOpen = true
             })
         if (isOpen) {
             ListPreference(
-                values = listOf(
-                    stringResource(R.string.layout_modern),
-                    stringResource(R.string.layout_classic),
-                    stringResource(R.string.layout_custom)),
+                values = Layouts.entries,
                 title = stringResource(R.string.settings_view_mode),
                 selectedItem = getViewMode(),
-                onClick = { mode: String? ->
+                onClick = { mode: Layouts? ->
                     if (mode != null) {
                         saveViewMode(mode, mainActivity)
                     }
                     isOpen = false
-                }
+                },
+                getText = {v: Layouts -> v.text}
             )
         }
     }
@@ -108,6 +99,17 @@ fun Title(title: String, modifier: Modifier = Modifier) {
         )
 }
 
+@Composable
+fun PageTitle(title: String, modifier: Modifier = Modifier) {
+    Text(
+        text = title,
+        style = MaterialTheme.typography.headlineMedium,
+        modifier = modifier
+            .padding(start = 17.dp)
+            .padding(bottom = 16.dp)
+            .padding(top = 16.dp),
+    )
+}
 @Composable
 fun ListSelector(values: List<String>, onDismissRequest: (String?) -> Unit) {
     var selectedText by remember { mutableStateOf("Select an option") }
@@ -226,7 +228,8 @@ fun <T> ListPreference(
     values: List<T>,
     title: String,
     selectedItem: T,
-    onClick: (T?) -> Unit
+    onClick: (T?) -> Unit,
+    getText: (T) -> String = { v -> v.toString()}
 ){
     var currentItem by remember { mutableStateOf(selectedItem) }
     currentItem = selectedItem
@@ -251,6 +254,7 @@ fun <T> ListPreference(
                     Row(
                         modifier = Modifier
                             .clickable {
+                                println("FOOB $value")
                                 onClick(value)
                             }
                             .fillMaxWidth()
@@ -265,7 +269,7 @@ fun <T> ListPreference(
                             }
                         )
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text(text = value.toString())
+                        Text(text = getText(value))
                     }
                 }
             }

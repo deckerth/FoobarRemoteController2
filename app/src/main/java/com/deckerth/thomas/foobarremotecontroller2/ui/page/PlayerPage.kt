@@ -47,6 +47,7 @@ import com.deckerth.thomas.foobarremotecontroller2.model.PlaybackState
 import com.deckerth.thomas.foobarremotecontroller2.model.Player
 import com.deckerth.thomas.foobarremotecontroller2.ui.components.LayoutComponent
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.LayoutManager
+import com.deckerth.thomas.foobarremotecontroller2.ui.layout.layoutManager
 import com.deckerth.thomas.foobarremotecontroller2.ui.observer
 import com.deckerth.thomas.foobarremotecontroller2.ui.player
 import com.deckerth.thomas.foobarremotecontroller2.ui.playlist
@@ -250,7 +251,6 @@ fun PlayerCard(player: Player) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        val layoutManager = LayoutManager()
         val layout = layoutManager.getLayout()
 
         for(item in layout.playerLayout.items) {

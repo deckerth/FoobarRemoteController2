@@ -14,14 +14,14 @@
     <string name="button_expand">Mehr anzeigen</string>
     <string name="info_titles">%1$s Titel</string>
     <string name="button_playlist_switcher">Playlisten</string>
-    <string name="title_setup_screen">Foobar Link Einrichten</string>
+    <string name="title_setup_screen">Foobar Link einrichten</string>
     <string name="info_no_track_playing">Wiedergabe ist gestoppt</string>
-    <string name="title_device_selection">Gerät Auswählen</string>
+    <string name="title_device_selection">Gerät auswählen</string>
     <string name="field_ip_address">IP Adresse</string>
     <string name="field_port">Port</string>
     <string name="button_save">Speichern</string>
     <string name="button_check_connection">Verbindung testen</string>
-    <string name="desc_repeat">Wiederholungs Modus</string>
+    <string name="desc_repeat">Wiederholungsmodus</string>
     <string name="desc_shuffle">Zufallswiedergabe</string>
     <string name="layout_item_medium">Medium</string>
     <string name="layout_item_composer">Komponist</string>
@@ -33,4 +33,17 @@
     <string name="layout_item_playlist_id">Playlist id</string>
     <string name="layout_item_index">Index</string>
     <string name="layout_item_smart_artist">Individueller Künstler eines Titels</string>
+    <string name="layout_modern">Modern</string>
+    <string name="layout_classic">Klassisch</string>
+    <string name="layout_custom">Angepasst</string>
+    <string name="settings_view_mode">Anzeigeformat</string>
+    <string name="settings_appearance">Darstellung</string>
+    <string name="settings_connectivity">Verbindung</string>
+    <string name="open_layout_editor">Layout ändern</string>
+    <string name="choose_layout_to_change">Angepasstes Layout</string>
+    <string name="layout_playlist">Playlist</string>
+    <string name="choose_album_layout">Albumlayout</string>
+    <string name="choose_title_layout">Titellayout</string>
+    <string name="choose_player_layout">Player Layout</string>
+    <string name="desc_jump_to_title">Zu aktuellem Titel springen</string>
 </resources>

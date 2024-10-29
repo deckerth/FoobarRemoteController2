@@ -9,7 +9,7 @@ public class Title implements ITitle {
     // mPlaylistId, mCatalog, mIndex, mComposer, mAlbum, mArtist
     protected final String mCatalog;
     protected final String mPlaylistId;
-    protected final String mIndex;
+    protected final int mIndex;
     protected final String mComposer;
     private final String mTitle;
     private final String mDiscNumber;
@@ -23,10 +23,10 @@ public class Title implements ITitle {
     protected Bitmap mArtwork;
     private Boolean mIsCurrent = false;
 
-    public Title(String mPlaylistId, String mIndex, String mCatalog, String mComposer, String mAlbum, String mTitle, String mArtist, String mDiscNumber, String mTrack, String mPlaybackTime, String duration, String position, String mArtworkUrl) {
+    public Title(String mPlaylistId, int mIndex, String mCatalog, String mComposer, String mAlbum, String mTitle, String mArtist, String mDiscNumber, String mTrack, String mPlaybackTime, String duration, String position, String mArtworkUrl) {
         this.mCatalog = set(mCatalog);
         this.mPlaylistId = set(mPlaylistId);
-        this.mIndex = set(mIndex);
+        this.mIndex = mIndex;
         this.mComposer = set(mComposer);
         this.mAlbum = set(mAlbum);
         this.mTitle = set(mTitle);
@@ -68,7 +68,7 @@ public class Title implements ITitle {
     }
 
     @Override
-    public String getIndex() {
+    public int getIndex() {
         return mIndex;
     }
 

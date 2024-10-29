@@ -38,6 +38,7 @@ fun TextComponent(text: String, item: LayoutItem) {
 @Composable
 fun LayoutComponent(player: Player, layoutItem: LayoutItem) {
     when (layoutItem.item) {
+        LayoutItems.CATALOG -> TextComponent(text = player.catalog, item = layoutItem)
         LayoutItems.ARTWORK -> ArtWork(player = player, item = layoutItem)
         LayoutItems.TITLE -> TextComponent(text = player.title, item = layoutItem)
         LayoutItems.ALBUM -> TextComponent(text = player.album, item = layoutItem)
@@ -54,6 +55,7 @@ fun LayoutComponent(player: Player, layoutItem: LayoutItem) {
 @Composable
 fun LayoutComponent(album: Album, layoutItem: LayoutItem) {
     when (layoutItem.item) {
+        LayoutItems.CATALOG -> TextComponent(text = album.originalTitle.catalog, item = layoutItem)
         LayoutItems.ALBUM -> TextComponent(text = album.originalTitle.album, item = layoutItem)
         LayoutItems.ARTIST -> TextComponent(text = album.originalTitle.artist, item = layoutItem)
         LayoutItems.COMPOSER ->
@@ -67,11 +69,17 @@ fun LayoutComponent(album: Album, layoutItem: LayoutItem) {
 @Composable
 fun LayoutComponent(album: Album, title: ITitle, checkArtist: Boolean, layoutItem: LayoutItem) {
     when (layoutItem.item) {
+        LayoutItems.CATALOG -> TextComponent(text = title.catalog, item = layoutItem)
+        LayoutItems.ALBUM -> TextComponent(text = title.album, item = layoutItem)
         LayoutItems.TITLE -> TextComponent(text = title.title, item = layoutItem)
         LayoutItems.ARTIST -> TextComponent(text = title.artist, item = layoutItem)
         LayoutItems.SMART_ARTIST ->
             if (!checkArtist || !title.artist.equals(album.originalTitle.artist))
                 TextComponent(text = title.artist, item = layoutItem)
+        LayoutItems.COMPOSER ->
+            if (title.composer != "" && title.composer != "?") {
+                TextComponent(text = title.composer, item = layoutItem)
+            }
         else -> Text("UNKNOWN ITEM")
     }
 }

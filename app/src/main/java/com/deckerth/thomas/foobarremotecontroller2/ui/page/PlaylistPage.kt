@@ -52,10 +52,13 @@ import com.deckerth.thomas.foobarremotecontroller2.model.PlaylistEntity
 import com.deckerth.thomas.foobarremotecontroller2.model.Playlists
 import com.deckerth.thomas.foobarremotecontroller2.model.Title
 import com.deckerth.thomas.foobarremotecontroller2.ui.components.LayoutComponent
-import com.deckerth.thomas.foobarremotecontroller2.ui.layout.LayoutManager
+import com.deckerth.thomas.foobarremotecontroller2.ui.getCurrentAlbumIndex
+import com.deckerth.thomas.foobarremotecontroller2.ui.layout.Layout
+import com.deckerth.thomas.foobarremotecontroller2.ui.layout.layoutManager
 import com.deckerth.thomas.foobarremotecontroller2.ui.loadingList
 import com.deckerth.thomas.foobarremotecontroller2.ui.player
 import com.deckerth.thomas.foobarremotecontroller2.ui.playlist
+import com.deckerth.thomas.foobarremotecontroller2.ui.playlistState
 import com.deckerth.thomas.foobarremotecontroller2.ui.theme.Foobar2000RemoteControllerTheme
 
 @Composable
@@ -71,17 +74,22 @@ fun PlaylistPage() {
 }
 
 @Composable
-fun AlbumCard(album: Album) {
-    var isSelected by rememberSaveable {
-        mutableStateOf(false)
-    }
-//    if (player != null){
-//        isSelected = album.hasIndex(player!!.index)
-//    }
+fun AlbumCard( album: Album, layout: Layout?) {
 
-    val surfaceColor by animateColorAsState(
-        if (isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceContainer,
-    )
+    /*
+    in automatic mode (initial state):
+      automatically expand albums that are played, collapse them otherwise
+    automatic mode is left when the user collapses a playing album, or expands a not playing album
+    automatic mode is re-entered otherwise
+    */
+    if (player != null) {
+        val currentlyPlaying = album.originalTitle.playlistId == player!!.playlistId && album.hasIndex(player!!.getIndex())
+        if (album.isAutomaticSelection)
+            album.isSelected = currentlyPlaying
+        else
+            album.isAutomaticSelection = album.isSelected == currentlyPlaying
+    }
+
     ElevatedCard(
         modifier = Modifier
             .animateContentSize()
@@ -93,7 +101,7 @@ fun AlbumCard(album: Album) {
 //                    .playTrack(album.playlistId, album.index)
 //            }
     ) {
-        Column{
+        Column {
             Row {
                 AsyncImage(
                     model = album.originalTitle.artworkUrl,
@@ -108,23 +116,24 @@ fun AlbumCard(album: Album) {
                         .padding(horizontal = 16.dp)
                         .height(80.dp)
                 ) {
-                    val layoutManager = LayoutManager()
-                    val layout = layoutManager.getLayout()
-
-                    for(item in layout.albumLayout.items) {
-                        LayoutComponent(album, item)
-                    }
+                    if (layout != null)
+                        for (item in layout.albumLayout.items) {
+                            LayoutComponent(album, item)
+                        }
                 }
             }
-            if (album.titles.size > 1){
+            if (album.titles.size > 1) {
                 HorizontalDivider()
                 Box {
                     TextButton(
                         modifier = Modifier
                             .padding(horizontal = 8.dp, vertical = 2.dp),
-                        onClick = { isSelected = !isSelected }
+                        onClick = {
+                            album.isAutomaticSelection = false
+                            album.isSelected = !album.isSelected
+                        }
                     ) {
-                        if (isSelected) {
+                        if (album.isSelected) {
                             Text(text = stringResource(R.string.button_collapse))
                         } else {
                             Text(text = stringResource(R.string.button_expand))
@@ -141,14 +150,14 @@ fun AlbumCard(album: Album) {
                     )
                 }
 
-                if (isSelected) {
+                if (album.isSelected) {
                     Column {
                         album.titles.forEach { title ->
                             TitleEntry(album = album, title = title)
                         }
                     }
                 }
-            }else{
+            } else {
                 TitleEntry(album = album, title = album.titles[0])
             }
 
@@ -180,7 +189,7 @@ fun AlbumCardOld(album: Album) {
 //                    .playTrack(album.playlistId, album.index)
 //            }
     ) {
-        Column{
+        Column {
             Row {
                 AsyncImage(
                     model = album.originalTitle.artworkUrl,
@@ -216,7 +225,7 @@ fun AlbumCardOld(album: Album) {
 
 
             }
-            if (album.titles.size > 1){
+            if (album.titles.size > 1) {
                 HorizontalDivider()
                 Box {
                     TextButton(
@@ -248,7 +257,7 @@ fun AlbumCardOld(album: Album) {
                         }
                     }
                 }
-            }else{
+            } else {
                 TitleEntry(album = album, title = album.titles[0])
             }
 
@@ -258,15 +267,15 @@ fun AlbumCardOld(album: Album) {
 }
 
 @Composable
-fun TitleEntry(album: Album, title: ITitle){
+fun TitleEntry(album: Album, title: ITitle) {
     var titleSelected = false
     if (player != null)
-        titleSelected = title.index == player!!.index && title.playlistId == player!!.playlistId
+        titleSelected =
+            title.index == player!!.getIndex() && title.playlistId == player!!.playlistId
     var modifier = Modifier
         .clickable {
-            PlayerAccess.getInstance().playTrack(title.playlistId,title.index)
+            PlayerAccess.getInstance().playTrack(title.playlistId, title.index)
         }
-    println("FOOB selected: $titleSelected")
     if (titleSelected)
         modifier = modifier.background(MaterialTheme.colorScheme.primaryContainer)
     Column(
@@ -277,50 +286,10 @@ fun TitleEntry(album: Album, title: ITitle){
             modifier = Modifier
                 .padding(16.dp)
         ) {
-            val layoutManager = LayoutManager()
             val layout = layoutManager.getLayout()
-
-            for(item in layout.titleLayout.items) {
+            for (item in layout.titleLayout.items) {
                 LayoutComponent(album, title, layout.albumLayoutHasArtist, item)
             }
-        }
-    }
-}
-
-@Composable
-fun TitleEntryOld(title: ITitle){
-    var titleSelected = false
-    if (player != null)
-        titleSelected = title.index == player!!.index && title.playlistId == player!!.playlistId
-    var modifier = Modifier
-        .clickable {
-            PlayerAccess.getInstance().playTrack(title.playlistId,title.index)
-        }
-    println("FOOB selected: $titleSelected")
-    if (titleSelected)
-        modifier = modifier.background(MaterialTheme.colorScheme.primaryContainer)
-    Column(
-        modifier = modifier
-    ) {
-        HorizontalDivider()
-        Column(
-            modifier = Modifier
-                .padding(16.dp)
-        ) {
-            Text(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                text = title.title,
-                maxLines = 1,
-                style = MaterialTheme.typography.titleMedium
-            )
-            Text(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                text = title.artist,
-                maxLines = 1,
-                style = MaterialTheme.typography.bodySmall
-            )
         }
     }
 }
@@ -330,7 +299,7 @@ fun TitleEntryOld(title: ITitle){
 fun AlbumCardPreview() {
     val title = Title(
         "",
-        "",
+        -1,
         "",
         "Composer",
         "Ibrahim Ferrer (Buena Vista Social Club Presents)",
@@ -344,30 +313,37 @@ fun AlbumCardPreview() {
         "",
     )
     val album = Album(title)
-    album.titles.add(title)
-    album.titles.add(title)
-    album.titles.add(title)
-    album.titles.add(title)
-    album.titles.add(title)
-    AlbumCard(album)
+    album.addTitle(title)
+    album.addTitle(title)
+    album.addTitle(title)
+    album.addTitle(title)
+    album.addTitle(title)
+
+    //val fields = LayoutDescription()
+    //val albumItem = LayoutItem(LayoutItems.ALBUM, ItemSize.TITLE_MEDIUM)
+    //val albumItem = LayoutItem() // <--- does not work for some reason
+    //fields.items.add(LayoutItem(LayoutItems.ALBUM, ItemSize.TITLE_MEDIUM))
+    //fields.items.add(LayoutItem(LayoutItems.ARTIST, ItemSize.BODY_SMALL))
+    //fields.items.add(LayoutItem(LayoutItems.COMPOSER, ItemSize.BODY_SMALL))
+
+    //val layout = Layout(playerLayout = fields, albumLayout = fields, titleLayout = fields)
+    AlbumCard(  album, null)
 }
 
 @Composable
 fun Playlist(playlist: Playlist) {
-    var index = 0;
-    if (player != null)
-        index = player!!.index.toInt()
-    val listState = rememberLazyListState(initialFirstVisibleItemIndex = index)
-    LazyColumn(state = listState) {
+
+    playlistState = rememberLazyListState(initialFirstVisibleItemIndex = getCurrentAlbumIndex())
+    LazyColumn(state = playlistState) {
         items(playlist.albums) { album ->
-            AlbumCard(album)
+            AlbumCard(album, layoutManager.getLayout())
         }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PlaylistSwitcher(playlists: Playlists, selected: Int){
+fun PlaylistSwitcher(playlists: Playlists, selected: Int) {
     var expanded by remember {
         mutableStateOf(false)
     }
@@ -380,7 +356,7 @@ fun PlaylistSwitcher(playlists: Playlists, selected: Int){
             .fillMaxWidth(),
         expanded = expanded,
         onExpandedChange = { expanded = !expanded }
-    ){
+    ) {
         OutlinedTextField(
             modifier = Modifier
                 .fillMaxWidth()
@@ -389,7 +365,7 @@ fun PlaylistSwitcher(playlists: Playlists, selected: Int){
             readOnly = true,
             value = playlists.playlists[selectedIndex].name,
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-            onValueChange = {s: String ->
+            onValueChange = { s: String ->
 
             }
         )
@@ -411,7 +387,10 @@ fun PlaylistSwitcher(playlists: Playlists, selected: Int){
                     },
                     trailingIcon = {
                         if (playlistEntity.isCurrent) {
-                            Icon(painter = painterResource(id = R.drawable.equalizer), contentDescription = "Playing")
+                            Icon(
+                                painter = painterResource(id = R.drawable.equalizer),
+                                contentDescription = "Playing"
+                            )
                         }
                     }
                 )
@@ -425,7 +404,7 @@ fun PlaylistSwitcher(playlists: Playlists, selected: Int){
     showBackground = true
 )
 @Composable
-fun PlaylistSwitcherPreview(){
+fun PlaylistSwitcherPreview() {
 //    var text by remember {
 //        mutableStateOf("text")
 //    }
@@ -439,26 +418,34 @@ fun PlaylistSwitcherPreview(){
 //        }
 //    )
     val playlists = Playlists()
-    playlists.addPlaylistEntity(PlaylistEntity(
-        "p1",
-        "name1",
-        false
-    ))
-    playlists.addPlaylistEntity(PlaylistEntity(
-        "p2",
-        "name2",
-        false
-    ))
-    playlists.addPlaylistEntity(PlaylistEntity(
-        "p3",
-        "name3",
-        true
-    ))
-    playlists.addPlaylistEntity(PlaylistEntity(
-        "p4",
-        "name4",
-        false
-    ))
+    playlists.addPlaylistEntity(
+        PlaylistEntity(
+            "p1",
+            "name1",
+            false
+        )
+    )
+    playlists.addPlaylistEntity(
+        PlaylistEntity(
+            "p2",
+            "name2",
+            false
+        )
+    )
+    playlists.addPlaylistEntity(
+        PlaylistEntity(
+            "p3",
+            "name3",
+            true
+        )
+    )
+    playlists.addPlaylistEntity(
+        PlaylistEntity(
+            "p4",
+            "name4",
+            false
+        )
+    )
     PlaylistSwitcher(playlists = playlists, selected = 0)
 }
 
@@ -471,7 +458,7 @@ fun PlaylistPreview() {
     Foobar2000RemoteControllerTheme {
         val title = Title(
             "",
-            "",
+            0,
             "",
             "Composer",
             "Ibrahim Ferrer (Buena Vista Social Club Presents)",
@@ -484,7 +471,7 @@ fun PlaylistPreview() {
             "",
             "",
         )
-        val playlist = Playlist(PlaylistEntity("p4","main",true))
+        val playlist = Playlist(PlaylistEntity("p4", "main", true))
         playlist.addTitle(title)
         playlist.addTitle(title)
         playlist.addTitle(title)

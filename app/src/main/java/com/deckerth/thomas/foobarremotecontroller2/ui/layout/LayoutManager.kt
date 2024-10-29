@@ -4,6 +4,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.font.FontStyle
 import com.deckerth.thomas.foobarremotecontroller2.getViewMode
 
+val layoutManager = LayoutManager()
+
 class LayoutManager {
     
     private val classicLayout : Layout = createClassicLayout()
@@ -73,8 +75,8 @@ class LayoutManager {
     @Composable
     fun getLayout() : Layout {
         return when(getViewMode()) {
-            "Modern" -> modernLayout
-            "Classic" -> classicLayout
+            Layouts.LAYOUT_MODERN -> modernLayout
+            Layouts.LAYOUT_CLASSIC -> classicLayout
             else -> modernLayout
         }
     }

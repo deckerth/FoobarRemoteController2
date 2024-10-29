@@ -46,4 +46,11 @@ data class Player(
         val seconds:Int = duration%60
         return String.format("%01d:%02d", minutes, seconds)
     }
+
+    fun getIndex(): Int {
+        try{
+            val pos = index.toInt()
+            return pos
+        } catch (ex: NumberFormatException) {return -1}
+    }
 }

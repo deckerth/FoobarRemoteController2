@@ -7,6 +7,8 @@ import com.deckerth.thomas.foobarremotecontroller2.model.PlaylistEntity;
 import com.deckerth.thomas.foobarremotecontroller2.model.Playlists;
 import com.deckerth.thomas.foobarremotecontroller2.model.Title;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -21,6 +23,12 @@ public class PlaylistAccess {
         if (INSTANCE == null)
             INSTANCE = new PlaylistAccess();
         return INSTANCE;
+    }
+
+    @Nullable
+    public Playlist getCurrentPlaylist(@NotNull String playlistId, @NotNull String index) {
+        return getCurrentPlaylist();
+        //TODO use parameters
     }
 
     public Playlist getCurrentPlaylist() {
@@ -92,7 +100,7 @@ public class PlaylistAccess {
                 playlist.addTitle(
                         new Title(
                                 playlistEntity.getPlaylistId(),
-                                String.valueOf(i),
+                                i,
                                 catalog,
                                 composer,
                                 album,
@@ -152,4 +160,5 @@ public class PlaylistAccess {
         }
         return result;
     }
-}
+
+ }

@@ -188,9 +188,9 @@ public class PlayerAccess {
         new Thread(() -> mConnector.postData("player/next")).start();
     }
 
-    public void playTrack(String playlistId, String index) {
+    public void playTrack(String playlistId, Integer index) {
         new Thread(() -> {
-            mConnector.postData("player/play/" + playlistId + "/" + index);
+            mConnector.postData("player/play/" + playlistId + "/" + index.toString());
             getPlayerState();
         }).start();
     }

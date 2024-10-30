@@ -6,7 +6,7 @@ import com.deckerth.thomas.foobarremotecontroller2.model.PlaybackMode;
 import com.deckerth.thomas.foobarremotecontroller2.model.PlaybackState;
 import com.deckerth.thomas.foobarremotecontroller2.model.Player;
 import com.deckerth.thomas.foobarremotecontroller2.model.VolumeControl;
-import com.deckerth.thomas.foobarremotecontroller2.ui.ViewModelKt;
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.ViewModelKt;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -99,30 +99,34 @@ public class PlayerAccess {
                     playbackState = PlaybackState.STOPPED;
                     break;
             }
-            Player player = new Player(
-                    columns.getString(0),
-                    columns.getString(1),
-                    columns.getString(2),
-                    columns.getString(3),
-                    columns.getString(4),
-                    columns.getString(5),
-                    columns.getString(6),
-                    columns.getString(7),
-                    activeItemObject.getString("playlistId"),
-                    activeItemObject.getString("index"),
-                    activeItemObject.getString("duration"),
-                    activeItemObject.getString("position"),
-                    mConnector.getServerAddress() + "artwork/" + activeItemObject.getString("playlistId") + "/" + activeItemObject.getString("index"),
-                    playbackState,
-                    PlaybackMode.getEntries().get(playerObject.getInt("playbackMode"))
-            );
+
             VolumeControl volumeControl = ViewModelKt.getFoobVolumeControl();
             volumeControl.setMuted(volumeObject.getBoolean("isMuted"));
             volumeControl.setMin(volumeObject.getInt("min"));
             volumeControl.setMax(volumeObject.getInt("max"));
             volumeControl.setType(volumeObject.getString("type"));
             volumeControl.setValue(volumeObject.getInt("value"));
-            return player;
+
+            if (columns.length() > 0)
+                return new Player(
+                        columns.getString(0),
+                        columns.getString(1),
+                        columns.getString(2),
+                        columns.getString(3),
+                        columns.getString(4),
+                        columns.getString(5),
+                        columns.getString(6),
+                        columns.getString(7),
+                        activeItemObject.getString("playlistId"),
+                        activeItemObject.getString("index"),
+                        activeItemObject.getString("duration"),
+                        activeItemObject.getString("position"),
+                        mConnector.getServerAddress() + "artwork/" + activeItemObject.getString("playlistId") + "/" + activeItemObject.getString("index"),
+                        playbackState,
+                        PlaybackMode.getEntries().get(playerObject.getInt("playbackMode"))
+                );
+            else
+                return null;
 //
 //            String column = columns.getString(0);
 //            mPlayerViewModel.setCatalog(column);
@@ -205,7 +209,7 @@ public class PlayerAccess {
 
     public void setPlaybackMode(PlaybackMode mode) {
         new Thread(() -> {
-            String jsonString = "{\"options\":[{\"id\": \"playbackOrder\", \"value\": "+mode.ordinal()+"}]}";
+            String jsonString = "{\"options\":[{\"id\": \"playbackOrder\", \"value\": " + mode.ordinal() + "}]}";
             mConnector.postData("player/", jsonString);
             getPlayerState();
         }).start();

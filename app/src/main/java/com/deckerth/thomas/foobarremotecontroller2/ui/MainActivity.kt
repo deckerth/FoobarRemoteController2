@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.automirrored.outlined.List
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
@@ -24,8 +23,11 @@ import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledIconToggleButton
+import androidx.compose.material3.FilledTonalIconToggleButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -41,7 +43,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -59,13 +60,16 @@ import com.deckerth.thomas.foobarremotecontroller2.ui.page.LayoutSelection
 import com.deckerth.thomas.foobarremotecontroller2.ui.page.PlayingPage
 import com.deckerth.thomas.foobarremotecontroller2.ui.page.PlaylistPage
 import com.deckerth.thomas.foobarremotecontroller2.ui.page.SettingsPage
-import com.deckerth.thomas.foobarremotecontroller2.ui.page.prepareDeviceSelectionPage
 import com.deckerth.thomas.foobarremotecontroller2.ui.theme.Foobar2000RemoteControllerTheme
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.UpdatePreferences
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.autoScrollIndex
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.autoscroll
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.getCurrentAlbumIndex
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.playlistState
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.updateList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import me.zhanghai.compose.preference.defaultPreferenceFlow
 
 data class BottomNavigationItem(
     val title: String,
@@ -129,10 +133,14 @@ class MainActivity : ComponentActivity() {
                             actions = {
                                 when (getCurrentRoute(navController)) {
                                     "Playlist" -> Row(){
-                                        IconButton(onClick = {
-                                            CoroutineScope(Dispatchers.Main).launch {
-                                                jumpToCurrentTitle()
-                                            }})
+                                        FilledIconToggleButton(
+                                            checked = autoscroll,
+                                            onCheckedChange = {
+                                                CoroutineScope(Dispatchers.Main).launch{
+                                                    autoscroll = true
+                                                    playlistState.scrollToItem(getCurrentAlbumIndex())
+                                                }
+                                            })
                                         {
                                             Icon(
                                                 painter = painterResource(R.drawable.jump_to_element),

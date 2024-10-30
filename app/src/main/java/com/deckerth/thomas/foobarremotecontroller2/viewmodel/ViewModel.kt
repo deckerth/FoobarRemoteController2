@@ -1,4 +1,4 @@
-package com.deckerth.thomas.foobarremotecontroller2.ui
+package com.deckerth.thomas.foobarremotecontroller2.viewmodel
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -6,7 +6,9 @@ import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MonotonicFrameClock
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.deckerth.thomas.foobarremotecontroller2.connector.HTTPConnector
@@ -19,13 +21,17 @@ import com.deckerth.thomas.foobarremotecontroller2.model.PlaybackState
 import com.deckerth.thomas.foobarremotecontroller2.model.Player
 import com.deckerth.thomas.foobarremotecontroller2.model.Playlist
 import com.deckerth.thomas.foobarremotecontroller2.model.VolumeControl
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import me.zhanghai.compose.preference.Preferences
-import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URL
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledFuture
 import java.util.concurrent.TimeUnit
+import kotlin.math.abs
 import kotlin.math.floor
 
 var preferences: Preferences? = null
@@ -61,31 +67,23 @@ fun UpdatePreferences() {
     }.start()
 }
 
-var playlistId: String? = null;
-var playlist by mutableStateOf<Playlist?>(null)
+var autoscroll by mutableStateOf(true)
+var autoScrollIndex by mutableStateOf<Int?>(0)
+var displayedPlaylist by mutableStateOf<Playlist?>(null)
 var loadingList by mutableStateOf(false)
 var playlistState by mutableStateOf(LazyListState())
 
+var selectedPlaylist by mutableStateOf("")
+
 fun updateList() {
-    loadingList = true
-    //list.clear()
-    Thread {
-        var currentPlaylist: Playlist? = null
-        if (player != null)
-            currentPlaylist = PlaylistAccess.getInstance().getCurrentPlaylist(player!!.playlistId, player!!.index) ?: return@Thread
-        else
-            currentPlaylist = PlaylistAccess.getInstance().currentPlaylist ?: return@Thread
-        playlistId = currentPlaylist.playlistEntity.playlistId
-        playlist = currentPlaylist
-        loadingList = false
-    }.start()
+    invalidatePlaylist(selectedPlaylist)
 }
 
 fun getCurrentAlbumIndex(): Int {
     var index = 0;
     if (player == null) return 0
     if (player!!.getIndex() != -1)
-        for (album in playlist!!.albums) {
+        for (album in displayedPlaylist!!.albums) {
             if (album.hasIndex(player!!.getIndex()))
                 break
             index++
@@ -93,14 +91,16 @@ fun getCurrentAlbumIndex(): Int {
     return index
 }
 
-suspend fun jumpToCurrentTitle() {
-    playlistState.scrollToItem(getCurrentAlbumIndex())
-}
-
 var player by mutableStateOf<Player?>(null)
 
 fun updatePlayer() {
     player = PlayerAccess.getInstance().playerState
+    if (autoscroll && player != null &&
+        displayedPlaylist != null &&
+        displayedPlaylist!!.albums.isNotEmpty() &&
+        getCurrentAlbumIndex() != autoScrollIndex) {
+        autoScrollIndex = getCurrentAlbumIndex()
+    }
     if (mediaSession != null && player != null) {
         val state = when (player!!.playbackState) {
             PlaybackState.STOPPED -> PlaybackStateCompat.STATE_STOPPED
@@ -142,13 +142,14 @@ fun updatePlayer() {
 
 private fun getBitmapFromURL(src: String?): Bitmap? {
     return try {
+        println("FOOB getBitmapFromURL: $src")
         val url = URL(src)
         val connection = url.openConnection() as HttpURLConnection
         connection.doInput = true
         connection.connect()
         val input = connection.inputStream
         BitmapFactory.decodeStream(input)
-    } catch (e: IOException) {
+    } catch (e: Exception) {
         e.printStackTrace()
         null
     }
@@ -182,7 +183,7 @@ fun startPlayerObserver() {
     val scheduler = Executors.newSingleThreadScheduledExecutor()
     observer = scheduler.scheduleWithFixedDelay({
         updatePlayer()
-        if (!loadingList && PlaylistAccess.getInstance().currentPlaylistID != playlistId)
-            updateList()
+        val playlists = PlaylistAccess.getInstance().playlists
+        setPlaylists(playlists)
     }, 0, 1, TimeUnit.SECONDS)
 }

@@ -29,6 +29,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -52,29 +53,31 @@ import com.deckerth.thomas.foobarremotecontroller2.model.PlaylistEntity
 import com.deckerth.thomas.foobarremotecontroller2.model.Playlists
 import com.deckerth.thomas.foobarremotecontroller2.model.Title
 import com.deckerth.thomas.foobarremotecontroller2.ui.components.LayoutComponent
-import com.deckerth.thomas.foobarremotecontroller2.ui.getCurrentAlbumIndex
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.getCurrentAlbumIndex
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.Layout
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.layoutManager
-import com.deckerth.thomas.foobarremotecontroller2.ui.loadingList
-import com.deckerth.thomas.foobarremotecontroller2.ui.player
-import com.deckerth.thomas.foobarremotecontroller2.ui.playlist
-import com.deckerth.thomas.foobarremotecontroller2.ui.playlistState
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.loadingList
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.player
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.displayedPlaylist
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.playlistState
 import com.deckerth.thomas.foobarremotecontroller2.ui.theme.Foobar2000RemoteControllerTheme
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.autoScrollIndex
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.autoscroll
 
 @Composable
 fun PlaylistPage() {
-    if (loadingList || playlist == null)
+    if (displayedPlaylist == null)
+        return
+    Playlist(displayedPlaylist!!)
+    if (loadingList || displayedPlaylist == null)
         LinearProgressIndicator(
             modifier = Modifier
                 .fillMaxWidth()
         )
-    if (playlist == null)
-        return
-    Playlist(playlist!!)
 }
 
 @Composable
-fun AlbumCard( album: Album, layout: Layout?) {
+fun AlbumCard(album: Album, layout: Layout?) {
 
     /*
     in automatic mode (initial state):
@@ -83,7 +86,10 @@ fun AlbumCard( album: Album, layout: Layout?) {
     automatic mode is re-entered otherwise
     */
     if (player != null) {
-        val currentlyPlaying = album.originalTitle.playlistId == player!!.playlistId && album.hasIndex(player!!.getIndex())
+        val currentlyPlaying =
+            album.originalTitle.playlistId == player!!.playlistId && album.hasIndex(
+                player!!.getIndex()
+            )
         if (album.isAutomaticSelection)
             album.isSelected = currentlyPlaying
         else
@@ -327,18 +333,31 @@ fun AlbumCardPreview() {
     //fields.items.add(LayoutItem(LayoutItems.COMPOSER, ItemSize.BODY_SMALL))
 
     //val layout = Layout(playerLayout = fields, albumLayout = fields, titleLayout = fields)
-    AlbumCard(  album, null)
+    AlbumCard(album, null)
 }
 
 @Composable
 fun Playlist(playlist: Playlist) {
-
-    playlistState = rememberLazyListState(initialFirstVisibleItemIndex = getCurrentAlbumIndex())
-    LazyColumn(state = playlistState) {
-        items(playlist.albums) { album ->
-            AlbumCard(album, layoutManager.getLayout())
+    playlistState = rememberLazyListState(initialFirstVisibleItemIndex = if (!loadingList && autoscroll) getCurrentAlbumIndex() else 0)
+    var animating by remember { mutableStateOf(false) }
+    if (playlist.albums.isNotEmpty()){
+        LazyColumn(state = playlistState) {
+            items(playlist.albums) { album ->
+                AlbumCard(album, layoutManager.getLayout())
+            }
+        }
+        if (!animating && !loadingList && playlistState.firstVisibleItemIndex != autoScrollIndex)
+            autoscroll = false
+        LaunchedEffect(autoScrollIndex) {
+            animating = true
+            playlistState.animateScrollToItem(autoScrollIndex!!)
+            autoscroll = true
+            animating = false
         }
     }
+
+
+
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -422,28 +441,28 @@ fun PlaylistSwitcherPreview() {
         PlaylistEntity(
             "p1",
             "name1",
-            false
+            false, 10
         )
     )
     playlists.addPlaylistEntity(
         PlaylistEntity(
             "p2",
             "name2",
-            false
+            false, 10
         )
     )
     playlists.addPlaylistEntity(
         PlaylistEntity(
             "p3",
             "name3",
-            true
+            true, 10
         )
     )
     playlists.addPlaylistEntity(
         PlaylistEntity(
             "p4",
             "name4",
-            false
+            false, 10
         )
     )
     PlaylistSwitcher(playlists = playlists, selected = 0)
@@ -471,7 +490,7 @@ fun PlaylistPreview() {
             "",
             "",
         )
-        val playlist = Playlist(PlaylistEntity("p4", "main", true))
+        val playlist = Playlist(PlaylistEntity("p4", "main", true, 10))
         playlist.addTitle(title)
         playlist.addTitle(title)
         playlist.addTitle(title)

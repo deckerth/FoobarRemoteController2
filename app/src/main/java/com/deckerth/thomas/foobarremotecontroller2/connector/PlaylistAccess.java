@@ -7,6 +7,7 @@ import com.deckerth.thomas.foobarremotecontroller2.model.PlaylistEntity;
 import com.deckerth.thomas.foobarremotecontroller2.model.Playlists;
 import com.deckerth.thomas.foobarremotecontroller2.model.Title;
 
+import org.jetbrains.annotations.Debug;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONArray;
@@ -25,28 +26,18 @@ public class PlaylistAccess {
         return INSTANCE;
     }
 
-    @Nullable
-    public Playlist getCurrentPlaylist(@NotNull String playlistId, @NotNull String index) {
-        return getCurrentPlaylist();
-        //TODO use parameters
-    }
-
-    public Playlist getCurrentPlaylist() {
+    public Playlists getPlaylists() {
         if (mConnector == null)
             this.mConnector = new HTTPConnector();
         String response = queryPlaylists();
-        Playlists playlists = parsePlaylists(response);
-        PlaylistEntity current = playlists.getCurrentPlaylist();
-        if (current != null) {
-            return getPlaylist(current);
-        }
-        return null;
+        return parsePlaylists(response);
     }
 
-    public Playlist getPlaylist(PlaylistEntity playlistEntity) {
+    public Playlist getPlaylist(PlaylistEntity playlistEntity, int startIndex) {
+
         String response = mConnector.getData("playlists/" + playlistEntity.getPlaylistId() +
-                "/items/0%3A1000?columns=%25catalog%25,%25composer%25,%25album%25,%25title%25,%25artist%25,%25discnumber%25,%25track%25,%25length%25");
-        return parsePlaylist(response, playlistEntity);
+                "/items/"+startIndex+"%3A"+1000+"?columns=%25catalog%25,%25composer%25,%25album%25,%25title%25,%25artist%25,%25discnumber%25,%25track%25,%25length%25");
+        return parsePlaylist(response, playlistEntity, startIndex);
 //        try {
 //                mActivity.runOnUiThread(() -> {
 //                    Playlist playlist = parsePlaylist(response, playlistEntity);
@@ -59,7 +50,7 @@ public class PlaylistAccess {
 //        }
     }
 
-    private Playlist parsePlaylist(String input, PlaylistEntity playlistEntity) {
+    private Playlist parsePlaylist(String input, PlaylistEntity playlistEntity, int startIndex) {
         Playlist playlist = new Playlist(playlistEntity);
         try {
             JSONObject contentObject = new JSONObject(input);
@@ -100,7 +91,7 @@ public class PlaylistAccess {
                 playlist.addTitle(
                         new Title(
                                 playlistEntity.getPlaylistId(),
-                                i,
+                                i + startIndex,
                                 catalog,
                                 composer,
                                 album,
@@ -109,30 +100,13 @@ public class PlaylistAccess {
                                 discNumber,
                                 track,
                                 length, "", "",
-                                mConnector.getServerAddress() + "artwork/" + playlistEntity.getPlaylistId() + "/" + i));
+                                mConnector.getServerAddress() + "artwork/" + playlistEntity.getPlaylistId() + "/" + (i+startIndex)));
             }
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
         return playlist;
-    }
-
-    public String getCurrentPlaylistID(){
-        if (mConnector == null)
-            this.mConnector = new HTTPConnector();
-        String response = queryPlaylists();
-        try {
-            JSONArray array = new JSONObject(response).getJSONArray("playlists");
-            for (int i = 0; i < array.length(); i++) {
-                JSONObject playlist = array.getJSONObject(i);
-                if (playlist.getBoolean("isCurrent"))
-                    return playlist.getString("id");
-            }
-        } catch (JSONException e) {
-            throw new RuntimeException(e);
-        }
-        return null;
     }
 
     private String queryPlaylists() {
@@ -153,7 +127,11 @@ public class PlaylistAccess {
                         "itemCount": 12,
                         "title": "Default Playlist",
                         "totalTime": 0 */
-                result.addPlaylistEntity(new PlaylistEntity(playlistObject.getString("id"), playlistObject.getString("title"), playlistObject.getBoolean("isCurrent")));
+
+                result.addPlaylistEntity(new PlaylistEntity(playlistObject.getString("id"),
+                                                            playlistObject.getString("title"),
+                                                            playlistObject.getBoolean("isCurrent"),
+                                                            playlistObject.getInt("itemCount")));
             }
         } catch (JSONException e) {
             e.printStackTrace();

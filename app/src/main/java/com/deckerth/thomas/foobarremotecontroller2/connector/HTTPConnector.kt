@@ -2,7 +2,7 @@ package com.deckerth.thomas.foobarremotecontroller2.connector
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import com.deckerth.thomas.foobarremotecontroller2.ui.ip_address
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.ip_address
 import java.io.IOException
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
@@ -27,11 +27,11 @@ class HTTPConnector {
             var urlConnection: HttpURLConnection? = null
             try {
                 url = URL(serverAddress + endpoint)
-                //open a URL coonnection
+                //open a URL connection
                 urlConnection = url.openConnection() as HttpURLConnection
-                println("FOOB response:"+urlConnection.responseCode+" Message:"+urlConnection.responseMessage)
-                val `in` = urlConnection.inputStream
-                val isw = InputStreamReader(`in`)
+                //println("FOOB ${url.toString()} response:"+urlConnection.responseCode+" Message:"+urlConnection.responseMessage)
+                val inputStream = urlConnection.inputStream
+                val isw = InputStreamReader(inputStream)
                 var data = isw.read()
                 while (data != -1) {
                     result.append(data.toChar())

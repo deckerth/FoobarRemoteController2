@@ -1,9 +1,9 @@
 package com.deckerth.thomas.foobarremotecontroller2.model
 
-class Playlist(val playlistEntity: PlaylistEntity) {
-    private val mTitles = mutableListOf<ITitle>()
+class Playlist(var playlistEntity: PlaylistEntity) {
+    val mTitles = mutableListOf<ITitle>()
 
-    var albums = mutableListOf<Album>()
+    val albums = mutableListOf<Album>()
 
     fun clear() {
         mTitles.clear()
@@ -27,5 +27,13 @@ class Playlist(val playlistEntity: PlaylistEntity) {
                 albums.add(currentAlbum)
             }
         }
+    }
+
+    fun clone(): Playlist {
+        val playlist = Playlist(playlistEntity)
+        mTitles.forEach {
+            playlist.addTitle(it.clone())
+        }
+        return playlist
     }
 }

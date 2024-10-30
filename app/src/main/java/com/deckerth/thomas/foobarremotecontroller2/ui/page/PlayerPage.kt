@@ -33,7 +33,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -46,14 +45,13 @@ import com.deckerth.thomas.foobarremotecontroller2.model.PlaybackMode
 import com.deckerth.thomas.foobarremotecontroller2.model.PlaybackState
 import com.deckerth.thomas.foobarremotecontroller2.model.Player
 import com.deckerth.thomas.foobarremotecontroller2.ui.components.LayoutComponent
-import com.deckerth.thomas.foobarremotecontroller2.ui.layout.LayoutManager
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.layoutManager
-import com.deckerth.thomas.foobarremotecontroller2.ui.observer
-import com.deckerth.thomas.foobarremotecontroller2.ui.player
-import com.deckerth.thomas.foobarremotecontroller2.ui.playlist
-import com.deckerth.thomas.foobarremotecontroller2.ui.startPlayerObserver
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.observer
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.player
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.displayedPlaylist
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.startPlayerObserver
 import com.deckerth.thomas.foobarremotecontroller2.ui.theme.Foobar2000RemoteControllerTheme
-import com.deckerth.thomas.foobarremotecontroller2.ui.updatePlayer
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.updatePlayer
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -70,7 +68,7 @@ fun PlayingPage() {
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
         ) {
-            if (player == null && playlist != null) {
+            if (player == null && displayedPlaylist != null) {
                 Column(
                     modifier = Modifier
                         .align(Alignment.Center)

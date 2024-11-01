@@ -52,6 +52,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import coil.ImageLoader
 import com.deckerth.thomas.foobarremotecontroller2.FoobarMediaService
 import com.deckerth.thomas.foobarremotecontroller2.R
 import com.deckerth.thomas.foobarremotecontroller2.ui.page.CustomDevicePage
@@ -90,10 +91,13 @@ class MainActivity : ComponentActivity() {
 
     private lateinit var appLabel: String
 
+    //lateinit var imageLoader: ImageLoader
+
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mainActivity = this
+        //imageLoader = ImageLoader.Builder(mainActivity.baseContext).build() // Get your ImageLoader instance
         enableEdgeToEdge()
         setContent {
             // Read ip address and start observer
@@ -128,18 +132,23 @@ class MainActivity : ComponentActivity() {
                 Scaffold(
                     topBar = {
                         TopAppBar(
-                            title = { Text(text = _appBarLabel ) },
+                            title = { Text(text = _appBarLabel) },
                             modifier = Modifier.fillMaxWidth(),
                             actions = {
                                 when (getCurrentRoute(navController)) {
-                                    "Playlist" -> Row(){
+                                    "Playlist" -> Row() {
                                         FilledIconToggleButton(
                                             checked = autoscroll,
                                             onCheckedChange = {
-                                                CoroutineScope(Dispatchers.Main).launch{
-                                                    autoscroll = true
-                                                    playlistState.scrollToItem(getCurrentAlbumIndex())
-                                                }
+                                                if (getCurrentAlbumIndex() != -1)
+                                                    autoscroll = !autoscroll
+                                                if (autoscroll)
+                                                    CoroutineScope(Dispatchers.Main).launch {
+                                                        playlistState.scrollToItem(
+                                                            getCurrentAlbumIndex()
+                                                        )
+                                                        autoScrollIndex = getCurrentAlbumIndex()
+                                                    }
                                             })
                                         {
                                             Icon(
@@ -158,6 +167,7 @@ class MainActivity : ComponentActivity() {
                                             )
                                         }
                                     }
+
                                     "DeviceSelectionPage" -> Button(
                                         onClick = {
                                             navigateTo("CustomDevicePage")
@@ -172,9 +182,11 @@ class MainActivity : ComponentActivity() {
                                                 modifier = Modifier
                                                     .size(24.dp)
                                             )
-                                            Spacer(modifier = Modifier
-                                                .width(5.dp)
-                                                .height(26.dp))
+                                            Spacer(
+                                                modifier = Modifier
+                                                    .width(5.dp)
+                                                    .height(26.dp)
+                                            )
                                             Text(
                                                 text = "Custom Device",
                                                 style = MaterialTheme.typography.labelSmall
@@ -189,7 +201,7 @@ class MainActivity : ComponentActivity() {
                         )
                     },
                     bottomBar = {
-                        if (getCurrentRoute(navController) in items.map { it.key }){
+                        if (getCurrentRoute(navController) in items.map { it.key }) {
                             NavigationBar {
                                 items.forEachIndexed { index, item ->
                                     NavigationBarItem(

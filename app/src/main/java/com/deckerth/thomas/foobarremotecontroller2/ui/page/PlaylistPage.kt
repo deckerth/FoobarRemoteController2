@@ -4,6 +4,7 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -38,6 +39,10 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.freeFocus
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -63,12 +68,27 @@ import com.deckerth.thomas.foobarremotecontroller2.viewmodel.playlistState
 import com.deckerth.thomas.foobarremotecontroller2.ui.theme.Foobar2000RemoteControllerTheme
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.autoScrollIndex
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.autoscroll
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.playlists
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.selectedPlaylist
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.selectedPlaylistIndex
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.setSelectedPlaylist
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.updatePlaylists
 
 @Composable
 fun PlaylistPage() {
-    if (displayedPlaylist == null)
-        return
-    Playlist(displayedPlaylist!!)
+    if (displayedPlaylist != null &&
+        !displayedPlaylist!!.valid
+    ) {
+        displayedPlaylist!!.clear()
+        displayedPlaylist = null
+        updatePlaylists()  // delayed update to avoid crashed during layout update
+    }
+    Column() {
+        PlaylistSwitcher(playlists = playlists)
+        if (displayedPlaylist != null)
+            Playlist(displayedPlaylist!!)
+    }
+
     if (loadingList || displayedPlaylist == null)
         LinearProgressIndicator(
             modifier = Modifier
@@ -85,6 +105,7 @@ fun AlbumCard(album: Album, layout: Layout?) {
     automatic mode is left when the user collapses a playing album, or expands a not playing album
     automatic mode is re-entered otherwise
     */
+
     if (player != null) {
         val currentlyPlaying =
             album.originalTitle.playlistId == player!!.playlistId && album.hasIndex(
@@ -101,11 +122,6 @@ fun AlbumCard(album: Album, layout: Layout?) {
             .animateContentSize()
             .fillMaxWidth()
             .padding(vertical = 4.dp, horizontal = 8.dp)
-//            .clickable {
-//                PlayerAccess
-//                    .getInstance()
-//                    .playTrack(album.playlistId, album.index)
-//            }
     ) {
         Column {
             Row {
@@ -166,7 +182,6 @@ fun AlbumCard(album: Album, layout: Layout?) {
             } else {
                 TitleEntry(album = album, title = album.titles[0])
             }
-
         }
     }
 
@@ -338,37 +353,43 @@ fun AlbumCardPreview() {
 
 @Composable
 fun Playlist(playlist: Playlist) {
-    playlistState = rememberLazyListState(initialFirstVisibleItemIndex = if (!loadingList && autoscroll) getCurrentAlbumIndex() else 0)
+    val currentAlbumIndex = getCurrentAlbumIndex()
+    playlistState =
+        rememberLazyListState(initialFirstVisibleItemIndex = if (!loadingList && autoscroll && currentAlbumIndex != -1) currentAlbumIndex else 0)
     var animating by remember { mutableStateOf(false) }
-    if (playlist.albums.isNotEmpty()){
-        LazyColumn(state = playlistState) {
-            items(playlist.albums) { album ->
-                AlbumCard(album, layoutManager.getLayout())
+
+    LazyColumn(state = playlistState) {
+        if (playlist.albums.isNotEmpty()) {
+            try {
+                items(playlist.albums) { album ->
+                    AlbumCard(album, layoutManager.getLayout())
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
         }
-        if (!animating && !loadingList && playlistState.firstVisibleItemIndex != autoScrollIndex)
-            autoscroll = false
-        LaunchedEffect(autoScrollIndex) {
+    }
+//        if (!animating && !loadingList && playlistState.firstVisibleItemIndex != autoScrollIndex)
+//            autoscroll = false
+    LaunchedEffect(autoScrollIndex) {
+        if (autoscroll) {
             animating = true
-            playlistState.animateScrollToItem(autoScrollIndex!!)
-            autoscroll = true
+            playlistState.animateScrollToItem(autoScrollIndex)
             animating = false
         }
     }
-
-
-
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PlaylistSwitcher(playlists: Playlists, selected: Int) {
+fun PlaylistSwitcher(playlists: Playlists) {
     var expanded by remember {
         mutableStateOf(false)
     }
     var selectedIndex by remember {
-        mutableIntStateOf(selected)
+        mutableIntStateOf(selectedPlaylistIndex)
     }
+    val focusRequester = remember { FocusRequester() }
     ExposedDropdownMenuBox(
         modifier = Modifier
             .padding(8.dp)
@@ -379,13 +400,17 @@ fun PlaylistSwitcher(playlists: Playlists, selected: Int) {
         OutlinedTextField(
             modifier = Modifier
                 .fillMaxWidth()
-                .menuAnchor(),
+                .menuAnchor()
+                .focusRequester(focusRequester)
+                .onFocusChanged {
+                    if (it.isFocused) // clear focus immediately
+                        focusRequester.freeFocus()
+                },
             label = { Text(text = stringResource(R.string.button_playlist_switcher)) },
             readOnly = true,
-            value = playlists.playlists[selectedIndex].name,
+            value = if (playlists.playlists.isEmpty()) "" else playlists.playlists[if (selectedIndex == -1) 0 else selectedIndex].name,
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-            onValueChange = { s: String ->
-
+            onValueChange = {
             }
         )
         DropdownMenu(
@@ -403,6 +428,8 @@ fun PlaylistSwitcher(playlists: Playlists, selected: Int) {
                     onClick = {
                         selectedIndex = index
                         expanded = false
+                        autoscroll = false
+                        setSelectedPlaylist(playlists.playlists[selectedIndex].playlistId)
                     },
                     trailingIcon = {
                         if (playlistEntity.isCurrent) {
@@ -465,7 +492,7 @@ fun PlaylistSwitcherPreview() {
             false, 10
         )
     )
-    PlaylistSwitcher(playlists = playlists, selected = 0)
+    PlaylistSwitcher(playlists = playlists)
 }
 
 

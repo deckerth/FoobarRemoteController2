@@ -29,7 +29,8 @@ class HTTPConnector {
                 url = URL(serverAddress + endpoint)
                 //open a URL connection
                 urlConnection = url.openConnection() as HttpURLConnection
-                //println("FOOB ${url.toString()} response:"+urlConnection.responseCode+" Message:"+urlConnection.responseMessage)
+                // Uncommenting the following can cause issues
+                println("FOOB $url ")
                 val inputStream = urlConnection.inputStream
                 val isw = InputStreamReader(inputStream)
                 var data = isw.read()
@@ -47,12 +48,13 @@ class HTTPConnector {
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            return "Exception: " + e.message
+            throw e
         }
         return result.toString()
     }
 
     fun checkConnection(ip:String): Boolean{
+        if (ip == "0.0.0.0") return false
         try {
             val url = URL("http://$ip/api/playlists")
             println("FOOB \"http://$ip/api/playlists\"")

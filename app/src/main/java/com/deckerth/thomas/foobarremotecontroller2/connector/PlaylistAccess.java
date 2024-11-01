@@ -30,24 +30,21 @@ public class PlaylistAccess {
         if (mConnector == null)
             this.mConnector = new HTTPConnector();
         String response = queryPlaylists();
-        return parsePlaylists(response);
+        if (response == null)
+            return null;
+        else
+            return parsePlaylists(response);
     }
 
     public Playlist getPlaylist(PlaylistEntity playlistEntity, int startIndex) {
-
-        String response = mConnector.getData("playlists/" + playlistEntity.getPlaylistId() +
-                "/items/"+startIndex+"%3A"+1000+"?columns=%25catalog%25,%25composer%25,%25album%25,%25title%25,%25artist%25,%25discnumber%25,%25track%25,%25length%25");
+        String response = null;
+        try {
+            response = mConnector.getData("playlists/" + playlistEntity.getPlaylistId() +
+                    "/items/" + startIndex + "%3A" + 1000 + "?columns=%25catalog%25,%25composer%25,%25album%25,%25title%25,%25artist%25,%25discnumber%25,%25track%25,%25length%25");
+        } catch (Exception e) {
+            return null;
+        }
         return parsePlaylist(response, playlistEntity, startIndex);
-//        try {
-//                mActivity.runOnUiThread(() -> {
-//                    Playlist playlist = parsePlaylist(response, playlistEntity);
-//                    PlaylistViewModel viewModel = PlaylistViewModel.getInstance();
-//                    Objects.requireNonNull(viewModel).setDisplayedPlaylist(playlistEntity);
-//                    viewModel.setPlaylist(playlist);
-//                });
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
     }
 
     private Playlist parsePlaylist(String input, PlaylistEntity playlistEntity, int startIndex) {
@@ -100,7 +97,7 @@ public class PlaylistAccess {
                                 discNumber,
                                 track,
                                 length, "", "",
-                                mConnector.getServerAddress() + "artwork/" + playlistEntity.getPlaylistId() + "/" + (i+startIndex)));
+                                mConnector.getServerAddress() + "artwork/" + playlistEntity.getPlaylistId() + "/" + (i + startIndex)));
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -110,8 +107,13 @@ public class PlaylistAccess {
     }
 
     private String queryPlaylists() {
-        return mConnector.getData("playlists");
-
+        String response;
+        try {
+            response = mConnector.getData("playlists");
+        } catch (Exception e) {
+            return null;
+        }
+        return response;
     }
 
     private Playlists parsePlaylists(String input) {
@@ -129,9 +131,9 @@ public class PlaylistAccess {
                         "totalTime": 0 */
 
                 result.addPlaylistEntity(new PlaylistEntity(playlistObject.getString("id"),
-                                                            playlistObject.getString("title"),
-                                                            playlistObject.getBoolean("isCurrent"),
-                                                            playlistObject.getInt("itemCount")));
+                        playlistObject.getString("title"),
+                        playlistObject.getBoolean("isCurrent"),
+                        playlistObject.getInt("itemCount")));
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -139,4 +141,4 @@ public class PlaylistAccess {
         return result;
     }
 
- }
+}

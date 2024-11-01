@@ -49,7 +49,13 @@ public class PlayerAccess {
 //    }
 
     public Player getPlayerState() {
-        return parsePlayerState(mConnector.getData("player?columns=%25catalog%25,%25composer%25,%25album%25,%25title%25,%25artist%25,%25discnumber%25,%25track%25,%25playback_time%25"));
+        String response = null;
+        try{
+            response = mConnector.getData("player?columns=%25catalog%25,%25composer%25,%25album%25,%25title%25,%25artist%25,%25discnumber%25,%25track%25,%25playback_time%25");
+        } catch (Exception e) {
+            return null;
+        }
+        return parsePlayerState(response);
     }
 
     private Player parsePlayerState(String input) {

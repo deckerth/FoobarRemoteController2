@@ -1,19 +1,25 @@
 package com.deckerth.thomas.foobarremotecontroller2.model
 
-class Playlist(var playlistEntity: PlaylistEntity) {
-    val mTitles = mutableListOf<ITitle>()
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 
+class Playlist(var playlistEntity: PlaylistEntity) {
+    val titles = mutableListOf<ITitle>()
     val albums = mutableListOf<Album>()
 
+    var valid by mutableStateOf(true)
+
     fun clear() {
-        mTitles.clear()
+        titles.clear()
         albums.clear()
+        valid = true
     }
 
     fun addTitle(title: ITitle) {
-        mTitles.add(title)
+        titles.add(title)
 
-        if (mTitles.count() == 1) {
+        if (titles.count() == 1) {
             val currentAlbum = Album(title)
             albums.add(currentAlbum)
             currentAlbum.addTitle(title)
@@ -31,7 +37,7 @@ class Playlist(var playlistEntity: PlaylistEntity) {
 
     fun clone(): Playlist {
         val playlist = Playlist(playlistEntity)
-        mTitles.forEach {
+        titles.forEach {
             playlist.addTitle(it.clone())
         }
         return playlist

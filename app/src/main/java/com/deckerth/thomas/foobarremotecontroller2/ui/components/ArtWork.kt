@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -19,21 +20,27 @@ import com.deckerth.thomas.foobarremotecontroller2.ui.layout.LayoutItem
 
 @Composable
 fun ArtWork(player: Player, item: LayoutItem) {
-    AsyncImage(
-        model = player.artworkUrl,
-        //placeholder = painterResource(R.drawable.album),
-        contentDescription = stringResource(R.string.desc_album_picture),
-        placeholder = painterResource(id = R.drawable.icon),
-        modifier = Modifier
-            .aspectRatio(1f)
-            .size(
-                when(item.itemSize) {
-                    ItemSize.SMALL_COVER -> 120.dp
-                    ItemSize.MEDIUM_COVER -> 240.dp
-                    ItemSize.LARGE_COVER -> 320.dp
-                    else -> 240.dp
-                })
-            .clip(MaterialTheme.shapes.medium)
-    )
+    val index = player.getIndex()
+    if (index >= 0) {
+        AsyncImage(
+            model = player.artworkUrl,
+            //placeholder = painterResource(R.drawable.album),
+            contentDescription = stringResource(R.string.desc_album_picture),
+            placeholder = painterResource(id = R.drawable.icon),
+            modifier = Modifier
+                .aspectRatio(1f)
+                .size(
+                    when (item.itemSize) {
+                        ItemSize.SMALL_COVER -> 120.dp
+                        ItemSize.MEDIUM_COVER -> 240.dp
+                        ItemSize.LARGE_COVER -> 320.dp
+                        else -> 240.dp
+                    }
+                )
+                .clip(MaterialTheme.shapes.medium)
+        )
+    } else {
+        Text("Removed from playlist")
+    }
     Spacer(modifier = Modifier.height(16.dp))
 }

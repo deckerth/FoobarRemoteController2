@@ -114,7 +114,6 @@ fun PlayingPage() {
 }
 
 fun onRefresh() {
-    updatePlayer()
     observer?.cancel(true)
     startPlayerObserver()
 }

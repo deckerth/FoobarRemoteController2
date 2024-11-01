@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.PlaybackStateCompat
+import androidx.collection.emptyLongSet
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MonotonicFrameClock
@@ -68,7 +69,7 @@ fun UpdatePreferences() {
 }
 
 var autoscroll by mutableStateOf(true)
-var autoScrollIndex by mutableStateOf<Int?>(0)
+var autoScrollIndex by mutableIntStateOf(0)
 var displayedPlaylist by mutableStateOf<Playlist?>(null)
 var loadingList by mutableStateOf(false)
 var playlistState by mutableStateOf(LazyListState())
@@ -80,26 +81,27 @@ fun updateList() {
 }
 
 fun getCurrentAlbumIndex(): Int {
-    var index = 0;
-    if (player == null) return 0
-    if (player!!.getIndex() != -1)
-        for (album in displayedPlaylist!!.albums) {
-            if (album.hasIndex(player!!.getIndex()))
-                break
-            index++
-        }
-    return index
+    if (player == null || player!!.getIndex() == -1 || displayedPlaylist == null || displayedPlaylist!!.albums.isEmpty())
+        return -1
+    for ((index, album) in displayedPlaylist!!.albums.withIndex()) {
+        if (album.hasIndex(player!!.getIndex()))
+            return index
+    }
+    return -1
 }
 
 var player by mutableStateOf<Player?>(null)
 
 fun updatePlayer() {
     player = PlayerAccess.getInstance().playerState
+    val currentAlbumIndex = getCurrentAlbumIndex()
     if (autoscroll && player != null &&
         displayedPlaylist != null &&
         displayedPlaylist!!.albums.isNotEmpty() &&
-        getCurrentAlbumIndex() != autoScrollIndex) {
-        autoScrollIndex = getCurrentAlbumIndex()
+        currentAlbumIndex != autoScrollIndex &&
+        currentAlbumIndex != -1
+    ) {
+        autoScrollIndex = currentAlbumIndex
     }
     if (mediaSession != null && player != null) {
         val state = when (player!!.playbackState) {
@@ -108,24 +110,40 @@ fun updatePlayer() {
             PlaybackState.PAUSED -> PlaybackStateCompat.STATE_PAUSED
         }
 
-        mediaSession!!.setMetadata(
-            MediaMetadataCompat.Builder()
-                .putString(MediaMetadataCompat.METADATA_KEY_TITLE, player!!.title)
-                .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, player!!.artist)
-                .putBitmap(
-                    MediaMetadataCompat.METADATA_KEY_ALBUM_ART,
-                    getBitmapFromURL(player!!.artworkUrl)
-                )
-                .putLong(
-                    MediaMetadataCompat.METADATA_KEY_DURATION,
-                    (floor(player!!.duration.toDouble() * 1000)).toLong()
-                )
-                .build()
-        )
+        if (player!!.getIndex() == -1)
+            mediaSession!!.setMetadata(
+                MediaMetadataCompat.Builder()
+                    .putString(MediaMetadataCompat.METADATA_KEY_TITLE, player!!.title)
+                    .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, player!!.artist)
+                    .putBitmap(
+                        MediaMetadataCompat.METADATA_KEY_ALBUM_ART,
+                        getBitmapFromURL(player!!.artworkUrl)
+                    )
+                    .putLong(
+                        MediaMetadataCompat.METADATA_KEY_DURATION,
+                        (floor(player!!.duration.toDouble() * 1000)).toLong()
+                    )
+                    .build()
+            )
+        else  // no longer in playlist -> no image
+            mediaSession!!.setMetadata(
+                MediaMetadataCompat.Builder()
+                    .putString(MediaMetadataCompat.METADATA_KEY_TITLE, player!!.title)
+                    .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, player!!.artist)
+                    .putLong(
+                        MediaMetadataCompat.METADATA_KEY_DURATION,
+                        (floor(player!!.duration.toDouble() * 1000)).toLong()
+                    )
+                    .build()
+            )
         System.out.println("FOOB updatePlayer: ${player!!.position}")
         mediaSession!!.setPlaybackState(
             PlaybackStateCompat.Builder()
-                .setState(state, floor(player!!.position.toDouble() * 1000).toLong(), 1f)
+                .setState(
+                    state,
+                    floor(player!!.position.toDouble() * 1000).toLong(),
+                    1f
+                )
                 .setActions(
                     (if (state == PlaybackStateCompat.STATE_PLAYING) PlaybackStateCompat.ACTION_PAUSE else PlaybackStateCompat.ACTION_PLAY) or
                             PlaybackStateCompat.ACTION_PLAY_PAUSE or
@@ -141,49 +159,44 @@ fun updatePlayer() {
 }
 
 private fun getBitmapFromURL(src: String?): Bitmap? {
-    return try {
-        println("FOOB getBitmapFromURL: $src")
-        val url = URL(src)
-        val connection = url.openConnection() as HttpURLConnection
-        connection.doInput = true
-        connection.connect()
-        val input = connection.inputStream
-        BitmapFactory.decodeStream(input)
-    } catch (e: Exception) {
-        e.printStackTrace()
+    return if (!(src!!.contains("-1")))
+        try {
+            println("FOOB getBitmapFromURL: $src")
+            val url = URL(src)
+            val connection = url.openConnection() as HttpURLConnection
+            connection.doInput = true
+            connection.connect()
+            val input = connection.inputStream
+            BitmapFactory.decodeStream(input)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    else
         null
-    }
 }
-
-//    public void startPlayerObserver() {
-//
-//        if (mObserverIsRunning) return;
-//
-//        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-//
-//        final Runnable task = () -> {
-//            mLastPlayerState = mConnector.getData("player?columns=%25catalog%25,%25composer%25,%25album%25,%25title%25,%25artist%25,%25discnumber%25,%25track%25,%25playback_time%25");
-//            mActivity.runOnUiThread(() -> {
-//                parsePlayerState(mLastPlayerState);
-//                getArtwork();
-//                mObserverIsRunning = true;
-//            });
-//        };
-//
-//        // Schedule the task to run with an initial delay and then periodically
-//        // For example, to run every second after an initial delay of 0 seconds
-//        scheduler.scheduleWithFixedDelay(task, 0, 1, TimeUnit.SECONDS);
-//    }
 
 var observer: ScheduledFuture<*>? = null
 
 fun startPlayerObserver() {
-    if (observer != null && !observer!!.isDone)
-        observer!!.cancel(true)
-    val scheduler = Executors.newSingleThreadScheduledExecutor()
-    observer = scheduler.scheduleWithFixedDelay({
-        updatePlayer()
-        val playlists = PlaylistAccess.getInstance().playlists
-        setPlaylists(playlists)
-    }, 0, 1, TimeUnit.SECONDS)
+    try {
+        if (observer != null && !observer!!.isDone)
+            observer!!.cancel(true)
+        val scheduler = Executors.newSingleThreadScheduledExecutor()
+        observer = scheduler.scheduleWithFixedDelay({
+            try {
+                updatePlayer()
+                val playlists = PlaylistAccess.getInstance().playlists
+                if (autoscroll && player != null && player!!.playlistId.isNotEmpty() && player!!.playlistId != selectedPlaylist)
+                    setSelectedPlaylist(player!!.playlistId)
+                if (playlists != null)
+                    setPlaylists(playlists)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }, 0, 1, TimeUnit.SECONDS)
+
+    } catch (e: Exception) {
+        e.printStackTrace()
+    }
 }

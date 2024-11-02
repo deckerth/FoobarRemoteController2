@@ -83,11 +83,12 @@ fun PlaylistPage() {
         displayedPlaylist = null
         updatePlaylists()  // delayed update to avoid crashed during layout update
     }
-    Column() {
-        PlaylistSwitcher(playlists = playlists)
-        if (displayedPlaylist != null)
-            Playlist(displayedPlaylist!!)
-    }
+    if (displayedPlaylist != null)
+        Column() {
+            PlaylistSwitcher(playlists = playlists)
+            if (displayedPlaylist != null)
+                Playlist(displayedPlaylist!!)
+        }
 
     if (loadingList || displayedPlaylist == null)
         LinearProgressIndicator(

@@ -3,6 +3,7 @@
 package com.deckerth.thomas.foobarremotecontroller2.ui.page
 
 import android.content.res.Configuration
+import android.widget.Space
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,6 +24,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
@@ -41,6 +43,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.deckerth.thomas.foobarremotecontroller2.R
 import com.deckerth.thomas.foobarremotecontroller2.connector.PlayerAccess
+import com.deckerth.thomas.foobarremotecontroller2.connector.errorHandler
 import com.deckerth.thomas.foobarremotecontroller2.model.PlaybackMode
 import com.deckerth.thomas.foobarremotecontroller2.model.PlaybackState
 import com.deckerth.thomas.foobarremotecontroller2.model.Player
@@ -51,12 +54,15 @@ import com.deckerth.thomas.foobarremotecontroller2.viewmodel.player
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.displayedPlaylist
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.startPlayerObserver
 import com.deckerth.thomas.foobarremotecontroller2.ui.theme.Foobar2000RemoteControllerTheme
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.isSick
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.loadingList
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.updatePlayer
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlayingPage() {
     val pullToRefreshState = rememberPullToRefreshState()
+    var showLoading = loadingList
     Box(
         modifier = Modifier
             .nestedScroll(pullToRefreshState.nestedScrollConnection)
@@ -68,11 +74,41 @@ fun PlayingPage() {
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
         ) {
-            if (player == null && displayedPlaylist != null) {
+            if (player == null) {
+                showLoading = !isSick
                 Column(
                     modifier = Modifier
                         .align(Alignment.Center)
-                ){
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.signal_disconnected),
+                        contentDescription = stringResource(R.string.desc_album_picture),
+                        modifier = Modifier
+                            .align(Alignment.CenterHorizontally)
+                            .size(180.dp)
+                            .clip(MaterialTheme.shapes.medium)
+                    )
+                    Text(
+                        modifier = Modifier.fillMaxWidth(),
+                        maxLines = 1,
+                        textAlign = TextAlign.Center,
+                        text = stringResource(R.string.info_no_connection),
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    OutlinedButton(
+                        modifier = Modifier
+                            .align(Alignment.CenterHorizontally),
+                        onClick = { onRefresh() }
+                    ) {
+                        Text(text = "Refresh")
+                    }
+                }
+            } else if (player!!.playbackState == PlaybackState.STOPPED) {
+                Column(
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                ) {
                     Icon(
                         painter = painterResource(R.drawable.stop_circle),
                         contentDescription = stringResource(R.string.desc_album_picture),
@@ -89,12 +125,7 @@ fun PlayingPage() {
                         style = MaterialTheme.typography.bodyLarge
                     )
                 }
-            } else if (player == null) {
-                LinearProgressIndicator(
-                    modifier = Modifier.fillMaxWidth()
-                )
-                return
-            }else{
+            } else {
                 PlayerCard(player = player!!)
             }
             if (pullToRefreshState.isRefreshing) {
@@ -111,6 +142,10 @@ fun PlayingPage() {
                 )
         }
     }
+    if (showLoading)
+        LinearProgressIndicator(
+            modifier = Modifier.fillMaxWidth()
+        )
 }
 
 fun onRefresh() {
@@ -120,7 +155,7 @@ fun onRefresh() {
 
 @Composable
 fun PlayerButtons(player: Player) {
-    Spacer(modifier = Modifier.height(32.dp))
+    Spacer(modifier = Modifier.height(10.dp))
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center
@@ -128,9 +163,13 @@ fun PlayerButtons(player: Player) {
         val space = 15.dp
         IconButton(
             onClick = {
-                when(player.playbackMode) {
-                    PlaybackMode.REPEAT_TRACK -> PlayerAccess.getInstance().setPlaybackMode(PlaybackMode.DEFAULT)
-                    PlaybackMode.REPEAT_PLAYLIST -> PlayerAccess.getInstance().setPlaybackMode(PlaybackMode.REPEAT_TRACK)
+                when (player.playbackMode) {
+                    PlaybackMode.REPEAT_TRACK -> PlayerAccess.getInstance()
+                        .setPlaybackMode(PlaybackMode.DEFAULT)
+
+                    PlaybackMode.REPEAT_PLAYLIST -> PlayerAccess.getInstance()
+                        .setPlaybackMode(PlaybackMode.REPEAT_TRACK)
+
                     else -> PlayerAccess.getInstance().setPlaybackMode(PlaybackMode.REPEAT_PLAYLIST)
                 }
             },
@@ -138,7 +177,7 @@ fun PlayerButtons(player: Player) {
                 .size(40.dp)
         ) {
             Icon(
-                painter = when(player.playbackMode) {
+                painter = when (player.playbackMode) {
                     PlaybackMode.REPEAT_TRACK -> painterResource(R.drawable.repeat_one_on)
                     PlaybackMode.REPEAT_PLAYLIST -> painterResource(R.drawable.repeat_on)
                     else -> painterResource(R.drawable.repeat)
@@ -214,10 +253,16 @@ fun PlayerButtons(player: Player) {
         Spacer(modifier = Modifier.width(space))
         IconButton(
             onClick = {
-                when(player.playbackMode) {
-                    PlaybackMode.SHUFFLE_TRACKS -> PlayerAccess.getInstance().setPlaybackMode(PlaybackMode.DEFAULT)
-                    PlaybackMode.SHUFFLE_ALBUMS -> PlayerAccess.getInstance().setPlaybackMode(PlaybackMode.DEFAULT)
-                    PlaybackMode.SHUFFLE_FOLDERS -> PlayerAccess.getInstance().setPlaybackMode(PlaybackMode.DEFAULT)
+                when (player.playbackMode) {
+                    PlaybackMode.SHUFFLE_TRACKS -> PlayerAccess.getInstance()
+                        .setPlaybackMode(PlaybackMode.DEFAULT)
+
+                    PlaybackMode.SHUFFLE_ALBUMS -> PlayerAccess.getInstance()
+                        .setPlaybackMode(PlaybackMode.DEFAULT)
+
+                    PlaybackMode.SHUFFLE_FOLDERS -> PlayerAccess.getInstance()
+                        .setPlaybackMode(PlaybackMode.DEFAULT)
+
                     else -> PlayerAccess.getInstance().setPlaybackMode(PlaybackMode.SHUFFLE_TRACKS)
                 }
             },
@@ -225,7 +270,7 @@ fun PlayerButtons(player: Player) {
                 .size(40.dp)
         ) {
             Icon(
-                painter = when(player.playbackMode) {
+                painter = when (player.playbackMode) {
                     PlaybackMode.SHUFFLE_TRACKS -> painterResource(R.drawable.shuffle_on)
                     PlaybackMode.SHUFFLE_ALBUMS -> painterResource(R.drawable.shuffle_on)
                     PlaybackMode.SHUFFLE_FOLDERS -> painterResource(R.drawable.shuffle_on)
@@ -239,18 +284,19 @@ fun PlayerButtons(player: Player) {
         }
     }
 }
+
 @Composable
 fun PlayerCard(player: Player) {
     Column(
         modifier = Modifier
-            .padding(40.dp)
+            .padding(15.dp)
             .fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         val layout = layoutManager.getLayout()
 
-        for(item in layout.playerLayout.items) {
+        for (item in layout.playerLayout.items) {
             LayoutComponent(player, item)
         }
         PlayerButtons(player)

@@ -18,6 +18,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.deckerth.thomas.foobarremotecontroller2.R
+import com.deckerth.thomas.foobarremotecontroller2.ui.layout.ViewsWithLayout
+import com.deckerth.thomas.foobarremotecontroller2.ui.mainActivity
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.selectedView
 
 enum class LayoutArea {
     PLAYER,
@@ -46,11 +49,24 @@ fun LayoutSelection() {
         Spacer(Modifier.height(40.dp))
         PageTitle("Layouts")
         Title(stringResource(R.string.layout_item_title))
-        PreferenceItem<Boolean>(title = stringResource(R.string.choose_player_layout), summary = "", onClick = {} )
+        PreferenceItem<Boolean>(title = stringResource(R.string.choose_player_layout), summary = "",
+                                onClick = {
+                                    selectedView = ViewsWithLayout.PLAYER
+                                    mainActivity.navigateTo("Layout editor")
+                                } )
 
         Title(stringResource(R.string.layout_playlist))
-        PreferenceItem<Boolean>(title = stringResource(R.string.choose_album_layout), summary = "", onClick = {} )
-        PreferenceItem<Boolean>(title = stringResource(R.string.choose_title_layout), summary = "", onClick = {} )
+        PreferenceItem<Boolean>(title = stringResource(R.string.choose_album_layout), summary = "",
+            onClick = {
+                selectedView = ViewsWithLayout.ALBUM
+                mainActivity.navigateTo("Layout editor")
+            } )
+        PreferenceItem<Boolean>(title = stringResource(R.string.choose_title_layout), summary = "",
+            onClick = {
+                selectedView = ViewsWithLayout.TITLE
+                mainActivity.navigateTo("Layout editor")
+            } )
+
     }
 }
 

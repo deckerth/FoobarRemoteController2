@@ -7,14 +7,17 @@ import com.deckerth.thomas.foobarremotecontroller2.getViewMode
 val layoutManager = LayoutManager()
 
 class LayoutManager {
-    
-    private val classicLayout : Layout = createClassicLayout()
-    private val modernLayout : Layout = createModernLayout()
+
+    private val classicLayout: Layout = createClassicLayout()
+    private val modernLayout: Layout = createModernLayout()
+    private val customLayout: Layout = createModernLayout()
 
     private fun createModernLayout(): Layout {
-        return Layout(playerLayout = createModernPlayerLayout(),
+        return Layout(
+            playerLayout = createModernPlayerLayout(),
             albumLayout = createModernAlbumLayout(),
-            titleLayout = createModernTitleLayout())
+            titleLayout = createModernTitleLayout()
+        )
     }
 
     private fun createModernPlayerLayout(): LayoutDescription {
@@ -42,16 +45,25 @@ class LayoutManager {
     }
 
     private fun createClassicLayout(): Layout {
-        return Layout(playerLayout = createClassicPlayerLayout(),
-                      albumLayout = createClassicAlbumLayout(),
-                      titleLayout = createClassicTitleLayout())
+        return Layout(
+            playerLayout = createClassicPlayerLayout(),
+            albumLayout = createClassicAlbumLayout(),
+            titleLayout = createClassicTitleLayout()
+        )
     }
 
     private fun createClassicPlayerLayout(): LayoutDescription {
         val fields = LayoutDescription()
         fields.items.add(LayoutItem(LayoutItems.ARTWORK, ItemSize.MEDIUM_COVER))
         fields.items.add(LayoutItem(LayoutItems.COMPOSER, ItemSize.TITLE_LARGE))
-        fields.items.add(LayoutItem(LayoutItems.ALBUM, ItemSize.TITLE_MEDIUM, fontStyle = FontStyle.Italic))
+        fields.items.add(
+            LayoutItem(
+                LayoutItems.ALBUM,
+                ItemSize.TITLE_MEDIUM,
+                fontStyle = FontStyle.Italic
+            )
+        )
+        fields.items.add(LayoutItem(LayoutItems.TITLE, ItemSize.BODY_SMALL))
         fields.items.add(LayoutItem(LayoutItems.ARTIST, ItemSize.BODY_SMALL, maxLines = 10))
         fields.items.add(LayoutItem(LayoutItems.PROGRESS))
         return fields
@@ -73,12 +85,19 @@ class LayoutManager {
     }
 
     @Composable
-    fun getLayout() : Layout {
-        return when(getViewMode()) {
+    fun getLayout(): Layout {
+        return when (getViewMode()) {
             Layouts.LAYOUT_MODERN -> modernLayout
             Layouts.LAYOUT_CLASSIC -> classicLayout
             else -> modernLayout
         }
     }
 
+    fun getCustomLayoutDescription(view: ViewsWithLayout): LayoutDescription {
+        return when (view) {
+            ViewsWithLayout.PLAYER -> customLayout.playerLayout
+            ViewsWithLayout.ALBUM -> customLayout.albumLayout
+            ViewsWithLayout.TITLE -> customLayout.titleLayout
+        }
+    }
 }

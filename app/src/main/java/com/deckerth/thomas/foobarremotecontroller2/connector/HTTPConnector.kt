@@ -37,20 +37,23 @@ class HTTPConnector {
                 while (data != -1) {
                     result.append(data.toChar())
                     data = isw.read()
-                }
 
+                }
+                errorHandler.reset()
                 // return the data to onPostExecute method
                 return result.toString()
             } catch (e: Exception) {
                 e.printStackTrace()
+                errorHandler.logError(ErrorType.NETWORK, ErrorCode.CONNECTION_ERROR, ErrorSource.HTTP_CONNECTOR, e)
+                throw e
             } finally {
                 urlConnection?.disconnect()
             }
         } catch (e: Exception) {
             e.printStackTrace()
+            errorHandler.logError(ErrorType.NETWORK, ErrorCode.CONNECTION_ERROR, ErrorSource.HTTP_CONNECTOR, e)
             throw e
         }
-        return result.toString()
     }
 
     fun checkConnection(ip:String): Boolean{

@@ -17,8 +17,10 @@ public class PlayerAccess {
     @SuppressLint("StaticFieldLeak")
     private static PlayerAccess INSTANCE;
     private final HTTPConnector mConnector;
+    private final ErrorHandler errorHandler;
 
     public PlayerAccess() {
+        this.errorHandler = ErrorHandlerKt.getErrorHandler();
         this.mConnector = new HTTPConnector();
     }
 
@@ -53,6 +55,7 @@ public class PlayerAccess {
         try{
             response = mConnector.getData("player?columns=%25catalog%25,%25composer%25,%25album%25,%25title%25,%25artist%25,%25discnumber%25,%25track%25,%25playback_time%25");
         } catch (Exception e) {
+            errorHandler.logError(ErrorType.NETWORK, ErrorCode.CONNECTION_ERROR, ErrorSource.PLAYER_STATE, e);
             return null;
         }
         return parsePlayerState(response);
@@ -129,46 +132,27 @@ public class PlayerAccess {
                         activeItemObject.getString("position"),
                         mConnector.getServerAddress() + "artwork/" + activeItemObject.getString("playlistId") + "/" + activeItemObject.getString("index"),
                         playbackState,
-                        PlaybackMode.getEntries().get(playerObject.getInt("playbackMode"))
-                );
+                        PlaybackMode.getEntries().get(playerObject.getInt("playbackMode")));
             else
-                return null;
-//
-//            String column = columns.getString(0);
-//            mPlayerViewModel.setCatalog(column);
-//            column = columns.getString(1);
-//            mPlayerViewModel.setComposer(column);
-//            column = columns.getString(2);
-//            mPlayerViewModel.setAlbum(column);
-//            String title = columns.getString(3);
-//            column = columns.getString(4);
-//            mPlayerViewModel.setArtist(column);
-//            column = columns.getString(5);
-//            mPlayerViewModel.setDiscNumber(column);
-//            column = columns.getString(6);
-//            String track = columns.getString(6);
-//            if (!title.equals(track))
-//                mPlayerViewModel.setTitle(title);
-//            else
-//                mPlayerViewModel.setTitle("");
-//            mPlayerViewModel.setTrack(column);
-//            column = columns.getString(7);
-//            mPlayerViewModel.setPlaybackTime(column);
-//
-//            mPlayerViewModel.setPlaylistId(activeItemObject.getString("playlistId"));
-//            mPlayerViewModel.setIndex(activeItemObject.getString("index"));
-//            mPlayerViewModel.setDuration(activeItemObject.getString("duration"));
-//            mPlayerViewModel.setPosition(activeItemObject.getString("position"));
-//
-//            mCurrentPlaylistId = activeItemObject.getString("playlistId");
-//            mCurrentIndex = activeItemObject.getString("index");
-//
-//
-//
-
-
+                return new Player(
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        playbackState,
+                        PlaybackMode.getEntries().get(playerObject.getInt("playbackMode")));
         } catch (JSONException e) {
             e.printStackTrace();
+            errorHandler.logError(ErrorType.API, ErrorCode.BAD_RESPONSE, ErrorSource.PLAYER_STATE, e);
             return null;
         }
     }

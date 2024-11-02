@@ -20,6 +20,12 @@ public class PlaylistAccess {
     private static PlaylistAccess INSTANCE;
     private HTTPConnector mConnector;
 
+    private ErrorHandler errorHandler = null;
+
+    public PlaylistAccess() {
+        this.errorHandler = ErrorHandlerKt.getErrorHandler();
+    }
+
     public static PlaylistAccess getInstance() {
         if (INSTANCE == null)
             INSTANCE = new PlaylistAccess();
@@ -42,6 +48,7 @@ public class PlaylistAccess {
             response = mConnector.getData("playlists/" + playlistEntity.getPlaylistId() +
                     "/items/" + startIndex + "%3A" + 1000 + "?columns=%25catalog%25,%25composer%25,%25album%25,%25title%25,%25artist%25,%25discnumber%25,%25track%25,%25length%25");
         } catch (Exception e) {
+            errorHandler.logError(ErrorType.NETWORK, ErrorCode.CONNECTION_ERROR, ErrorSource.PLAYLIST_ITEMS, e);
             return null;
         }
         return parsePlaylist(response, playlistEntity, startIndex);
@@ -100,7 +107,9 @@ public class PlaylistAccess {
                                 mConnector.getServerAddress() + "artwork/" + playlistEntity.getPlaylistId() + "/" + (i + startIndex)));
             }
         } catch (JSONException e) {
+            errorHandler.logError(ErrorType.API, ErrorCode.BAD_RESPONSE, ErrorSource.PLAYLIST_ITEMS, e);
             e.printStackTrace();
+            return null;
         }
 
         return playlist;
@@ -111,6 +120,7 @@ public class PlaylistAccess {
         try {
             response = mConnector.getData("playlists");
         } catch (Exception e) {
+            errorHandler.logError(ErrorType.NETWORK, ErrorCode.CONNECTION_ERROR, ErrorSource.PLAYLIST_ITEMS, e);
             return null;
         }
         return response;
@@ -136,7 +146,9 @@ public class PlaylistAccess {
                         playlistObject.getInt("itemCount")));
             }
         } catch (JSONException e) {
+            errorHandler.logError(ErrorType.API, ErrorCode.BAD_RESPONSE, ErrorSource.PLAYLISTS, e);
             e.printStackTrace();
+            return null;
         }
         return result;
     }

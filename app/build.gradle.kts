@@ -66,6 +66,8 @@ dependencies {
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.androidx.media)
     implementation(libs.androidx.datastore.preferences)
+    implementation(libs.androidx.foundation.layout.android)
+    implementation(libs.reorderable)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

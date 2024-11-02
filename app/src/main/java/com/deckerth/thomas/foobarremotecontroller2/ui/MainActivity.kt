@@ -57,6 +57,7 @@ import com.deckerth.thomas.foobarremotecontroller2.FoobarMediaService
 import com.deckerth.thomas.foobarremotecontroller2.R
 import com.deckerth.thomas.foobarremotecontroller2.ui.page.CustomDevicePage
 import com.deckerth.thomas.foobarremotecontroller2.ui.page.DeviceSelectionPage
+import com.deckerth.thomas.foobarremotecontroller2.ui.page.LayoutEditorMainPage
 import com.deckerth.thomas.foobarremotecontroller2.ui.page.LayoutSelection
 import com.deckerth.thomas.foobarremotecontroller2.ui.page.PlayingPage
 import com.deckerth.thomas.foobarremotecontroller2.ui.page.PlaylistPage
@@ -257,6 +258,10 @@ class MainActivity : ComponentActivity() {
                         composable("Layout selection") {
                             _appBarLabel = stringResource(R.string.choose_layout_to_change)
                             LayoutSelection()
+                        }
+                        composable("Layout editor") {
+                            _appBarLabel = stringResource(R.string.choose_layout_to_change)
+                            LayoutEditorMainPage()
                         }
 
                     }

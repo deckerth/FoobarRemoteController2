@@ -45,4 +45,6 @@
     <string name="choose_title_layout">Title layout</string>
     <string name="choose_player_layout">Player layout</string>
     <string name="desc_jump_to_title">Scroll to current title</string>
+    <string name="info_no_connection">No Internet Connection</string>
+    <string name="info_removed">Title removed from playlist</string>
 </resources>

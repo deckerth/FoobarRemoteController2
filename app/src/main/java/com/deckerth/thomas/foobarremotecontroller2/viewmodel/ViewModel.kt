@@ -15,6 +15,7 @@ import androidx.compose.runtime.setValue
 import com.deckerth.thomas.foobarremotecontroller2.connector.HTTPConnector
 import com.deckerth.thomas.foobarremotecontroller2.connector.PlayerAccess
 import com.deckerth.thomas.foobarremotecontroller2.connector.PlaylistAccess
+import com.deckerth.thomas.foobarremotecontroller2.connector.errorHandler
 import com.deckerth.thomas.foobarremotecontroller2.foobarMediaService
 import com.deckerth.thomas.foobarremotecontroller2.getIpAddress
 import com.deckerth.thomas.foobarremotecontroller2.mediaSession
@@ -22,6 +23,7 @@ import com.deckerth.thomas.foobarremotecontroller2.model.PlaybackState
 import com.deckerth.thomas.foobarremotecontroller2.model.Player
 import com.deckerth.thomas.foobarremotecontroller2.model.Playlist
 import com.deckerth.thomas.foobarremotecontroller2.model.VolumeControl
+import com.deckerth.thomas.foobarremotecontroller2.ui.layout.ViewsWithLayout
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -73,8 +75,9 @@ var autoScrollIndex by mutableIntStateOf(0)
 var displayedPlaylist by mutableStateOf<Playlist?>(null)
 var loadingList by mutableStateOf(false)
 var playlistState by mutableStateOf(LazyListState())
-
+var selectedView by mutableStateOf(ViewsWithLayout.PLAYER)
 var selectedPlaylist by mutableStateOf("")
+var isSick by mutableStateOf(false)
 
 fun updateList() {
     invalidatePlaylist(selectedPlaylist)
@@ -110,7 +113,7 @@ fun updatePlayer() {
             PlaybackState.PAUSED -> PlaybackStateCompat.STATE_PAUSED
         }
 
-        if (player!!.getIndex() == -1)
+        if (player!!.getIndex() != -1) {
             mediaSession!!.setMetadata(
                 MediaMetadataCompat.Builder()
                     .putString(MediaMetadataCompat.METADATA_KEY_TITLE, player!!.title)
@@ -125,7 +128,22 @@ fun updatePlayer() {
                     )
                     .build()
             )
-        else  // no longer in playlist -> no image
+            mediaSession!!.setPlaybackState(
+                PlaybackStateCompat.Builder()
+                    .setState(
+                        state,
+                        floor(player!!.position.toDouble() * 1000).toLong(),
+                        1f
+                    )
+                    .setActions(
+                        (if (state == PlaybackStateCompat.STATE_PLAYING) PlaybackStateCompat.ACTION_PAUSE else PlaybackStateCompat.ACTION_PLAY) or
+                                PlaybackStateCompat.ACTION_PLAY_PAUSE or
+                                PlaybackStateCompat.ACTION_SKIP_TO_NEXT or
+                                PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS
+                    )
+                    .build()
+            )
+        } else if (player!!.playbackState != PlaybackState.STOPPED) {// no longer in playlist -> no image
             mediaSession!!.setMetadata(
                 MediaMetadataCompat.Builder()
                     .putString(MediaMetadataCompat.METADATA_KEY_TITLE, player!!.title)
@@ -136,22 +154,25 @@ fun updatePlayer() {
                     )
                     .build()
             )
+            mediaSession!!.setPlaybackState(
+                PlaybackStateCompat.Builder()
+                    .setState(
+                        state,
+                        floor(player!!.position.toDouble() * 1000).toLong(),
+                        1f
+                    )
+                    .setActions(
+                        (if (state == PlaybackStateCompat.STATE_PLAYING) PlaybackStateCompat.ACTION_PAUSE else PlaybackStateCompat.ACTION_PLAY) or
+                                PlaybackStateCompat.ACTION_PLAY_PAUSE or
+                                PlaybackStateCompat.ACTION_SKIP_TO_NEXT or
+                                PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS
+                    )
+                    .build()
+            )
+        } else
+            mediaSession!!.setMetadata(null)
         System.out.println("FOOB updatePlayer: ${player!!.position}")
-        mediaSession!!.setPlaybackState(
-            PlaybackStateCompat.Builder()
-                .setState(
-                    state,
-                    floor(player!!.position.toDouble() * 1000).toLong(),
-                    1f
-                )
-                .setActions(
-                    (if (state == PlaybackStateCompat.STATE_PLAYING) PlaybackStateCompat.ACTION_PAUSE else PlaybackStateCompat.ACTION_PLAY) or
-                            PlaybackStateCompat.ACTION_PLAY_PAUSE or
-                            PlaybackStateCompat.ACTION_SKIP_TO_NEXT or
-                            PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS
-                )
-                .build()
-        )
+
         foobarMediaService?.updateNotification()
     }
 
@@ -183,17 +204,19 @@ fun startPlayerObserver() {
         if (observer != null && !observer!!.isDone)
             observer!!.cancel(true)
         val scheduler = Executors.newSingleThreadScheduledExecutor()
+        errorHandler.reset()
         observer = scheduler.scheduleWithFixedDelay({
-            try {
-                updatePlayer()
-                val playlists = PlaylistAccess.getInstance().playlists
-                if (autoscroll && player != null && player!!.playlistId.isNotEmpty() && player!!.playlistId != selectedPlaylist)
-                    setSelectedPlaylist(player!!.playlistId)
-                if (playlists != null)
-                    setPlaylists(playlists)
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
+            if (!errorHandler.sick())
+                try {
+                    updatePlayer()
+                    val playlists = PlaylistAccess.getInstance().playlists
+                    if (autoscroll && player != null && player!!.playlistId.isNotEmpty() && player!!.playlistId != selectedPlaylist)
+                        setSelectedPlaylist(player!!.playlistId)
+                    if (playlists != null)
+                        setPlaylists(playlists)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
         }, 0, 1, TimeUnit.SECONDS)
 
     } catch (e: Exception) {

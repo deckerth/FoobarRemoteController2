@@ -2,7 +2,9 @@ package com.deckerth.thomas.foobarremotecontroller2.viewmodel
 
 
 import coil.annotation.ExperimentalCoilApi
+import com.deckerth.thomas.foobarremotecontroller2.connector.ErrorHandler
 import com.deckerth.thomas.foobarremotecontroller2.connector.PlaylistAccess
+import com.deckerth.thomas.foobarremotecontroller2.connector.errorHandler
 import com.deckerth.thomas.foobarremotecontroller2.model.Playlist
 import com.deckerth.thomas.foobarremotecontroller2.model.PlaylistEntity
 import com.deckerth.thomas.foobarremotecontroller2.model.Playlists
@@ -78,13 +80,12 @@ fun setPlaylists(playlists: Playlists) {
     // check if playing playlist is still current
     if (player != null && player!!.playlistId.isNotEmpty()) {
         val playingList = getPlaylist(player!!.playlistId)
-        if (playingList.titles.count() >= player!!.getIndex()) {  // otherwise do not yet check
+        if (player!!.getIndex() >= 0 && playingList.titles.count() > player!!.getIndex()) {  // otherwise do not yet check
             val playlistTitle = playingList.titles[player!!.getIndex()]
             if (playlistTitle.album != player?.album || playlistTitle.title != player?.title) {
                 invalidatePlaylist(playingList)
                 println("FOOB clearing changed playlist")
             }
-
         }
     }
     updatePlaylists()
@@ -109,7 +110,7 @@ fun getPlaylistToBeUpdated(): Playlist? {
 }
 
 fun updatePlaylists() {
-    if (!loadingList) {
+    if (!loadingList && !errorHandler.sick()) {
         val next = getPlaylistToBeUpdated()
         if (next != null)
             updatePlaylist(next)
@@ -119,25 +120,29 @@ fun updatePlaylists() {
 private fun updatePlaylist(playlist: Playlist) {
     loadingList = true
     Thread {
-        var currentPlaylist: Playlist? = playlist
-        println("FOOB starting updatePlaylist: ${currentPlaylist!!.playlistEntity.playlistId}, titles: ${currentPlaylist.titles.count()}")
-        do {
-            // invariant: currentPlaylist is not null
-            val startIndex = currentPlaylist!!.titles.count()
-            val playlistPart = PlaylistAccess.getInstance()
-                .getPlaylist(currentPlaylist.playlistEntity, startIndex)
-            // validity check
-            if (playlistPart != null && currentPlaylist.titles.count() == startIndex) {
-                for (title in playlistPart.titles)
-                    currentPlaylist.addTitle(title)
-                if (playlist.playlistEntity.playlistId == selectedPlaylist)
-                    displayedPlaylist = currentPlaylist //.clone()
-                println("FOOB updatePlaylist: ${currentPlaylist.playlistEntity.playlistId}, titles: ${currentPlaylist.titles.count()}")
-            }
-            currentPlaylist = getPlaylistToBeUpdated()
-        } while (currentPlaylist != null)
-        loadingList = false
-        println("FOOB updatePlaylist finished")
+        try {
+            var currentPlaylist: Playlist? = playlist
+            println("FOOB starting updatePlaylist: ${currentPlaylist!!.playlistEntity.playlistId}, titles: ${currentPlaylist.titles.count()}")
+            do {
+                // invariant: currentPlaylist is not null
+                val startIndex = currentPlaylist!!.titles.count()
+                val playlistPart = PlaylistAccess.getInstance()
+                    .getPlaylist(currentPlaylist.playlistEntity, startIndex)
+                // validity check
+                if (playlistPart != null && currentPlaylist.titles.count() == startIndex) {
+                    for (title in playlistPart.titles)
+                        currentPlaylist.addTitle(title)
+                    if (playlist.playlistEntity.playlistId == selectedPlaylist)
+                        displayedPlaylist = currentPlaylist //.clone()
+                    println("FOOB updatePlaylist: ${currentPlaylist.playlistEntity.playlistId}, titles: ${currentPlaylist.titles.count()}")
+                }
+                currentPlaylist = getPlaylistToBeUpdated()
+            } while (currentPlaylist != null && !errorHandler.sick())
+            loadingList = false
+            println("FOOB updatePlaylist finished")
+        } catch (e: Exception){
+            loadingList = false
+        }
     }.start()
 }
 

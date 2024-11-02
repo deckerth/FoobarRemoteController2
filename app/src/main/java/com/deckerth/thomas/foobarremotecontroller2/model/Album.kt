@@ -1,5 +1,9 @@
 package com.deckerth.thomas.foobarremotecontroller2.model
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+
 data class Album(
     val originalTitle: ITitle
 ){
@@ -8,7 +12,7 @@ data class Album(
     val titles: List<ITitle>
         get() { return _titles.toList() }
 
-    var isSelected = false
+    var isSelected by mutableStateOf(false)
 
     var isAutomaticSelection = true
 

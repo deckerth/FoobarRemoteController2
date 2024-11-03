@@ -1,5 +1,6 @@
 package com.deckerth.thomas.foobarremotecontroller2.ui.components
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
@@ -15,6 +16,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -25,26 +28,44 @@ import com.deckerth.thomas.foobarremotecontroller2.ui.layout.ItemSize
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.LayoutItem
 
 @Composable
-fun ArtWork(player: Player, item: LayoutItem) {
+fun ArtWork(player: Player, item: LayoutItem, artworkResourceId: Int = -1) {
     val index = player.getIndex()
     if (index >= 0) {
-        AsyncImage(
-            model = player.artworkUrl,
-            //placeholder = painterResource(R.drawable.album),
-            contentDescription = stringResource(R.string.desc_album_picture),
-            placeholder = painterResource(id = R.drawable.icon),
-            modifier = Modifier
-                .aspectRatio(1f)
-                .size(
-                    when (item.itemSize) {
-                        ItemSize.SMALL_COVER -> 120.dp
-                        ItemSize.MEDIUM_COVER -> 240.dp
-                        ItemSize.LARGE_COVER -> 320.dp
-                        else -> 240.dp
-                    }
-                )
-                .clip(MaterialTheme.shapes.medium)
-        )
+        if (artworkResourceId > 0) {
+            Image(
+                bitmap = ImageBitmap.imageResource(id = artworkResourceId),
+                //placeholder = painterResource(R.drawable.album),
+                contentDescription = stringResource(R.string.desc_album_picture),
+                modifier = Modifier
+                    .aspectRatio(1f)
+                    .size(
+                        when (item.itemSize) {
+                            ItemSize.SMALL_COVER -> 120.dp
+                            ItemSize.MEDIUM_COVER -> 240.dp
+                            ItemSize.LARGE_COVER -> 320.dp
+                            else -> 240.dp
+                        }
+                    )
+                    .clip(MaterialTheme.shapes.medium)
+            )
+        } else
+            AsyncImage(
+                model = player.artworkUrl,
+                //placeholder = painterResource(R.drawable.album),
+                contentDescription = stringResource(R.string.desc_album_picture),
+                placeholder = painterResource(id = R.drawable.icon),
+                modifier = Modifier
+                    .aspectRatio(1f)
+                    .size(
+                        when (item.itemSize) {
+                            ItemSize.SMALL_COVER -> 120.dp
+                            ItemSize.MEDIUM_COVER -> 240.dp
+                            ItemSize.LARGE_COVER -> 320.dp
+                            else -> 240.dp
+                        }
+                    )
+                    .clip(MaterialTheme.shapes.medium)
+            )
     } else {
         Box(
             modifier = Modifier
@@ -59,10 +80,11 @@ fun ArtWork(player: Player, item: LayoutItem) {
                 )
                 .clip(MaterialTheme.shapes.medium)
         ) {
-            Box(modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.surfaceContainerHigh)
-            ){
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.surfaceContainerHigh)
+            ) {
                 Text(
                     modifier = Modifier
                         .align(Alignment.Center),

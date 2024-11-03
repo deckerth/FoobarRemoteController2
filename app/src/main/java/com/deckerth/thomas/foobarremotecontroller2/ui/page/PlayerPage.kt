@@ -154,7 +154,12 @@ fun onRefresh() {
 }
 
 @Composable
-fun PlayerButtons(player: Player) {
+fun PlayerButtons(
+    player: Player,
+    onPreviousTrack: () -> Unit = { PlayerAccess.getInstance().previousTrack() },
+    onNextTrack: () -> Unit = { PlayerAccess.getInstance().nextTrack() },
+    previewMode: Boolean = false
+) {
     Spacer(modifier = Modifier.height(10.dp))
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -163,15 +168,17 @@ fun PlayerButtons(player: Player) {
         val space = 15.dp
         IconButton(
             onClick = {
-                when (player.playbackMode) {
-                    PlaybackMode.REPEAT_TRACK -> PlayerAccess.getInstance()
-                        .setPlaybackMode(PlaybackMode.DEFAULT)
+                if (!previewMode)
+                    when (player.playbackMode) {
+                        PlaybackMode.REPEAT_TRACK -> PlayerAccess.getInstance()
+                            .setPlaybackMode(PlaybackMode.DEFAULT)
 
-                    PlaybackMode.REPEAT_PLAYLIST -> PlayerAccess.getInstance()
-                        .setPlaybackMode(PlaybackMode.REPEAT_TRACK)
+                        PlaybackMode.REPEAT_PLAYLIST -> PlayerAccess.getInstance()
+                            .setPlaybackMode(PlaybackMode.REPEAT_TRACK)
 
-                    else -> PlayerAccess.getInstance().setPlaybackMode(PlaybackMode.REPEAT_PLAYLIST)
-                }
+                        else -> PlayerAccess.getInstance()
+                            .setPlaybackMode(PlaybackMode.REPEAT_PLAYLIST)
+                    }
             },
             modifier = Modifier
                 .size(40.dp)
@@ -190,9 +197,7 @@ fun PlayerButtons(player: Player) {
         }
         Spacer(modifier = Modifier.width(space))
         IconButton(
-            onClick = {
-                PlayerAccess.getInstance().previousTrack()
-            },
+            onClick = onPreviousTrack,
             modifier = Modifier
                 .size(60.dp)
         ) {
@@ -207,10 +212,11 @@ fun PlayerButtons(player: Player) {
         Spacer(modifier = Modifier.width(space))
         FilledIconButton(
             onClick = {
-                if (player.playbackState == PlaybackState.PLAYING)
-                    PlayerAccess.getInstance().pausePlayback()
-                else
-                    PlayerAccess.getInstance().startPlayback()
+                if (!previewMode)
+                    if (player.playbackState == PlaybackState.PLAYING)
+                        PlayerAccess.getInstance().pausePlayback()
+                    else
+                        PlayerAccess.getInstance().startPlayback()
             },
             modifier = Modifier
                 .size(60.dp)
@@ -236,9 +242,7 @@ fun PlayerButtons(player: Player) {
         }
         Spacer(modifier = Modifier.width(space))
         IconButton(
-            onClick = {
-                PlayerAccess.getInstance().nextTrack()
-            },
+            onClick = onNextTrack,
             modifier = Modifier
                 .size(60.dp)
         ) {
@@ -253,18 +257,20 @@ fun PlayerButtons(player: Player) {
         Spacer(modifier = Modifier.width(space))
         IconButton(
             onClick = {
-                when (player.playbackMode) {
-                    PlaybackMode.SHUFFLE_TRACKS -> PlayerAccess.getInstance()
-                        .setPlaybackMode(PlaybackMode.DEFAULT)
+                if (!previewMode)
+                    when (player.playbackMode) {
+                        PlaybackMode.SHUFFLE_TRACKS -> PlayerAccess.getInstance()
+                            .setPlaybackMode(PlaybackMode.DEFAULT)
 
-                    PlaybackMode.SHUFFLE_ALBUMS -> PlayerAccess.getInstance()
-                        .setPlaybackMode(PlaybackMode.DEFAULT)
+                        PlaybackMode.SHUFFLE_ALBUMS -> PlayerAccess.getInstance()
+                            .setPlaybackMode(PlaybackMode.DEFAULT)
 
-                    PlaybackMode.SHUFFLE_FOLDERS -> PlayerAccess.getInstance()
-                        .setPlaybackMode(PlaybackMode.DEFAULT)
+                        PlaybackMode.SHUFFLE_FOLDERS -> PlayerAccess.getInstance()
+                            .setPlaybackMode(PlaybackMode.DEFAULT)
 
-                    else -> PlayerAccess.getInstance().setPlaybackMode(PlaybackMode.SHUFFLE_TRACKS)
-                }
+                        else -> PlayerAccess.getInstance()
+                            .setPlaybackMode(PlaybackMode.SHUFFLE_TRACKS)
+                    }
             },
             modifier = Modifier
                 .size(40.dp)
@@ -286,7 +292,12 @@ fun PlayerButtons(player: Player) {
 }
 
 @Composable
-fun PlayerCard(player: Player) {
+fun PlayerCard(
+    player: Player,
+    artworkResourceId: Int = -1,
+    onPreviousTrack: (() -> Unit)? = null,
+    onNextTrack: (() -> Unit)? = null
+) {
     Column(
         modifier = Modifier
             .padding(15.dp)
@@ -297,9 +308,12 @@ fun PlayerCard(player: Player) {
         val layout = layoutManager.getLayout()
 
         for (item in layout.playerLayout.items) {
-            LayoutComponent(player, item)
+            LayoutComponent(player, item, artworkResourceId)
         }
-        PlayerButtons(player)
+        if (onPreviousTrack != null && onNextTrack != null)
+            PlayerButtons(player, onPreviousTrack, onNextTrack)
+        else
+            PlayerButtons(player)
     }
 }
 

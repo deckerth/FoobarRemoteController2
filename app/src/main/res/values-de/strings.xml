@@ -48,4 +48,5 @@
     <string name="desc_jump_to_title">Zu aktuellem Titel springen</string>
     <string name="info_no_connection">Keine Verbindung möglich</string>
     <string name="info_removed">Von der Playlist entfernt</string>
+    <string name="available_fields">Verfügbare Felder</string>
 </resources>

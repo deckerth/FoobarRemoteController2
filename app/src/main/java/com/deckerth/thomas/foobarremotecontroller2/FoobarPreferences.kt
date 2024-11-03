@@ -9,6 +9,7 @@ import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.Layouts
+import com.deckerth.thomas.foobarremotecontroller2.ui.layout.layoutManager
 import com.deckerth.thomas.foobarremotecontroller2.ui.mainActivity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -52,7 +53,8 @@ fun getIpAddress(): String {
     return getValue(mainActivity, IP_ADDRESS_KEY,"0.0.0.0")
 }
 
-fun saveViewMode(mode: Layouts, context: Context) {
+fun saveViewMode(previousMode: Layouts, mode: Layouts, context: Context) {
+    layoutManager.changeLayout(previousMode, mode)
     runBlocking {
         saveValue(context, mode.ordinal, VIEW_MODE_KEY)
     }

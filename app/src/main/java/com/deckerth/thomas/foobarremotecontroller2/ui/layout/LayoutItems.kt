@@ -29,6 +29,9 @@ fun getLayoutItemsFor(viewWithLayout: ViewsWithLayout):List<LayoutItems> {
         ViewsWithLayout.TITLE -> {
             entries.filter( { it.onTitle })
         }
+        else -> {
+            emptyList<LayoutItems>()
+        }
     }
 }
 

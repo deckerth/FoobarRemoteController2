@@ -15,19 +15,36 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-
+import com.deckerth.thomas.foobarremotecontroller2.R
+import com.deckerth.thomas.foobarremotecontroller2.ui.layout.ItemSize
+import com.deckerth.thomas.foobarremotecontroller2.ui.layout.LayoutDescription
+import com.deckerth.thomas.foobarremotecontroller2.ui.layout.LayoutItem
+import com.deckerth.thomas.foobarremotecontroller2.ui.layout.LayoutItems
+import com.deckerth.thomas.foobarremotecontroller2.ui.layout.getLayoutItemsFor
+import com.deckerth.thomas.foobarremotecontroller2.ui.layout.layoutManager
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.LayoutField
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.LayoutViewModel
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.selectedView
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LayoutEditorMainPage() {
+fun LayoutEditorMainPage(
+    modifier: Modifier = Modifier,
+    vm: LayoutViewModel = viewModel()
+) {
     val navController = rememberNavController()
     var editorMode by remember {
         mutableStateOf(true)
     }
+
+    vm.currentView = selectedView
+
     Scaffold(
         topBar = {
             SingleChoiceSegmentedButtonRow(
@@ -70,13 +87,12 @@ fun LayoutEditorMainPage() {
             modifier = Modifier.padding(innerPadding)
         ) {
             composable("Preview") {
-                LayoutPreviewPage()
+                LayoutPreviewPage(vm = vm)
             }
             composable("Editor") {
-                LayoutEditorPage()
+                LayoutEditorPage(vm = vm)
             }
         }
 
     }
 }
-

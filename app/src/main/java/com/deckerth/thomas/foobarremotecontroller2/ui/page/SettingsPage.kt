@@ -75,7 +75,7 @@ fun SettingsPage() {
                 selectedItem = getViewMode(),
                 onClick = { mode: Layouts? ->
                     if (mode != null) {
-                        saveViewMode(mode, mainActivity)
+                        saveViewMode(viewMode, mode, mainActivity)
                     }
                     isOpen = false
                 },

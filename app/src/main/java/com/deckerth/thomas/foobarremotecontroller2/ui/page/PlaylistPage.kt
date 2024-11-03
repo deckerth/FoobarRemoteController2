@@ -2,6 +2,7 @@ package com.deckerth.thomas.foobarremotecontroller2.ui.page
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -39,10 +41,13 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.freeFocus
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -58,6 +63,7 @@ import com.deckerth.thomas.foobarremotecontroller2.model.PlaylistEntity
 import com.deckerth.thomas.foobarremotecontroller2.model.Playlists
 import com.deckerth.thomas.foobarremotecontroller2.model.Title
 import com.deckerth.thomas.foobarremotecontroller2.ui.components.LayoutComponent
+import com.deckerth.thomas.foobarremotecontroller2.ui.layout.ItemSize
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.getCurrentAlbumIndex
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.Layout
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.layoutManager
@@ -98,7 +104,7 @@ fun PlaylistPage() {
 }
 
 @Composable
-fun AlbumCard(album: Album, layout: Layout?) {
+fun AlbumCard(album: Album, layout: Layout?, previewMode: Boolean = false) {
 
     /*
     in automatic mode (initial state):
@@ -107,7 +113,7 @@ fun AlbumCard(album: Album, layout: Layout?) {
     automatic mode is re-entered otherwise
     */
 
-    if (player != null) {
+    if (!previewMode && player != null) {
         val currentlyPlaying =
             album.originalTitle.playlistId == player!!.playlistId && album.hasIndex(
                 player!!.getIndex()
@@ -126,13 +132,21 @@ fun AlbumCard(album: Album, layout: Layout?) {
     ) {
         Column {
             Row {
-                AsyncImage(
-                    model = album.originalTitle.artworkUrl,
-                    placeholder = painterResource(R.drawable.ic_launcher_background),
-                    contentDescription = stringResource(id = R.string.desc_album_picture),
-                    modifier = Modifier
-                        .size(80.dp)
-                )
+                if (previewMode)
+                    Image(
+                        bitmap = ImageBitmap.imageResource(id = album.originalTitle.artworkUrl.toInt()),
+                        contentDescription = stringResource(R.string.desc_album_picture),
+                        modifier = Modifier
+                            .size(80.dp)
+                    )
+                else
+                    AsyncImage(
+                        model = album.originalTitle.artworkUrl,
+                        placeholder = painterResource(R.drawable.ic_launcher_background),
+                        contentDescription = stringResource(id = R.string.desc_album_picture),
+                        modifier = Modifier
+                            .size(80.dp)
+                    )
                 Column(
                     verticalArrangement = Arrangement.Center,
                     modifier = Modifier
@@ -152,8 +166,10 @@ fun AlbumCard(album: Album, layout: Layout?) {
                         modifier = Modifier
                             .padding(horizontal = 8.dp, vertical = 2.dp),
                         onClick = {
-                            album.isAutomaticSelection = false
-                            album.isSelected = !album.isSelected
+                            if (!previewMode) {
+                                album.isAutomaticSelection = false
+                                album.isSelected = !album.isSelected
+                            }
                         }
                     ) {
                         if (album.isSelected) {
@@ -176,12 +192,12 @@ fun AlbumCard(album: Album, layout: Layout?) {
                 if (album.isSelected) {
                     Column {
                         album.titles.forEach { title ->
-                            TitleEntry(album = album, title = title)
+                            TitleEntry(album = album, title = title, previewMode = previewMode)
                         }
                     }
                 }
             } else {
-                TitleEntry(album = album, title = album.titles[0])
+                TitleEntry(album = album, title = album.titles[0], previewMode = previewMode)
             }
         }
     }
@@ -289,14 +305,15 @@ fun AlbumCardOld(album: Album) {
 }
 
 @Composable
-fun TitleEntry(album: Album, title: ITitle) {
+fun TitleEntry(album: Album, title: ITitle, previewMode: Boolean = false) {
     var titleSelected = false
     if (player != null)
         titleSelected =
             title.index == player!!.getIndex() && title.playlistId == player!!.playlistId
     var modifier = Modifier
         .clickable {
-            PlayerAccess.getInstance().playTrack(title.playlistId, title.index)
+            if (!previewMode)
+                PlayerAccess.getInstance().playTrack(title.playlistId, title.index)
         }
     if (titleSelected)
         modifier = modifier.background(MaterialTheme.colorScheme.primaryContainer)

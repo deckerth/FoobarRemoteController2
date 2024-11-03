@@ -10,7 +10,7 @@ class LayoutManager {
 
     private val classicLayout: Layout = createClassicLayout()
     private val modernLayout: Layout = createModernLayout()
-    private val customLayout: Layout = createModernLayout()
+    private var customLayout: Layout? = null
 
     private fun createModernLayout(): Layout {
         return Layout(
@@ -86,18 +86,43 @@ class LayoutManager {
 
     @Composable
     fun getLayout(): Layout {
+        if (getViewMode() == Layouts.LAYOUT_CUSTOM && customLayout == null) {
+            customLayout = createModernLayout()
+            //TODO Remove this as soon as preferences are connected
+        }
         return when (getViewMode()) {
             Layouts.LAYOUT_MODERN -> modernLayout
             Layouts.LAYOUT_CLASSIC -> classicLayout
-            else -> modernLayout
+            Layouts.LAYOUT_CUSTOM -> customLayout!!
+        }
+    }
+
+    fun changeLayout(previousMode: Layouts, newLayout: Layouts) {
+        if (newLayout == Layouts.LAYOUT_CUSTOM && customLayout == null) {
+            customLayout = when (previousMode) {
+                Layouts.LAYOUT_MODERN -> createModernLayout()
+                Layouts.LAYOUT_CLASSIC -> createClassicLayout()
+                Layouts.LAYOUT_CUSTOM -> createModernLayout()  // should not happen
+            }
         }
     }
 
     fun getCustomLayoutDescription(view: ViewsWithLayout): LayoutDescription {
         return when (view) {
-            ViewsWithLayout.PLAYER -> customLayout.playerLayout
-            ViewsWithLayout.ALBUM -> customLayout.albumLayout
-            ViewsWithLayout.TITLE -> customLayout.titleLayout
+            ViewsWithLayout.PLAYER -> customLayout!!.playerLayout
+            ViewsWithLayout.ALBUM -> customLayout!!.albumLayout
+            ViewsWithLayout.TITLE -> customLayout!!.titleLayout
+            else -> LayoutDescription()
+        }
+    }
+
+    fun setCustomLayoutDescription(view: ViewsWithLayout, layout: LayoutDescription) {
+        when (view) {
+            ViewsWithLayout.PLAYER -> customLayout!!.playerLayout = layout
+            ViewsWithLayout.ALBUM -> customLayout!!.albumLayout = layout
+            ViewsWithLayout.TITLE -> customLayout!!.titleLayout = layout
+            else -> {}
         }
     }
 }
+

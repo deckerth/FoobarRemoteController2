@@ -36,10 +36,10 @@ fun TextComponent(text: String, item: LayoutItem) {
 }
 
 @Composable
-fun LayoutComponent(player: Player, layoutItem: LayoutItem) {
+fun LayoutComponent(player: Player, layoutItem: LayoutItem, artworkResourceId: Int = -1) {
     when (layoutItem.item) {
         LayoutItems.CATALOG -> TextComponent(text = player.catalog, item = layoutItem)
-        LayoutItems.ARTWORK -> ArtWork(player = player, item = layoutItem)
+        LayoutItems.ARTWORK -> ArtWork(player = player, item = layoutItem, artworkResourceId)
         LayoutItems.TITLE -> TextComponent(text = player.title, item = layoutItem)
         LayoutItems.ALBUM -> TextComponent(text = player.album, item = layoutItem)
         LayoutItems.ARTIST -> TextComponent(text = player.artist, item = layoutItem)

@@ -2,7 +2,10 @@ package com.deckerth.thomas.foobarremotecontroller2.ui.layout
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.font.FontStyle
+import com.deckerth.thomas.foobarremotecontroller2.getCustomLayout
 import com.deckerth.thomas.foobarremotecontroller2.getViewMode
+import com.deckerth.thomas.foobarremotecontroller2.saveCustomLayout
+import com.deckerth.thomas.foobarremotecontroller2.ui.mainActivity
 
 val layoutManager = LayoutManager()
 
@@ -12,7 +15,13 @@ class LayoutManager {
     private val modernLayout: Layout = createModernLayout()
     private var customLayout: Layout? = null
 
-    private fun createModernLayout(): Layout {
+    @Composable
+    fun InitLayoutManager() {
+        if (customLayout == null)
+            customLayout = getCustomLayout()
+    }
+
+    fun createModernLayout(): Layout {
         return Layout(
             playerLayout = createModernPlayerLayout(),
             albumLayout = createModernAlbumLayout(),
@@ -21,7 +30,7 @@ class LayoutManager {
     }
 
     private fun createModernPlayerLayout(): LayoutDescription {
-        val fields = LayoutDescription()
+        val fields = LayoutDescription(ViewsWithLayout.PLAYER)
         fields.items.add(LayoutItem(LayoutItems.ARTWORK, ItemSize.LARGE_COVER))
         fields.items.add(LayoutItem(LayoutItems.TITLE, ItemSize.TITLE_LARGE))
         fields.items.add(LayoutItem(LayoutItems.ALBUM, ItemSize.BODY_SMALL))
@@ -30,7 +39,7 @@ class LayoutManager {
     }
 
     private fun createModernAlbumLayout(): LayoutDescription {
-        val fields = LayoutDescription()
+        val fields = LayoutDescription(ViewsWithLayout.ALBUM)
         fields.items.add(LayoutItem(LayoutItems.ALBUM, ItemSize.TITLE_MEDIUM))
         fields.items.add(LayoutItem(LayoutItems.ARTIST, ItemSize.BODY_SMALL))
         fields.items.add(LayoutItem(LayoutItems.COMPOSER, ItemSize.BODY_SMALL))
@@ -38,7 +47,7 @@ class LayoutManager {
     }
 
     private fun createModernTitleLayout(): LayoutDescription {
-        val fields = LayoutDescription()
+        val fields = LayoutDescription(ViewsWithLayout.TITLE)
         fields.items.add(LayoutItem(LayoutItems.TITLE, ItemSize.TITLE_MEDIUM))
         fields.items.add(LayoutItem(LayoutItems.SMART_ARTIST, ItemSize.BODY_SMALL))
         return fields
@@ -53,14 +62,14 @@ class LayoutManager {
     }
 
     private fun createClassicPlayerLayout(): LayoutDescription {
-        val fields = LayoutDescription()
+        val fields = LayoutDescription(ViewsWithLayout.PLAYER)
         fields.items.add(LayoutItem(LayoutItems.ARTWORK, ItemSize.MEDIUM_COVER))
         fields.items.add(LayoutItem(LayoutItems.COMPOSER, ItemSize.TITLE_LARGE))
         fields.items.add(
             LayoutItem(
                 LayoutItems.ALBUM,
                 ItemSize.TITLE_MEDIUM,
-                fontStyle = FontStyle.Italic
+                italic = true
             )
         )
         fields.items.add(LayoutItem(LayoutItems.TITLE, ItemSize.BODY_SMALL))
@@ -70,7 +79,7 @@ class LayoutManager {
     }
 
     private fun createClassicAlbumLayout(): LayoutDescription {
-        val fields = LayoutDescription()
+        val fields = LayoutDescription(ViewsWithLayout.ALBUM)
         fields.items.add(LayoutItem(LayoutItems.COMPOSER, ItemSize.TITLE_MEDIUM))
         fields.items.add(LayoutItem(LayoutItems.ALBUM, ItemSize.BODY_MEDIUM))
         fields.items.add(LayoutItem(LayoutItems.ARTIST, ItemSize.BODY_SMALL))
@@ -78,7 +87,7 @@ class LayoutManager {
     }
 
     private fun createClassicTitleLayout(): LayoutDescription {
-        val fields = LayoutDescription()
+        val fields = LayoutDescription(ViewsWithLayout.TITLE)
         fields.items.add(LayoutItem(LayoutItems.TITLE, ItemSize.TITLE_MEDIUM))
         fields.items.add(LayoutItem(LayoutItems.SMART_ARTIST, ItemSize.BODY_SMALL))
         return fields
@@ -86,10 +95,7 @@ class LayoutManager {
 
     @Composable
     fun getLayout(): Layout {
-        if (getViewMode() == Layouts.LAYOUT_CUSTOM && customLayout == null) {
-            customLayout = createModernLayout()
-            //TODO Remove this as soon as preferences are connected
-        }
+        InitLayoutManager()
         return when (getViewMode()) {
             Layouts.LAYOUT_MODERN -> modernLayout
             Layouts.LAYOUT_CLASSIC -> classicLayout
@@ -104,6 +110,7 @@ class LayoutManager {
                 Layouts.LAYOUT_CLASSIC -> createClassicLayout()
                 Layouts.LAYOUT_CUSTOM -> createModernLayout()  // should not happen
             }
+            saveCustomLayout(mainActivity.baseContext, customLayout!!)
         }
     }
 
@@ -112,7 +119,7 @@ class LayoutManager {
             ViewsWithLayout.PLAYER -> customLayout!!.playerLayout
             ViewsWithLayout.ALBUM -> customLayout!!.albumLayout
             ViewsWithLayout.TITLE -> customLayout!!.titleLayout
-            else -> LayoutDescription()
+            else -> LayoutDescription(ViewsWithLayout.PLAYER)
         }
     }
 
@@ -123,6 +130,7 @@ class LayoutManager {
             ViewsWithLayout.TITLE -> customLayout!!.titleLayout = layout
             else -> {}
         }
+        saveCustomLayout(mainActivity.baseContext, customLayout!!)
     }
 }
 

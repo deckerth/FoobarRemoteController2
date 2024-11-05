@@ -42,7 +42,7 @@ val previewPlayerClassic = Player(
     "1",
     "125.1700625",
     "53.58589853333333",
-    "",
+    R.drawable.cover_tosca.toString(),
     PlaybackState.PLAYING,
     PlaybackMode.DEFAULT
 )
@@ -50,7 +50,7 @@ val previewPlayerClassic = Player(
 val previewPlayerPop = Player(
     "517 007-2", "Björn Ulvaeus", "Gold - Greatest Hits",
     "Dancing Queen", "ABBA", "1", "1", "0:50", "p4",
-    "1", "232.2", "51.080651833333334", "", PlaybackState.PLAYING, PlaybackMode.DEFAULT
+    "1", "232.2", "51.080651833333334", R.drawable.cover_abba.toString(), PlaybackState.PLAYING, PlaybackMode.DEFAULT
 )
 
 val previewPlaylist = Playlist(PlaylistEntity("p4", "Preview", true, 2))
@@ -60,7 +60,7 @@ private fun setupPreviewPlaylist() {
     previewPlaylist.addTitle(
         Title(
             "p4",
-            1,
+            0,
             "517 007-2",
             "Björn Ulvaeus",
             "Gold - Greatest Hits",
@@ -77,7 +77,7 @@ private fun setupPreviewPlaylist() {
     previewPlaylist.addTitle(
         Title(
             "p4",
-            2,
+            1,
             "421 670-2",
             "Puccini, Giacomo",
             "Tosca",
@@ -108,7 +108,7 @@ fun LayoutPreviewPage(
                 .verticalScroll(rememberScrollState())
         ) {
             PlayerCard(currentPlayer,
-                if (currentPlayer == previewPlayerPop) R.drawable.cover_abba else R.drawable.cover_tosca,
+                true,
                 { currentPlayer = previewPlayerPop },
                 { currentPlayer = previewPlayerClassic })
         }

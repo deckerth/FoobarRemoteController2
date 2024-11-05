@@ -63,6 +63,7 @@ import com.deckerth.thomas.foobarremotecontroller2.viewmodel.updatePlayer
 fun PlayingPage() {
     val pullToRefreshState = rememberPullToRefreshState()
     var showLoading = loadingList
+    //layoutManager.InitLayoutManager()
     Box(
         modifier = Modifier
             .nestedScroll(pullToRefreshState.nestedScrollConnection)
@@ -294,7 +295,7 @@ fun PlayerButtons(
 @Composable
 fun PlayerCard(
     player: Player,
-    artworkResourceId: Int = -1,
+    previewMode: Boolean = false,
     onPreviousTrack: (() -> Unit)? = null,
     onNextTrack: (() -> Unit)? = null
 ) {
@@ -308,10 +309,10 @@ fun PlayerCard(
         val layout = layoutManager.getLayout()
 
         for (item in layout.playerLayout.items) {
-            LayoutComponent(player, item, artworkResourceId)
+            LayoutComponent(player, item, previewMode)
         }
         if (onPreviousTrack != null && onNextTrack != null)
-            PlayerButtons(player, onPreviousTrack, onNextTrack)
+            PlayerButtons(player, onPreviousTrack, onNextTrack, previewMode)
         else
             PlayerButtons(player)
     }

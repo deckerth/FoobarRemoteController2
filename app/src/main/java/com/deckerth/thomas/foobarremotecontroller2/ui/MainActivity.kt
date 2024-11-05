@@ -67,6 +67,7 @@ import com.deckerth.thomas.foobarremotecontroller2.viewmodel.UpdatePreferences
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.autoScrollIndex
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.autoscroll
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.getCurrentAlbumIndex
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.initViewModel
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.playlistState
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.updateList
 import kotlinx.coroutines.CoroutineScope
@@ -98,6 +99,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mainActivity = this
+        initViewModel()
         //imageLoader = ImageLoader.Builder(mainActivity.baseContext).build() // Get your ImageLoader instance
         enableEdgeToEdge()
         setContent {

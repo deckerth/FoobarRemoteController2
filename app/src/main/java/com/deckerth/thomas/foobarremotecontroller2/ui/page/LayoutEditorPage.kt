@@ -40,7 +40,7 @@ fun LayoutEditorPage(
     modifier: Modifier = Modifier,
     vm: LayoutViewModel
 ) {
-    val state = rememberReorderableLazyListState(onMove = vm::moveField, canDragOver = vm::isFieldDraggable)
+    val state = rememberReorderableLazyListState(onMove = vm::moveField, canDragOver = vm::isFieldDraggable, onDragEnd = vm::onDragEnd)
     LazyColumn(
         state = state.listState,
         modifier = modifier.reorderable(state)

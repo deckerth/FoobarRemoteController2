@@ -28,12 +28,12 @@ import com.deckerth.thomas.foobarremotecontroller2.ui.layout.ItemSize
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.LayoutItem
 
 @Composable
-fun ArtWork(player: Player, item: LayoutItem, artworkResourceId: Int = -1) {
+fun ArtWork(player: Player, item: LayoutItem, previewMode: Boolean = false) {
     val index = player.getIndex()
     if (index >= 0) {
-        if (artworkResourceId > 0) {
+        if (previewMode) {
             Image(
-                bitmap = ImageBitmap.imageResource(id = artworkResourceId),
+                bitmap = ImageBitmap.imageResource(id = player.artworkUrl.toInt()),
                 //placeholder = painterResource(R.drawable.album),
                 contentDescription = stringResource(R.string.desc_album_picture),
                 modifier = Modifier

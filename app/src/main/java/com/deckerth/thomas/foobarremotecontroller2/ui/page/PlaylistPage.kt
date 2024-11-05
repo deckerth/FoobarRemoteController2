@@ -307,7 +307,9 @@ fun AlbumCardOld(album: Album) {
 @Composable
 fun TitleEntry(album: Album, title: ITitle, previewMode: Boolean = false) {
     var titleSelected = false
-    if (player != null)
+    if (previewMode)
+            titleSelected = title.index == 0
+    else if (player != null)
         titleSelected =
             title.index == player!!.getIndex() && title.playlistId == player!!.playlistId
     var modifier = Modifier

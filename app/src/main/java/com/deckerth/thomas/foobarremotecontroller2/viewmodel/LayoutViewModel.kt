@@ -22,67 +22,79 @@ data class LayoutField(
     val layoutItem: LayoutItem? = null,
     val sectionTitle: String = "",
     val isSectionTitle: Boolean = false
-    )
+)
 
-    class LayoutViewModel : ViewModel() {
-        var layoutFields = mutableStateOf(listOf<LayoutField>())
-        var currentView: ViewsWithLayout = ViewsWithLayout.UNDEFINED
-            set(value) {
-                if (value == field) return
-                field = value
-                initializeViewModel()
-            }
-        private var layoutDescription: LayoutDescription? = null
-
-        fun moveField(from: ItemPosition, to: ItemPosition) {
-            layoutFields.value = layoutFields.value.toMutableList().apply {
-                add(to.index, removeAt(from.index))
-            }
-            saveChanges()
+class LayoutViewModel : ViewModel() {
+    var layoutFields = mutableStateOf(listOf<LayoutField>())
+    var currentView: ViewsWithLayout = ViewsWithLayout.UNDEFINED
+        set(value) {
+            if (value == field) return
+            field = value
+            initializeViewModel()
         }
+    private var layoutDescription: LayoutDescription? = null
 
-        private fun saveChanges() {
-            val description = LayoutDescription()
-            for (field in layoutFields.value) {
-                if (field.isSectionTitle) {
-                    continue
-                }
-                description.items.add(field.layoutItem!!)
-            }
-            layoutManager.setCustomLayoutDescription(selectedView, description)
-        }
-
-        fun isFieldDraggable(draggedOver: ItemPosition, dragging: ItemPosition) = layoutFields.value.getOrNull(draggedOver.index)?.isSectionTitle != true && layoutFields.value.getOrNull(dragging.index)?.isSectionTitle != true
-
-        private fun initializeViewModel() {
-            currentView = selectedView
-            layoutDescription = layoutManager.getCustomLayoutDescription(selectedView)
-
-            val layoutItems = layoutDescription!!.items
-            val allItems = getLayoutItemsFor(selectedView)
-            val unusedItems = allItems.filter { item -> !layoutItems.any { it.item == item } }
-            val fields = mutableListOf<LayoutField>()
-
-            fields.add(LayoutField(0,null, selectedView.text, true))
-            var i = 1
-            for (item in layoutItems) {
-                fields.add(LayoutField(i, item))
-                i++
-            }
-            fields.add(LayoutField(i, null, mainActivity.getString (R.string.available_fields), true))
-            i++
-            for (item in unusedItems) {
-                fields.add(
-                    LayoutField(
-                        i,
-                        LayoutItem(
-                            item,
-                            itemSize = if (item == LayoutItems.ARTWORK) ItemSize.MEDIUM_COVER else ItemSize.BODY_MEDIUM
-                        )
-                    )
-                )
-                i++
-            }
-            layoutFields.value = fields
+    fun moveField(from: ItemPosition, to: ItemPosition) {
+        layoutFields.value = layoutFields.value.toMutableList().apply {
+            add(to.index, removeAt(from.index))
         }
     }
+
+    fun onDragEnd(startIndex: Int, endIndex: Int) {
+        if (startIndex == endIndex) return
+        saveChanges()
+    }
+
+    private fun saveChanges() {
+        var sectionCount = 0
+        val description = LayoutDescription(currentView)
+        for (field in layoutFields.value) {
+            if (field.isSectionTitle) {
+                sectionCount++
+                if (sectionCount == 2)
+                    break
+                else
+                    continue
+            }
+            description.items.add(field.layoutItem!!)
+        }
+        layoutManager.setCustomLayoutDescription(selectedView, description)
+    }
+
+    fun isFieldDraggable(draggedOver: ItemPosition, dragging: ItemPosition) =
+        layoutFields.value.getOrNull(draggedOver.index)?.isSectionTitle != true && layoutFields.value.getOrNull(
+            dragging.index
+        )?.isSectionTitle != true
+
+    private fun initializeViewModel() {
+        currentView = selectedView
+        layoutDescription = layoutManager.getCustomLayoutDescription(selectedView)
+
+        val layoutItems = layoutDescription!!.items
+        val allItems = getLayoutItemsFor(selectedView)
+        val unusedItems = allItems.filter { item -> !layoutItems.any { it.item == item } }
+        val fields = mutableListOf<LayoutField>()
+
+        fields.add(LayoutField(0, null, selectedView.text, true))
+        var i = 1
+        for (item in layoutItems) {
+            fields.add(LayoutField(i, item))
+            i++
+        }
+        fields.add(LayoutField(i, null, mainActivity.getString(R.string.available_fields), true))
+        i++
+        for (item in unusedItems) {
+            fields.add(
+                LayoutField(
+                    i,
+                    LayoutItem(
+                        item,
+                        itemSize = if (item == LayoutItems.ARTWORK) ItemSize.MEDIUM_COVER else ItemSize.BODY_MEDIUM
+                    )
+                )
+            )
+            i++
+        }
+        layoutFields.value = fields
+    }
+}

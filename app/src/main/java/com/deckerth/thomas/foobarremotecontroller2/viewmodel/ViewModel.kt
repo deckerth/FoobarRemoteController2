@@ -43,6 +43,19 @@ var valid = false
 val connector = HTTPConnector()
 val foobVolumeControl: VolumeControl = VolumeControl(false, 0, 1, "db", 0)
 
+var autoscroll by mutableStateOf(true)
+var autoScrollIndex by mutableIntStateOf(0)
+var displayedPlaylist by mutableStateOf<Playlist?>(null)
+var loadingList by mutableStateOf(false)
+var playlistState by mutableStateOf(LazyListState())
+lateinit var selectedView: ViewsWithLayout
+var selectedPlaylist by mutableStateOf("")
+var isSick by mutableStateOf(false)
+
+fun initViewModel() {
+    selectedView = ViewsWithLayout.PLAYER
+}
+
 @Composable
 fun UpdatePreferences() {
     ip_address = getIpAddress()
@@ -70,14 +83,6 @@ fun UpdatePreferences() {
     }.start()
 }
 
-var autoscroll by mutableStateOf(true)
-var autoScrollIndex by mutableIntStateOf(0)
-var displayedPlaylist by mutableStateOf<Playlist?>(null)
-var loadingList by mutableStateOf(false)
-var playlistState by mutableStateOf(LazyListState())
-var selectedView by mutableStateOf(ViewsWithLayout.PLAYER)
-var selectedPlaylist by mutableStateOf("")
-var isSick by mutableStateOf(false)
 
 fun updateList() {
     invalidatePlaylist(selectedPlaylist)

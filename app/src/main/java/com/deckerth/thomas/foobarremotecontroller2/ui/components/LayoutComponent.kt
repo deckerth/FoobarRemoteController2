@@ -6,6 +6,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontStyle
 import com.deckerth.thomas.foobarremotecontroller2.model.Album
 import com.deckerth.thomas.foobarremotecontroller2.model.ITitle
 import com.deckerth.thomas.foobarremotecontroller2.model.Player
@@ -31,15 +32,16 @@ fun TextComponent(text: String, item: LayoutItem) {
             .fillMaxWidth(),
         text = text,
         style = getTextStyle(item.itemSize),
+        fontStyle = if (item.italic) FontStyle.Italic else FontStyle.Normal,
         maxLines = item.maxLines
     )
 }
 
 @Composable
-fun LayoutComponent(player: Player, layoutItem: LayoutItem, artworkResourceId: Int = -1) {
+fun LayoutComponent(player: Player, layoutItem: LayoutItem, previewMode: Boolean = false) {
     when (layoutItem.item) {
         LayoutItems.CATALOG -> TextComponent(text = player.catalog, item = layoutItem)
-        LayoutItems.ARTWORK -> ArtWork(player = player, item = layoutItem, artworkResourceId)
+        LayoutItems.ARTWORK -> ArtWork(player = player, item = layoutItem, previewMode = previewMode)
         LayoutItems.TITLE -> TextComponent(text = player.title, item = layoutItem)
         LayoutItems.ALBUM -> TextComponent(text = player.album, item = layoutItem)
         LayoutItems.ARTIST -> TextComponent(text = player.artist, item = layoutItem)

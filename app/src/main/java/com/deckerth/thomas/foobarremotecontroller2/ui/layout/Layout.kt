@@ -1,5 +1,8 @@
 package com.deckerth.thomas.foobarremotecontroller2.ui.layout
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class Layout(
     var playerLayout : LayoutDescription,
     var albumLayout : LayoutDescription,

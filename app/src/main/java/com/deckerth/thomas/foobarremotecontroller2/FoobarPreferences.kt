@@ -9,15 +9,12 @@ import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.Layout
-import com.deckerth.thomas.foobarremotecontroller2.ui.layout.LayoutDescription
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.Layouts
-import com.deckerth.thomas.foobarremotecontroller2.ui.layout.ViewsWithLayout
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.layoutManager
 import com.deckerth.thomas.foobarremotecontroller2.ui.mainActivity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
@@ -69,39 +66,19 @@ fun saveViewMode(previousMode: Layouts, mode: Layouts, context: Context) {
 
 @Composable
 fun getViewMode(): Layouts {
-    return Layouts.entries.get(getValue(mainActivity, VIEW_MODE_KEY, Layouts.LAYOUT_MODERN.ordinal))
+    return Layouts.entries[getValue(mainActivity, VIEW_MODE_KEY, Layouts.LAYOUT_MODERN.ordinal)]
 }
-
-//@Composable
-//fun getCustomLayout(): LayoutDescription {
-//    val layoutString = getValue(mainActivity, CUSTOM_LAYOUT_KEY, "")
-//    if (layoutString.isEmpty()) {
-//        return LayoutDescription(ViewsWithLayout.PLAYER)//layoutManager.createModernLayout()
-//    }
-//    return Json.decodeFromString(layoutString)
-//    //return context.dataStore.data.map { preferences -> preferences[CUSTOM_LAYOUT_KEY]?.let { Json.decodeFromString(it) } ?: emptyList()
-//}
-//
-//fun saveCustomLayout(context: Context, layout: LayoutDescription) {
-//    val layoutString = Json.encodeToString(layout)
-//    runBlocking {
-//        saveValue(context, layoutString, CUSTOM_LAYOUT_KEY)
-//    }
-//}
 
 @Composable
 fun getCustomLayout(): Layout {
     val layoutString = getValue(mainActivity.baseContext, CUSTOM_LAYOUT_KEY, "")
-    var layout: Layout? = null
-    layout = if (layoutString.isEmpty())
-        // should not happen for the following reason:
-        // when the user selects "Custom layout" for the first time, the layout that
-        // was previously selected is saved as custom layout
+    return if (layoutString.isEmpty())
+    // should not happen for the following reason:
+    // when the user selects "Custom layout" for the first time, the layout that
+    // was previously selected is saved as custom layout
         layoutManager.createModernLayout()
     else
         Json.decodeFromString(layoutString)
-
-    return layout!!
 }
 
 fun saveCustomLayout(context: Context, layout: Layout) {

@@ -17,11 +17,12 @@ class LayoutManager {
 
     @Composable
     fun InitLayoutManager() {
-        if (customLayout == null)
-            customLayout = getCustomLayout()
+        // customLayout gets initialized when the player page opens
+        // it may be null afterwards if the user has not saved a custom layout
+        if (customLayout == null) customLayout = getCustomLayout()
     }
 
-    fun createModernLayout(): Layout {
+    private fun createModernLayout(): Layout {
         return Layout(
             playerLayout = createModernPlayerLayout(),
             albumLayout = createModernAlbumLayout(),
@@ -95,22 +96,27 @@ class LayoutManager {
 
     @Composable
     fun getLayout(): Layout {
-        InitLayoutManager()
         return when (getViewMode()) {
             Layouts.LAYOUT_MODERN -> modernLayout
             Layouts.LAYOUT_CLASSIC -> classicLayout
             Layouts.LAYOUT_CUSTOM -> customLayout!!
+            // customLayout gets initialized when the player page opens or,
+            // if the user has not saved a custom layout, it gets initialized
+            // when the user selects the custom layout in the settings page
         }
     }
 
     fun changeLayout(previousMode: Layouts, newLayout: Layouts) {
-        if (newLayout == Layouts.LAYOUT_CUSTOM && customLayout == null) {
-            customLayout = when (previousMode) {
-                Layouts.LAYOUT_MODERN -> createModernLayout()
-                Layouts.LAYOUT_CLASSIC -> createClassicLayout()
-                Layouts.LAYOUT_CUSTOM -> createModernLayout()  // should not happen
+        if (newLayout == Layouts.LAYOUT_CUSTOM) {
+            if (customLayout == null) {
+                // it is the first time the user has selected the custom layout
+                customLayout = when (previousMode) {
+                    Layouts.LAYOUT_MODERN -> createModernLayout()
+                    Layouts.LAYOUT_CLASSIC -> createClassicLayout()
+                    Layouts.LAYOUT_CUSTOM -> createModernLayout()  // should not happen
+                }
+                saveCustomLayout(mainActivity.baseContext, customLayout!!)
             }
-            saveCustomLayout(mainActivity.baseContext, customLayout!!)
         }
     }
 

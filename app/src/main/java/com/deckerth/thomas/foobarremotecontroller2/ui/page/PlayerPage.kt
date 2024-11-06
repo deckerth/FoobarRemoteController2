@@ -44,6 +44,7 @@ import coil.compose.AsyncImage
 import com.deckerth.thomas.foobarremotecontroller2.R
 import com.deckerth.thomas.foobarremotecontroller2.connector.PlayerAccess
 import com.deckerth.thomas.foobarremotecontroller2.connector.errorHandler
+import com.deckerth.thomas.foobarremotecontroller2.getCustomLayout
 import com.deckerth.thomas.foobarremotecontroller2.model.PlaybackMode
 import com.deckerth.thomas.foobarremotecontroller2.model.PlaybackState
 import com.deckerth.thomas.foobarremotecontroller2.model.Player
@@ -63,7 +64,7 @@ import com.deckerth.thomas.foobarremotecontroller2.viewmodel.updatePlayer
 fun PlayingPage() {
     val pullToRefreshState = rememberPullToRefreshState()
     var showLoading = loadingList
-    //layoutManager.InitLayoutManager()
+    layoutManager.InitLayoutManager()
     Box(
         modifier = Modifier
             .nestedScroll(pullToRefreshState.nestedScrollConnection)

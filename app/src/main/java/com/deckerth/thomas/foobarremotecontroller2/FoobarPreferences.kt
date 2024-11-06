@@ -25,8 +25,7 @@ private val VIEW_MODE_KEY = intPreferencesKey("view_mode")
 private val CUSTOM_LAYOUT_KEY = stringPreferencesKey("custom_layout")
 
 private fun <T> getFlow(context: Context, key: Preferences.Key<T>): Flow<T?> {
-    return context.dataStore.data
-        .map { preferences ->
+    return context.dataStore.data.map { preferences ->
             preferences[key]
         }
 
@@ -70,15 +69,10 @@ fun getViewMode(): Layouts {
 }
 
 @Composable
-fun getCustomLayout(): Layout {
+fun getCustomLayout(): Layout? {
     val layoutString = getValue(mainActivity.baseContext, CUSTOM_LAYOUT_KEY, "")
-    return if (layoutString.isEmpty())
-    // should not happen for the following reason:
-    // when the user selects "Custom layout" for the first time, the layout that
-    // was previously selected is saved as custom layout
-        layoutManager.createModernLayout()
-    else
-        Json.decodeFromString(layoutString)
+    return if (layoutString.isEmpty()) null
+    else Json.decodeFromString(layoutString)
 }
 
 fun saveCustomLayout(context: Context, layout: Layout) {

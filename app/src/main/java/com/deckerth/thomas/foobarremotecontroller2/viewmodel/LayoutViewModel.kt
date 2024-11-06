@@ -45,7 +45,7 @@ class LayoutViewModel : ViewModel() {
         saveChanges()
     }
 
-    private fun saveChanges() {
+    fun saveChanges() {
         var sectionCount = 0
         val description = LayoutDescription(currentView)
         for (field in layoutFields.value) {
@@ -67,7 +67,6 @@ class LayoutViewModel : ViewModel() {
         )?.isSectionTitle != true
 
     private fun initializeViewModel() {
-        currentView = selectedView
         layoutDescription = layoutManager.getCustomLayoutDescription(selectedView)
 
         val layoutItems = layoutDescription!!.items

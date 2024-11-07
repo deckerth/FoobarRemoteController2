@@ -33,8 +33,7 @@ fun TextComponent(text: String, item: LayoutItem) {
         text = text,
         style = getTextStyle(item.itemSize),
         fontStyle = if (item.italic) FontStyle.Italic else FontStyle.Normal,
-        maxLines = item.maxLines
-    )
+        maxLines = item.maxLines)
 }
 
 @Composable

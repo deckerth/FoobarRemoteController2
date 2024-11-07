@@ -213,9 +213,6 @@ fun AlbumCardOld(album: Album) {
 //        isSelected = album.hasIndex(player!!.index)
 //    }
 
-    val surfaceColor by animateColorAsState(
-        if (isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceContainer,
-    )
     ElevatedCard(
         modifier = Modifier
             .animateContentSize()

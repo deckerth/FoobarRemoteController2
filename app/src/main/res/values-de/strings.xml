@@ -49,4 +49,11 @@
     <string name="info_no_connection">Keine Verbindung möglich</string>
     <string name="info_removed">Von der Playlist entfernt</string>
     <string name="available_fields">Verfügbare Felder</string>
+    <string name="title_large">Großer Titel</string>
+    <string name="title_medium">Mittelgroßer Titel</string>
+    <string name="body_medium">Mittelgroßer Fließtext</string>
+    <string name="body_small">Kleiner Fließtext</string>
+    <string name="small_cover">Klein</string>
+    <string name="medium_cover">Mittel</string>
+    <string name="large_cover">Groß</string>
 </resources>

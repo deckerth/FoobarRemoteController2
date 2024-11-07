@@ -48,4 +48,11 @@
     <string name="info_no_connection">No Internet Connection</string>
     <string name="info_removed">Title removed from playlist</string>
     <string name="available_fields">Available fields</string>
+    <string name="title_large">Large title</string>
+    <string name="title_medium">Medium title</string>
+    <string name="body_medium">Medium text body</string>
+    <string name="body_small">Small text body</string>
+    <string name="small_cover">Small</string>
+    <string name="medium_cover">Medium</string>
+    <string name="large_cover">Large</string>
 </resources>

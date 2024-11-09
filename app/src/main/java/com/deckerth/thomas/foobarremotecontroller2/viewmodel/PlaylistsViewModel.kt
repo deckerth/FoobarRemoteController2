@@ -1,8 +1,6 @@
 package com.deckerth.thomas.foobarremotecontroller2.viewmodel
 
 
-import coil.annotation.ExperimentalCoilApi
-import com.deckerth.thomas.foobarremotecontroller2.connector.ErrorHandler
 import com.deckerth.thomas.foobarremotecontroller2.connector.PlaylistAccess
 import com.deckerth.thomas.foobarremotecontroller2.connector.errorHandler
 import com.deckerth.thomas.foobarremotecontroller2.model.Playlist
@@ -58,11 +56,14 @@ fun setPlaylists(playlists: Playlists) {
             name = entity.name
             isCurrent = entity.isCurrent
             noOfTracks = entity.noOfTracks
+            if (selectedPlaylist == entry.playlistEntity.playlistId)
+                selectedPlaylistName = entity.name
         }
 
         if (selectedPlaylist == "" && entity.playlistId == playingPlaylistId) {
             // select first playlistsetSelectedPlaylist(entity.playlistId)
             selectedPlaylist = entity.playlistId
+            selectedPlaylistName = entity.name
             displayedPlaylist = getPlaylist(entity.playlistId) //.clone()
             println("FOOB setSelectedPlaylist: ${entity.playlistId}")
         }
@@ -164,20 +165,7 @@ fun setSelectedPlaylist(id: String) {
             println("FOOB changing from playlist: $selectedPlaylist to $id")
         selectedPlaylist = id
         displayedPlaylist = getPlaylist(id) //.clone()
+        selectedPlaylistName = displayedPlaylist!!.playlistEntity.name
         updatePlaylists()
     }
-}
-
-@OptIn(ExperimentalCoilApi::class)
-private fun clearImageCache() {
-
-// Clear the memory cache
-    //imageLoader.memoryCache?.clear()
-
-//    val keys = mainActivity.imageLoader.memoryCache?.size
-//    val x = 0
-// Clear the disk cache (asynchronously)
-//    CoroutineScope(Dispatchers.Main).launch {
-//        imageLoader.diskCache?.clear()
-//    }
 }

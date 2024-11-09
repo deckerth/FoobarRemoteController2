@@ -4,10 +4,8 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.PlaybackStateCompat
-import androidx.collection.emptyLongSet
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MonotonicFrameClock
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -24,20 +22,13 @@ import com.deckerth.thomas.foobarremotecontroller2.model.Player
 import com.deckerth.thomas.foobarremotecontroller2.model.Playlist
 import com.deckerth.thomas.foobarremotecontroller2.model.VolumeControl
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.ViewsWithLayout
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import me.zhanghai.compose.preference.Preferences
 import java.net.HttpURLConnection
 import java.net.URL
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledFuture
 import java.util.concurrent.TimeUnit
-import kotlin.math.abs
 import kotlin.math.floor
 
-var preferences: Preferences? = null
 var ip_address: String? = null
 var valid = false
 val connector = HTTPConnector()
@@ -50,6 +41,7 @@ var loadingList by mutableStateOf(false)
 var playlistState by mutableStateOf(LazyListState())
 lateinit var selectedView: ViewsWithLayout
 var selectedPlaylist by mutableStateOf("")
+var selectedPlaylistName by mutableStateOf("")
 var isSick by mutableStateOf(false)
 
 fun initViewModel() {
@@ -215,8 +207,12 @@ fun startPlayerObserver() {
                 try {
                     updatePlayer()
                     val playlists = PlaylistAccess.getInstance().playlists
-                    if (autoscroll && player != null && player!!.playlistId.isNotEmpty() && player!!.playlistId != selectedPlaylist)
+                    if (player != null && playlists != null)
+                    if (autoscroll && player!!.playlistId.isNotEmpty() && player!!.playlistId != selectedPlaylist)
                         setSelectedPlaylist(player!!.playlistId)
+                    else if(selectedPlaylist.isEmpty())
+                        setSelectedPlaylist(playlists.currentPlaylist.playlistId)
+
                     if (playlists != null)
                         setPlaylists(playlists)
                 } catch (e: Exception) {

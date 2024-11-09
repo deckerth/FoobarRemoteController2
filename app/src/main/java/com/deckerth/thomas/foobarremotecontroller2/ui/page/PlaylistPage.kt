@@ -1,16 +1,13 @@
 package com.deckerth.thomas.foobarremotecontroller2.ui.page
 
-import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -37,14 +34,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.focus.freeFocus
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.res.imageResource
@@ -63,20 +57,19 @@ import com.deckerth.thomas.foobarremotecontroller2.model.PlaylistEntity
 import com.deckerth.thomas.foobarremotecontroller2.model.Playlists
 import com.deckerth.thomas.foobarremotecontroller2.model.Title
 import com.deckerth.thomas.foobarremotecontroller2.ui.components.LayoutComponent
-import com.deckerth.thomas.foobarremotecontroller2.ui.layout.ItemSize
-import com.deckerth.thomas.foobarremotecontroller2.viewmodel.getCurrentAlbumIndex
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.Layout
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.layoutManager
-import com.deckerth.thomas.foobarremotecontroller2.viewmodel.loadingList
-import com.deckerth.thomas.foobarremotecontroller2.viewmodel.player
-import com.deckerth.thomas.foobarremotecontroller2.viewmodel.displayedPlaylist
-import com.deckerth.thomas.foobarremotecontroller2.viewmodel.playlistState
 import com.deckerth.thomas.foobarremotecontroller2.ui.theme.Foobar2000RemoteControllerTheme
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.autoScrollIndex
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.autoscroll
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.displayedPlaylist
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.getCurrentAlbumIndex
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.loadingList
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.player
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.playlistState
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.playlists
-import com.deckerth.thomas.foobarremotecontroller2.viewmodel.selectedPlaylist
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.selectedPlaylistIndex
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.selectedPlaylistName
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.setSelectedPlaylist
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.updatePlaylists
 
@@ -199,103 +192,6 @@ fun AlbumCard(album: Album, layout: Layout?, previewMode: Boolean = false) {
             } else {
                 TitleEntry(album = album, title = album.titles[0], previewMode = previewMode)
             }
-        }
-    }
-
-}
-
-@Composable
-fun AlbumCardOld(album: Album) {
-    var isSelected by rememberSaveable {
-        mutableStateOf(false)
-    }
-//    if (player != null){
-//        isSelected = album.hasIndex(player!!.index)
-//    }
-
-    ElevatedCard(
-        modifier = Modifier
-            .animateContentSize()
-            .fillMaxWidth()
-            .padding(vertical = 4.dp, horizontal = 8.dp)
-//            .clickable {
-//                PlayerAccess
-//                    .getInstance()
-//                    .playTrack(album.playlistId, album.index)
-//            }
-    ) {
-        Column {
-            Row {
-                AsyncImage(
-                    model = album.originalTitle.artworkUrl,
-                    placeholder = painterResource(R.drawable.ic_launcher_background),
-                    contentDescription = stringResource(id = R.string.desc_album_picture),
-                    modifier = Modifier
-                        .size(80.dp)
-                )
-                Column(
-                    verticalArrangement = Arrangement.Center,
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                        .height(80.dp)
-                ) {
-                    Text(
-                        text = album.originalTitle.album,
-                        maxLines = 1,
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                    Text(
-                        text = album.originalTitle.artist,
-                        maxLines = 1,
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                    if (album.originalTitle.composer != "" && album.originalTitle.composer != "?" && album.originalTitle.composer != album.originalTitle.artist) {
-                        Text(
-                            text = album.originalTitle.composer,
-                            maxLines = 1,
-                            style = MaterialTheme.typography.bodySmall
-                        )
-                    }
-                }
-
-
-            }
-            if (album.titles.size > 1) {
-                HorizontalDivider()
-                Box {
-                    TextButton(
-                        modifier = Modifier
-                            .padding(horizontal = 8.dp, vertical = 2.dp),
-                        onClick = { isSelected = !isSelected }
-                    ) {
-                        if (isSelected) {
-                            Text(text = stringResource(R.string.button_collapse))
-                        } else {
-                            Text(text = stringResource(R.string.button_expand))
-                        }
-                    }
-                    Text(
-                        modifier = Modifier
-                            .padding(horizontal = 16.dp)
-                            .fillMaxWidth()
-                            .align(Alignment.Center),
-                        textAlign = TextAlign.Right,
-                        style = MaterialTheme.typography.bodySmall,
-                        text = stringResource(R.string.info_titles, album.titles.size)
-                    )
-                }
-
-                if (isSelected) {
-                    Column {
-                        album.titles.forEach { title ->
-                            TitleEntry(album = album, title = title)
-                        }
-                    }
-                }
-            } else {
-                TitleEntry(album = album, title = album.titles[0])
-            }
-
         }
     }
 
@@ -425,7 +321,7 @@ fun PlaylistSwitcher(playlists: Playlists) {
                 },
             label = { Text(text = stringResource(R.string.button_playlist_switcher)) },
             readOnly = true,
-            value = if (playlists.playlists.isEmpty()) "" else playlists.playlists[if (selectedIndex == -1) 0 else selectedIndex].name,
+            value = selectedPlaylistName,
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             onValueChange = {
             }

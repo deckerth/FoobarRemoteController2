@@ -12,7 +12,7 @@
     <string name="button_collapse">Collapse</string>
     <string name="button_expand">Expand</string>
     <string name="info_titles">%1$s Titles</string>
-    <string name="button_playlist_switcher">Playlists</string>
+    <string name="button_playlist_switcher">Playlist</string>
     <string name="title_setup_screen">Setup Foobar Link</string>
     <string name="info_no_track_playing">Player is Stopped</string>
     <string name="layout_item_medium">Medium</string>

@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -26,7 +25,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -35,8 +33,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.deckerth.thomas.foobarremotecontroller2.R
-import com.deckerth.thomas.foobarremotecontroller2.ui.mainActivity
 import com.deckerth.thomas.foobarremotecontroller2.saveIpAddress
+import com.deckerth.thomas.foobarremotecontroller2.ui.mainActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
@@ -58,7 +56,7 @@ private var loading by mutableStateOf(true)
 val devices = mutableStateListOf<Device>()
 
 @Composable
-fun DeviceSelectionPage(){
+fun DeviceSelectionPage() {
     // State to hold whether the search has already been done
     var hasSearched by rememberSaveable { mutableStateOf(false) }
 
@@ -69,20 +67,23 @@ fun DeviceSelectionPage(){
             prepareDeviceSelectionPage()
         }
     }
-    Column{
-        if (loading) {
-            LinearProgressIndicator(
-                modifier = Modifier.fillMaxWidth()
-            )
+    if (devices.isEmpty())
+        Text(modifier = Modifier.padding(16.dp), text = "No Devices Found")
+    else
+        Column {
+            if (loading) {
+                LinearProgressIndicator(
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+            DeviceList(devices = devices)
         }
-        DeviceList(devices = devices)
-    }
 
 }
 
-fun prepareDeviceSelectionPage(){
+fun prepareDeviceSelectionPage() {
     devices.clear()
-    Thread{
+    Thread {
         runBlocking {
             scanForFoobarServers(8880)
         }
@@ -91,19 +92,27 @@ fun prepareDeviceSelectionPage(){
 
 
 suspend fun scanForFoobarServers(port: Int, timeout: Int = 1000) {
-    loading = true
-    val baseIp = getLocalIpBase()
+    val baseIp: String
+    try {
+        baseIp = getLocalIpBase()
+    } catch (_: Exception) {
+        return
+    }
 
+    loading = true
     coroutineScope {
         val jobs = (1..254).map { i ->
             launch(Dispatchers.IO) {
                 val ip = "$baseIp.$i"
                 println("FOOB $ip")
-                if (isFoobarServer(ip, port, timeout)) {
-                    val hostName = getHostName(ip)
-                    val element = Device(hostName, ip)
-                    println("FOOB Success $element")
-                    devices.add(element)
+                try {
+                    if (isFoobarServer(ip, port, timeout)) {
+                        val hostName = getHostName(ip)
+                        val element = Device(hostName, ip)
+                        println("FOOB Success $element")
+                        devices.add(element)
+                    }
+                } catch (_: Exception) {
                 }
             }
         }
@@ -116,9 +125,11 @@ private fun getLocalIpBase(): String {
     val networkInterfaces = NetworkInterface.getNetworkInterfaces()
     networkInterfaces.iterator().forEach { networkInterface ->
         networkInterface.inetAddresses.iterator().forEach { inetAddress ->
-            if (!inetAddress.isLoopbackAddress && inetAddress.hostAddress.contains('.')) {
+            if (!inetAddress.isLoopbackAddress && inetAddress.hostAddress?.contains('.') == true) {
                 val ip = inetAddress.hostAddress
-                return ip.substringBeforeLast(".")
+                if (ip != null) {
+                    return ip.substringBeforeLast(".")
+                }
             }
         }
     }
@@ -152,7 +163,7 @@ private fun getHostName(ip: String): String? {
 
 
 @Composable
-fun DeviceList(devices: List<Device>){
+fun DeviceList(devices: List<Device>) {
     LazyColumn {
         items(devices) { device ->
             DeviceEntry(device)
@@ -161,53 +172,53 @@ fun DeviceList(devices: List<Device>){
 }
 
 @Composable
-fun DeviceEntry(device: Device){
-        Column(
-            modifier = Modifier
-                .clickable {
-                    saveIpAddress("${device.ipAddress}:8880", mainActivity)
-                    mainActivity.navigateTo("Settings")
-                }
-                .padding(16.dp)
-                .height(40.dp),
-            verticalArrangement = Arrangement.Center
-        ) {
-            if (device.hostName == null){
-                Text(
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxWidth(),
-                    text = device.ipAddress,
-                    maxLines = 1,
-                    style = MaterialTheme.typography.bodyLarge
-                )
-            }else {
-                Text(
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxWidth(),
-                    text = device.hostName,
-                    maxLines = 1,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    style = MaterialTheme.typography.bodyLarge
-                )
-                Text(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    text = device.ipAddress,
-                    maxLines = 1,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    style = MaterialTheme.typography.bodySmall
-                )
+fun DeviceEntry(device: Device) {
+    Column(
+        modifier = Modifier
+            .clickable {
+                saveIpAddress("${device.ipAddress}:8880", mainActivity)
+                mainActivity.navigateTo("Settings")
             }
+            .padding(16.dp)
+            .height(40.dp),
+        verticalArrangement = Arrangement.Center
+    ) {
+        if (device.hostName == null) {
+            Text(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth(),
+                text = device.ipAddress,
+                maxLines = 1,
+                style = MaterialTheme.typography.bodyLarge
+            )
+        } else {
+            Text(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth(),
+                text = device.hostName,
+                maxLines = 1,
+                color = MaterialTheme.colorScheme.onSurface,
+                style = MaterialTheme.typography.bodyLarge
+            )
+            Text(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                text = device.ipAddress,
+                maxLines = 1,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.bodySmall
+            )
         }
+    }
 }
 
 @Preview(
     showBackground = true
 )
 @Composable
-fun DevicePreview(){
+fun DevicePreview() {
     val device = Device(
         "obsidian.fritz.box",
         "192.168.178.103:8880"
@@ -219,12 +230,12 @@ fun DevicePreview(){
     showBackground = true
 )
 @Composable
-fun DeviceListPreview(){
+fun DeviceListPreview() {
     val device = Device(
         hostName = "Obsidian.fritz.box",
         ipAddress = "192.168.178.103:8880"
     )
-    val devices = listOf<Device>(
+    val devices = listOf(
         device,
         device,
         device,
@@ -279,19 +290,26 @@ fun CustomDevicePage() {
                     Toast.makeText(mainActivity, "Checking Connection", Toast.LENGTH_SHORT).show()
                     // Launch a coroutine on the IO dispatcher for network operations
                     CoroutineScope(Dispatchers.IO).launch {
-                        var success = false
-                        try {
-                            success = isFoobarServer(ip, port.toInt(), 1000)
+                        val success: Boolean = try {
+                            isFoobarServer(ip, port.toInt(), 1000)
                         } catch (e: Exception) {
-                            success = false
+                            false
                         }
 
                         // Switch back to the main thread to show the Toast messages
                         withContext(Dispatchers.Main) {
                             if (success) {
-                                Toast.makeText(mainActivity, "Connection successful", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(
+                                    mainActivity,
+                                    "Connection successful",
+                                    Toast.LENGTH_SHORT
+                                ).show()
                             } else {
-                                Toast.makeText(mainActivity, "Connection failed", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(
+                                    mainActivity,
+                                    "Connection failed",
+                                    Toast.LENGTH_SHORT
+                                ).show()
                             }
                         }
                     }
@@ -324,6 +342,6 @@ private fun CustomDevicePagePreview() {
 
 @Preview
 @Composable
-fun DeviceSelectionPagePreview(){
+fun DeviceSelectionPagePreview() {
     DeviceSelectionPage()
 }

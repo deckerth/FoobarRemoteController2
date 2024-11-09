@@ -32,7 +32,7 @@ class LayoutManager {
 
     private fun createModernPlayerLayout(): LayoutDescription {
         val fields = LayoutDescription(ViewsWithLayout.PLAYER)
-        fields.items.add(LayoutItem(LayoutItems.ARTWORK, ItemSize.LARGE_COVER))
+        fields.items.add(LayoutItem(LayoutItems.ARTWORK, ItemSize.MAX_COVER))
         fields.items.add(LayoutItem(LayoutItems.TITLE, ItemSize.TITLE_LARGE))
         fields.items.add(LayoutItem(LayoutItems.ALBUM, ItemSize.BODY_SMALL))
         fields.items.add(LayoutItem(LayoutItems.PROGRESS))
@@ -64,7 +64,7 @@ class LayoutManager {
 
     private fun createClassicPlayerLayout(): LayoutDescription {
         val fields = LayoutDescription(ViewsWithLayout.PLAYER)
-        fields.items.add(LayoutItem(LayoutItems.ARTWORK, ItemSize.MEDIUM_COVER))
+        fields.items.add(LayoutItem(LayoutItems.ARTWORK, ItemSize.LARGE_COVER))
         fields.items.add(LayoutItem(LayoutItems.COMPOSER, ItemSize.TITLE_LARGE))
         fields.items.add(
             LayoutItem(

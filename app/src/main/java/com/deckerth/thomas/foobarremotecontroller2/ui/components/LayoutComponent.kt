@@ -7,12 +7,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.style.TextAlign
 import com.deckerth.thomas.foobarremotecontroller2.model.Album
 import com.deckerth.thomas.foobarremotecontroller2.model.ITitle
 import com.deckerth.thomas.foobarremotecontroller2.model.Player
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.LayoutItem
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.LayoutItems
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.ItemSize
+import com.deckerth.thomas.foobarremotecontroller2.ui.layout.TextAlignment
 
 @Composable
 fun getTextStyle(itemSize: ItemSize): TextStyle {
@@ -30,6 +32,7 @@ fun TextComponent(text: String, item: LayoutItem) {
     Text(
         modifier = Modifier
             .fillMaxWidth(),
+        textAlign = when(item.alignment) {TextAlignment.LEFT -> TextAlign.Left; TextAlignment.RIGHT -> TextAlign.Right; TextAlignment.CENTER -> TextAlign.Center},
         text = text,
         style = getTextStyle(item.itemSize),
         fontStyle = if (item.italic) FontStyle.Italic else FontStyle.Normal,

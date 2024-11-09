@@ -19,18 +19,18 @@ enum class LayoutItems(val text : String, val onPlayer: Boolean = true, val onAl
 fun getLayoutItemsFor(viewWithLayout: ViewsWithLayout):List<LayoutItems> {
     return when(viewWithLayout){
         ViewsWithLayout.PLAYER -> {
-            entries.filter( { it.onPlayer })
+            entries.filter { it.onPlayer }
         }
 
         ViewsWithLayout.ALBUM -> {
-            entries.filter( { it.onAlbum })
+            entries.filter { it.onAlbum }
         }
 
         ViewsWithLayout.TITLE -> {
-            entries.filter( { it.onTitle })
+            entries.filter { it.onTitle }
         }
         else -> {
-            emptyList<LayoutItems>()
+            emptyList()
         }
     }
 }

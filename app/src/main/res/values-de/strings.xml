@@ -51,9 +51,17 @@
     <string name="available_fields">Verfügbare Felder</string>
     <string name="title_large">Großer Titel</string>
     <string name="title_medium">Mittelgroßer Titel</string>
-    <string name="body_medium">Mittelgroßer Fließtext</string>
-    <string name="body_small">Kleiner Fließtext</string>
+    <string name="body_medium">Mittelgroßer Text</string>
+    <string name="body_small">Kleiner Text</string>
     <string name="small_cover">Klein</string>
     <string name="medium_cover">Mittel</string>
     <string name="large_cover">Groß</string>
+    <string name="item_format">Format</string>
+    <string name="font_bold">Fett</string>
+    <string name="font_italic">Kursiv</string>
+    <string name="size_property">Größe:</string>
+    <string name="text_alignment">Ausrichtung</string>
+    <string name="max_lines">Max. Zeilenanzahl:</string>
+    <string name="max_cover">Maximalgröße</string>
+    <string name="font_properties">Schriftart</string>
 </resources>

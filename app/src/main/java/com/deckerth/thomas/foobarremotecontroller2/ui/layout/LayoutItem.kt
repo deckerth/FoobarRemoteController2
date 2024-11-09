@@ -9,7 +9,8 @@ data class LayoutItem(
     var itemSize: ItemSize = ItemSize.UNDEFINED,
     var italic:  Boolean = false,
     var bold: Boolean = false,
-    var maxLines: Int = 1 ) {
+    var maxLines: Int = 1,
+    var alignment: TextAlignment = TextAlignment.LEFT) {
 
     fun verbose(): String {
         //TODO Make this nice:

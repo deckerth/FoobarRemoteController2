@@ -55,4 +55,12 @@
     <string name="small_cover">Small</string>
     <string name="medium_cover">Medium</string>
     <string name="large_cover">Large</string>
+    <string name="item_format">Format</string>
+    <string name="font_bold">Bold</string>
+    <string name="font_italic">Italic</string>
+    <string name="size_property">"Size: "</string>
+    <string name="text_alignment">Alignment</string>
+    <string name="max_lines">Max. lines:</string>
+    <string name="max_cover">Maximum size</string>
+    <string name="font_properties">Font</string>
 </resources>

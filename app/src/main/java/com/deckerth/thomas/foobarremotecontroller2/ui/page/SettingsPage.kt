@@ -218,12 +218,6 @@ fun <T> PreferenceItem(
 }
 
 @Composable
-fun OutOfStockDialog(onDismiss: () -> Unit) {
-
-}
-
-
-@Composable
 fun <T> ListPreference(
     values: List<T>,
     title: String,

@@ -432,10 +432,11 @@ class MainActivity : ComponentActivity() {
                     LayoutEditorMainPage()
                 }
 
-    fun navigateTo(route: String) {
-        if (route != "Layout selection" && route != "Layout editor")
-            navController.popBackStack()
-        navController.navigate(route)
+                fun navigateTo(route: String) {
+                    if (route != "Layout selection" && route != "Layout editor")
+                        navController.popBackStack()
+                    navController.navigate(route)
+                }
             }
         }
     }
@@ -450,21 +451,16 @@ class MainActivity : ComponentActivity() {
                 (context as MainActivity).finish()
             } else {
                 backPressedTime = System.currentTimeMillis()
-                Toast.makeText(context,
-                    getString(R.string), Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    context,
+                    getString(R.string.press_back_again_to_exit), Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }
 
-    override fun onStart() {
-        super.onStart()
-        //start FoobarMediaSessionService
-        val intent = Intent(this, FoobarMediaService::class.java)
-        startForegroundService(intent)
+    private fun Context.isTablet(): Boolean {
+        return (this.resources.configuration.screenLayout and Configuration.SCREENLAYOUT_SIZE_MASK) >= Configuration.SCREENLAYOUT_SIZE_LARGE
     }
-}
-
-fun Context.isTablet(): Boolean {
-    return (this.resources.configuration.screenLayout and Configuration.SCREENLAYOUT_SIZE_MASK) >= Configuration.SCREENLAYOUT_SIZE_LARGE
 }
 

@@ -57,6 +57,7 @@ private fun setupPreviewPlaylist() {
         Title(
             "p4",
             0,
+            "Polydor",
             "517 007-2",
             "Björn Ulvaeus",
             "Gold - Greatest Hits",
@@ -74,6 +75,7 @@ private fun setupPreviewPlaylist() {
         Title(
             "p4",
             1,
+            "Decca",
             "421 670-2",
             "Puccini, Giacomo",
             "Tosca",

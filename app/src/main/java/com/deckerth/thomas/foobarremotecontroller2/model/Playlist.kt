@@ -35,6 +35,10 @@ class Playlist(var playlistEntity: PlaylistEntity) {
         }
     }
 
+    fun getTitle(index: Int): ITitle? {
+        return titles.find{ it.index == index }
+    }
+
     fun clone(): Playlist {
         val playlist = Playlist(playlistEntity)
         titles.forEach {

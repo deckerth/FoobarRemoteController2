@@ -8,6 +8,8 @@ public interface ITitle {
 
     String getCatalog();
 
+    String getLabel();
+
     String getPlaylistId();
 
     int getIndex();

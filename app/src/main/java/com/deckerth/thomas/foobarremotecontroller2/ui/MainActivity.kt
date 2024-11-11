@@ -62,6 +62,8 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.deckerth.thomas.foobarremotecontroller2.FoobarMediaService
 import com.deckerth.thomas.foobarremotecontroller2.R
+import com.deckerth.thomas.foobarremotecontroller2.model.PlaybackState
+import com.deckerth.thomas.foobarremotecontroller2.ui.components.TitleDetails
 import com.deckerth.thomas.foobarremotecontroller2.ui.page.CustomDevicePage
 import com.deckerth.thomas.foobarremotecontroller2.ui.page.DeviceSelectionPage
 import com.deckerth.thomas.foobarremotecontroller2.ui.page.LayoutEditorMainPage
@@ -75,6 +77,7 @@ import com.deckerth.thomas.foobarremotecontroller2.viewmodel.autoScrollIndex
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.autoscroll
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.getCurrentAlbumIndex
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.initViewModel
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.player
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.playlistState
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.updateList
 import kotlinx.coroutines.CoroutineScope
@@ -203,6 +206,21 @@ class MainActivity : ComponentActivity() {
                                         contentDescription = "Refresh"
                                     )
                                 }
+                            }
+
+                            "Now Playing" -> Row() {
+                                val infoButtonClicked = remember { mutableStateOf(false) }
+                                IconButton(
+                                    onClick = { infoButtonClicked.value = true },
+                                    enabled = player != null && player!!.playbackState != PlaybackState.STOPPED
+                                ) {
+                                    Icon(
+                                        painter = painterResource(R.drawable.info_i),
+                                        contentDescription = "Refresh"
+                                    )
+                                }
+                                if(player != null && infoButtonClicked.value)
+                                TitleDetails(player = player!!, onDismiss = { -> infoButtonClicked.value = false})
                             }
 
                             "DeviceSelectionPage" -> Button(

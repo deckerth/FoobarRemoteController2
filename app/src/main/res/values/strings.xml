@@ -68,4 +68,6 @@
     <string name="alignment_centered">centered</string>
     <string name="alignment_right">right</string>
     <string name="button_details">Details</string>
+    <string name="layout_item_label">Label</string>
+    <string name="button_close">Close</string>
 </resources>

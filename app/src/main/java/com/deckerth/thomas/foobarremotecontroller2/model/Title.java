@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 public class Title implements ITitle {
 
     // mPlaylistId, mCatalog, mIndex, mComposer, mAlbum, mArtist
+    protected final String mLabel;
     protected final String mCatalog;
     protected final String mPlaylistId;
     protected final int mIndex;
@@ -23,7 +24,8 @@ public class Title implements ITitle {
     protected Bitmap mArtwork;
     private Boolean mIsCurrent = false;
 
-    public Title(String mPlaylistId, int mIndex, String mCatalog, String mComposer, String mAlbum, String mTitle, String mArtist, String mDiscNumber, String mTrack, String mPlaybackTime, String duration, String position, String mArtworkUrl) {
+    public Title(String mPlaylistId, int mIndex, String mLabel, String mCatalog, String mComposer, String mAlbum, String mTitle, String mArtist, String mDiscNumber, String mTrack, String mPlaybackTime, String duration, String position, String mArtworkUrl) {
+        this.mLabel = set(mLabel);
         this.mCatalog = set(mCatalog);
         this.mPlaylistId = set(mPlaylistId);
         this.mIndex = mIndex;
@@ -61,6 +63,9 @@ public class Title implements ITitle {
     public String getCatalog() {
         return mCatalog;
     }
+
+    @Override
+    public String getLabel() { return mLabel; }
 
     @Override
     public String getPlaylistId() {
@@ -160,7 +165,7 @@ public class Title implements ITitle {
     @NonNull
     @Override
     public ITitle clone() {
-        ITitle result = new Title(mPlaylistId, mIndex, mCatalog, mComposer, mAlbum, mTitle, mArtist, mDiscNumber, mTrack, mPlaybackTime, mDuration.toString(), mPosition.toString(), mArtworkUrl);
+        ITitle result = new Title(mPlaylistId, mIndex, mLabel, mCatalog, mComposer, mAlbum, mTitle, mArtist, mDiscNumber, mTrack, mPlaybackTime, mDuration.toString(), mPosition.toString(), mArtworkUrl);
         result.setArtwork(mArtwork);
         result.setIsCurrentTitle(mIsCurrent);
         return result;

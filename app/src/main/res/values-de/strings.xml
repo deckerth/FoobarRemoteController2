@@ -69,4 +69,6 @@
     <string name="alignment_centered">zentriert</string>
     <string name="alignment_right">rechtsbündig</string>
     <string name="button_details">Details</string>
+    <string name="layout_item_label">Label</string>
+    <string name="button_close">Schließen</string>
 </resources>

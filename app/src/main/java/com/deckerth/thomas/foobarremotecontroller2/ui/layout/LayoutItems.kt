@@ -5,6 +5,7 @@ import com.deckerth.thomas.foobarremotecontroller2.ui.layout.LayoutItems.entries
 import com.deckerth.thomas.foobarremotecontroller2.ui.mainActivity
 
 enum class LayoutItems(val text : String, val onPlayer: Boolean = true, val onAlbum: Boolean = true, val onTitle: Boolean = true) {
+    LABEL(mainActivity.baseContext.getString(R.string.layout_item_label)),
     CATALOG(mainActivity.baseContext.getString(R.string.layout_item_medium)),
     COMPOSER(mainActivity.baseContext.getString(R.string.layout_item_composer)),
     ALBUM(mainActivity.baseContext.getString(R.string.layout_item_album)),

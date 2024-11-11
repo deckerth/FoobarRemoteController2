@@ -255,6 +255,7 @@ fun AlbumCardPreview() {
         "",
         -1,
         "",
+        "",
         "Composer",
         "Ibrahim Ferrer (Buena Vista Social Club Presents)",
         "Mamí Me Gustó",
@@ -438,6 +439,7 @@ fun PlaylistPreview() {
         val title = Title(
             "",
             0,
+            "",
             "",
             "Composer",
             "Ibrahim Ferrer (Buena Vista Social Club Presents)",

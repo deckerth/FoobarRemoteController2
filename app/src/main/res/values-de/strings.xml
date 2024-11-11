@@ -57,12 +57,15 @@
     <string name="medium_cover">Mittel</string>
     <string name="large_cover">Groß</string>
     <string name="item_format">Format</string>
-    <string name="font_bold">Fett</string>
-    <string name="font_italic">Kursiv</string>
+    <string name="font_bold">fett</string>
+    <string name="font_italic">kursiv</string>
     <string name="size_property">Größe:</string>
     <string name="text_alignment">Ausrichtung</string>
     <string name="max_lines">Max. Zeilenanzahl:</string>
     <string name="max_cover">Maximalgröße</string>
     <string name="font_properties">Schriftart</string>
     <string name="press_back_again_to_exit">Zum Beenden erneut drücken</string>
+    <string name="alignment_left">linksbündig</string>
+    <string name="alignment_centered">zentriert</string>
+    <string name="alignment_right">rechtsbündig</string>
 </resources>

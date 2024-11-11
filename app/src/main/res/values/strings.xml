@@ -64,4 +64,7 @@
     <string name="max_cover">Maximum size</string>
     <string name="font_properties">Font</string>
     <string name="press_back_again_to_exit">Press back again to exit</string>
+    <string name="alignment_left">left</string>
+    <string name="alignment_centered">centered</string>
+    <string name="alignment_right">right</string>
 </resources>

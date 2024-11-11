@@ -63,4 +63,5 @@
     <string name="max_lines">Max. lines:</string>
     <string name="max_cover">Maximum size</string>
     <string name="font_properties">Font</string>
+    <string name="press_back_again_to_exit">Press back again to exit</string>
 </resources>

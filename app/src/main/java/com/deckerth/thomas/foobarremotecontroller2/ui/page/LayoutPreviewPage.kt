@@ -10,7 +10,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.deckerth.thomas.foobarremotecontroller2.R
@@ -18,14 +17,11 @@ import com.deckerth.thomas.foobarremotecontroller2.model.PlaybackMode
 import com.deckerth.thomas.foobarremotecontroller2.model.PlaybackState
 import com.deckerth.thomas.foobarremotecontroller2.model.Player
 import com.deckerth.thomas.foobarremotecontroller2.model.Playlist
-import com.deckerth.thomas.foobarremotecontroller2.model.Title
 import com.deckerth.thomas.foobarremotecontroller2.model.PlaylistEntity
+import com.deckerth.thomas.foobarremotecontroller2.model.Title
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.ViewsWithLayout
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.layoutManager
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.LayoutViewModel
-import com.deckerth.thomas.foobarremotecontroller2.viewmodel.autoscroll
-import com.deckerth.thomas.foobarremotecontroller2.viewmodel.getCurrentAlbumIndex
-import com.deckerth.thomas.foobarremotecontroller2.viewmodel.loadingList
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.playlistState
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.selectedView
 

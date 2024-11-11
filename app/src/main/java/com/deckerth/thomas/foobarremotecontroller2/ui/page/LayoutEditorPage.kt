@@ -226,21 +226,6 @@ fun EditProperties(
                             )
                         }
                     }
-//                    Row(verticalAlignment = Alignment.CenterVertically) {
-//                        Checkbox(
-//                            italic,
-//                            onCheckedChange = {
-//                                italic = !italic; dirty = true
-//                            })
-//
-//                        Text(stringResource(R.string.font_italic))
-//                        Checkbox(
-//                            bold,
-//                            onCheckedChange = {
-//                                bold = !bold; dirty = true
-//                            })
-//                        Text(text = stringResource(R.string.font_bold))
-//                    }
 
                     // Alignment
                     Text(

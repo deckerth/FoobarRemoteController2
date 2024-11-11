@@ -64,4 +64,5 @@
     <string name="max_lines">Max. Zeilenanzahl:</string>
     <string name="max_cover">Maximalgröße</string>
     <string name="font_properties">Schriftart</string>
+    <string name="press_back_again_to_exit">Zum Beenden erneut drücken</string>
 </resources>

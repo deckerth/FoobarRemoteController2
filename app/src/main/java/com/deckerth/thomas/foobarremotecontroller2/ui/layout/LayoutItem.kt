@@ -15,7 +15,6 @@ data class LayoutItem(
 ) {
 
     fun verbose(): String {
-        //TODO Make this nice:
         when (item) {
             LayoutItems.ARTWORK ->
                 return mainActivity.baseContext.getString(R.string.size_property) + " ${itemSize.text}"

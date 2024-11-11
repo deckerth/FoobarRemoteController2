@@ -23,6 +23,7 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -57,6 +58,7 @@ import com.deckerth.thomas.foobarremotecontroller2.model.PlaylistEntity
 import com.deckerth.thomas.foobarremotecontroller2.model.Playlists
 import com.deckerth.thomas.foobarremotecontroller2.model.Title
 import com.deckerth.thomas.foobarremotecontroller2.ui.components.LayoutComponent
+import com.deckerth.thomas.foobarremotecontroller2.ui.components.TitleDetails
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.Layout
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.layoutManager
 import com.deckerth.thomas.foobarremotecontroller2.ui.theme.Foobar2000RemoteControllerTheme
@@ -201,7 +203,7 @@ fun AlbumCard(album: Album, layout: Layout?, previewMode: Boolean = false) {
 fun TitleEntry(album: Album, title: ITitle, previewMode: Boolean = false) {
     var titleSelected = false
     if (previewMode)
-            titleSelected = title.index == 0
+        titleSelected = title.index == 0
     else if (player != null)
         titleSelected =
             title.index == player!!.getIndex() && title.playlistId == player!!.playlistId
@@ -215,15 +217,33 @@ fun TitleEntry(album: Album, title: ITitle, previewMode: Boolean = false) {
     Column(
         modifier = modifier
     ) {
+        var infoButtonClicked by remember { mutableStateOf(false) }
         HorizontalDivider()
-        Column(
-            modifier = Modifier
-                .padding(16.dp)
-        ) {
-            val layout = layoutManager.getLayout()
-            for (item in layout.titleLayout.items) {
-                LayoutComponent(album, title, layout.albumLayoutHasArtist, item)
+        Box {
+            Column(
+                modifier = Modifier
+                    .padding(16.dp)
+            ) {
+                val layout = layoutManager.getLayout()
+                for (item in layout.titleLayout.items) {
+                    LayoutComponent(album, title, layout.albumLayoutHasArtist, item)
+                }
             }
+            IconButton(
+                modifier = Modifier.align(Alignment.CenterEnd),
+                onClick = { infoButtonClicked = true }
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.info_i),
+                    contentDescription = stringResource(R.string.button_details),
+                    modifier = Modifier.size(16.dp)
+                )
+            }
+            if (infoButtonClicked)
+                TitleDetails(
+                    title = title,
+                    onDismiss = { -> infoButtonClicked = false },
+                    )
         }
     }
 }

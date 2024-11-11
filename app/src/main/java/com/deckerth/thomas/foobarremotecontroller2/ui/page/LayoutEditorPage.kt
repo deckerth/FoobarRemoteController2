@@ -163,9 +163,7 @@ fun EditProperties(
         },
         title = {
             Text(
-                text = if (layoutField.layoutItem!!.item == LayoutItems.ARTWORK) stringResource(R.string.item_format) else stringResource(
-                    R.string.item_format
-                ),
+                text = stringResource(R.string.item_format),
                 style = MaterialTheme.typography.headlineSmall
             )
         },

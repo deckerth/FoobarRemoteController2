@@ -68,4 +68,5 @@
     <string name="alignment_left">linksbündig</string>
     <string name="alignment_centered">zentriert</string>
     <string name="alignment_right">rechtsbündig</string>
+    <string name="button_details">Details</string>
 </resources>

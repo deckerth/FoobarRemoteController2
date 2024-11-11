@@ -105,7 +105,7 @@ fun LayoutEditorPage(
                         )
                         HorizontalDivider()
                     }
-                    if (isClicked) {
+                    if (isClicked && item.layoutItem!!.item != LayoutItems.PROGRESS) {
                         EditProperties(item,
                             onDismiss = { dirty: Boolean ->
                                 if (dirty) {

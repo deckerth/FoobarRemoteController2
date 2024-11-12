@@ -42,7 +42,9 @@ fun TextComponent(text: String, item: LayoutItem) {
 @Composable
 fun LayoutComponent(player: Player, layoutItem: LayoutItem, previewMode: Boolean = false) {
     when (layoutItem.item) {
+        LayoutItems.LABEL -> TextComponent(text = player.label, item = layoutItem)
         LayoutItems.CATALOG -> TextComponent(text = player.catalog, item = layoutItem)
+        LayoutItems.LABEL_CATALOG -> TextComponent(text = player.label+" "+player.catalog, item = layoutItem)
         LayoutItems.ARTWORK -> ArtWork(player = player, item = layoutItem, previewMode = previewMode)
         LayoutItems.TITLE -> TextComponent(text = player.title, item = layoutItem)
         LayoutItems.ALBUM -> TextComponent(text = player.album, item = layoutItem)
@@ -59,7 +61,9 @@ fun LayoutComponent(player: Player, layoutItem: LayoutItem, previewMode: Boolean
 @Composable
 fun LayoutComponent(album: Album, layoutItem: LayoutItem) {
     when (layoutItem.item) {
+        LayoutItems.LABEL -> TextComponent(text = album.originalTitle.label, item = layoutItem)
         LayoutItems.CATALOG -> TextComponent(text = album.originalTitle.catalog, item = layoutItem)
+        LayoutItems.LABEL_CATALOG -> TextComponent(text = album.originalTitle.label+" "+album.originalTitle.catalog, item = layoutItem)
         LayoutItems.ALBUM -> TextComponent(text = album.originalTitle.album, item = layoutItem)
         LayoutItems.ARTIST -> TextComponent(text = album.originalTitle.artist, item = layoutItem)
         LayoutItems.COMPOSER ->
@@ -73,7 +77,9 @@ fun LayoutComponent(album: Album, layoutItem: LayoutItem) {
 @Composable
 fun LayoutComponent(album: Album, title: ITitle, checkArtist: Boolean, layoutItem: LayoutItem) {
     when (layoutItem.item) {
+        LayoutItems.LABEL -> TextComponent(text = title.label, item = layoutItem)
         LayoutItems.CATALOG -> TextComponent(text = title.catalog, item = layoutItem)
+        LayoutItems.LABEL_CATALOG -> TextComponent(text = title.label+" "+title.catalog, item = layoutItem)
         LayoutItems.ALBUM -> TextComponent(text = title.album, item = layoutItem)
         LayoutItems.TITLE -> TextComponent(text = title.title, item = layoutItem)
         LayoutItems.ARTIST -> TextComponent(text = title.artist, item = layoutItem)

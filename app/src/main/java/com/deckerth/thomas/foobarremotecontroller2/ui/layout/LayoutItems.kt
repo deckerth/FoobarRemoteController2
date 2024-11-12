@@ -4,9 +4,22 @@ import com.deckerth.thomas.foobarremotecontroller2.R
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.LayoutItems.entries
 import com.deckerth.thomas.foobarremotecontroller2.ui.mainActivity
 
+/**
+Required steps when adding new metadata fields:
+
+1. add the new field to the enum
+2. add the field to the ITitle interface
+3. adapt the Title class accordingly
+4. add the field to Player
+5. adjust the classes PlayerAccess and PlaylistAccess
+6. extend LayoutComponent
+7. adapt the example objects in LayoutPreviewPage
+8. extend TitleDetails with the new field
+*/
 enum class LayoutItems(val text : String, val onPlayer: Boolean = true, val onAlbum: Boolean = true, val onTitle: Boolean = true) {
     LABEL(mainActivity.baseContext.getString(R.string.layout_item_label)),
     CATALOG(mainActivity.baseContext.getString(R.string.layout_item_medium)),
+    LABEL_CATALOG(mainActivity.baseContext.getString(R.string.layout_item_label_catalog)),
     COMPOSER(mainActivity.baseContext.getString(R.string.layout_item_composer)),
     ALBUM(mainActivity.baseContext.getString(R.string.layout_item_album)),
     TITLE(mainActivity.baseContext.getString(R.string.layout_item_title), onAlbum = false),

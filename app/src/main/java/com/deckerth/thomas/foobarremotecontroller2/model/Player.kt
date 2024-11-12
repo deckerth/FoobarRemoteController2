@@ -17,6 +17,7 @@ enum class PlaybackMode {
 }
 
 data class Player(
+    val label: String,
     val catalog: String,
     val composer: String,
     val album: String,

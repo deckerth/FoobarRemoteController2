@@ -26,6 +26,7 @@ import com.deckerth.thomas.foobarremotecontroller2.viewmodel.playlistState
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.selectedView
 
 val previewPlayerClassic = Player(
+    "Decca",
     "421 670-2",
     "Puccini, Giacomo",
     "Tosca",
@@ -44,7 +45,7 @@ val previewPlayerClassic = Player(
 )
 
 val previewPlayerPop = Player(
-    "517 007-2", "Björn Ulvaeus", "Gold - Greatest Hits",
+    "Polydor","517 007-2", "Björn Ulvaeus", "Gold - Greatest Hits",
     "Dancing Queen", "ABBA", "1", "1", "0:50", "p4",
     "1", "232.2", "51.080651833333334", R.drawable.cover_abba.toString(), PlaybackState.PLAYING, PlaybackMode.DEFAULT
 )

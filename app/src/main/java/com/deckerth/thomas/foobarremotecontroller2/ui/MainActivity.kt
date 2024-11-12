@@ -219,8 +219,10 @@ class MainActivity : ComponentActivity() {
                                         contentDescription = "Refresh"
                                     )
                                 }
-                                if(player != null && infoButtonClicked.value)
-                                TitleDetails(player = player!!, onDismiss = { -> infoButtonClicked.value = false})
+                                if (player != null && infoButtonClicked.value)
+                                    TitleDetails(
+                                        player = player!!,
+                                        onDismiss = { -> infoButtonClicked.value = false })
                             }
 
                             "DeviceSelectionPage" -> Button(
@@ -330,32 +332,52 @@ class MainActivity : ComponentActivity() {
         Scaffold(
             topBar = {
                 TopAppBar(
-                    title = { Text(text = _appBarLabel) },
+                    title = {
+                        Row {
+                            Text(modifier = Modifier.align(Alignment.CenterVertically), text = _appBarLabel)
+                            FilledIconToggleButton(
+                                modifier = Modifier.padding(start = 10.dp),
+                                checked = autoscroll,
+                                onCheckedChange = {
+                                    if (getCurrentAlbumIndex() != -1)
+                                        autoscroll = !autoscroll
+                                    if (autoscroll)
+                                        CoroutineScope(Dispatchers.Main).launch {
+                                            playlistState.scrollToItem(
+                                                getCurrentAlbumIndex()
+                                            )
+                                            autoScrollIndex = getCurrentAlbumIndex()
+                                        }
+                                })
+                            {
+                                Icon(
+                                    painter = painterResource(R.drawable.jump_to_element),
+                                    contentDescription = stringResource(R.string.desc_jump_to_title),
+                                    modifier = Modifier
+                                        .size(24.dp)
+                                )
+                            }
+                        }
+                    },
                     modifier = Modifier.fillMaxWidth(),
                     actions = {
+                        var infoButtonClicked by remember { mutableStateOf(false) }
                         when (getCurrentRoute(navController)) {
                             "Now Playing And Playlist" -> Row() {
-                                FilledIconToggleButton(
-                                    checked = autoscroll,
-                                    onCheckedChange = {
-                                        if (getCurrentAlbumIndex() != -1)
-                                            autoscroll = !autoscroll
-                                        if (autoscroll)
-                                            CoroutineScope(Dispatchers.Main).launch {
-                                                playlistState.scrollToItem(
-                                                    getCurrentAlbumIndex()
-                                                )
-                                                autoScrollIndex = getCurrentAlbumIndex()
-                                            }
-                                    })
-                                {
+                                IconButton(
+                                    onClick = { infoButtonClicked = true },
+                                    enabled = player != null && player!!.playbackState != PlaybackState.STOPPED
+                                ) {
                                     Icon(
-                                        painter = painterResource(R.drawable.jump_to_element),
-                                        contentDescription = stringResource(R.string.desc_jump_to_title),
-                                        modifier = Modifier
-                                            .size(24.dp)
+                                        painter = painterResource(R.drawable.info_i),
+                                        contentDescription = stringResource(R.string.button_details),
                                     )
                                 }
+                                if (infoButtonClicked)
+                                    TitleDetails(
+                                        player = player!!,
+                                        onDismiss = { -> infoButtonClicked = false },
+                                    )
                                 IconButton(onClick = {
                                     updateList()
                                 }) {
@@ -476,9 +498,9 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+}
 
-    private fun Context.isTablet(): Boolean {
-        return (this.resources.configuration.screenLayout and Configuration.SCREENLAYOUT_SIZE_MASK) >= Configuration.SCREENLAYOUT_SIZE_LARGE
-    }
+fun Context.isTablet(): Boolean {
+    return (this.resources.configuration.screenLayout and Configuration.SCREENLAYOUT_SIZE_MASK) >= Configuration.SCREENLAYOUT_SIZE_LARGE
 }
 

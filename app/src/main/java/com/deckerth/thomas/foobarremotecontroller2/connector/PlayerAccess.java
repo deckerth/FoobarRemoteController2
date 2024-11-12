@@ -51,9 +51,9 @@ public class PlayerAccess {
 //    }
 
     public Player getPlayerState() {
-        String response = null;
+        String response;
         try{
-            response = mConnector.getData("player?columns=%25catalog%25,%25composer%25,%25album%25,%25title%25,%25artist%25,%25discnumber%25,%25track%25,%25playback_time%25");
+            response = mConnector.getData("player?columns=%25label%25,%25catalog%25,%25composer%25,%25album%25,%25title%25,%25artist%25,%25discnumber%25,%25track%25,%25playback_time%25");
         } catch (Exception e) {
             errorHandler.logError(ErrorType.NETWORK, ErrorCode.CONNECTION_ERROR, ErrorSource.PLAYER_STATE, e);
             return null;
@@ -72,6 +72,7 @@ public class PlayerAccess {
                 "player": {
                     "activeItem": {
                         "columns": [
+                            "DGG",
                             "7353 72726",
                             "Franck, César (1822-1890)",
                             "Klavierquintett f-Moll", !! OPTIONAL may be just ""
@@ -126,6 +127,7 @@ public class PlayerAccess {
                         columns.getString(5),
                         columns.getString(6),
                         columns.getString(7),
+                        columns.getString(8),
                         activeItemObject.getString("playlistId"),
                         activeItemObject.getString("index"),
                         activeItemObject.getString("duration"),
@@ -135,6 +137,7 @@ public class PlayerAccess {
                         PlaybackMode.getEntries().get(playerObject.getInt("playbackMode")));
             else
                 return new Player(
+                        "",
                         "",
                         "",
                         "",

@@ -1,11 +1,7 @@
 package com.deckerth.thomas.foobarremotecontroller2.viewmodel
 
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.deckerth.thomas.foobarremotecontroller2.R
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.ItemSize
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.LayoutDescription
@@ -21,7 +17,8 @@ data class LayoutField(
     val key: Int,
     val layoutItem: LayoutItem? = null,
     val sectionTitle: String = "",
-    val isSectionTitle: Boolean = false
+    val isSectionTitle: Boolean = false,
+    val isEndMarker: Boolean = false,
 )
 
 class LayoutViewModel : ViewModel() {
@@ -93,6 +90,7 @@ class LayoutViewModel : ViewModel() {
             )
             i++
         }
+        fields.add(LayoutField(i, null, "", false, true))
         layoutFields.value = fields
     }
 }

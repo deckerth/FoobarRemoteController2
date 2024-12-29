@@ -15,9 +15,15 @@ import androidx.media.VolumeProviderCompat
 import androidx.media.app.NotificationCompat.MediaStyle
 import com.deckerth.thomas.foobarremotecontroller2.connector.PlayerAccess
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.foobVolumeControl
+import java.time.Instant
+import kotlin.math.floor
+import kotlin.math.max
+import kotlin.math.min
 
 var mediaSession: MediaSessionCompat? = null
 var foobarMediaService: FoobarMediaService? = null
+lateinit var volumeProvider: VolumeProviderCompat
+var lastChanged: Instant = Instant.now()
 
 class FoobarMediaService : Service() {
 
@@ -90,23 +96,27 @@ class FoobarMediaService : Service() {
 
             isActive = true
 
-            val volumeProvider = object : VolumeProviderCompat(
+            println("FOOB Volume get")
+            volumeProvider = object : VolumeProviderCompat(
                 VOLUME_CONTROL_ABSOLUTE,
                 100, // Max volume
                 foobVolumeControl.currentValuePercent
             ) {
                 override fun onSetVolumeTo(volume: Int) {
+                    lastChanged = Instant.now()
                     currentVolume = volume
                     foobVolumeControl.value = foobVolumeControl.getDecibelValue(currentVolume)
                     PlayerAccess.getInstance().setVolume(foobVolumeControl.value)
                 }
 
                 override fun onAdjustVolume(direction: Int) {
+                    lastChanged = Instant.now()
                     currentVolume += direction
                     foobVolumeControl.value = foobVolumeControl.getDecibelValue(currentVolume)
                     PlayerAccess.getInstance().setVolume(foobVolumeControl.value)
                 }
             }
+
 
             setPlaybackToRemote(volumeProvider)
         }

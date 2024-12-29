@@ -77,7 +77,7 @@ fun TitleDetails(player: Player, onDismiss: () -> Unit) {
 @Composable
 fun DisplayItemDetail(title: ITitle, item: LayoutItems) {
 
-    if (item == LayoutItems.ARTWORK || item == LayoutItems.PROGRESS) return
+    if (item == LayoutItems.ARTWORK || item == LayoutItems.PROGRESS || item == LayoutItems.LABEL_CATALOG) return
     Text(
         text = item.text,
         style = MaterialTheme.typography.titleMedium

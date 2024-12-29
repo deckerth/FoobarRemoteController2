@@ -45,7 +45,6 @@ fun LayoutComponent(player: Player, layoutItem: LayoutItem, previewMode: Boolean
         LayoutItems.LABEL -> TextComponent(text = player.label, item = layoutItem)
         LayoutItems.CATALOG -> TextComponent(text = player.catalog, item = layoutItem)
         LayoutItems.LABEL_CATALOG -> TextComponent(text = player.label+" "+player.catalog, item = layoutItem)
-        LayoutItems.ARTWORK -> ArtWork(player = player, item = layoutItem, previewMode = previewMode)
         LayoutItems.TITLE -> TextComponent(text = player.title, item = layoutItem)
         LayoutItems.ALBUM -> TextComponent(text = player.album, item = layoutItem)
         LayoutItems.ARTIST -> TextComponent(text = player.artist, item = layoutItem)

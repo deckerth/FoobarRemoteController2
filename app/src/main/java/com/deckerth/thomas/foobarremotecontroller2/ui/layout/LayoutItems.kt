@@ -26,7 +26,7 @@ enum class LayoutItems(val text : String, val onPlayer: Boolean = true, val onAl
     ARTIST(mainActivity.baseContext.getString(R.string.layout_item_artist)),
     SMART_ARTIST(mainActivity.baseContext.getString(R.string.layout_item_smart_artist), onAlbum = false, onPlayer = false),
     PROGRESS(mainActivity.baseContext.getString(R.string.layout_item_progress_bar), onTitle = false, onAlbum = false),
-    ARTWORK(mainActivity.baseContext.getString(R.string.layout_item_cover), onTitle = false, onAlbum = false),
+    ARTWORK(mainActivity.baseContext.getString(R.string.layout_item_cover), onTitle = false, onAlbum = false, onPlayer = false),
     UNDEFINED("UNDEFINED", onTitle = false, onAlbum = false, onPlayer = false);
 }
 

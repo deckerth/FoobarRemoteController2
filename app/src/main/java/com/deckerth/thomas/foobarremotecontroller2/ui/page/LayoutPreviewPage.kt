@@ -1,6 +1,7 @@
 package com.deckerth.thomas.foobarremotecontroller2.ui.page
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -10,8 +11,12 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.dp
 import com.deckerth.thomas.foobarremotecontroller2.R
 import com.deckerth.thomas.foobarremotecontroller2.model.PlaybackMode
 import com.deckerth.thomas.foobarremotecontroller2.model.PlaybackState
@@ -100,16 +105,23 @@ fun LayoutPreviewPage(
     modifier: Modifier = Modifier,
     vm: LayoutViewModel
 ) {
+    var maxBoxHeight by remember { mutableStateOf(0.dp)}
+    var maxBoxWidth by remember { mutableStateOf(0.dp)}
+
     if (selectedView == ViewsWithLayout.PLAYER) {
-        Box(
+        BoxWithConstraints(
             modifier = Modifier
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState())
         ) {
-            PlayerCard(currentPlayer,
+            maxBoxHeight = maxHeight
+            maxBoxWidth = maxWidth
+            PlayerCard(
+                currentPlayer,
                 true,
                 { currentPlayer = previewPlayerPop },
-                { currentPlayer = previewPlayerClassic })
+                { currentPlayer = previewPlayerClassic },
+                boxSize = IntSize(maxBoxWidth.value.toInt(), maxBoxHeight.value.toInt())
+            )
         }
     } else {
         setupPreviewPlaylist()

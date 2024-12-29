@@ -74,6 +74,8 @@ class LayoutViewModel : ViewModel() {
         fields.add(LayoutField(0, null, selectedView.text, true))
         var i = 1
         for (item in layoutItems) {
+            if (item.item == LayoutItems.ARTWORK)
+                continue
             fields.add(LayoutField(i, item))
             i++
         }

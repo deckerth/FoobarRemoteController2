@@ -57,7 +57,8 @@ public class PlayerAccess {
     public Player getPlayerState() {
         String response;
         try {
-            response = mConnector.getData("player?columns=%25label%25,%25catalog%25,%25composer%25,%25album%25,%25title%25,%25artist%25,%25discnumber%25,%25track%25,%25playback_time%25");
+            //response = mConnector.getData("player?columns=%25label%25,%25catalog%25,%25composer%25,%25album%25,%25title%25,%25artist%25,%25discnumber%25,%25track%25,%25playback_time%25");
+            response = mConnector.getData("player?columns=%25label%25,%25catalog%25,%25composer%25,%25album%25,%25title%25,%25artist%25,%25discnumber%25,%25track%25,%25playback_time%25,%24filename%28%25path%25%29%24");
         } catch (Exception e) {
             errorHandler.logError(ErrorType.NETWORK, ErrorCode.CONNECTION_ERROR, ErrorSource.PLAYER_STATE, e);
             return null;
@@ -85,6 +86,7 @@ public class PlayerAccess {
                             "?",
                             "02",
                             "0:28"
+                            "<filename>"
                         ],
                         "duration": 955.8266666666667,
                         "index": 13,
@@ -124,13 +126,17 @@ public class PlayerAccess {
                 FoobarMediaServiceKt.volumeProvider.setCurrentVolume(volumeControl.getCurrentValuePercent());
             }
 
-            if (columns.length() > 0)
+            if (columns.length() > 0) {
+                String title = columns.getString(4);
+                String filename = columns.getString(9);
+                String effectiveTitle = "";
+                if (!title.equals(filename)) effectiveTitle = title;
                 return new Player(
                         columns.getString(0),
                         columns.getString(1),
                         columns.getString(2),
                         columns.getString(3),
-                        columns.getString(4),
+                        effectiveTitle,
                         columns.getString(5),
                         columns.getString(6),
                         columns.getString(7),
@@ -142,6 +148,7 @@ public class PlayerAccess {
                         mConnector.getServerAddress() + "artwork/" + activeItemObject.getString("playlistId") + "/" + activeItemObject.getString("index"),
                         playbackState,
                         PlaybackMode.getEntries().get(playerObject.getInt("playbackMode")));
+            }
             else
                 return new Player(
                         "",

@@ -77,49 +77,27 @@ fun TitleDetails(player: Player, onDismiss: () -> Unit) {
 @Composable
 fun DisplayItemDetail(title: ITitle, item: LayoutItems) {
 
+    val value = when (item) {
+        LayoutItems.TITLE -> title.title
+        LayoutItems.ALBUM -> title.album
+        LayoutItems.ARTIST -> title.artist
+        LayoutItems.COMPOSER -> title.composer
+        LayoutItems.CATALOG -> title.catalog
+        LayoutItems.LABEL -> title.label
+        else -> ""
+    }
+
+    if (value.isEmpty()) return
+
     if (item == LayoutItems.ARTWORK || item == LayoutItems.PROGRESS || item == LayoutItems.LABEL_CATALOG) return
     Text(
         text = item.text,
         style = MaterialTheme.typography.titleMedium
     )
-    when (item) {
-        LayoutItems.TITLE -> Text(
-            text = title.title,
-            style = MaterialTheme.typography.bodySmall,
-            maxLines = 20
-        )
-
-        LayoutItems.ALBUM -> Text(
-            text = title.album,
-            style = MaterialTheme.typography.bodySmall,
-            maxLines = 20
-        )
-
-        LayoutItems.ARTIST -> Text(
-            text = title.artist,
-            style = MaterialTheme.typography.bodySmall,
-            maxLines = 20
-        )
-
-        LayoutItems.COMPOSER -> Text(
-            text = title.composer,
-            style = MaterialTheme.typography.bodySmall,
-            maxLines = 2
-        )
-
-        LayoutItems.CATALOG -> Text(
-            text = title.catalog,
-            style = MaterialTheme.typography.bodySmall,
-            maxLines = 2
-        )
-
-        LayoutItems.LABEL -> Text(
-            text = title.label,
-            style = MaterialTheme.typography.bodySmall,
-            maxLines = 2
-        )
-
-        else -> {}
-    }
+    Text(
+        text = value,
+        style = MaterialTheme.typography.bodySmall,
+        maxLines = 20
+    )
     Spacer(modifier = Modifier.height(8.dp))
 }

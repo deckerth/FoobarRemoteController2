@@ -119,13 +119,30 @@ fun AlbumCard(album: Album, layout: Layout?, previewMode: Boolean = false) {
             album.isAutomaticSelection = album.isSelected == currentlyPlaying
     }
 
+    // if the album contains a single title without name, the album itself represents the title, and can be selected
+    val albumRepresentsTitle = album.titles.size == 1 && album.titles[0].title == ""
+    var modifier : Modifier = Modifier
+    if (albumRepresentsTitle) {
+        var titleSelected = false
+        if (player != null)
+            titleSelected =
+                album.titles[0].index == player!!.getIndex() && album.titles[0].playlistId == player!!.playlistId
+
+        modifier = modifier.clickable {
+                PlayerAccess.getInstance().playTrack(album.titles[0].playlistId, album.titles[0].index)
+            }
+        if (titleSelected)
+            modifier = modifier.background(MaterialTheme.colorScheme.primaryContainer)
+    }
+
+
     ElevatedCard(
         modifier = Modifier
             .animateContentSize()
             .fillMaxWidth()
             .padding(vertical = 4.dp, horizontal = 8.dp)
     ) {
-        Column {
+        Column(modifier = modifier) {
             Row {
                 if (previewMode)
                     Image(
@@ -145,6 +162,7 @@ fun AlbumCard(album: Album, layout: Layout?, previewMode: Boolean = false) {
                 Column(
                     verticalArrangement = Arrangement.Center,
                     modifier = Modifier
+                        .weight(1f)
                         .padding(horizontal = 16.dp)
                         .height(80.dp)
                 ) {
@@ -152,6 +170,24 @@ fun AlbumCard(album: Album, layout: Layout?, previewMode: Boolean = false) {
                         for (item in layout.albumLayout.items) {
                             LayoutComponent(album, item)
                         }
+                }
+                if (albumRepresentsTitle){
+                    var infoButtonClicked by remember { mutableStateOf(false) }
+                    IconButton(
+                        modifier = Modifier.align(Alignment.CenterVertically),
+                        onClick = { infoButtonClicked = true }
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.info_i),
+                            contentDescription = stringResource(R.string.button_details),
+                            modifier = Modifier.size(16.dp)
+                        )
+                    }
+                    if (infoButtonClicked)
+                        TitleDetails(
+                            title = album.titles[0],
+                            onDismiss = { -> infoButtonClicked = false },
+                        )
                 }
             }
             if (album.titles.size > 1) {
@@ -191,7 +227,7 @@ fun AlbumCard(album: Album, layout: Layout?, previewMode: Boolean = false) {
                         }
                     }
                 }
-            } else {
+            } else if (!albumRepresentsTitle) {
                 TitleEntry(album = album, title = album.titles[0], previewMode = previewMode)
             }
         }
@@ -272,6 +308,39 @@ fun AlbumCardPreview() {
     album.addTitle(title)
     album.addTitle(title)
     album.addTitle(title)
+    album.addTitle(title)
+
+    //val fields = LayoutDescription()
+    //val albumItem = LayoutItem(LayoutItems.ALBUM, ItemSize.TITLE_MEDIUM)
+    //val albumItem = LayoutItem() // <--- does not work for some reason
+    //fields.items.add(LayoutItem(LayoutItems.ALBUM, ItemSize.TITLE_MEDIUM))
+    //fields.items.add(LayoutItem(LayoutItems.ARTIST, ItemSize.BODY_SMALL))
+    //fields.items.add(LayoutItem(LayoutItems.COMPOSER, ItemSize.BODY_SMALL))
+
+    //val layout = Layout(playerLayout = fields, albumLayout = fields, titleLayout = fields)
+    AlbumCard(album, null)
+}
+
+@Preview(showBackground = true)
+@Composable
+fun AlbumCardPreview2() {
+    val title = Title(
+        "",
+        -1,
+        "",
+        "",
+        "Composer",
+        "Ibrahim Ferrer (Buena Vista Social Club Presents)",
+        "",
+        "Ibrahim Ferrer",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+    )
+    val album = Album(title)
     album.addTitle(title)
 
     //val fields = LayoutDescription()
@@ -459,6 +528,24 @@ fun PlaylistPreview() {
         playlist.addTitle(title)
         playlist.addTitle(title)
         playlist.addTitle(title)
+        val title2 = Title(
+            "",
+            0,
+            "",
+            "",
+            "Composer",
+            "Ibrahim Ferrer (Buena Vista Social Club Presents)",
+            "",
+            "Ibrahim Ferrer",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+        )
+        playlist.addTitle(title2)
+        playlist.addTitle(title2)
 //        var titles = PlaylistAccess().getCurrentPlaylist();
 //        if (titles == null) {
 //            return@ComposePlaylistTheme

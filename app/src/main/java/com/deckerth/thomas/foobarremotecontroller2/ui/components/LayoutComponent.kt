@@ -29,6 +29,7 @@ fun getTextStyle(itemSize: ItemSize): TextStyle {
 
 @Composable
 fun TextComponent(text: String, item: LayoutItem) {
+    if (text == "") return
     Text(
         modifier = Modifier
             .fillMaxWidth(),

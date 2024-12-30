@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
@@ -23,6 +24,8 @@ val Context.dataStore by preferencesDataStore(name = "settings")
 private val IP_ADDRESS_KEY = stringPreferencesKey("ip_address")
 private val VIEW_MODE_KEY = intPreferencesKey("view_mode")
 private val CUSTOM_LAYOUT_KEY = stringPreferencesKey("custom_layout")
+private val FOOBAR_VOLUME_CONTROL_KEY = booleanPreferencesKey("foobar_volume_control")
+private val PAUSE_DURING_PHONE_CALLS_KEY = booleanPreferencesKey("pause_during_phone_calls")
 
 private fun <T> getFlow(context: Context, key: Preferences.Key<T>): Flow<T?> {
     return context.dataStore.data.map { preferences ->
@@ -80,4 +83,26 @@ fun saveCustomLayout(context: Context, layout: Layout) {
     runBlocking {
         saveValue(context, layoutString, CUSTOM_LAYOUT_KEY)
     }
+}
+
+fun saveFoobarVolumeControl(enabled: Boolean, context: Context) {
+    runBlocking {
+        saveValue(context, enabled, FOOBAR_VOLUME_CONTROL_KEY)
+    }
+}
+
+@Composable
+fun getFoobarVolumeControl(): Boolean {
+    return getValue(mainActivity, FOOBAR_VOLUME_CONTROL_KEY, true)
+}
+
+fun savePauseDuringPhoneCalls(enabled: Boolean, context: Context) {
+    runBlocking {
+        saveValue(context, enabled, PAUSE_DURING_PHONE_CALLS_KEY)
+    }
+}
+
+@Composable
+fun getPauseDuringPhoneCalls(): Boolean {
+    return getValue(mainActivity, PAUSE_DURING_PHONE_CALLS_KEY, true)
 }

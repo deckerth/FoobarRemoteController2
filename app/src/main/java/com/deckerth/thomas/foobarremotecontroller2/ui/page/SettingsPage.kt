@@ -39,8 +39,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.deckerth.thomas.foobarremotecontroller2.R
+import com.deckerth.thomas.foobarremotecontroller2.getFoobarVolumeControl
 import com.deckerth.thomas.foobarremotecontroller2.getIpAddress
+import com.deckerth.thomas.foobarremotecontroller2.getPauseDuringPhoneCalls
 import com.deckerth.thomas.foobarremotecontroller2.getViewMode
+import com.deckerth.thomas.foobarremotecontroller2.saveFoobarVolumeControl
+import com.deckerth.thomas.foobarremotecontroller2.savePauseDuringPhoneCalls
 import com.deckerth.thomas.foobarremotecontroller2.saveViewMode
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.Layouts
 import com.deckerth.thomas.foobarremotecontroller2.ui.mainActivity
@@ -82,6 +86,21 @@ fun SettingsPage() {
                 getText = {v: Layouts -> v.text}
             )
         }
+        Title(stringResource(R.string.settings_playback))
+        PreferenceItem<Boolean>(
+            stringResource(R.string.settings_foobar_volume_control),
+            summary = "",
+            onClick = { enabled : Boolean -> saveFoobarVolumeControl(enabled, mainActivity) },
+            showToggle = true,
+            isChecked = getFoobarVolumeControl(),
+            isEnabled = true)
+        PreferenceItem<Boolean>(
+            stringResource(R.string.settings_pause_during_phone_call),
+            summary = "",
+            onClick = { enabled : Boolean -> savePauseDuringPhoneCalls(enabled, mainActivity) },
+            showToggle = true,
+            isChecked = getPauseDuringPhoneCalls(),
+            isEnabled = true)
     }
 }
 
@@ -201,7 +220,7 @@ fun <T> PreferenceItem(
             Switch(
                 checked = isChecked,
                 enabled = isEnabled,
-                onCheckedChange = { onClick(isChecked as T) },
+                onCheckedChange = { onClick(!isChecked as T) },
                 modifier = Modifier.padding(start = 8.dp),
             )
         }

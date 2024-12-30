@@ -2,6 +2,7 @@ package com.deckerth.thomas.foobarremotecontroller2.connector;
 
 import android.annotation.SuppressLint;
 
+import com.deckerth.thomas.foobarremotecontroller2.FoobarMediaServiceKt;
 import com.deckerth.thomas.foobarremotecontroller2.model.PlaybackMode;
 import com.deckerth.thomas.foobarremotecontroller2.model.PlaybackState;
 import com.deckerth.thomas.foobarremotecontroller2.model.Player;
@@ -11,6 +12,9 @@ import com.deckerth.thomas.foobarremotecontroller2.viewmodel.ViewModelKt;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.time.Duration;
+import java.time.Instant;
 
 public class PlayerAccess {
 
@@ -52,7 +56,7 @@ public class PlayerAccess {
 
     public Player getPlayerState() {
         String response;
-        try{
+        try {
             response = mConnector.getData("player?columns=%25label%25,%25catalog%25,%25composer%25,%25album%25,%25title%25,%25artist%25,%25discnumber%25,%25track%25,%25playback_time%25");
         } catch (Exception e) {
             errorHandler.logError(ErrorType.NETWORK, ErrorCode.CONNECTION_ERROR, ErrorSource.PLAYER_STATE, e);
@@ -109,13 +113,16 @@ public class PlayerAccess {
                     playbackState = PlaybackState.STOPPED;
                     break;
             }
-
-            VolumeControl volumeControl = ViewModelKt.getFoobVolumeControl();
-            volumeControl.setMuted(volumeObject.getBoolean("isMuted"));
-            volumeControl.setMin(volumeObject.getInt("min"));
-            volumeControl.setMax(volumeObject.getInt("max"));
-            volumeControl.setType(volumeObject.getString("type"));
-            volumeControl.setValue(volumeObject.getInt("value"));
+            if (Duration.between(FoobarMediaServiceKt.getLastChanged(), Instant.now()).toMillis() > 500) {
+                System.out.println("FOOB Volume set");
+                VolumeControl volumeControl = ViewModelKt.getFoobVolumeControl();
+                volumeControl.setMuted(volumeObject.getBoolean("isMuted"));
+                volumeControl.setMin(volumeObject.getInt("min"));
+                volumeControl.setMax(volumeObject.getInt("max"));
+                volumeControl.setType(volumeObject.getString("type"));
+                volumeControl.setValue(volumeObject.getInt("value"));
+                FoobarMediaServiceKt.volumeProvider.setCurrentVolume(volumeControl.getCurrentValuePercent());
+            }
 
             if (columns.length() > 0)
                 return new Player(

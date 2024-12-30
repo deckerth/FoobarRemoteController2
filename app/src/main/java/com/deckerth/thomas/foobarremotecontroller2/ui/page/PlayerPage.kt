@@ -5,6 +5,7 @@ package com.deckerth.thomas.foobarremotecontroller2.ui.page
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
@@ -29,6 +31,10 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -37,13 +43,16 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.deckerth.thomas.foobarremotecontroller2.R
 import com.deckerth.thomas.foobarremotecontroller2.connector.PlayerAccess
 import com.deckerth.thomas.foobarremotecontroller2.model.PlaybackMode
 import com.deckerth.thomas.foobarremotecontroller2.model.PlaybackState
 import com.deckerth.thomas.foobarremotecontroller2.model.Player
+import com.deckerth.thomas.foobarremotecontroller2.ui.components.ArtWork
 import com.deckerth.thomas.foobarremotecontroller2.ui.components.LayoutComponent
+import com.deckerth.thomas.foobarremotecontroller2.ui.layout.LayoutItems
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.layoutManager
 import com.deckerth.thomas.foobarremotecontroller2.ui.theme.Foobar2000RemoteControllerTheme
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.isSick
@@ -57,17 +66,21 @@ import com.deckerth.thomas.foobarremotecontroller2.viewmodel.startPlayerObserver
 fun PlayingPage() {
     val pullToRefreshState = rememberPullToRefreshState()
     var showLoading = loadingList
+    var maxBoxHeight by remember { mutableStateOf(0.dp)}
+    var maxBoxWidth by remember { mutableStateOf(0.dp)}
     layoutManager.InitLayoutManager()
-    Box(
+    BoxWithConstraints(
         modifier = Modifier
             .nestedScroll(pullToRefreshState.nestedScrollConnection)
             .fillMaxSize()
     )
     {
+        maxBoxHeight = maxHeight
+        maxBoxWidth = maxWidth
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState())
+                .verticalScroll(rememberScrollState(),enabled = true)
         ) {
             if (player == null) {
                 showLoading = !isSick
@@ -121,7 +134,7 @@ fun PlayingPage() {
                     )
                 }
             } else {
-                PlayerCard(player = player!!)
+                PlayerCard(player = player!!, boxSize = IntSize(maxBoxWidth.value.toInt(), maxBoxHeight.value.toInt()))
             }
             if (pullToRefreshState.isRefreshing) {
                 LaunchedEffect(true) {
@@ -143,6 +156,7 @@ fun PlayingPage() {
         )
 }
 
+
 fun onRefresh() {
     observer?.cancel(true)
     startPlayerObserver()
@@ -157,6 +171,7 @@ fun PlayerButtons(
 ) {
     Spacer(modifier = Modifier.height(10.dp))
     Row(
+        modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center
     ) {
@@ -291,24 +306,37 @@ fun PlayerCard(
     player: Player,
     previewMode: Boolean = false,
     onPreviousTrack: (() -> Unit)? = null,
-    onNextTrack: (() -> Unit)? = null
+    onNextTrack: (() -> Unit)? = null,
+    boxSize: IntSize
 ) {
+    // The main layout container, occupying the entire screen.
     Column(
         modifier = Modifier
-            .padding(15.dp)
-            .fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+            .requiredSize(boxSize.width.dp, boxSize.height.dp)
     ) {
-        val layout = layoutManager.getLayout()
-
-        for (item in layout.playerLayout.items) {
-            LayoutComponent(player, item, previewMode)
+        // This Box is used to contain the image and make it occupy the remaining space.
+        Box(modifier = Modifier
+            // Assigns a weight of 1 to the Box, making it take up all available space not used by other elements in the Column.
+            .weight(1f)
+            // Makes the Box occupy the full width of the screen.
+            .fillMaxWidth()
+        ) {
+            ArtWork(player, previewMode = previewMode)
         }
-        if (onPreviousTrack != null && onNextTrack != null)
-            PlayerButtons(player, onPreviousTrack, onNextTrack, previewMode)
-        else
-            PlayerButtons(player)
+
+        // This Column contains the text fields and other controls.
+        Column(modifier = Modifier.padding(16.dp)) {
+            val layout = layoutManager.getLayout()
+
+            for (item in layout.playerLayout.items) {
+                if (item.item != LayoutItems.ARTWORK)
+                    LayoutComponent(player, item, previewMode)
+            }
+            if (onPreviousTrack != null && onNextTrack != null)
+                PlayerButtons(player, onPreviousTrack, onNextTrack, previewMode)
+            else
+                PlayerButtons(player)
+        }
     }
 }
 
@@ -344,7 +372,8 @@ fun PlayerCardPreview() {
                     "",
                     PlaybackState.PLAYING,
                     PlaybackMode.DEFAULT
-                )
+                ),
+                boxSize = IntSize(200, 200)
             )
         }
 

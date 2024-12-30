@@ -6,6 +6,7 @@
     <string name="tab_settings">Einstellungen</string>
     <string name="desc_album_picture">Album Bild</string>
     <string name="info_disc_track">Disc %1$s Track %2$s</string>
+    <string name="info_track">Track %1$s</string>
     <string name="desc_skip_previous">Zurückspulen</string>
     <string name="desc_play">Play</string>
     <string name="desc_pause">Pause</string>
@@ -39,6 +40,7 @@
     <string name="settings_view_mode">Anzeigeformat</string>
     <string name="settings_appearance">Darstellung</string>
     <string name="settings_connectivity">Verbindung</string>
+    <string name="settings_playback">Wiedergabe</string>
     <string name="open_layout_editor">Layout ändern</string>
     <string name="choose_layout_to_change">Angepasstes Layout</string>
     <string name="layout_playlist">Playlist</string>
@@ -72,4 +74,8 @@
     <string name="layout_item_label">Label</string>
     <string name="button_close">Schließen</string>
     <string name="layout_item_label_catalog">Label und Medium</string>
+    <string name="settings_foobar_volume_control">Foobar Lautstärke mit den Lautstärketasten steuern</string>
+    <string name="settings_enabled">Ja</string>
+    <string name="settings_disabled">Nein</string>
+    <string name="settings_pause_during_phone_call">Wiedergabe während Telefonaten pausieren</string>
 </resources>

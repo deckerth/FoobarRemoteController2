@@ -57,7 +57,7 @@ class HTTPConnector {
     }
 
     fun checkConnection(ip:String): Boolean{
-        if (ip == "0.0.0.0") return false
+        if (!ip.contains(":")) return false
         try {
             val url = URL("http://$ip/api/playlists")
             println("FOOB \"http://$ip/api/playlists\"")

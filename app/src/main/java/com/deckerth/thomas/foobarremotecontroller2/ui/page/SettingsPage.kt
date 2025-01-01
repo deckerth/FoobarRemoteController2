@@ -91,14 +91,14 @@ fun SettingsPage() {
         PreferenceItem<Boolean>(
             stringResource(R.string.settings_foobar_volume_control),
             summary = "",
-            onClick = { enabled : Boolean -> saveFoobarVolumeControl(enabled, mainActivity) },
+            onClick = { enabled : Boolean -> saveFoobarVolumeControl(!enabled, mainActivity) },
             showToggle = true,
             isChecked = getFoobarVolumeControl(),
             isEnabled = true)
         PreferenceItem<Boolean>(
             stringResource(R.string.settings_pause_during_phone_call),
             summary = "",
-            onClick = { enabled : Boolean -> savePauseDuringPhoneCalls(enabled, mainActivity) },
+            onClick = { enabled : Boolean -> savePauseDuringPhoneCalls(!enabled, mainActivity) },
             showToggle = true,
             isChecked = getPauseDuringPhoneCalls(),
             isEnabled = true)
@@ -249,7 +249,7 @@ fun <T> PreferenceItem(
                 enabled = isEnabled,
                 onCheckedChange = {
                     @Suppress("UNCHECKED_CAST")
-                    onClick(!isChecked as T)
+                    onClick(isChecked as T)
                 },
                 modifier = Modifier.padding(start = 8.dp),
             )

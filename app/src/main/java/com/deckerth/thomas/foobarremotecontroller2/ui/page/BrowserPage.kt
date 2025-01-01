@@ -148,13 +148,15 @@ fun DirectoryEntry(
 
             if (!entry.isParentDirectory())
                 if (entry.isAdded.value)
-                    Icon(
-                        painter = painterResource(R.drawable.library_add_check),
-                        contentDescription = stringResource(R.string.desc_added),
-                        modifier = Modifier
-                            .size(24.dp),
-                        tint = MaterialTheme.colorScheme.primary
-                    )
+                    IconButton(onClick = { }){
+                        Icon(
+                            painter = painterResource(R.drawable.library_add_check),
+                            contentDescription = stringResource(R.string.desc_added),
+                            modifier = Modifier
+                                .size(24.dp),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
                 else
                     IconButton(onClick = {
                         vm.addToPlaylist(entry, addBehavior)

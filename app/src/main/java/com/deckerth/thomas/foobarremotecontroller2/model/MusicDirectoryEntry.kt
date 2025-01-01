@@ -6,7 +6,7 @@ open class MusicDirectoryEntry(val name: String, val path: String) {
 
     var isAdded = mutableStateOf(false)
 
-    fun setIsAdded(added: Boolean) {
+    open fun setIsAdded(added: Boolean) {
         isAdded.value = added
     }
 

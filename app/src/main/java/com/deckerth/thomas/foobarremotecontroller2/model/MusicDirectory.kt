@@ -21,6 +21,13 @@ open class MusicDirectory(name: String, path: String, private val parentDirector
         return true
     }
 
+    override fun setIsAdded(added: Boolean) {
+        super.setIsAdded(added)
+        for (entry in entries) {
+            entry.setIsAdded(added)
+        }
+    }
+
     fun isExpanded(): Boolean {
         return expanded.value
     }
@@ -34,6 +41,7 @@ open class MusicDirectory(name: String, path: String, private val parentDirector
         if (result != null) {
             for (entry in result.entries) {
                 println("FOOB addEntry: ${entry.name}")
+                entry.setIsAdded(isAdded.value)
                 addEntry(entry)
             }
             expanded.value = true

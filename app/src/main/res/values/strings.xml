@@ -92,4 +92,17 @@
     <string name="add_behavior_replace_play">Replace and play</string>
     <string name="settings_add_behavior">Action when adding tracks</string>
     <string name="title_settings">Settings</string>
+    <string name="welcome_heading">Introduction</string>
+    <string name="welcome_start">Let\'s start by adding a foobar2000 server. Ensure that Foobar and the Beefweb plugin are running, properly configured, and located on the same network as this device.</string>
+    <string name="welcome_next">Next</string>
+    <string name="welcome_start2">.</string>
+    <string name="welcome_then_press">"Then press "</string>
+    <string name="device_not_found_heading">No Device Found</string>
+    <string name="device_not_found_start">"No media center was found on the local network. If you need help with the configuration, click "</string>
+    <string name="device_not_found_link">here</string>
+    <string name="device_not_found_start2">.</string>
+    <string name="device_not_found_text1">"Select "</string>
+    <string name="device_not_found_search_again">Search again</string>
+    <string name="device_not_found_text2">" to search again or "</string>
+    <string name="device_not_found_text4">" for manual configuration."</string>
 </resources>

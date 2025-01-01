@@ -99,7 +99,7 @@
     <string name="welcome_start2">drücken.</string>
     <string name="welcome_then_press">"Anschließend auf "</string>
     <string name="device_not_found_heading">Es wurde kein Server gefunden</string>
-    <string name="device_not_found_start">"Im lokalen Netzwerk konnte kein Mediacenter gefunden werden. Falls Hilfe beim Konfigurieren benötigt wird, "</string>
+    <string name="device_not_found_start">"Im lokalen Netzwerk konnte kein foobar2000 Server gefunden werden. Falls Hilfe beim Konfigurieren benötigt wird, "</string>
     <string name="device_not_found_link">hier</string>
     <string name="device_not_found_start2">" drücken."</string>
     <string name="device_not_found_text1">""</string>

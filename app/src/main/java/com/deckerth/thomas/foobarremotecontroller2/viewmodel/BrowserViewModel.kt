@@ -1,0 +1,76 @@
+package com.deckerth.thomas.foobarremotecontroller2.viewmodel
+
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.lifecycle.ViewModel
+import com.deckerth.thomas.foobarremotecontroller2.connector.PlaylistAccess
+import com.deckerth.thomas.foobarremotecontroller2.connector.browserAccess
+import com.deckerth.thomas.foobarremotecontroller2.connector.errorHandler
+import com.deckerth.thomas.foobarremotecontroller2.model.AddTracksBehaviors
+import com.deckerth.thomas.foobarremotecontroller2.model.MusicDirectory
+import com.deckerth.thomas.foobarremotecontroller2.model.MusicDirectoryEntry
+
+class BrowserViewModel() : ViewModel() {
+
+    private var filesystem = mutableStateOf(MusicDirectory("ROOT", "", "NULL"))
+    private var currentPath = mutableStateOf("")
+    var loadingData by mutableStateOf(false)
+    private var directories = HashMap<String, MusicDirectory>()
+    var filesAdded by mutableStateOf(false)
+
+    init {
+        directories[""] = filesystem.value
+    }
+
+    fun setCurrentPath(path: String) {
+        currentPath.value = path
+    }
+
+    fun getDirectory(): MusicDirectory {
+        if (!directories[currentPath.value]!!.isExpanded())
+            expand(directories[currentPath.value]!!)
+        return directories[currentPath.value]!!
+    }
+
+    private fun expand(musicDirectory: MusicDirectory) {
+        if (!loadingData && !errorHandler.sick()) {
+            loadingData = true
+            Thread {
+                try {
+                    musicDirectory.expand()
+                    for (entry in musicDirectory.getEntries())
+                        if (entry is MusicDirectory && !entry.isParentDirectory())
+                            directories[entry.path] = entry
+                    loadingData = false
+                    invalidatePlaylist(displayedPlaylist!!)
+                } catch (e: Exception) {
+                    loadingData = false
+                }
+            }.start()
+        }
+    }
+
+    fun getCurrentPath(): String {
+        return currentPath.value
+    }
+
+    fun addToPlaylist(entry: MusicDirectoryEntry, addBehavior: AddTracksBehaviors) {
+        if (!errorHandler.sick())
+            Thread {
+                if (displayedPlaylist != null) {
+                    loadingData = true
+                    PlaylistAccess.getInstance()
+                        .addPathToPlaylist(
+                            displayedPlaylist!!.playlistEntity.playlistId,
+                            browserAccess.escapePathSeparator(entry.path),
+                            addBehavior
+                        )
+                    entry.setIsAdded(true)
+                    loadingData = false
+                    filesAdded = true
+                }
+            }.start()
+    }
+
+}

@@ -72,8 +72,8 @@ fun setPlaylists(playlists: Playlists) {
     // process removed playlists
     for (list in playlistRegistry) {
         if (!playlists.playlists.any { it.playlistId == list.playlistEntity.playlistId }) {
-            invalidatePlaylist(list)
             list.playlistEntity.noOfTracks = 0
+            invalidatePlaylist(list)
             println("FOOB invalidating removed playlist ${list.playlistEntity.playlistId}")
         }
     }
@@ -100,7 +100,7 @@ fun getPlaylistToBeUpdated(): Playlist? {
             return selected
     }
     // check player
-    if (player != null) {
+    if (player != null && player!!.playlistId.isNotBlank()) {
         if (player!!.playlistId != selectedPlaylist) {
             val played = getPlaylist(player!!.playlistId)
             if (played.valid && played.titles.count() < played.playlistEntity.noOfTracks)

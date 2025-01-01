@@ -78,4 +78,19 @@
     <string name="settings_enabled">Ja</string>
     <string name="settings_disabled">Nein</string>
     <string name="settings_pause_during_phone_call">Wiedergabe während Telefonaten pausieren</string>
+    <string name="browser">Browser</string>
+    <string name="desc_folder">Ordner</string>
+    <string name="desc_audio_file">Audiodatei</string>
+    <string name="desc_added">Hinzugefügt</string>
+    <string name="desc_add">Zur Playlist hinzufügen</string>
+    <string name="edit_layout">Editor</string>
+    <string name="preview_layout">Vorschau</string>
+    <string name="files_added">Die Tracks wurden zur Playlist %1$s hinzugefügt</string>
+    <string name="button_back">Zurück</string>
+    <string name="settings_browser">Browser</string>
+    <string name="add_behavior_add">Hinzufügen</string>
+    <string name="add_behavior_add_play">Hinzufügen und wiedergeben</string>
+    <string name="add_behavior_replace_play">Ersetzen und wiedergeben</string>
+    <string name="settings_add_behavior">Action when adding tracks</string>
+    <string name="title_settings">Settings</string>
 </resources>

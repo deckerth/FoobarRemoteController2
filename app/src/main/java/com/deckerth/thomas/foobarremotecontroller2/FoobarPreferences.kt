@@ -9,6 +9,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.deckerth.thomas.foobarremotecontroller2.model.AddTracksBehaviors
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.Layout
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.Layouts
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.layoutManager
@@ -26,6 +27,7 @@ private val VIEW_MODE_KEY = intPreferencesKey("view_mode")
 private val CUSTOM_LAYOUT_KEY = stringPreferencesKey("custom_layout")
 private val FOOBAR_VOLUME_CONTROL_KEY = booleanPreferencesKey("foobar_volume_control")
 private val PAUSE_DURING_PHONE_CALLS_KEY = booleanPreferencesKey("pause_during_phone_calls")
+private val ADD_TRACK_BEHAVIOR_KEY = intPreferencesKey("add_track_behavior")
 
 private fun <T> getFlow(context: Context, key: Preferences.Key<T>): Flow<T?> {
     return context.dataStore.data.map { preferences ->
@@ -105,4 +107,16 @@ fun savePauseDuringPhoneCalls(enabled: Boolean, context: Context) {
 @Composable
 fun getPauseDuringPhoneCalls(): Boolean {
     return getValue(mainActivity, PAUSE_DURING_PHONE_CALLS_KEY, true)
+}
+
+fun saveAddTrackBehavior(behavior: AddTracksBehaviors, context: Context) {
+    runBlocking {
+        saveValue(context, behavior.ordinal, ADD_TRACK_BEHAVIOR_KEY)
+    }
+}
+
+@Composable
+fun getAddTrackBehavior(): AddTracksBehaviors {
+    return AddTracksBehaviors.entries[getValue(mainActivity, ADD_TRACK_BEHAVIOR_KEY, AddTracksBehaviors.ADD_BEHAVIOR_ADD_PLAY.ordinal)]
+
 }

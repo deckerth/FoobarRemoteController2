@@ -77,4 +77,19 @@
     <string name="settings_enabled">Enabled</string>
     <string name="settings_disabled">Disabled</string>
     <string name="settings_pause_during_phone_call">Pause playback during phone calls</string>
+    <string name="browser">Browser</string>
+    <string name="desc_folder">Folder</string>
+    <string name="desc_audio_file">Audio file</string>
+    <string name="desc_added">Added to playlist</string>
+    <string name="desc_add">Add to playlist</string>
+    <string name="edit_layout">Editor</string>
+    <string name="preview_layout">Preview</string>
+    <string name="files_added">Selected tracks were added to playlist: %1$s</string>
+    <string name="button_back">Back</string>
+    <string name="settings_browser">Browser</string>
+    <string name="add_behavior_add">Add</string>
+    <string name="add_behavior_add_play">Add and play</string>
+    <string name="add_behavior_replace_play">Replace and play</string>
+    <string name="settings_add_behavior">Action when adding tracks</string>
+    <string name="title_settings">Settings</string>
 </resources>

@@ -15,11 +15,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.deckerth.thomas.foobarremotecontroller2.R
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.LayoutViewModel
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.selectedView
 
@@ -49,7 +51,7 @@ fun LayoutEditorMainPage(vm: LayoutViewModel = viewModel()){
                     selected = editorMode
                 )
                 {
-                    Text("Editor")
+                    Text(stringResource(R.string.edit_layout))
                 }
                 SegmentedButton(
                     shape = SegmentedButtonDefaults.itemShape(1, 2),
@@ -60,7 +62,7 @@ fun LayoutEditorMainPage(vm: LayoutViewModel = viewModel()){
                     selected = !editorMode
                 )
                 {
-                    Text("Preview")
+                    Text(stringResource(R.string.preview_layout))
                 }
             }
         },

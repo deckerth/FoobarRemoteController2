@@ -6,13 +6,14 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
@@ -39,23 +40,22 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.deckerth.thomas.foobarremotecontroller2.R
+import com.deckerth.thomas.foobarremotecontroller2.getAddTrackBehavior
 import com.deckerth.thomas.foobarremotecontroller2.getFoobarVolumeControl
 import com.deckerth.thomas.foobarremotecontroller2.getIpAddress
 import com.deckerth.thomas.foobarremotecontroller2.getPauseDuringPhoneCalls
 import com.deckerth.thomas.foobarremotecontroller2.getViewMode
+import com.deckerth.thomas.foobarremotecontroller2.model.AddTracksBehaviors
+import com.deckerth.thomas.foobarremotecontroller2.saveAddTrackBehavior
 import com.deckerth.thomas.foobarremotecontroller2.saveFoobarVolumeControl
 import com.deckerth.thomas.foobarremotecontroller2.savePauseDuringPhoneCalls
 import com.deckerth.thomas.foobarremotecontroller2.saveViewMode
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.Layouts
 import com.deckerth.thomas.foobarremotecontroller2.ui.mainActivity
-import me.zhanghai.compose.preference.ProvidePreferenceLocals
-import me.zhanghai.compose.preference.footerPreference
-import me.zhanghai.compose.preference.listPreference
-import me.zhanghai.compose.preference.textFieldPreference
 
 @Composable
 fun SettingsPage() {
-    Column {
+    Column(Modifier.verticalScroll(rememberScrollState())) {
         Title(stringResource(R.string.settings_connectivity))
         PreferenceItem<Boolean>("IP Address", summary = getIpAddress(), onClick = {
             mainActivity.navigateTo("DeviceSelectionPage")
@@ -86,6 +86,7 @@ fun SettingsPage() {
                 getText = {v: Layouts -> v.text}
             )
         }
+
         Title(stringResource(R.string.settings_playback))
         PreferenceItem<Boolean>(
             stringResource(R.string.settings_foobar_volume_control),
@@ -101,6 +102,30 @@ fun SettingsPage() {
             showToggle = true,
             isChecked = getPauseDuringPhoneCalls(),
             isEnabled = true)
+
+        Title(stringResource(R.string.settings_browser))
+        var isChooseAddOptionsOpen by remember { mutableStateOf(false) }
+        val behavior = getAddTrackBehavior()
+        PreferenceItem<Boolean>(stringResource(R.string.settings_add_behavior),
+            summary = behavior.text,
+            showButton = false,
+            onClick = {
+                isChooseAddOptionsOpen = true
+            })
+        if (isChooseAddOptionsOpen) {
+            ListPreference(
+                values = AddTracksBehaviors.entries,
+                title = stringResource(R.string.settings_add_behavior),
+                selectedItem = getAddTrackBehavior(),
+                onClick = { chosen:AddTracksBehaviors? ->
+                    if (chosen != null) {
+                        saveAddTrackBehavior(chosen, mainActivity)
+                    }
+                    isChooseAddOptionsOpen = false
+                },
+                getText = {v: AddTracksBehaviors -> v.text}
+            )
+        }
     }
 }
 
@@ -165,6 +190,7 @@ fun <T> PreferenceItem(
             .fillMaxWidth()
             .clickable {
                 if (optionList == null) {
+                    @Suppress("UNCHECKED_CAST")
                     onClick(isChecked as T)
                 } else {
                     expanded = true
@@ -209,6 +235,7 @@ fun <T> PreferenceItem(
                         onDismissRequest = { value: String? ->
                             expanded = false
                             if (value != null) {
+                                @Suppress("UNCHECKED_CAST")
                                 onClick(value as T)
                             }
                         },
@@ -220,7 +247,10 @@ fun <T> PreferenceItem(
             Switch(
                 checked = isChecked,
                 enabled = isEnabled,
-                onCheckedChange = { onClick(!isChecked as T) },
+                onCheckedChange = {
+                    @Suppress("UNCHECKED_CAST")
+                    onClick(!isChecked as T)
+                },
                 modifier = Modifier.padding(start = 8.dp),
             )
         }
@@ -300,30 +330,4 @@ fun <T> ListPreference(
 @Composable
 fun SettingsPreview() {
     SettingsPage()
-}
-
-@Composable
-fun SettingsPageOld() {
-    ProvidePreferenceLocals {
-        LazyColumn(modifier = Modifier.fillMaxSize()) {
-            textFieldPreference(
-                key = "ip_address_preference",
-                defaultValue = "0.0.0.0",
-                title = { Text(text = "IP Address") },
-                textToValue = { it },
-                summary = { Text(text = "http://$it/") }
-            )
-            listPreference(
-                key = "view_mode_preference",
-                defaultValue = "Modern",
-                values = listOf("Modern", "Classic"),
-                title = { Text(text = "View Mode") },
-                summary = { Text(text = it) }
-            )
-            footerPreference(
-                key = "footer_preference",
-                summary = { Text(text = "Made by Thomas and Paul Decker\nThanks to @zhanghai for the Preference Library") }
-            )
-        }
-    }
 }

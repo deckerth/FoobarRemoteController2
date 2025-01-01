@@ -82,7 +82,7 @@ fun PlaylistPage() {
     ) {
         displayedPlaylist!!.clear()
         displayedPlaylist = null
-        updatePlaylists()  // delayed update to avoid crashed during layout update
+        updatePlaylists()  // delayed update to avoid crashes during layout update
     }
     if (displayedPlaylist != null)
         Column() {
@@ -121,7 +121,7 @@ fun AlbumCard(album: Album, layout: Layout?, previewMode: Boolean = false) {
 
     // if the album contains a single title without name, the album itself represents the title, and can be selected
     val albumRepresentsTitle = album.titles.size == 1 && album.titles[0].title == ""
-    var modifier : Modifier = Modifier
+    var modifier: Modifier = Modifier
     if (albumRepresentsTitle) {
         var titleSelected = false
         if (player != null)
@@ -129,8 +129,8 @@ fun AlbumCard(album: Album, layout: Layout?, previewMode: Boolean = false) {
                 album.titles[0].index == player!!.getIndex() && album.titles[0].playlistId == player!!.playlistId
 
         modifier = modifier.clickable {
-                PlayerAccess.getInstance().playTrack(album.titles[0].playlistId, album.titles[0].index)
-            }
+            PlayerAccess.getInstance().playTrack(album.titles[0].playlistId, album.titles[0].index)
+        }
         if (titleSelected)
             modifier = modifier.background(MaterialTheme.colorScheme.primaryContainer)
     }
@@ -171,7 +171,7 @@ fun AlbumCard(album: Album, layout: Layout?, previewMode: Boolean = false) {
                             LayoutComponent(album, item)
                         }
                 }
-                if (albumRepresentsTitle){
+                if (albumRepresentsTitle) {
                     var infoButtonClicked by remember { mutableStateOf(false) }
                     IconButton(
                         modifier = Modifier.align(Alignment.CenterVertically),
@@ -279,7 +279,7 @@ fun TitleEntry(album: Album, title: ITitle, previewMode: Boolean = false) {
                 TitleDetails(
                     title = title,
                     onDismiss = { -> infoButtonClicked = false },
-                    )
+                )
         }
     }
 }

@@ -1,7 +1,5 @@
 package com.deckerth.thomas.foobarremotecontroller2.connector
 
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.ip_address
 import java.io.IOException
 import java.io.InputStreamReader
@@ -73,6 +71,7 @@ class HTTPConnector {
         }
     }
 
+/*
     fun getImage(endpoint: String): Bitmap? {
         // Fetch data from the API in the background.
         val result: Bitmap
@@ -100,6 +99,7 @@ class HTTPConnector {
         }
         return null
     }
+*/
 
     fun postData(endpoint: String) {
         val result = StringBuilder()
@@ -155,6 +155,7 @@ class HTTPConnector {
                         responseData = isw.read()
                     }
                 } catch (io: IOException) {
+                    io.printStackTrace()
                 }
             } catch (e: Exception) {
                 e.printStackTrace()

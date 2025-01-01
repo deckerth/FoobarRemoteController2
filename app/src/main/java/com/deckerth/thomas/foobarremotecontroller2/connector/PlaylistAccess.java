@@ -2,6 +2,7 @@ package com.deckerth.thomas.foobarremotecontroller2.connector;
 
 import android.annotation.SuppressLint;
 
+import com.deckerth.thomas.foobarremotecontroller2.model.AddTracksBehaviors;
 import com.deckerth.thomas.foobarremotecontroller2.model.Playlist;
 import com.deckerth.thomas.foobarremotecontroller2.model.PlaylistEntity;
 import com.deckerth.thomas.foobarremotecontroller2.model.Playlists;
@@ -113,7 +114,7 @@ public class PlaylistAccess {
             }
         } catch (JSONException e) {
             errorHandler.logError(ErrorType.API, ErrorCode.BAD_RESPONSE, ErrorSource.PLAYLIST_ITEMS, e);
-            e.printStackTrace();
+            //e.printStackTrace();
             return null;
         }
 
@@ -152,10 +153,37 @@ public class PlaylistAccess {
             }
         } catch (JSONException e) {
             errorHandler.logError(ErrorType.API, ErrorCode.BAD_RESPONSE, ErrorSource.PLAYLISTS, e);
-            e.printStackTrace();
+            //e.printStackTrace();
             return null;
         }
         return result;
+    }
+
+    public void addPathToPlaylist(String playlistId, String path, AddTracksBehaviors addBehavior) {
+//        {
+//            "items": [
+//            "T:\\Music\\Alpha\\Alpha 634"
+//             ],
+//            "play": true
+//        }
+        String playValue = "false";
+        String replaceValue = "true";
+        switch (addBehavior) {
+            case ADD_BEHAVIOR_ADD:
+                playValue = "false";
+                replaceValue = "false";
+                break;
+            case ADD_BEHAVIOR_ADD_PLAY:
+                playValue = "true";
+                replaceValue = "false";
+                break;
+            case ADD_BEHAVIOR_REPLACE_PLAY:
+                playValue = "true";
+                replaceValue = "true";
+                break;
+        }
+        String jsonString = "{\"items\":[\"" + path + "\"], \"play\":"+ playValue + ", \"replace\":"+ replaceValue + " }";
+        mConnector.postData("playlists/" + playlistId + "/items/add/", jsonString);
     }
 
 }

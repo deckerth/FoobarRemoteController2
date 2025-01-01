@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.automirrored.outlined.List
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
@@ -42,6 +43,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -64,6 +66,7 @@ import com.deckerth.thomas.foobarremotecontroller2.FoobarMediaService
 import com.deckerth.thomas.foobarremotecontroller2.R
 import com.deckerth.thomas.foobarremotecontroller2.model.PlaybackState
 import com.deckerth.thomas.foobarremotecontroller2.ui.components.TitleDetails
+import com.deckerth.thomas.foobarremotecontroller2.ui.page.BrowserMainPage
 import com.deckerth.thomas.foobarremotecontroller2.ui.page.CustomDevicePage
 import com.deckerth.thomas.foobarremotecontroller2.ui.page.DeviceSelectionPage
 import com.deckerth.thomas.foobarremotecontroller2.ui.page.LayoutEditorMainPage
@@ -99,7 +102,6 @@ class MainActivity : ComponentActivity() {
     val navController get() = _navController!!
 
     private var _appBarLabel by mutableStateOf("Foobar Link")
-    val appBarLabel get() = _appBarLabel
 
     private lateinit var appLabel: String
 
@@ -141,6 +143,7 @@ class MainActivity : ComponentActivity() {
         startForegroundService(intent)
     }
 
+    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun FoobarPhoneLayout() {
         val navController = rememberNavController()
@@ -167,13 +170,22 @@ class MainActivity : ComponentActivity() {
             ),
         )
         var selectedItemIndex by rememberSaveable {
-            mutableStateOf(1)
+            mutableIntStateOf(1)
         }
         Scaffold(
             topBar = {
                 TopAppBar(
                     title = { Text(text = _appBarLabel) },
                     modifier = Modifier.fillMaxWidth(),
+                    navigationIcon = {
+                        if (getCurrentRoute(navController) == "Browser")
+                            IconButton(onClick = { navController.popBackStack() }) {
+                                Icon(
+                                    painter = painterResource(R.drawable.arrow_back),
+                                    contentDescription = stringResource(R.string.button_back)
+                                )
+                            }
+                    },
                     actions = {
                         when (getCurrentRoute(navController)) {
                             "Playlist" -> Row() {
@@ -196,6 +208,14 @@ class MainActivity : ComponentActivity() {
                                         contentDescription = stringResource(R.string.desc_jump_to_title),
                                         modifier = Modifier
                                             .size(24.dp)
+                                    )
+                                }
+                                IconButton(onClick = {
+                                    navigateTo("Browser")
+                                }) {
+                                    Icon(
+                                        imageVector = Icons.Default.Add,
+                                        contentDescription = "Add music"
                                     )
                                 }
                                 IconButton(onClick = {
@@ -319,6 +339,10 @@ class MainActivity : ComponentActivity() {
                     _appBarLabel = stringResource(R.string.choose_layout_to_change)
                     LayoutEditorMainPage()
                 }
+                composable("Browser") {
+                    _appBarLabel = stringResource(R.string.browser)
+                    BrowserMainPage()
+                }
 
             }
         }
@@ -334,32 +358,54 @@ class MainActivity : ComponentActivity() {
                 TopAppBar(
                     title = {
                         Row {
-                            Text(modifier = Modifier.align(Alignment.CenterVertically), text = _appBarLabel)
-                            FilledIconToggleButton(
-                                modifier = Modifier.padding(start = 10.dp),
-                                checked = autoscroll,
-                                onCheckedChange = {
-                                    if (getCurrentAlbumIndex() != -1)
-                                        autoscroll = !autoscroll
-                                    if (autoscroll)
-                                        CoroutineScope(Dispatchers.Main).launch {
-                                            playlistState.scrollToItem(
-                                                getCurrentAlbumIndex()
-                                            )
-                                            autoScrollIndex = getCurrentAlbumIndex()
-                                        }
-                                })
-                            {
-                                Icon(
-                                    painter = painterResource(R.drawable.jump_to_element),
-                                    contentDescription = stringResource(R.string.desc_jump_to_title),
-                                    modifier = Modifier
-                                        .size(24.dp)
-                                )
+                            Text(
+                                modifier = Modifier.align(Alignment.CenterVertically),
+                                text = _appBarLabel
+                            )
+                            if (getCurrentRoute(navController) == "Now Playing And Playlist") {
+                                FilledIconToggleButton(
+                                    modifier = Modifier.padding(start = 10.dp),
+                                    checked = autoscroll,
+                                    onCheckedChange = {
+                                        if (getCurrentAlbumIndex() != -1)
+                                            autoscroll = !autoscroll
+                                        if (autoscroll)
+                                            CoroutineScope(Dispatchers.Main).launch {
+                                                playlistState.scrollToItem(
+                                                    getCurrentAlbumIndex()
+                                                )
+                                                autoScrollIndex = getCurrentAlbumIndex()
+                                            }
+                                    })
+                                {
+                                    Icon(
+                                        painter = painterResource(R.drawable.jump_to_element),
+                                        contentDescription = stringResource(R.string.desc_jump_to_title),
+                                        modifier = Modifier
+                                            .size(24.dp)
+                                    )
+                                }
+                                IconButton(onClick = {
+                                    navigateTo("Browser")
+                                }) {
+                                    Icon(
+                                        imageVector = Icons.Default.Add,
+                                        contentDescription = "Add music"
+                                    )
+                                }
                             }
                         }
                     },
                     modifier = Modifier.fillMaxWidth(),
+                    navigationIcon = {
+                        if (getCurrentRoute(navController) == "Browser" || getCurrentRoute(navController) == "Settings")
+                            IconButton(onClick = { navController.popBackStack() }) {
+                                Icon(
+                                    painter = painterResource(R.drawable.arrow_back),
+                                    contentDescription = stringResource(R.string.button_back)
+                                )
+                            }
+                    },
                     actions = {
                         var infoButtonClicked by remember { mutableStateOf(false) }
                         when (getCurrentRoute(navController)) {
@@ -452,7 +498,7 @@ class MainActivity : ComponentActivity() {
                     }
                 }
                 composable("Settings") {
-                    _appBarLabel = appLabel
+                    _appBarLabel = stringResource(R.string.title_settings)
                     SettingsPage()
                 }
                 composable("DeviceSelectionPage") {
@@ -471,11 +517,9 @@ class MainActivity : ComponentActivity() {
                     _appBarLabel = stringResource(R.string.choose_layout_to_change)
                     LayoutEditorMainPage()
                 }
-
-                fun navigateTo(route: String) {
-                    if (route != "Layout selection" && route != "Layout editor")
-                        navController.popBackStack()
-                    navController.navigate(route)
+                composable("Browser") {
+                    _appBarLabel = stringResource(R.string.browser)
+                    BrowserMainPage()
                 }
             }
         }

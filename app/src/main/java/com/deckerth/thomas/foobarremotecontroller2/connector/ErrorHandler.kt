@@ -1,14 +1,9 @@
 package com.deckerth.thomas.foobarremotecontroller2.connector
 
-import com.deckerth.thomas.foobarremotecontroller2.model.Playlist
-import com.deckerth.thomas.foobarremotecontroller2.viewmodel.displayedPlaylist
-import com.deckerth.thomas.foobarremotecontroller2.viewmodel.getPlaylistToBeUpdated
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.isSick
-import com.deckerth.thomas.foobarremotecontroller2.viewmodel.loadingList
-import com.deckerth.thomas.foobarremotecontroller2.viewmodel.selectedPlaylist
 import java.sql.Timestamp
 
-public val errorHandler = ErrorHandler()
+val errorHandler = ErrorHandler()
 
 enum class ErrorType {
     NETWORK,
@@ -27,7 +22,8 @@ enum class ErrorSource {
     PLAYER_STATE,
     PLAYLISTS,
     PLAYLIST_ITEMS,
-    HTTP_CONNECTOR
+    HTTP_CONNECTOR,
+    BROWSER
 }
 
 class ErrorHandler {

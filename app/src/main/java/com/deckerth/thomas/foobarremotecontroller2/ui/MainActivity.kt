@@ -285,6 +285,7 @@ class MainActivity : ComponentActivity() {
                                 selected = selectedItemIndex == index,
                                 onClick = {
                                     selectedItemIndex = index
+                                    navController.popBackStack()
                                     navigateTo(item.key)
                                 },
                                 label = {

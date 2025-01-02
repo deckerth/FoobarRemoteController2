@@ -334,7 +334,7 @@ fun PlayerCard(
 
             for (item in layout.playerLayout.items) {
                 if (item.item != LayoutItems.ARTWORK)
-                    LayoutComponent(player, item, previewMode)
+                    LayoutComponent(player, item)
             }
             if (onPreviousTrack != null && onNextTrack != null)
                 PlayerButtons(player, onPreviousTrack, onNextTrack, previewMode)

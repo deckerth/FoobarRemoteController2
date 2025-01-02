@@ -16,6 +16,7 @@ import com.deckerth.thomas.foobarremotecontroller2.ui.layout.Layouts
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.layoutManager
 import com.deckerth.thomas.foobarremotecontroller2.ui.mainActivity
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.encodeToString
@@ -51,6 +52,14 @@ private fun <T> saveValue(context: Context, value: T, key: Preferences.Key<T>) {
     }
 }
 
+suspend fun <T> getValueBlocking(context: Context, key: Preferences.Key<T>, initial: T): T {
+    return context.dataStore.data
+        .map { preferences ->
+            preferences[key] ?: initial
+        }
+        .first() // Wait for the first emission from the Flow
+}
+
 fun saveIpAddress(ip: String, context: Context) {
     val effectiveValue = ip.ifEmpty { mainActivity.getString(R.string.ip_address_not_set) }
     runBlocking {
@@ -63,14 +72,8 @@ fun getIpAddress(): String {
     return getValue(mainActivity, IP_ADDRESS_KEY, stringResource(R.string.ip_address_not_set))
 }
 
-@Composable
-fun getIpAddressBlocking(): String {
-    var ipAddress = ""
-    do {
-        ipAddress = getIpAddress()
-        if (ipAddress.isEmpty()) Thread.sleep(100)
-    } while (ipAddress.isEmpty())
-    return ipAddress
+suspend fun getIpAddressBlocking(): String {
+    return getValueBlocking(mainActivity, IP_ADDRESS_KEY, mainActivity.getString(R.string.ip_address_not_set))
 }
 
 fun saveViewMode(previousMode: Layouts, mode: Layouts, context: Context) {

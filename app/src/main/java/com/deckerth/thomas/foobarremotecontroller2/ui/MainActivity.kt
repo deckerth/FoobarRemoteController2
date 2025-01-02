@@ -42,6 +42,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
@@ -121,19 +122,45 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             // Read ip address and start observer
+            var ipAddress by remember { mutableStateOf("") }
+
+            LaunchedEffect(Unit) {
+                ipAddress = getIpAddressBlocking()
+            }
+
             UpdatePreferences()
             BackPressHandler()
-            Foobar2000RemoteControllerTheme {
-                if (!checkIpAddressSyntax(getIpAddressBlocking())){
-                    WelcomePage()
-                }else if (this.isTablet()) {
-                    FoobarTabletLayout()
-                } else {
-                    FoobarPhoneLayout()
+            if (ipAddress.isEmpty())
+                BlackPage()
+            else
+                Foobar2000RemoteControllerTheme {
+                    if (!checkIpAddressSyntax(ipAddress)) {
+                        WelcomePage()
+                    } else if (this.isTablet()) {
+                        FoobarTabletLayout()
+                    } else {
+                        FoobarPhoneLayout()
+                    }
                 }
-            }
         }
     }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    fun BlackPage() {
+        Foobar2000RemoteControllerTheme {
+            Scaffold(
+                topBar = {
+                    TopAppBar(
+                        title = { Text(text = mainActivity.appBarLabel) },
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                },
+            ) { innerPadding ->
+                Box(modifier = Modifier.padding(innerPadding)) { } }
+        }
+    }
+
 
 
     @Composable

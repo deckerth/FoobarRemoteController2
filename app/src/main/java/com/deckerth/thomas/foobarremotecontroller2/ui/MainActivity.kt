@@ -65,9 +65,7 @@ import androidx.navigation.compose.rememberNavController
 import com.deckerth.thomas.foobarremotecontroller2.FoobarMediaService
 import com.deckerth.thomas.foobarremotecontroller2.R
 import com.deckerth.thomas.foobarremotecontroller2.getIpAddress
-import com.deckerth.thomas.foobarremotecontroller2.getIpAddressBlocking
 import com.deckerth.thomas.foobarremotecontroller2.model.PlaybackState
-import com.deckerth.thomas.foobarremotecontroller2.model.checkIpAddressSyntax
 import com.deckerth.thomas.foobarremotecontroller2.saveIpAddress
 import com.deckerth.thomas.foobarremotecontroller2.ui.components.TitleDetails
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.Layouts
@@ -108,7 +106,7 @@ class MainActivity : ComponentActivity() {
     private var _navController: NavController? = null
     private val navController get() = _navController!!
 
-    private var _appBarLabel by mutableStateOf("Foobar Link")
+    var appBarLabel by mutableStateOf("Foobar Link")
 
     private lateinit var appLabel: String
 

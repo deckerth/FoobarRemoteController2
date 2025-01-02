@@ -1,6 +1,10 @@
 package com.deckerth.thomas.foobarremotecontroller2.ui.page
 
 import android.widget.Toast
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -25,6 +29,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -32,9 +37,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.deckerth.thomas.foobarremotecontroller2.R
 import com.deckerth.thomas.foobarremotecontroller2.saveIpAddress
 import com.deckerth.thomas.foobarremotecontroller2.ui.components.DeviceNotFoundText
+import com.deckerth.thomas.foobarremotecontroller2.ui.components.WelcomeText
 import com.deckerth.thomas.foobarremotecontroller2.ui.mainActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -53,11 +63,150 @@ data class Device(
     val ipAddress: String
 )
 
+internal class WizardState {
+    var navController: NavHostController? = null
+    var appBarLabel: String by mutableStateOf("Welcome")
+}
+
+private val state = WizardState()
+
 private var loading by mutableStateOf(true)
 val devices = mutableStateListOf<Device>()
 
 @Composable
-fun DeviceSelectionPage( onClick: (device: Device) -> Unit = {}) {
+fun WizardPage(modifier: Modifier = Modifier,showIntroduction:Boolean = true, onCancel: () -> Unit = {}, onFinished: () -> Unit = {}) {
+    state.navController = rememberNavController()
+    NavHost(
+        navController = state.navController!!,
+        startDestination = if (showIntroduction) "Introduction" else "Search Device",
+        modifier = modifier,
+        enterTransition = { slideInHorizontally(initialOffsetX = { 1000 }) + fadeIn() },
+        exitTransition = { slideOutHorizontally(targetOffsetX = { -1000 }) + fadeOut() },
+        popEnterTransition = { slideInHorizontally(initialOffsetX = { -1000 }) + fadeIn() },
+        popExitTransition = { slideOutHorizontally(targetOffsetX = { 1000 }) + fadeOut() },
+    ) {
+        composable("Introduction") {
+            mainActivity.appBarLabel = stringResource(R.string.welcome_heading)
+            Box(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                WelcomeText(Modifier.padding(16.dp))
+                Row(
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(16.dp)
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    FilledTonalButton(
+                        onClick = onCancel
+                    ) {
+                        Text(stringResource(id = android.R.string.cancel))
+                    }
+                    Spacer(modifier = Modifier.weight(1f))
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Button(
+                        onClick = {
+                            state.navController?.navigate("Search Device")
+                        },
+                    ) {
+                        Text(stringResource(id = R.string.button_next))
+                    }
+                }
+            }
+
+        }
+        composable("Search Device") {
+            mainActivity.appBarLabel = stringResource(R.string.search_device_heading)
+            Box(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                var hasSearched by remember { mutableStateOf(false) }
+                SearchDevices(
+                    onFinishedLoading = {
+                        hasSearched = true
+                    },
+                    onFinished = { device: Device ->
+                        saveIpAddress("${device.ipAddress}:8880", mainActivity)
+                        onFinished()
+                    }
+                )
+                if (hasSearched){
+                    Row(
+                        modifier = Modifier
+                            .align(Alignment.BottomEnd)
+                            .padding(16.dp)
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End
+                    ) {
+                        FilledTonalButton(
+                            onClick = {
+                                prepareDeviceSelectionPage()
+                                state.navController!!.navigate("Search Device")
+                            }
+                        ) {
+                            Text(stringResource(id = R.string.button_refresh_roots))
+                        }
+                        Spacer(modifier = Modifier.weight(1f))
+                        Spacer(modifier = Modifier.width(12.dp))
+                        Button(
+                            onClick = {
+                                state.navController?.navigate("Manual Device")
+                            },
+                        ) {
+                            Text(stringResource(id = R.string.button_next))
+                        }
+                    }
+                }
+            }
+        }
+        composable("No Device Found") {
+            mainActivity.appBarLabel = stringResource(R.string.device_not_found_heading)
+            Box(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                DeviceNotFoundText(Modifier.padding(16.dp))
+                Row(
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(16.dp)
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    FilledTonalButton(
+                        onClick = {
+                            prepareDeviceSelectionPage()
+                            state.navController!!.navigateUp()
+                        }
+                    ) {
+                        Text(stringResource(id = R.string.button_refresh_roots))
+                    }
+                    Spacer(modifier = Modifier.weight(1f))
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Button(
+                        onClick = {
+                            state.navController?.navigate("Manual Device")
+                        },
+                    ) {
+                        Text(stringResource(id = R.string.button_next))
+                    }
+                }
+            }
+        }
+        composable("Manual Device") {
+            mainActivity.appBarLabel = stringResource(R.string.manual_device_heading)
+            CustomDevicePage(onFinished = { device: Device ->
+                saveIpAddress(device.ipAddress, mainActivity)
+                onFinished()
+            })
+        }
+    }
+
+
+}
+
+@Composable
+fun SearchDevices(modifier: Modifier = Modifier, onFinishedLoading: () -> Unit = {}, onFinished: (device: Device) -> Unit) {
     // State to hold whether the search has already been done
     var hasSearched by rememberSaveable { mutableStateOf(false) }
 
@@ -68,18 +217,24 @@ fun DeviceSelectionPage( onClick: (device: Device) -> Unit = {}) {
             prepareDeviceSelectionPage()
         }
     }
+    LaunchedEffect(loading) {
+        if (!loading) {
+            onFinishedLoading()
+        }
+    }
     if (devices.isEmpty() && !loading)
-        DeviceNotFoundText(Modifier.padding(16.dp))
+        state.navController!!.navigate("No Device Found")
     else
-        Column {
+        Column(modifier) {
             if (loading) {
                 LinearProgressIndicator(
                     modifier = Modifier.fillMaxWidth()
                 )
             }
-            DeviceList(devices = devices,onClick)
+            DeviceList(devices = devices) {
+                onFinished(it)
+            }
         }
-
 }
 
 fun prepareDeviceSelectionPage() {
@@ -246,7 +401,9 @@ fun DeviceListPreview() {
 }
 
 @Composable
-fun CustomDevicePage() {
+fun CustomDevicePage(
+    onFinished: (device: Device) -> Unit
+) {
     var ip by rememberSaveable { mutableStateOf("") }
     var port by rememberSaveable { mutableStateOf("8880") }
 
@@ -321,9 +478,8 @@ fun CustomDevicePage() {
             Spacer(modifier = Modifier.width(12.dp))
             Button(
                 onClick = {
-                    saveIpAddress("$ip:$port", mainActivity)
-                    mainActivity.navigateTo("Settings")
-                },
+                    onFinished(Device(hostName = null, "$ip:$port"))
+                }
             ) {
                 Text(stringResource(id = R.string.button_save))
             }
@@ -337,11 +493,11 @@ fun CustomDevicePage() {
 )
 @Composable
 private fun CustomDevicePagePreview() {
-    CustomDevicePage()
+    CustomDevicePage(onFinished = {})
 }
 
 @Preview
 @Composable
 fun DeviceSelectionPagePreview() {
-    DeviceSelectionPage()
+    WizardPage()
 }

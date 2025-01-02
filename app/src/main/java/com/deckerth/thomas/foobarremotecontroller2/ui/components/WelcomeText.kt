@@ -42,12 +42,8 @@ fun WelcomeText(modifier: Modifier = Modifier) {
     )
 
     val annotatedString = buildAnnotatedString {
-        withStyle(headingStyle) {
-            append(stringResource(R.string.welcome_heading))
-        }
-
         withStyle(textStyle) {
-            append("\n\n" + stringResource(R.string.welcome_start) + "\n")
+            append(stringResource(R.string.welcome_start) + "\n")
         }
 
         withStyle(textStyle) {
@@ -96,12 +92,8 @@ fun DeviceNotFoundText(modifier: Modifier = Modifier) {
     )
 
     val annotatedString = buildAnnotatedString {
-        withStyle(headingStyle) {
-            append(stringResource(R.string.device_not_found_heading))
-        }
-
         withStyle(textStyle) {
-            append("\n\n" + stringResource(R.string.device_not_found_start))
+            append(stringResource(R.string.device_not_found_start))
         }
 
         withLink(LinkAnnotation.Url(url = "https://github.com/hyperblast/beefweb?tab=readme-ov-file#how-to-install")) {

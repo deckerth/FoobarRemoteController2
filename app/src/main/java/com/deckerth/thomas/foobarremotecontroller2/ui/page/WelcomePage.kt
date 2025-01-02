@@ -1,4 +1,5 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
+@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class)
+
 package com.deckerth.thomas.foobarremotecontroller2.ui.page
 
 import com.deckerth.thomas.foobarremotecontroller2.ui.components.WelcomeText
@@ -46,103 +47,28 @@ import com.deckerth.thomas.foobarremotecontroller2.ui.mainActivity
 import com.deckerth.thomas.foobarremotecontroller2.ui.theme.Foobar2000RemoteControllerTheme
 
 
-
-internal class WelcomePageViewModel {
-    var navController: NavHostController? = null
-    var appBarLabel: String by mutableStateOf("Welcome")
-}
-
-private val viewModel = WelcomePageViewModel()
-
 @Composable
 fun WelcomePage() {
-    viewModel.navController = rememberNavController()
+
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(text = viewModel.appBarLabel) },
+                title = { Text(text = mainActivity.appBarLabel) },
                 modifier = Modifier.fillMaxWidth(),
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = TopAppBarDefaults.topAppBarColors().scrolledContainerColor
-                )
+                //colors = TopAppBarDefaults.topAppBarColors(
+                //    containerColor = TopAppBarDefaults.topAppBarColors().scrolledContainerColor
+                //)
             )
         },
         modifier = Modifier.fillMaxSize()
     ) { innerPadding ->
-        NavHost(
-            navController = viewModel.navController!!,
-            startDestination = "Introduction",
-            modifier = Modifier.padding(innerPadding),
-            enterTransition = { slideInHorizontally(initialOffsetX = { 1000 }) + fadeIn() },
-            exitTransition = { slideOutHorizontally(targetOffsetX = { -1000 }) + fadeOut() },
-            popEnterTransition = { slideInHorizontally(initialOffsetX = { -1000 }) + fadeIn() },
-            popExitTransition = { slideOutHorizontally(targetOffsetX = { 1000 }) + fadeOut() },
-        ) {
-            composable("Introduction") {
-                viewModel.appBarLabel = stringResource(R.string.welcome_heading)
-                Box(
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    WelcomeText(Modifier.padding(16.dp))
-                    Row(
-                        modifier = Modifier
-                            .align(Alignment.BottomEnd)
-                            .padding(16.dp)
-                            .fillMaxWidth(),
-                        horizontalArrangement = Arrangement.End
-                    ) {
-                        FilledTonalButton(
-                            onClick = {}
-                        ) {
-                            Text(stringResource(id = R.string.button_check_connection))
-                        }
-                        Spacer(modifier = Modifier.weight(1f))
-                        Spacer(modifier = Modifier.width(12.dp))
-                        Button(
-                            onClick = {
-                                viewModel.navController?.navigate("Search Device")
-                            },
-                        ) {
-                            Text(stringResource(id = R.string.button_save))
-                        }
-                    }
-                }
-
-            }
-            composable("Search Device") {
-                Box(
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    DeviceSelectionPage(
-                        onClick = { device: Device ->
-                            saveIpAddress("${device.ipAddress}:8880", mainActivity)
-                        }
-                    )
-                    Row(
-                        modifier = Modifier
-                            .align(Alignment.BottomEnd)
-                            .padding(16.dp)
-                            .fillMaxWidth(),
-                        horizontalArrangement = Arrangement.End
-                    ) {
-                        FilledTonalButton(
-                            onClick = {}
-                        ) {
-                            Text(stringResource(id = R.string.button_check_connection))
-                        }
-                        Spacer(modifier = Modifier.weight(1f))
-                        Spacer(modifier = Modifier.width(12.dp))
-                        Button(
-                            onClick = {
-                                viewModel.navController?.navigate("Select Device")
-                            },
-                        ) {
-                            Text(stringResource(id = R.string.button_save))
-                        }
-                    }
-                }
-            }
-        }
+        WizardPage(Modifier.padding(innerPadding),
+            onCancel = {
+               mainActivity.finish()
+            },
+            onFinished = {
+                mainActivity.recreate()
+            })
     }
 
 }

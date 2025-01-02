@@ -44,7 +44,7 @@ fun TextComponent(text: String, item: LayoutItem) {
 }
 
 @Composable
-fun LayoutComponent(player: Player, layoutItem: LayoutItem, previewMode: Boolean = false) {
+fun LayoutComponent(player: Player, layoutItem: LayoutItem) {
     when (layoutItem.item) {
         LayoutItems.LABEL -> TextComponent(text = player.label, item = layoutItem)
         LayoutItems.CATALOG -> TextComponent(text = player.catalog, item = layoutItem)

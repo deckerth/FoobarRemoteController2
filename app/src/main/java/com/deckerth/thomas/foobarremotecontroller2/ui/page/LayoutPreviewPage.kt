@@ -22,7 +22,6 @@ import com.deckerth.thomas.foobarremotecontroller2.model.PlaylistEntity
 import com.deckerth.thomas.foobarremotecontroller2.model.Title
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.ViewsWithLayout
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.layoutManager
-import com.deckerth.thomas.foobarremotecontroller2.viewmodel.LayoutViewModel
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.playlistState
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.selectedView
 
@@ -110,10 +109,7 @@ private fun setupPreviewPlaylist() {
 var currentPlayer by mutableStateOf(previewPlayerPop)
 
 @Composable
-fun LayoutPreviewPage(
-    modifier: Modifier = Modifier,
-    vm: LayoutViewModel
-) {
+fun LayoutPreviewPage() {
     var maxBoxHeight by remember { mutableStateOf(0.dp) }
     var maxBoxWidth by remember { mutableStateOf(0.dp) }
 

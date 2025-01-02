@@ -158,8 +158,7 @@ class FoobarMediaService : Service() {
     }
 
     private fun requestAudioFocus(): Boolean {
-        val result = audioManager.requestAudioFocus(
-            AudioManager.OnAudioFocusChangeListener { focusChange ->
+        val result = audioManager.requestAudioFocus({ focusChange ->
                 when (focusChange) {
                     AudioManager.AUDIOFOCUS_LOSS_TRANSIENT -> {
                         PlayerAccess.getInstance().pausePlayback()

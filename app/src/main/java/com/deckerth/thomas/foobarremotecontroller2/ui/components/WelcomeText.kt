@@ -20,11 +20,6 @@ import com.deckerth.thomas.foobarremotecontroller2.ui.theme.Foobar2000RemoteCont
 
 @Composable
 fun WelcomeText(modifier: Modifier = Modifier) {
-    val headingStyle = SpanStyle(
-        color = MaterialTheme.colorScheme.secondary,
-        fontSize = MaterialTheme.typography.titleLarge.fontSize,
-        fontWeight = MaterialTheme.typography.titleLarge.fontWeight
-    )
     val textStyle = SpanStyle(
         color = MaterialTheme.colorScheme.secondary,
         fontSize = MaterialTheme.typography.bodyLarge.fontSize,
@@ -63,12 +58,6 @@ fun WelcomeText(modifier: Modifier = Modifier) {
 
 @Composable
 fun DeviceNotFoundText(modifier: Modifier = Modifier) {
-
-    val headingStyle = SpanStyle(
-        color = MaterialTheme.colorScheme.secondary,
-        fontSize = MaterialTheme.typography.titleLarge.fontSize,
-        fontWeight = MaterialTheme.typography.titleLarge.fontWeight
-    )
     val textStyle = SpanStyle(
         color = MaterialTheme.colorScheme.secondary,
         fontSize = MaterialTheme.typography.bodyLarge.fontSize,

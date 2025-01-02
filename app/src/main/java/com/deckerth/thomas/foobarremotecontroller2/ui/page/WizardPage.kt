@@ -65,7 +65,6 @@ data class Device(
 
 internal class WizardState {
     var navController: NavHostController? = null
-    var appBarLabel: String by mutableStateOf("Welcome")
 }
 
 private val state = WizardState()

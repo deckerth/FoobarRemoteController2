@@ -64,7 +64,7 @@ fun WelcomePage() {
     ) { innerPadding ->
         WizardPage(Modifier.padding(innerPadding),
             onCancel = {
-               mainActivity.finish()
+                mainActivity.finish()
             },
             onFinished = {
                 mainActivity.recreate()

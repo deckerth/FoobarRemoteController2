@@ -65,20 +65,22 @@ import androidx.navigation.compose.rememberNavController
 import com.deckerth.thomas.foobarremotecontroller2.FoobarMediaService
 import com.deckerth.thomas.foobarremotecontroller2.R
 import com.deckerth.thomas.foobarremotecontroller2.getIpAddress
+import com.deckerth.thomas.foobarremotecontroller2.getIpAddressBlocking
 import com.deckerth.thomas.foobarremotecontroller2.model.PlaybackState
+import com.deckerth.thomas.foobarremotecontroller2.model.checkIpAddressSyntax
 import com.deckerth.thomas.foobarremotecontroller2.saveIpAddress
 import com.deckerth.thomas.foobarremotecontroller2.ui.components.TitleDetails
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.Layouts
 import com.deckerth.thomas.foobarremotecontroller2.ui.page.BrowserMainPage
 import com.deckerth.thomas.foobarremotecontroller2.ui.page.CustomDevicePage
 import com.deckerth.thomas.foobarremotecontroller2.ui.page.Device
-import com.deckerth.thomas.foobarremotecontroller2.ui.page.DeviceSelectionPage
 import com.deckerth.thomas.foobarremotecontroller2.ui.page.LayoutEditorMainPage
 import com.deckerth.thomas.foobarremotecontroller2.ui.page.LayoutSelection
 import com.deckerth.thomas.foobarremotecontroller2.ui.page.PlayingPage
 import com.deckerth.thomas.foobarremotecontroller2.ui.page.PlaylistPage
 import com.deckerth.thomas.foobarremotecontroller2.ui.page.SettingsPage
 import com.deckerth.thomas.foobarremotecontroller2.ui.page.WelcomePage
+import com.deckerth.thomas.foobarremotecontroller2.ui.page.WizardPage
 import com.deckerth.thomas.foobarremotecontroller2.ui.theme.Foobar2000RemoteControllerTheme
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.UpdatePreferences
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.autoScrollIndex
@@ -181,7 +183,7 @@ class MainActivity : ComponentActivity() {
         Scaffold(
             topBar = {
                 TopAppBar(
-                    title = { Text(text = _appBarLabel) },
+                    title = { Text(text = appBarLabel) },
                     modifier = Modifier.fillMaxWidth(),
                     navigationIcon = {
                         if (getCurrentRoute(navController) == "Browser")
@@ -250,32 +252,6 @@ class MainActivity : ComponentActivity() {
                                         player = player!!,
                                         onDismiss = { infoButtonClicked.value = false })
                             }
-
-                            "DeviceSelectionPage" -> Button(
-                                onClick = {
-                                    navigateTo("CustomDevicePage")
-                                }
-                            ) {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Icon(
-                                        painter = painterResource(R.drawable.tune),
-                                        contentDescription = stringResource(R.string.desc_play),
-                                        modifier = Modifier
-                                            .size(24.dp)
-                                    )
-                                    Spacer(
-                                        modifier = Modifier
-                                            .width(5.dp)
-                                            .height(26.dp)
-                                    )
-                                    Text(
-                                        text = "Custom Device",
-                                        style = MaterialTheme.typography.labelSmall
-                                    )
-                                }
-                            }
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
@@ -319,38 +295,38 @@ class MainActivity : ComponentActivity() {
                 modifier = Modifier.padding(innerPadding)
             ) {
                 composable("Playlist") {
-                    _appBarLabel = appLabel
+                    appBarLabel = appLabel
                     PlaylistPage()
                 }
                 composable("Now Playing") {
-                    _appBarLabel = appLabel
+                    appBarLabel = appLabel
                     PlayingPage()
                 }
                 composable("Settings") {
-                    _appBarLabel = appLabel
+                    appBarLabel = appLabel
                     SettingsPage()
                 }
                 composable("DeviceSelectionPage") {
-                    _appBarLabel = stringResource(R.string.title_device_selection)
-                    DeviceSelectionPage(onClick = { device: Device ->
-                        saveIpAddress("${device.ipAddress}:8880", mainActivity)
-                        mainActivity.navigateTo("Settings")
-                    })
-                }
-                composable("CustomDevicePage") {
-                    _appBarLabel = stringResource(R.string.title_device_selection)
-                    CustomDevicePage()
+                    appBarLabel = stringResource(R.string.title_device_selection)
+                    WizardPage(
+                        showIntroduction = false,
+                        onCancel = {
+                            navController.navigateUp()
+                        },
+                        onFinished = {
+                            navController.navigateUp()
+                        })
                 }
                 composable("Layout selection") {
-                    _appBarLabel = stringResource(R.string.choose_layout_to_change)
+                    appBarLabel = stringResource(R.string.choose_layout_to_change)
                     LayoutSelection()
                 }
                 composable("Layout editor") {
-                    _appBarLabel = stringResource(R.string.choose_layout_to_change)
+                    appBarLabel = stringResource(R.string.choose_layout_to_change)
                     LayoutEditorMainPage()
                 }
                 composable("Browser") {
-                    _appBarLabel = stringResource(R.string.browser)
+                    appBarLabel = stringResource(R.string.browser)
                     BrowserMainPage()
                 }
 
@@ -370,7 +346,7 @@ class MainActivity : ComponentActivity() {
                         Row {
                             Text(
                                 modifier = Modifier.align(Alignment.CenterVertically),
-                                text = _appBarLabel
+                                text = appBarLabel
                             )
                             if (getCurrentRoute(navController) == "Now Playing And Playlist") {
                                 FilledIconToggleButton(
@@ -451,32 +427,6 @@ class MainActivity : ComponentActivity() {
                                     )
                                 }
                             }
-
-                            "DeviceSelectionPage" -> Button(
-                                onClick = {
-                                    navigateTo("CustomDevicePage")
-                                }
-                            ) {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Icon(
-                                        painter = painterResource(R.drawable.tune),
-                                        contentDescription = stringResource(R.string.desc_play),
-                                        modifier = Modifier
-                                            .size(24.dp)
-                                    )
-                                    Spacer(
-                                        modifier = Modifier
-                                            .width(5.dp)
-                                            .height(26.dp)
-                                    )
-                                    Text(
-                                        text = "Custom Device",
-                                        style = MaterialTheme.typography.labelSmall
-                                    )
-                                }
-                            }
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
@@ -492,7 +442,7 @@ class MainActivity : ComponentActivity() {
                 modifier = Modifier.padding(innerPadding)
             ) {
                 composable("Now Playing And Playlist") {
-                    _appBarLabel = appLabel
+                    appBarLabel = appLabel
                     Row { // Row for the two pages
                         Box(
                             modifier = Modifier.weight(1f)
@@ -507,30 +457,30 @@ class MainActivity : ComponentActivity() {
                     }
                 }
                 composable("Settings") {
-                    _appBarLabel = stringResource(R.string.title_settings)
+                    appBarLabel = stringResource(R.string.title_settings)
                     SettingsPage()
                 }
                 composable("DeviceSelectionPage") {
-                    _appBarLabel = stringResource(R.string.title_device_selection)
-                    DeviceSelectionPage(onClick = { device: Device ->
-                        saveIpAddress("${device.ipAddress}:8880", mainActivity)
-                        mainActivity.navigateTo("Settings")
-                    })
-                }
-                composable("CustomDevicePage") {
-                    _appBarLabel = stringResource(R.string.title_device_selection)
-                    CustomDevicePage()
+                    appBarLabel = stringResource(R.string.title_device_selection)
+                    WizardPage(
+                        showIntroduction = false,
+                        onCancel = {
+                            navController.navigateUp()
+                        },
+                        onFinished = {
+                            navController.navigateUp()
+                        })
                 }
                 composable("Layout selection") {
-                    _appBarLabel = stringResource(R.string.choose_layout_to_change)
+                    appBarLabel = stringResource(R.string.choose_layout_to_change)
                     LayoutSelection()
                 }
                 composable("Layout editor") {
-                    _appBarLabel = stringResource(R.string.choose_layout_to_change)
+                    appBarLabel = stringResource(R.string.choose_layout_to_change)
                     LayoutEditorMainPage()
                 }
                 composable("Browser") {
-                    _appBarLabel = stringResource(R.string.browser)
+                    appBarLabel = stringResource(R.string.browser)
                     BrowserMainPage()
                 }
             }

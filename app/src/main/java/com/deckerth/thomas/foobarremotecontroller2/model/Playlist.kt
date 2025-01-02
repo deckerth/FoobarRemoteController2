@@ -39,11 +39,4 @@ class Playlist(var playlistEntity: PlaylistEntity) {
         return titles.find{ it.index == index }
     }
 
-    fun clone(): Playlist {
-        val playlist = Playlist(playlistEntity)
-        titles.forEach {
-            playlist.addTitle(it.clone())
-        }
-        return playlist
-    }
 }

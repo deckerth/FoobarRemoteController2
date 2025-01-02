@@ -39,7 +39,6 @@ import com.deckerth.thomas.foobarremotecontroller2.viewmodel.BrowserViewModel
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.displayedPlaylist
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BrowserPage(vm: BrowserViewModel, navController: NavHostController) {
     val path = vm.getCurrentPath()

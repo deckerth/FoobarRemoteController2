@@ -61,7 +61,7 @@ fun setPlaylists(playlists: Playlists) {
         }
 
         if (selectedPlaylist == "" && entity.playlistId == playingPlaylistId) {
-            // select first playlistsetSelectedPlaylist(entity.playlistId)
+            // select first playlist setSelectedPlaylist(entity.playlistId)
             selectedPlaylist = entity.playlistId
             selectedPlaylistName = entity.name
             displayedPlaylist = getPlaylist(entity.playlistId) //.clone()

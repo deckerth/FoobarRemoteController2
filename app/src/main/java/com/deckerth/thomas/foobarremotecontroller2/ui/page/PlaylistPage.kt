@@ -85,7 +85,7 @@ fun PlaylistPage() {
         updatePlaylists()  // delayed update to avoid crashes during layout update
     }
     if (displayedPlaylist != null)
-        Column() {
+        Column {
             PlaylistSwitcher(playlists = playlists)
             if (displayedPlaylist != null)
                 Playlist(displayedPlaylist!!)
@@ -186,7 +186,7 @@ fun AlbumCard(album: Album, layout: Layout?, previewMode: Boolean = false) {
                     if (infoButtonClicked)
                         TitleDetails(
                             title = album.titles[0],
-                            onDismiss = { -> infoButtonClicked = false },
+                            onDismiss = { infoButtonClicked = false },
                         )
                 }
             }
@@ -278,7 +278,7 @@ fun TitleEntry(album: Album, title: ITitle, previewMode: Boolean = false) {
             if (infoButtonClicked)
                 TitleDetails(
                     title = title,
-                    onDismiss = { -> infoButtonClicked = false },
+                    onDismiss = { infoButtonClicked = false },
                 )
         }
     }

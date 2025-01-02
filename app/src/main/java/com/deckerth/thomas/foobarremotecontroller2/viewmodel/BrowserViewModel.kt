@@ -11,7 +11,7 @@ import com.deckerth.thomas.foobarremotecontroller2.model.AddTracksBehaviors
 import com.deckerth.thomas.foobarremotecontroller2.model.MusicDirectory
 import com.deckerth.thomas.foobarremotecontroller2.model.MusicDirectoryEntry
 
-class BrowserViewModel() : ViewModel() {
+class BrowserViewModel : ViewModel() {
 
     private var filesystem = mutableStateOf(MusicDirectory("ROOT", "", "NULL"))
     private var currentPath = mutableStateOf("")

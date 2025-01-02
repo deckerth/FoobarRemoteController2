@@ -63,7 +63,7 @@ class HTTPConnector {
             val urlConnection = url.openConnection() as HttpURLConnection
             val response = urlConnection.responseCode
             val message = urlConnection.responseMessage
-            println("FOOB respone: $response message:$message")
+            println("FOOB response: $response message:$message")
             return response == 200 && message == "OK"
         } catch (e: Exception) {
             e.printStackTrace()
@@ -108,7 +108,7 @@ class HTTPConnector {
             var urlConnection: HttpURLConnection? = null
             try {
                 url = URL(serverAddress + endpoint)
-                //open a URL coonnection
+                //open an URL connection
                 urlConnection = url.openConnection() as HttpURLConnection
                 urlConnection.requestMethod = "POST"
                 urlConnection.doOutput = true
@@ -138,7 +138,7 @@ class HTTPConnector {
             var urlConnection: HttpURLConnection? = null
             try {
                 url = URL(serverAddress + endpoint)
-                //open a URL coonnection
+                //open a URL connection
                 urlConnection = url.openConnection() as HttpURLConnection
                 urlConnection.requestMethod = "POST"
                 urlConnection.doOutput = true

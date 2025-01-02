@@ -16,9 +16,6 @@ import androidx.media.app.NotificationCompat.MediaStyle
 import com.deckerth.thomas.foobarremotecontroller2.connector.PlayerAccess
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.foobVolumeControl
 import java.time.Instant
-import kotlin.math.floor
-import kotlin.math.max
-import kotlin.math.min
 
 var mediaSession: MediaSessionCompat? = null
 var foobarMediaService: FoobarMediaService? = null

@@ -18,12 +18,12 @@ import com.deckerth.thomas.foobarremotecontroller2.ui.layout.TextAlignment
 
 @Composable
 fun getTextStyle(itemSize: ItemSize): TextStyle {
-    when (itemSize) {
-        ItemSize.TITLE_LARGE -> return MaterialTheme.typography.titleLarge
-        ItemSize.TITLE_MEDIUM -> return MaterialTheme.typography.titleMedium
-        ItemSize.BODY_MEDIUM -> return MaterialTheme.typography.bodyMedium
-        ItemSize.BODY_SMALL -> return MaterialTheme.typography.bodySmall
-        else -> return MaterialTheme.typography.bodySmall
+    return when (itemSize) {
+        ItemSize.TITLE_LARGE -> MaterialTheme.typography.titleLarge
+        ItemSize.TITLE_MEDIUM -> MaterialTheme.typography.titleMedium
+        ItemSize.BODY_MEDIUM -> MaterialTheme.typography.bodyMedium
+        ItemSize.BODY_SMALL -> MaterialTheme.typography.bodySmall
+        else -> MaterialTheme.typography.bodySmall
     }
 }
 

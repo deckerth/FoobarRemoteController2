@@ -1,6 +1,5 @@
 package com.deckerth.thomas.foobarremotecontroller2.ui.layout
 
-import androidx.compose.ui.res.stringResource
 import com.deckerth.thomas.foobarremotecontroller2.R
 import com.deckerth.thomas.foobarremotecontroller2.ui.mainActivity
 

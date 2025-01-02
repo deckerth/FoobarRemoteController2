@@ -99,7 +99,7 @@ lateinit var mainActivity: MainActivity
 class MainActivity : ComponentActivity() {
 
     private var _navController: NavController? = null
-    val navController get() = _navController!!
+    private val navController get() = _navController!!
 
     private var _appBarLabel by mutableStateOf("Foobar Link")
 
@@ -107,7 +107,6 @@ class MainActivity : ComponentActivity() {
 
     //lateinit var imageLoader: ImageLoader
 
-    @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mainActivity = this
@@ -188,7 +187,7 @@ class MainActivity : ComponentActivity() {
                     },
                     actions = {
                         when (getCurrentRoute(navController)) {
-                            "Playlist" -> Row() {
+                            "Playlist" -> Row {
                                 FilledIconToggleButton(
                                     checked = autoscroll,
                                     onCheckedChange = {
@@ -228,7 +227,7 @@ class MainActivity : ComponentActivity() {
                                 }
                             }
 
-                            "Now Playing" -> Row() {
+                            "Now Playing" -> Row {
                                 val infoButtonClicked = remember { mutableStateOf(false) }
                                 IconButton(
                                     onClick = { infoButtonClicked.value = true },
@@ -242,7 +241,7 @@ class MainActivity : ComponentActivity() {
                                 if (player != null && infoButtonClicked.value)
                                     TitleDetails(
                                         player = player!!,
-                                        onDismiss = { -> infoButtonClicked.value = false })
+                                        onDismiss = { infoButtonClicked.value = false })
                             }
 
                             "DeviceSelectionPage" -> Button(
@@ -410,7 +409,7 @@ class MainActivity : ComponentActivity() {
                     actions = {
                         var infoButtonClicked by remember { mutableStateOf(false) }
                         when (getCurrentRoute(navController)) {
-                            "Now Playing And Playlist" -> Row() {
+                            "Now Playing And Playlist" -> Row {
                                 IconButton(
                                     onClick = { infoButtonClicked = true },
                                     enabled = player != null && player!!.playbackState != PlaybackState.STOPPED
@@ -423,7 +422,7 @@ class MainActivity : ComponentActivity() {
                                 if (infoButtonClicked)
                                     TitleDetails(
                                         player = player!!,
-                                        onDismiss = { -> infoButtonClicked = false },
+                                        onDismiss = { infoButtonClicked = false },
                                     )
                                 IconButton(onClick = {
                                     updateList()
@@ -484,8 +483,7 @@ class MainActivity : ComponentActivity() {
             ) {
                 composable("Now Playing And Playlist") {
                     _appBarLabel = appLabel
-                    Row(
-                    ) { // Row for the two pages
+                    Row { // Row for the two pages
                         Box(
                             modifier = Modifier.weight(1f)
                         ) {

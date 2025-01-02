@@ -1,7 +1,6 @@
 package com.deckerth.thomas.foobarremotecontroller2.ui.layout
 
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.text.font.FontStyle
 import com.deckerth.thomas.foobarremotecontroller2.getCustomLayout
 import com.deckerth.thomas.foobarremotecontroller2.getViewMode
 import com.deckerth.thomas.foobarremotecontroller2.saveCustomLayout

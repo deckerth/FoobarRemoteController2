@@ -16,7 +16,7 @@ import androidx.navigation.navArgument
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.BrowserViewModel
 
 sealed class Screen(val route: String) {
-    object Root : Screen("root")
+    data object Root : Screen("root")
     data class Directory(val path: String) : Screen("directory/{path}") {
         // Add this companion object to access the route template
         companion object {
@@ -25,7 +25,6 @@ sealed class Screen(val route: String) {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BrowserMainPage(vm: BrowserViewModel = viewModel()) {
 

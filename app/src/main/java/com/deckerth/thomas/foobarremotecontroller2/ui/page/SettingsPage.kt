@@ -57,7 +57,7 @@ import com.deckerth.thomas.foobarremotecontroller2.ui.mainActivity
 fun SettingsPage() {
     Column(Modifier.verticalScroll(rememberScrollState())) {
         Title(stringResource(R.string.settings_connectivity))
-        PreferenceItem<Boolean>("IP Address", summary = getIpAddress(), onClick = {
+        PreferenceItem<Boolean>(stringResource(R.string.field_ip_address), summary = getIpAddress(), onClick = {
             mainActivity.navigateTo("DeviceSelectionPage")
         })
 
@@ -88,14 +88,14 @@ fun SettingsPage() {
         }
 
         Title(stringResource(R.string.settings_playback))
-        PreferenceItem<Boolean>(
+        PreferenceItem(
             stringResource(R.string.settings_foobar_volume_control),
             summary = "",
             onClick = { enabled : Boolean -> saveFoobarVolumeControl(!enabled, mainActivity) },
             showToggle = true,
             isChecked = getFoobarVolumeControl(),
             isEnabled = true)
-        PreferenceItem<Boolean>(
+        PreferenceItem(
             stringResource(R.string.settings_pause_during_phone_call),
             summary = "",
             onClick = { enabled : Boolean -> savePauseDuringPhoneCalls(!enabled, mainActivity) },
@@ -156,7 +156,8 @@ fun PageTitle(title: String, modifier: Modifier = Modifier) {
 }
 @Composable
 fun ListSelector(values: List<String>, onDismissRequest: (String?) -> Unit) {
-    var selectedText by remember { mutableStateOf("Select an option") }
+    val textSelectAnOption = stringResource(R.string.text_select_an_option)
+    var selectedText by remember { mutableStateOf(textSelectAnOption) }
     DropdownMenu(expanded = true, onDismissRequest = { onDismissRequest(null) }) {
         for(option in values) {
             DropdownMenuItem(onClick = {

@@ -28,7 +28,7 @@ enum class ErrorSource {
 
 class ErrorHandler {
 
-    private var firstOccurrance: Timestamp? = null
+    private var firstOccurrence: Timestamp? = null
     private var errorType: ErrorType = ErrorType.UNKNOWN
     private var errorCode: ErrorCode = ErrorCode.UNKNOWN_ERROR
     private var errorSource: ErrorSource = ErrorSource.PLAYER_STATE
@@ -44,8 +44,8 @@ class ErrorHandler {
         this.errorCode = errorCode
         this.errorSource = errorSource
 
-        if (firstOccurrance == null)
-            firstOccurrance = Timestamp(System.currentTimeMillis())
+        if (firstOccurrence == null)
+            firstOccurrence = Timestamp(System.currentTimeMillis())
 
         var message = ""
         if (error.message != null) message = error.message!!
@@ -54,7 +54,7 @@ class ErrorHandler {
     }
 
     fun sick(): Boolean {
-        isSick = (firstOccurrance != null) && ((System.currentTimeMillis() - firstOccurrance!!.time) > 5000)
+        isSick = (firstOccurrence != null) && ((System.currentTimeMillis() - firstOccurrence!!.time) > 5000)
         if (isSick && !healing) {
             healing = true
             Thread {
@@ -71,7 +71,7 @@ class ErrorHandler {
 
     fun reset() {
         healing = false
-        firstOccurrance = null
+        firstOccurrence = null
     }
 
 }

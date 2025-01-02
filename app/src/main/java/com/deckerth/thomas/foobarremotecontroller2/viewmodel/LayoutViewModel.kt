@@ -92,7 +92,7 @@ class LayoutViewModel : ViewModel() {
             )
             i++
         }
-        fields.add(LayoutField(i, null, "", false, true))
+        fields.add(LayoutField(i, null, "", isSectionTitle = false, isEndMarker = true))
         layoutFields.value = fields
     }
 }

@@ -1,5 +1,7 @@
 package com.deckerth.thomas.foobarremotecontroller2.model
 
+import android.annotation.SuppressLint
+
 enum class PlaybackState {
     STOPPED,
     PLAYING,
@@ -44,6 +46,7 @@ data class Player(
 
     }
 
+    @SuppressLint("DefaultLocale")
     fun getNiceDuration(): String{
         try {
             val duration = duration.toFloat().toInt()

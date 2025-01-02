@@ -27,8 +27,3 @@ data class Album(
         endIndex=title.index
     }
 }
-
-fun MutableList<ITitle>.addTitle(title: ITitle,album: Album) {
-    this.add(title)
-    album.endIndex = title.index
-}

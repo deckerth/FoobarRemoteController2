@@ -19,37 +19,43 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.deckerth.thomas.foobarremotecontroller2.R
 import com.deckerth.thomas.foobarremotecontroller2.ui.theme.Foobar2000RemoteControllerTheme
 
+
 @Composable
 fun WelcomeText() {
+    val headingStyle = SpanStyle(
+        color = MaterialTheme.colorScheme.secondary,
+        fontSize = MaterialTheme.typography.titleMedium.fontSize,
+        fontWeight = MaterialTheme.typography.titleMedium.fontWeight
+    )
+    val textStyle = SpanStyle(
+        color = MaterialTheme.colorScheme.secondary,
+        fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+        fontWeight = MaterialTheme.typography.bodyMedium.fontWeight
+    )
+    val boldTextStyle = SpanStyle(
+        color = MaterialTheme.colorScheme.secondary,
+        fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+        fontWeight = FontWeight(FontWeight.Bold.weight)
+    )
+
     val annotatedString = buildAnnotatedString {
-        withStyle(
-            style = SpanStyle(
-                color = MaterialTheme.colorScheme.secondary,
-                fontSize = MaterialTheme.typography.titleMedium.fontSize,
-                fontWeight = MaterialTheme.typography.titleMedium.fontWeight
-            )
-        ) {
+        withStyle(headingStyle) {
             append(stringResource(R.string.welcome_heading))
         }
 
-        withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.secondary)) {
-            append("\n\n"+stringResource(R.string.welcome_start)+"\n")
+        withStyle(textStyle) {
+            append("\n\n" + stringResource(R.string.welcome_start) + "\n")
         }
 
-        withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.secondary)) {
-            append("\n"+stringResource(R.string.welcome_then_press))
+        withStyle(textStyle) {
+            append("\n" + stringResource(R.string.welcome_then_press))
         }
 
-        withStyle(
-            style = SpanStyle(
-                color = MaterialTheme.colorScheme.secondary,
-                fontWeight = FontWeight(FontWeight.Bold.weight)
-            )
-        ) {
+        withStyle(boldTextStyle) {
             append(stringResource(R.string.welcome_next))
         }
 
-        withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.secondary)) {
+        withStyle(textStyle) {
             append(stringResource(R.string.welcome_start2))
         }
     }
@@ -63,63 +69,67 @@ fun WelcomeText() {
 
 @Composable
 fun DeviceNotFoundText() {
+    val headingStyle = SpanStyle(
+        color = MaterialTheme.colorScheme.secondary,
+        fontSize = MaterialTheme.typography.titleMedium.fontSize,
+        fontWeight = MaterialTheme.typography.titleMedium.fontWeight
+    )
+    val textStyle = SpanStyle(
+        color = MaterialTheme.colorScheme.secondary,
+        fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+        fontWeight = MaterialTheme.typography.bodyMedium.fontWeight
+    )
+    val linkStyle = SpanStyle(
+        color = MaterialTheme.colorScheme.primary,
+        textDecoration = TextDecoration.Underline,
+        fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+        fontWeight = MaterialTheme.typography.bodyMedium.fontWeight
+    )
+    val boldTextStyle = SpanStyle(
+        color = MaterialTheme.colorScheme.secondary,
+        fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+        fontWeight = FontWeight(FontWeight.Bold.weight)
+    )
+
     val annotatedString = buildAnnotatedString {
-        withStyle(
-            style = SpanStyle(
-                color = MaterialTheme.colorScheme.secondary,
-                fontSize = MaterialTheme.typography.titleMedium.fontSize,
-                fontWeight = MaterialTheme.typography.titleMedium.fontWeight
-            )
-        ) {
+        withStyle(headingStyle) {
             append(stringResource(R.string.device_not_found_heading))
         }
 
-        withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.secondary)) {
-            append("\n\n"+stringResource(R.string.device_not_found_start))
+        withStyle(textStyle) {
+            append("\n\n" + stringResource(R.string.device_not_found_start))
         }
 
-        pushStringAnnotation(tag = "URL", annotation = "https://github.com/hyperblast/beefweb?tab=readme-ov-file#how-to-install")
-        withStyle(
-            style = SpanStyle(
-                color = MaterialTheme.colorScheme.primary,
-                textDecoration = TextDecoration.Underline
-            )
-        ) {
+        pushStringAnnotation(
+            tag = "URL",
+            annotation = "https://github.com/hyperblast/beefweb?tab=readme-ov-file#how-to-install"
+        )
+        withStyle(linkStyle) {
             append(stringResource(R.string.device_not_found_link))
         }
         pop()
 
-        withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.secondary)) {
-            append(stringResource(R.string.device_not_found_start2)+"\n")
+        withStyle(textStyle) {
+            append(stringResource(R.string.device_not_found_start2) + "\n")
         }
 
-        withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.secondary)) {
-            append("\n"+stringResource(R.string.device_not_found_text1))
+        withStyle(textStyle) {
+            append("\n" + stringResource(R.string.device_not_found_text1))
         }
 
-        withStyle(
-            style = SpanStyle(
-                color = MaterialTheme.colorScheme.secondary,
-                fontWeight = FontWeight(FontWeight.Bold.weight)
-            )
-        ) {
+        withStyle(boldTextStyle) {
             append(stringResource(R.string.device_not_found_search_again))
         }
 
-        withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.secondary)) {
+        withStyle(textStyle) {
             append(stringResource(R.string.device_not_found_text2))
         }
 
-        withStyle(
-            style = SpanStyle(
-                color = MaterialTheme.colorScheme.secondary,
-                fontWeight = FontWeight(FontWeight.Bold.weight)
-            )
-        ) {
+        withStyle(boldTextStyle) {
             append(stringResource(R.string.welcome_next))
         }
 
-        withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.secondary)) {
+        withStyle(textStyle) {
             append(stringResource(R.string.device_not_found_text4))
         }
     }

@@ -32,6 +32,10 @@ open class MusicDirectory(name: String, path: String, private val parentDirector
         return expanded.value
     }
 
+    fun setExpanded(expanded: Boolean) {
+        this.expanded.value = expanded
+    }
+
     fun expand() {
         val result =
             if (path == "")

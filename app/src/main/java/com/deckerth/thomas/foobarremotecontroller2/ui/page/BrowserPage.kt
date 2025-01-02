@@ -1,5 +1,7 @@
 package com.deckerth.thomas.foobarremotecontroller2.ui.page
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,8 +13,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.text.BasicText
+import androidx.compose.material3.Button
 import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
@@ -28,13 +31,20 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.deckerth.thomas.foobarremotecontroller2.R
 import com.deckerth.thomas.foobarremotecontroller2.getAddTrackBehavior
 import com.deckerth.thomas.foobarremotecontroller2.model.MusicDirectoryEntry
+import com.deckerth.thomas.foobarremotecontroller2.ui.theme.Foobar2000RemoteControllerTheme
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.BrowserViewModel
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.displayedPlaylist
 import kotlinx.coroutines.launch
@@ -72,6 +82,8 @@ fun BrowserPage(vm: BrowserViewModel, navController: NavHostController) {
                 LinearProgressIndicator(
                     modifier = Modifier.fillMaxWidth()
                 )
+            else if (path == "" && vm.getDirectory().getEntries().isEmpty())
+                NoMusicDirectoriesConfiguredInfo(vm)
             else
                 LazyColumn(state = playlistState) {
                     if (vm.getDirectory().getEntries().isNotEmpty()) {
@@ -93,6 +105,81 @@ fun BrowserPage(vm: BrowserViewModel, navController: NavHostController) {
                     }
             }
         }
+    }
+}
+
+@Composable
+fun NoMusicDirectoriesConfiguredInfo(vm: BrowserViewModel?) {
+    val headingStyle = SpanStyle(
+        color = MaterialTheme.colorScheme.secondary,
+        fontSize = MaterialTheme.typography.titleMedium.fontSize,
+        fontWeight = MaterialTheme.typography.titleMedium.fontWeight
+    )
+    val textStyle = SpanStyle(
+        color = MaterialTheme.colorScheme.secondary,
+        fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+        fontWeight = MaterialTheme.typography.bodyMedium.fontWeight
+    )
+    val linkStyle = SpanStyle(
+        color = MaterialTheme.colorScheme.primary,
+        textDecoration = TextDecoration.Underline,
+        fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+        fontWeight = MaterialTheme.typography.bodyMedium.fontWeight
+    )
+    val annotatedString = buildAnnotatedString {
+        withStyle(headingStyle) {
+            append(stringResource(R.string.directory_not_found_heading))
+        }
+        withStyle(textStyle) {
+            append("\n\n" + stringResource(R.string.directory_not_found_start))
+        }
+        pushStringAnnotation(
+            tag = "URL",
+            annotation = "https://github.com/hyperblast/beefweb/blob/master/README.md"
+        )
+        withStyle(linkStyle) {
+            append(stringResource(R.string.device_not_found_link))
+        }
+        pop()
+
+        withStyle(textStyle) {
+            append(stringResource(R.string.directory_not_found_start2) + "\n")
+        }
+    }
+    val context = LocalContext.current
+
+    BasicText(
+        text = annotatedString,
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable {
+                val intent = Intent(
+                    Intent.ACTION_VIEW,
+                    Uri.parse(
+                        annotatedString
+                            .getStringAnnotations("URL", 0, annotatedString.length)
+                            .first().item
+                    )
+                )
+                context.startActivity(intent)
+            }
+    )
+    if (vm != null)
+        Button(
+            modifier = Modifier
+                .padding(top = 16.dp, start = 16.dp, end = 16.dp),
+            onClick = { vm.refreshRoots() },
+            content = { Text(stringResource(R.string.button_refresh_roots)) }
+        )
+}
+
+@Preview(
+    showBackground = true,
+)
+@Composable
+fun NoMusicDirectoriesConfiguredInfoPreview() {
+    Foobar2000RemoteControllerTheme {
+        NoMusicDirectoriesConfiguredInfo(null)
     }
 }
 
@@ -147,7 +234,7 @@ fun DirectoryEntry(
 
             if (!entry.isParentDirectory())
                 if (entry.isAdded.value)
-                    IconButton(onClick = { }){
+                    IconButton(onClick = { }) {
                         Icon(
                             painter = painterResource(R.drawable.library_add_check),
                             contentDescription = stringResource(R.string.desc_added),

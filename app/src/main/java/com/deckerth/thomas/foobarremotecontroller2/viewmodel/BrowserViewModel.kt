@@ -43,7 +43,6 @@ class BrowserViewModel : ViewModel() {
                         if (entry is MusicDirectory && !entry.isParentDirectory())
                             directories[entry.path] = entry
                     loadingData = false
-                    invalidatePlaylist(displayedPlaylist!!)
                 } catch (e: Exception) {
                     loadingData = false
                 }
@@ -69,8 +68,13 @@ class BrowserViewModel : ViewModel() {
                     entry.setIsAdded(true)
                     loadingData = false
                     filesAdded = true
+                    invalidatePlaylist(displayedPlaylist!!)
                 }
             }.start()
     }
 
+    fun refreshRoots() {
+        if (currentPath.value == "")
+            directories[currentPath.value]!!.setExpanded(false)
+    }
 }

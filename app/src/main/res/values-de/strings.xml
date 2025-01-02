@@ -94,12 +94,12 @@
     <string name="settings_add_behavior">Verhalten beim Hinzufügen</string>
     <string name="title_settings">Einstellungen</string>
     <string name="welcome_heading">Einführung</string>
-    <string name="welcome_start">Beginnen wir mit dem Hinzufügen eines  foobar2000 Players. Stellen Sie sicher, dass Foobar und das Beefweb plugin läuft, richtig konfiguriert ist und sich im selben Netzwerk wie dieses Gerät befindet.</string>
+    <string name="welcome_start">Beginnen wir mit dem Hinzufügen eines  foobar2000 Players. Stellen Sie sicher, dass Foobar läuft, das Beefweb plugin installiert und richtig konfiguriert ist. Außerdem muss sich der foobar2000 Player im selben Netzwerk wie dieses Gerät befinden.</string>
     <string name="welcome_next">Weiter</string>
     <string name="welcome_start2">drücken.</string>
     <string name="welcome_then_press">"Anschließend auf "</string>
-    <string name="device_not_found_heading">Es wurde kein Server gefunden</string>
-    <string name="device_not_found_start">"Im lokalen Netzwerk konnte kein foobar2000 Server gefunden werden. Falls Hilfe beim Konfigurieren benötigt wird, "</string>
+    <string name="device_not_found_heading">Es wurde kein foobar2000 Player gefunden</string>
+    <string name="device_not_found_start">"Im lokalen Netzwerk konnte kein foobar2000 Player gefunden werden. Falls Hilfe beim Konfigurieren benötigt wird, "</string>
     <string name="device_not_found_link">hier</string>
     <string name="device_not_found_start2">" drücken."</string>
     <string name="device_not_found_text1">""</string>
@@ -107,4 +107,8 @@
     <string name="device_not_found_text2">" wählen, um nochmal zu suchen oder "</string>
     <string name="device_not_found_text4">" für die manuelle Konfiguration."</string>
     <string name="text_select_an_option">Auswahl</string>
+    <string name="directory_not_found_heading">Keine Verzeichnisse gefunden</string>
+    <string name="directory_not_found_start">"Um das Durchsuchen und Hinzufügen von Dateien über Foobar Link zu ermöglichen, geben Sie Musikverzeichnisse im Konfigurationsbildschirm des Beefweb-Plugins ein. Weitere Informationen finden Sie "</string>
+    <string name="directory_not_found_start2">.</string>
+    <string name="button_refresh_roots">Try again</string>
 </resources>

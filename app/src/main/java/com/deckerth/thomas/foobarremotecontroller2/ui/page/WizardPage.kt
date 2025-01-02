@@ -23,7 +23,9 @@ import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -42,6 +44,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.deckerth.thomas.foobarremotecontroller2.R
+import com.deckerth.thomas.foobarremotecontroller2.model.checkIpAddressSyntax
+import com.deckerth.thomas.foobarremotecontroller2.model.checkIpSyntax
+import com.deckerth.thomas.foobarremotecontroller2.model.checkPortSyntax
 import com.deckerth.thomas.foobarremotecontroller2.saveIpAddress
 import com.deckerth.thomas.foobarremotecontroller2.ui.components.DeviceNotFoundText
 import com.deckerth.thomas.foobarremotecontroller2.ui.components.WelcomeText
@@ -60,8 +65,12 @@ import java.net.URL
 
 data class Device(
     val hostName: String? = null,
-    val ipAddress: String
-)
+    val ipAddress: String){
+
+    val isValid:Boolean get() {
+        return checkIpAddressSyntax(ipAddress)
+    }
+}
 
 internal class WizardState {
     var navController: NavHostController? = null
@@ -200,8 +209,10 @@ fun WizardPage(
         composable("Manual Device") {
             mainActivity.appBarLabel = stringResource(R.string.manual_device_heading)
             CustomDevicePage(onFinished = { device: Device ->
-                saveIpAddress(device.ipAddress, mainActivity)
-                onFinished()
+                if (device.isValid) {
+                    saveIpAddress(device.ipAddress, mainActivity)
+                    onFinished()
+                }
             })
         }
     }
@@ -414,6 +425,8 @@ fun CustomDevicePage(
 ) {
     var ip by rememberSaveable { mutableStateOf("") }
     var port by rememberSaveable { mutableStateOf("8880") }
+    var device by remember { mutableStateOf(Device(ipAddress = "$ip:$port")) }
+    device = Device(ipAddress = "$ip:$port")
 
     Box(
         modifier = Modifier.fillMaxSize()
@@ -424,6 +437,7 @@ fun CustomDevicePage(
                 .fillMaxWidth()
         ) {
             OutlinedTextField(
+                isError = !checkIpSyntax(ip),
                 value = ip,
                 maxLines = 1,
                 onValueChange = { value ->
@@ -434,6 +448,7 @@ fun CustomDevicePage(
             )
             Spacer(modifier = Modifier.height(16.dp))
             OutlinedTextField(
+                isError = !checkPortSyntax(port),
                 value = port,
                 maxLines = 1,
                 onValueChange = { value ->
@@ -451,6 +466,7 @@ fun CustomDevicePage(
             horizontalArrangement = Arrangement.End
         ) {
             FilledTonalButton(
+                enabled = device.isValid,
                 onClick = {
                     Toast.makeText(mainActivity, "Checking Connection", Toast.LENGTH_SHORT).show()
                     // Launch a coroutine on the IO dispatcher for network operations
@@ -485,8 +501,9 @@ fun CustomDevicePage(
             Spacer(modifier = Modifier.weight(1f))
             Spacer(modifier = Modifier.width(12.dp))
             Button(
+                enabled = device.isValid,
                 onClick = {
-                    onFinished(Device(hostName = null, "$ip:$port"))
+                    onFinished(device)
                 }
             ) {
                 Text(stringResource(id = R.string.button_save))

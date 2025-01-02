@@ -34,6 +34,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.deckerth.thomas.foobarremotecontroller2.R
 import com.deckerth.thomas.foobarremotecontroller2.saveIpAddress
+import com.deckerth.thomas.foobarremotecontroller2.ui.components.DeviceNotFoundText
 import com.deckerth.thomas.foobarremotecontroller2.ui.mainActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -67,8 +68,8 @@ fun DeviceSelectionPage( onClick: (device: Device) -> Unit = {}) {
             prepareDeviceSelectionPage()
         }
     }
-    if (devices.isEmpty())
-        Text(modifier = Modifier.padding(16.dp), text = "No Devices Found")
+    if (devices.isEmpty() && !loading)
+        DeviceNotFoundText(Modifier.padding(16.dp))
     else
         Column {
             if (loading) {

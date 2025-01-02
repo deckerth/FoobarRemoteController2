@@ -6,14 +6,17 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withLink
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import com.deckerth.thomas.foobarremotecontroller2.R
@@ -24,17 +27,17 @@ import com.deckerth.thomas.foobarremotecontroller2.ui.theme.Foobar2000RemoteCont
 fun WelcomeText(modifier: Modifier = Modifier) {
     val headingStyle = SpanStyle(
         color = MaterialTheme.colorScheme.secondary,
-        fontSize = MaterialTheme.typography.titleMedium.fontSize,
-        fontWeight = MaterialTheme.typography.titleMedium.fontWeight
+        fontSize = MaterialTheme.typography.titleLarge.fontSize,
+        fontWeight = MaterialTheme.typography.titleLarge.fontWeight
     )
     val textStyle = SpanStyle(
         color = MaterialTheme.colorScheme.secondary,
-        fontSize = MaterialTheme.typography.bodyMedium.fontSize,
-        fontWeight = MaterialTheme.typography.bodyMedium.fontWeight
+        fontSize = MaterialTheme.typography.bodyLarge.fontSize,
+        fontWeight = MaterialTheme.typography.bodyLarge.fontWeight
     )
     val boldTextStyle = SpanStyle(
         color = MaterialTheme.colorScheme.secondary,
-        fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+        fontSize = MaterialTheme.typography.bodyLarge.fontSize,
         fontWeight = FontWeight(FontWeight.Bold.weight)
     )
 
@@ -60,7 +63,7 @@ fun WelcomeText(modifier: Modifier = Modifier) {
         }
     }
 
-    BasicText(
+    Text(
         text = annotatedString,
         modifier = modifier
             .fillMaxWidth()
@@ -71,23 +74,23 @@ fun WelcomeText(modifier: Modifier = Modifier) {
 fun DeviceNotFoundText(modifier: Modifier = Modifier) {
     val headingStyle = SpanStyle(
         color = MaterialTheme.colorScheme.secondary,
-        fontSize = MaterialTheme.typography.titleMedium.fontSize,
-        fontWeight = MaterialTheme.typography.titleMedium.fontWeight
+        fontSize = MaterialTheme.typography.titleLarge.fontSize,
+        fontWeight = MaterialTheme.typography.titleLarge.fontWeight
     )
     val textStyle = SpanStyle(
         color = MaterialTheme.colorScheme.secondary,
-        fontSize = MaterialTheme.typography.bodyMedium.fontSize,
-        fontWeight = MaterialTheme.typography.bodyMedium.fontWeight
+        fontSize = MaterialTheme.typography.bodyLarge.fontSize,
+        fontWeight = MaterialTheme.typography.bodyLarge.fontWeight
     )
     val linkStyle = SpanStyle(
         color = MaterialTheme.colorScheme.primary,
         textDecoration = TextDecoration.Underline,
-        fontSize = MaterialTheme.typography.bodyMedium.fontSize,
-        fontWeight = MaterialTheme.typography.bodyMedium.fontWeight
+        fontSize = MaterialTheme.typography.bodyLarge.fontSize,
+        fontWeight = MaterialTheme.typography.bodyLarge.fontWeight
     )
     val boldTextStyle = SpanStyle(
         color = MaterialTheme.colorScheme.secondary,
-        fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+        fontSize = MaterialTheme.typography.bodyLarge.fontSize,
         fontWeight = FontWeight(FontWeight.Bold.weight)
     )
 
@@ -100,14 +103,11 @@ fun DeviceNotFoundText(modifier: Modifier = Modifier) {
             append("\n\n" + stringResource(R.string.device_not_found_start))
         }
 
-        pushStringAnnotation(
-            tag = "URL",
-            annotation = "https://github.com/hyperblast/beefweb?tab=readme-ov-file#how-to-install"
-        )
-        withStyle(linkStyle) {
-            append(stringResource(R.string.device_not_found_link))
+        withLink(LinkAnnotation.Url(url = "https://github.com/hyperblast/beefweb?tab=readme-ov-file#how-to-install")) {
+            withStyle(linkStyle) {
+                append(stringResource(R.string.device_not_found_link))
+            }
         }
-        pop()
 
         withStyle(textStyle) {
             append(stringResource(R.string.device_not_found_start2) + "\n")
@@ -133,24 +133,10 @@ fun DeviceNotFoundText(modifier: Modifier = Modifier) {
             append(stringResource(R.string.device_not_found_text4))
         }
     }
-
-    val context = LocalContext.current
-
-    BasicText(
+    Text(
         text = annotatedString,
         modifier = modifier
             .fillMaxWidth()
-            .clickable {
-                val intent = Intent(
-                    Intent.ACTION_VIEW,
-                    Uri.parse(
-                        annotatedString
-                            .getStringAnnotations("URL", 0, annotatedString.length)
-                            .first().item
-                    )
-                )
-                context.startActivity(intent)
-            }
     )
 }
 

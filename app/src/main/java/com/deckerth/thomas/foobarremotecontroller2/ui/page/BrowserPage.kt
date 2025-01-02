@@ -152,6 +152,7 @@ fun NoMusicDirectoriesConfiguredInfo(vm: BrowserViewModel?) {
         text = annotatedString,
         modifier = Modifier
             .fillMaxWidth()
+            .padding(start = 16.dp, end = 16.dp)
             .clickable {
                 val intent = Intent(
                     Intent.ACTION_VIEW,

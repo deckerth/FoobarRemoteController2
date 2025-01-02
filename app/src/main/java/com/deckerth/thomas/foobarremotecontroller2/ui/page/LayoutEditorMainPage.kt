@@ -27,7 +27,7 @@ import com.deckerth.thomas.foobarremotecontroller2.viewmodel.selectedView
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LayoutEditorMainPage(vm: LayoutViewModel = viewModel()){
+fun LayoutEditorMainPage(vm: LayoutViewModel = viewModel()) {
     val navController = rememberNavController()
     var editorMode by remember {
         mutableStateOf(true)

@@ -24,10 +24,10 @@ class Playlist(var playlistEntity: PlaylistEntity) {
             albums.add(currentAlbum)
             currentAlbum.addTitle(title)
         } else {
-            var currentAlbum = albums[albums.count()-1]
-            if (title.album == currentAlbum.originalTitle.album){
+            var currentAlbum = albums[albums.count() - 1]
+            if (title.album == currentAlbum.originalTitle.album) {
                 currentAlbum.addTitle(title)
-            }else{
+            } else {
                 currentAlbum = Album(title)
                 currentAlbum.addTitle(title)
                 albums.add(currentAlbum)
@@ -36,7 +36,7 @@ class Playlist(var playlistEntity: PlaylistEntity) {
     }
 
     fun getTitle(index: Int): ITitle? {
-        return titles.find{ it.index == index }
+        return titles.find { it.index == index }
     }
 
 }

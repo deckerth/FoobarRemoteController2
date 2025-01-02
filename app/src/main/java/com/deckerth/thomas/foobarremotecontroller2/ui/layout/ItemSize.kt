@@ -2,8 +2,8 @@ package com.deckerth.thomas.foobarremotecontroller2.ui.layout
 
 import com.deckerth.thomas.foobarremotecontroller2.R
 import com.deckerth.thomas.foobarremotecontroller2.ui.isTablet
-import com.deckerth.thomas.foobarremotecontroller2.ui.mainActivity
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.ItemSize.entries
+import com.deckerth.thomas.foobarremotecontroller2.ui.mainActivity
 
 enum class ItemSize(
     val text: String,

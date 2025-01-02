@@ -66,8 +66,8 @@ import com.deckerth.thomas.foobarremotecontroller2.viewmodel.startPlayerObserver
 fun PlayingPage() {
     val pullToRefreshState = rememberPullToRefreshState()
     var showLoading = loadingList
-    var maxBoxHeight by remember { mutableStateOf(0.dp)}
-    var maxBoxWidth by remember { mutableStateOf(0.dp)}
+    var maxBoxHeight by remember { mutableStateOf(0.dp) }
+    var maxBoxWidth by remember { mutableStateOf(0.dp) }
     layoutManager.InitLayoutManager()
     BoxWithConstraints(
         modifier = Modifier
@@ -80,7 +80,7 @@ fun PlayingPage() {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState(),enabled = true)
+                .verticalScroll(rememberScrollState(), enabled = true)
         ) {
             if (player == null) {
                 showLoading = !isSick
@@ -134,7 +134,10 @@ fun PlayingPage() {
                     )
                 }
             } else {
-                PlayerCard(player = player!!, boxSize = IntSize(maxBoxWidth.value.toInt(), maxBoxHeight.value.toInt()))
+                PlayerCard(
+                    player = player!!,
+                    boxSize = IntSize(maxBoxWidth.value.toInt(), maxBoxHeight.value.toInt())
+                )
             }
             if (pullToRefreshState.isRefreshing) {
                 LaunchedEffect(true) {
@@ -315,11 +318,12 @@ fun PlayerCard(
             .requiredSize(boxSize.width.dp, boxSize.height.dp)
     ) {
         // This Box is used to contain the image and make it occupy the remaining space.
-        Box(modifier = Modifier
-            // Assigns a weight of 1 to the Box, making it take up all available space not used by other elements in the Column.
-            .weight(1f)
-            // Makes the Box occupy the full width of the screen.
-            .fillMaxWidth()
+        Box(
+            modifier = Modifier
+                // Assigns a weight of 1 to the Box, making it take up all available space not used by other elements in the Column.
+                .weight(1f)
+                // Makes the Box occupy the full width of the screen.
+                .fillMaxWidth()
         ) {
             ArtWork(player, previewMode = previewMode)
         }

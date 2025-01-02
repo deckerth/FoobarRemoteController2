@@ -43,19 +43,29 @@ class HTTPConnector {
                 return result.toString()
             } catch (e: Exception) {
                 e.printStackTrace()
-                errorHandler.logError(ErrorType.NETWORK, ErrorCode.CONNECTION_ERROR, ErrorSource.HTTP_CONNECTOR, e)
+                errorHandler.logError(
+                    ErrorType.NETWORK,
+                    ErrorCode.CONNECTION_ERROR,
+                    ErrorSource.HTTP_CONNECTOR,
+                    e
+                )
                 throw e
             } finally {
                 urlConnection?.disconnect()
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            errorHandler.logError(ErrorType.NETWORK, ErrorCode.CONNECTION_ERROR, ErrorSource.HTTP_CONNECTOR, e)
+            errorHandler.logError(
+                ErrorType.NETWORK,
+                ErrorCode.CONNECTION_ERROR,
+                ErrorSource.HTTP_CONNECTOR,
+                e
+            )
             throw e
         }
     }
 
-    fun checkConnection(ip:String): Boolean{
+    fun checkConnection(ip: String): Boolean {
         if (!checkIpAddressSyntax(ip)) return false
         try {
             val url = URL("http://$ip/api/playlists")
@@ -72,35 +82,35 @@ class HTTPConnector {
         }
     }
 
-/*
-    fun getImage(endpoint: String): Bitmap? {
-        // Fetch data from the API in the background.
-        val result: Bitmap
-        try {
-            val url: URL
-            var urlConnection: HttpURLConnection? = null
+    /*
+        fun getImage(endpoint: String): Bitmap? {
+            // Fetch data from the API in the background.
+            val result: Bitmap
             try {
-                url = URL(serverAddress + endpoint)
-                //open a URL connection
-                urlConnection = url.openConnection() as HttpURLConnection
-                val `in` = urlConnection.inputStream
+                val url: URL
+                var urlConnection: HttpURLConnection? = null
+                try {
+                    url = URL(serverAddress + endpoint)
+                    //open a URL connection
+                    urlConnection = url.openConnection() as HttpURLConnection
+                    val `in` = urlConnection.inputStream
 
-                result = BitmapFactory.decodeStream(`in`)
+                    result = BitmapFactory.decodeStream(`in`)
 
-                // return the data to onPostExecute method
-                return result
+                    // return the data to onPostExecute method
+                    return result
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                } finally {
+                    urlConnection?.disconnect()
+                }
             } catch (e: Exception) {
                 e.printStackTrace()
-            } finally {
-                urlConnection?.disconnect()
+                return null
             }
-        } catch (e: Exception) {
-            e.printStackTrace()
             return null
         }
-        return null
-    }
-*/
+    */
 
     fun postData(endpoint: String) {
         val result = StringBuilder()

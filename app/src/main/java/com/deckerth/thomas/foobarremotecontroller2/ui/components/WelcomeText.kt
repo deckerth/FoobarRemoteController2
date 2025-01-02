@@ -1,15 +1,10 @@
 package com.deckerth.thomas.foobarremotecontroller2.ui.components
 
-import android.content.Intent
-import android.net.Uri
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.text.BasicText
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.SpanStyle
@@ -68,7 +63,7 @@ fun WelcomeText(modifier: Modifier = Modifier) {
 
 @Composable
 fun DeviceNotFoundText(modifier: Modifier = Modifier) {
-    
+
     val headingStyle = SpanStyle(
         color = MaterialTheme.colorScheme.secondary,
         fontSize = MaterialTheme.typography.titleLarge.fontSize,

@@ -13,13 +13,10 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.automirrored.outlined.List
@@ -29,12 +26,10 @@ import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledIconToggleButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
@@ -65,16 +60,11 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.deckerth.thomas.foobarremotecontroller2.FoobarMediaService
 import com.deckerth.thomas.foobarremotecontroller2.R
-import com.deckerth.thomas.foobarremotecontroller2.getIpAddress
 import com.deckerth.thomas.foobarremotecontroller2.getIpAddressBlocking
 import com.deckerth.thomas.foobarremotecontroller2.model.PlaybackState
 import com.deckerth.thomas.foobarremotecontroller2.model.checkIpAddressSyntax
-import com.deckerth.thomas.foobarremotecontroller2.saveIpAddress
 import com.deckerth.thomas.foobarremotecontroller2.ui.components.TitleDetails
-import com.deckerth.thomas.foobarremotecontroller2.ui.layout.Layouts
 import com.deckerth.thomas.foobarremotecontroller2.ui.page.BrowserMainPage
-import com.deckerth.thomas.foobarremotecontroller2.ui.page.CustomDevicePage
-import com.deckerth.thomas.foobarremotecontroller2.ui.page.Device
 import com.deckerth.thomas.foobarremotecontroller2.ui.page.LayoutEditorMainPage
 import com.deckerth.thomas.foobarremotecontroller2.ui.page.LayoutSelection
 import com.deckerth.thomas.foobarremotecontroller2.ui.page.PlayingPage
@@ -157,10 +147,10 @@ class MainActivity : ComponentActivity() {
                     )
                 },
             ) { innerPadding ->
-                Box(modifier = Modifier.padding(innerPadding)) { } }
+                Box(modifier = Modifier.padding(innerPadding)) { }
+            }
         }
     }
-
 
 
     @Composable
@@ -411,7 +401,10 @@ class MainActivity : ComponentActivity() {
                     },
                     modifier = Modifier.fillMaxWidth(),
                     navigationIcon = {
-                        if (getCurrentRoute(navController) == "Browser" || getCurrentRoute(navController) == "Settings")
+                        if (getCurrentRoute(navController) == "Browser" || getCurrentRoute(
+                                navController
+                            ) == "Settings"
+                        )
                             IconButton(onClick = { navController.popBackStack() }) {
                                 Icon(
                                     painter = painterResource(R.drawable.arrow_back),

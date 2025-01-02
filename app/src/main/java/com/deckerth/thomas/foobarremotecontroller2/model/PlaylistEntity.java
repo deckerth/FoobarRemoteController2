@@ -26,20 +26,20 @@ public class PlaylistEntity {
         return mIsCurrent;
     }
 
-    public String getName() {
-        return mName;
-    }
-
-    public int getNoOfTracks() {
-        return mNoOfTracks;
-    }
-
     public void setIsCurrent(Boolean isCurrent) {
         this.mIsCurrent = isCurrent;
     }
 
+    public String getName() {
+        return mName;
+    }
+
     public void setName(String name) {
         this.mName = name;
+    }
+
+    public int getNoOfTracks() {
+        return mNoOfTracks;
     }
 
     public void setNoOfTracks(int noOfTracks) {

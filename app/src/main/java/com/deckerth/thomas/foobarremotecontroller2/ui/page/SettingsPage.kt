@@ -57,9 +57,12 @@ import com.deckerth.thomas.foobarremotecontroller2.ui.mainActivity
 fun SettingsPage() {
     Column(Modifier.verticalScroll(rememberScrollState())) {
         Title(stringResource(R.string.settings_connectivity))
-        PreferenceItem<Boolean>(stringResource(R.string.field_ip_address), summary = getIpAddress(), onClick = {
-            mainActivity.navigateTo("DeviceSelectionPage")
-        })
+        PreferenceItem<Boolean>(
+            stringResource(R.string.field_ip_address),
+            summary = getIpAddress(),
+            onClick = {
+                mainActivity.navigateTo("DeviceSelectionPage")
+            })
 
         Title(stringResource(R.string.settings_appearance))
         var isOpen by remember { mutableStateOf(false) }
@@ -83,7 +86,7 @@ fun SettingsPage() {
                     }
                     isOpen = false
                 },
-                getText = {v: Layouts -> v.text}
+                getText = { v: Layouts -> v.text }
             )
         }
 
@@ -91,17 +94,19 @@ fun SettingsPage() {
         PreferenceItem(
             stringResource(R.string.settings_foobar_volume_control),
             summary = "",
-            onClick = { enabled : Boolean -> saveFoobarVolumeControl(!enabled, mainActivity) },
+            onClick = { enabled: Boolean -> saveFoobarVolumeControl(!enabled, mainActivity) },
             showToggle = true,
             isChecked = getFoobarVolumeControl(),
-            isEnabled = true)
+            isEnabled = true
+        )
         PreferenceItem(
             stringResource(R.string.settings_pause_during_phone_call),
             summary = "",
-            onClick = { enabled : Boolean -> savePauseDuringPhoneCalls(!enabled, mainActivity) },
+            onClick = { enabled: Boolean -> savePauseDuringPhoneCalls(!enabled, mainActivity) },
             showToggle = true,
             isChecked = getPauseDuringPhoneCalls(),
-            isEnabled = true)
+            isEnabled = true
+        )
 
         Title(stringResource(R.string.settings_browser))
         var isChooseAddOptionsOpen by remember { mutableStateOf(false) }
@@ -117,13 +122,13 @@ fun SettingsPage() {
                 values = AddTracksBehaviors.entries,
                 title = stringResource(R.string.settings_add_behavior),
                 selectedItem = getAddTrackBehavior(),
-                onClick = { chosen:AddTracksBehaviors? ->
+                onClick = { chosen: AddTracksBehaviors? ->
                     if (chosen != null) {
                         saveAddTrackBehavior(chosen, mainActivity)
                     }
                     isChooseAddOptionsOpen = false
                 },
-                getText = {v: AddTracksBehaviors -> v.text}
+                getText = { v: AddTracksBehaviors -> v.text }
             )
         }
     }
@@ -140,7 +145,7 @@ fun Title(title: String, modifier: Modifier = Modifier) {
             .padding(start = 17.dp)
             .padding(bottom = 8.dp)
             .padding(top = 8.dp),
-        )
+    )
 }
 
 @Composable
@@ -154,18 +159,19 @@ fun PageTitle(title: String, modifier: Modifier = Modifier) {
             .padding(top = 16.dp),
     )
 }
+
 @Composable
 fun ListSelector(values: List<String>, onDismissRequest: (String?) -> Unit) {
     val textSelectAnOption = stringResource(R.string.text_select_an_option)
     var selectedText by remember { mutableStateOf(textSelectAnOption) }
     DropdownMenu(expanded = true, onDismissRequest = { onDismissRequest(null) }) {
-        for(option in values) {
+        for (option in values) {
             DropdownMenuItem(onClick = {
                 selectedText = option
                 onDismissRequest(selectedText)
-            }, text =  {
+            }, text = {
                 Text(text = option)
-            } )
+            })
         }
     }
 }
@@ -230,7 +236,7 @@ fun <T> PreferenceItem(
                         modifier = Modifier.alpha(0.60F),
                     )
                 }
-                if (optionList != null && expanded ) {
+                if (optionList != null && expanded) {
                     ListSelector(
                         values = optionList,
                         onDismissRequest = { value: String? ->
@@ -273,8 +279,8 @@ fun <T> ListPreference(
     title: String,
     selectedItem: T,
     onClick: (T?) -> Unit,
-    getText: (T) -> String = { v -> v.toString()}
-){
+    getText: (T) -> String = { v -> v.toString() }
+) {
     var currentItem by remember { mutableStateOf(selectedItem) }
     currentItem = selectedItem
 
@@ -282,7 +288,10 @@ fun <T> ListPreference(
         onDismissRequest = { onClick(null) },
         confirmButton = {
             TextButton(onClick = { onClick(null) }) {
-                Text(stringResource(android.R.string.cancel), style = MaterialTheme.typography.bodyMedium)
+                Text(
+                    stringResource(android.R.string.cancel),
+                    style = MaterialTheme.typography.bodyMedium
+                )
             }
         },
         title = {

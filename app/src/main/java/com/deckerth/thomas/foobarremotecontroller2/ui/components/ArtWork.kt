@@ -33,7 +33,9 @@ fun ArtWork(player: Player, previewMode: Boolean = false, modifier: Modifier = M
                 bitmap = ImageBitmap.imageResource(id = player.artworkUrl.toInt()),
                 contentDescription = stringResource(R.string.desc_album_picture),
                 contentScale = ContentScale.Fit,
-                modifier = Modifier.fillMaxSize().padding(top=16.dp)
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = 16.dp)
             )
         } else
             AsyncImage(
@@ -41,7 +43,9 @@ fun ArtWork(player: Player, previewMode: Boolean = false, modifier: Modifier = M
                 contentDescription = stringResource(R.string.desc_album_picture),
                 contentScale = ContentScale.Fit,
                 placeholder = painterResource(id = R.drawable.icon),
-                modifier = Modifier.fillMaxSize().padding(top=16.dp)
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = 16.dp)
             )
     } else {
         Box(

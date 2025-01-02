@@ -148,8 +148,7 @@ public class PlayerAccess {
                         mConnector.getServerAddress() + "artwork/" + activeItemObject.getString("playlistId") + "/" + activeItemObject.getString("index"),
                         playbackState,
                         PlaybackMode.getEntries().get(playerObject.getInt("playbackMode")));
-            }
-            else
+            } else
                 return new Player(
                         "",
                         "",

@@ -65,7 +65,9 @@ public class Title implements ITitle {
     }
 
     @Override
-    public String getLabel() { return mLabel; }
+    public String getLabel() {
+        return mLabel;
+    }
 
     @Override
     public String getPlaylistId() {

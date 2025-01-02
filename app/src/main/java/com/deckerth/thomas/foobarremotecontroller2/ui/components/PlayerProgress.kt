@@ -17,63 +17,63 @@ import androidx.compose.ui.unit.dp
 import com.deckerth.thomas.foobarremotecontroller2.R
 import com.deckerth.thomas.foobarremotecontroller2.model.Player
 
-    @Composable
-    fun PlayerProgress(player: Player) {
-        Spacer(modifier = Modifier.height(8.dp))
+@Composable
+fun PlayerProgress(player: Player) {
+    Spacer(modifier = Modifier.height(8.dp))
 
-        Column {
-            Box {
-                Text(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    text = player.playbackTime,
-                    style = MaterialTheme.typography.labelSmall
-                )
-                Text(
-                    textAlign = TextAlign.Right,
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    text = player.getNiceDuration(),
-                    style = MaterialTheme.typography.labelSmall
-                )
-            }
-            Spacer(modifier = Modifier.height(2.dp))
-            LinearProgressIndicator(
+    Column {
+        Box {
+            Text(
                 modifier = Modifier
-                    .clip(MaterialTheme.shapes.large)
                     .fillMaxWidth(),
-                progress = { player.getPos() }
+                text = player.playbackTime,
+                style = MaterialTheme.typography.labelSmall
             )
-            Spacer(modifier = Modifier.height(2.dp))
+            Text(
+                textAlign = TextAlign.Right,
+                modifier = Modifier
+                    .fillMaxWidth(),
+                text = player.getNiceDuration(),
+                style = MaterialTheme.typography.labelSmall
+            )
+        }
+        Spacer(modifier = Modifier.height(2.dp))
+        LinearProgressIndicator(
+            modifier = Modifier
+                .clip(MaterialTheme.shapes.large)
+                .fillMaxWidth(),
+            progress = { player.getPos() }
+        )
+        Spacer(modifier = Modifier.height(2.dp))
 
-            val discNumber = try {
-                player.discNumber.toInt()
-            } catch (e: NumberFormatException) {
-                -1
-            }
-            val track = try {
-                player.track.toInt()
-            } catch (e: NumberFormatException) {
-                -1
-            }
-            if (track != -1) {
-                val text = if (discNumber != -1)
-                    stringResource(
-                        R.string.info_disc_track,
-                        discNumber,
-                        track
-                    )
-                else
-                    stringResource(
-                        R.string.info_track,
-                        track
-                    )
-                Text(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    text = text,
-                    style = MaterialTheme.typography.bodySmall
+        val discNumber = try {
+            player.discNumber.toInt()
+        } catch (e: NumberFormatException) {
+            -1
+        }
+        val track = try {
+            player.track.toInt()
+        } catch (e: NumberFormatException) {
+            -1
+        }
+        if (track != -1) {
+            val text = if (discNumber != -1)
+                stringResource(
+                    R.string.info_disc_track,
+                    discNumber,
+                    track
                 )
-            }
+            else
+                stringResource(
+                    R.string.info_track,
+                    track
+                )
+            Text(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                text = text,
+                style = MaterialTheme.typography.bodySmall
+            )
         }
     }
+}

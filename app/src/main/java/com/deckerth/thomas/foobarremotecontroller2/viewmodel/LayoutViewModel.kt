@@ -85,7 +85,8 @@ class LayoutViewModel : ViewModel() {
             fields.add(
                 LayoutField(
                     i,
-                    LayoutItem(item,
+                    LayoutItem(
+                        item,
                         itemSize = if (item == LayoutItems.ARTWORK) ItemSize.MEDIUM_COVER else ItemSize.BODY_MEDIUM
                     )
                 )

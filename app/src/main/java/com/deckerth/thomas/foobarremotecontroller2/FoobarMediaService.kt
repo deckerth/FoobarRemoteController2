@@ -119,7 +119,7 @@ class FoobarMediaService : Service() {
         }
     }
 
-    fun updateNotification(){
+    fun updateNotification() {
         startForeground(NOTIFICATION_ID, createNotification())
     }
 

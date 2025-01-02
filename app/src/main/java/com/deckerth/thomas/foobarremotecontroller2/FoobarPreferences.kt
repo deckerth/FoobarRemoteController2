@@ -33,8 +33,8 @@ private val ADD_TRACK_BEHAVIOR_KEY = intPreferencesKey("add_track_behavior")
 
 private fun <T> getFlow(context: Context, key: Preferences.Key<T>): Flow<T?> {
     return context.dataStore.data.map { preferences ->
-            preferences[key]
-        }
+        preferences[key]
+    }
 
 }
 
@@ -73,7 +73,11 @@ fun getIpAddress(): String {
 }
 
 suspend fun getIpAddressBlocking(): String {
-    return getValueBlocking(mainActivity, IP_ADDRESS_KEY, mainActivity.getString(R.string.ip_address_not_set))
+    return getValueBlocking(
+        mainActivity,
+        IP_ADDRESS_KEY,
+        mainActivity.getString(R.string.ip_address_not_set)
+    )
 }
 
 fun saveViewMode(previousMode: Layouts, mode: Layouts, context: Context) {
@@ -132,6 +136,10 @@ fun saveAddTrackBehavior(behavior: AddTracksBehaviors, context: Context) {
 
 @Composable
 fun getAddTrackBehavior(): AddTracksBehaviors {
-    return AddTracksBehaviors.entries[getValue(mainActivity, ADD_TRACK_BEHAVIOR_KEY, AddTracksBehaviors.ADD_BEHAVIOR_ADD_PLAY.ordinal)]
+    return AddTracksBehaviors.entries[getValue(
+        mainActivity,
+        ADD_TRACK_BEHAVIOR_KEY,
+        AddTracksBehaviors.ADD_BEHAVIOR_ADD_PLAY.ordinal
+    )]
 
 }

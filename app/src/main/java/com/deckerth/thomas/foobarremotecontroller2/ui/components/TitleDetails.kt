@@ -66,12 +66,12 @@ fun TitleDetails(title: ITitle, onDismiss: () -> Unit) {
 
 @Composable
 fun TitleDetails(player: Player, onDismiss: () -> Unit) {
-        if (player.playlistId.isEmpty() || player.index.isEmpty()) return
-        val playlist = getPlaylist(player.playlistId)
-        val title = playlist.getTitle(player.index.toInt())
-        if (title != null) {
-            TitleDetails(title, onDismiss)
-        }
+    if (player.playlistId.isEmpty() || player.index.isEmpty()) return
+    val playlist = getPlaylist(player.playlistId)
+    val title = playlist.getTitle(player.index.toInt())
+    if (title != null) {
+        TitleDetails(title, onDismiss)
+    }
 }
 
 @Composable

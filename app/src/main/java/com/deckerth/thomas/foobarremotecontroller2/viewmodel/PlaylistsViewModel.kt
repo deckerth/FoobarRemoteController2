@@ -141,7 +141,7 @@ private fun updatePlaylist(playlist: Playlist) {
             } while (currentPlaylist != null && !errorHandler.sick())
             loadingList = false
             println("FOOB updatePlaylist finished")
-        } catch (e: Exception){
+        } catch (e: Exception) {
             loadingList = false
         }
     }.start()

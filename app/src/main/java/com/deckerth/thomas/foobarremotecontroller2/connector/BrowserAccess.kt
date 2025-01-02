@@ -101,7 +101,11 @@ class BrowserAccess {
         return response
     }
 
-    private fun parseDirectory(path: String, parentDirectory: String, response: String): MusicDirectory {
+    private fun parseDirectory(
+        path: String,
+        parentDirectory: String,
+        response: String
+    ): MusicDirectory {
         val entries = MusicDirectory(path, path, parentDirectory)
         try {
             val entriesObject = JSONObject(response)
@@ -158,6 +162,6 @@ class BrowserAccess {
     }
 
     fun escapePathSeparator(path: String): String {
-        return path.replace(pathSeparator, pathSeparator+pathSeparator)
+        return path.replace(pathSeparator, pathSeparator + pathSeparator)
     }
 }

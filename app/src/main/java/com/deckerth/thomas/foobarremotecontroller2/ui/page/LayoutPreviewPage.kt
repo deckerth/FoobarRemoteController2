@@ -46,9 +46,22 @@ val previewPlayerClassic = Player(
 )
 
 val previewPlayerPop = Player(
-    "Polydor","517 007-2", "Björn Ulvaeus", "Gold - Greatest Hits",
-    "Dancing Queen", "ABBA", "1", "1", "0:50", "p4",
-    "1", "232.2", "51.080651833333334", R.drawable.cover_abba.toString(), PlaybackState.PLAYING, PlaybackMode.DEFAULT
+    "Polydor",
+    "517 007-2",
+    "Björn Ulvaeus",
+    "Gold - Greatest Hits",
+    "Dancing Queen",
+    "ABBA",
+    "1",
+    "1",
+    "0:50",
+    "p4",
+    "1",
+    "232.2",
+    "51.080651833333334",
+    R.drawable.cover_abba.toString(),
+    PlaybackState.PLAYING,
+    PlaybackMode.DEFAULT
 )
 
 val previewPlaylist = Playlist(PlaylistEntity("p4", "Preview", true, 2))
@@ -101,8 +114,8 @@ fun LayoutPreviewPage(
     modifier: Modifier = Modifier,
     vm: LayoutViewModel
 ) {
-    var maxBoxHeight by remember { mutableStateOf(0.dp)}
-    var maxBoxWidth by remember { mutableStateOf(0.dp)}
+    var maxBoxHeight by remember { mutableStateOf(0.dp) }
+    var maxBoxWidth by remember { mutableStateOf(0.dp) }
 
     if (selectedView == ViewsWithLayout.PLAYER) {
         BoxWithConstraints(

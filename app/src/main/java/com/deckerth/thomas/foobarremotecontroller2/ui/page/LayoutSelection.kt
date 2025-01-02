@@ -5,9 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -26,14 +24,18 @@ enum class LayoutArea {
     TITLE
 }
 
-var selectedArea : LayoutArea = LayoutArea.PLAYER
+var selectedArea: LayoutArea = LayoutArea.PLAYER
 
 @Composable
-fun CenteredButton(text: String,
-                   onClick: () -> Unit,
-                   modifier: Modifier = Modifier){
-    Box(contentAlignment = Alignment.Center,
-        modifier = modifier.fillMaxWidth()){
+fun CenteredButton(
+    text: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = modifier.fillMaxWidth()
+    ) {
         Button(onClick = { onClick() }
         ) {
             Text(text)
@@ -48,22 +50,22 @@ fun LayoutSelection() {
         PageTitle("Layouts")
         Title(stringResource(R.string.layout_item_title))
         PreferenceItem<Boolean>(title = stringResource(R.string.choose_player_layout), summary = "",
-                                onClick = {
-                                    selectedView = ViewsWithLayout.PLAYER
-                                    mainActivity.navigateTo("Layout editor")
-                                } )
+            onClick = {
+                selectedView = ViewsWithLayout.PLAYER
+                mainActivity.navigateTo("Layout editor")
+            })
 
         Title(stringResource(R.string.layout_playlist))
         PreferenceItem<Boolean>(title = stringResource(R.string.choose_album_layout), summary = "",
             onClick = {
                 selectedView = ViewsWithLayout.ALBUM
                 mainActivity.navigateTo("Layout editor")
-            } )
+            })
         PreferenceItem<Boolean>(title = stringResource(R.string.choose_title_layout), summary = "",
             onClick = {
                 selectedView = ViewsWithLayout.TITLE
                 mainActivity.navigateTo("Layout editor")
-            } )
+            })
 
     }
 }
@@ -72,6 +74,6 @@ fun LayoutSelection() {
     showBackground = true
 )
 @Composable
-fun LayoutSelectionPreview(){
+fun LayoutSelectionPreview() {
     LayoutSelection()
 }

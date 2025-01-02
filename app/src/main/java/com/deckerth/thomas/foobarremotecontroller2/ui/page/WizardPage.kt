@@ -74,7 +74,12 @@ private var loading by mutableStateOf(true)
 val devices = mutableStateListOf<Device>()
 
 @Composable
-fun WizardPage(modifier: Modifier = Modifier,showIntroduction:Boolean = true, onCancel: () -> Unit = {}, onFinished: () -> Unit = {}) {
+fun WizardPage(
+    modifier: Modifier = Modifier,
+    showIntroduction: Boolean = true,
+    onCancel: () -> Unit = {},
+    onFinished: () -> Unit = {}
+) {
     state.navController = rememberNavController()
     NavHost(
         navController = state.navController!!,
@@ -131,7 +136,7 @@ fun WizardPage(modifier: Modifier = Modifier,showIntroduction:Boolean = true, on
                         onFinished()
                     }
                 )
-                if (hasSearched){
+                if (hasSearched) {
                     Row(
                         modifier = Modifier
                             .align(Alignment.BottomEnd)
@@ -206,7 +211,11 @@ fun WizardPage(modifier: Modifier = Modifier,showIntroduction:Boolean = true, on
 }
 
 @Composable
-fun SearchDevices(modifier: Modifier = Modifier, onFinishedLoading: () -> Unit = {}, onFinished: (device: Device) -> Unit) {
+fun SearchDevices(
+    modifier: Modifier = Modifier,
+    onFinishedLoading: () -> Unit = {},
+    onFinished: (device: Device) -> Unit
+) {
     // State to hold whether the search has already been done
     var hasSearched by rememberSaveable { mutableStateOf(false) }
 
@@ -322,7 +331,7 @@ private fun getHostName(ip: String): String? {
 fun DeviceList(devices: List<Device>, onClick: (device: Device) -> Unit = {}) {
     LazyColumn {
         items(devices) { device ->
-            DeviceEntry(device,onClick)
+            DeviceEntry(device, onClick)
         }
     }
 }

@@ -16,9 +16,8 @@ public class PlaylistAccess {
 
     @SuppressLint("StaticFieldLeak")
     private static PlaylistAccess INSTANCE;
-    private HTTPConnector mConnector;
-
     private final ErrorHandler errorHandler;
+    private HTTPConnector mConnector;
 
     public PlaylistAccess() {
         this.errorHandler = ErrorHandlerKt.getErrorHandler();
@@ -182,7 +181,7 @@ public class PlaylistAccess {
                 replaceValue = "true";
                 break;
         }
-        String jsonString = "{\"items\":[\"" + path + "\"], \"play\":"+ playValue + ", \"replace\":"+ replaceValue + " }";
+        String jsonString = "{\"items\":[\"" + path + "\"], \"play\":" + playValue + ", \"replace\":" + replaceValue + " }";
         mConnector.postData("playlists/" + playlistId + "/items/add/", jsonString);
     }
 

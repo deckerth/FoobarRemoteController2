@@ -54,7 +54,8 @@ class ErrorHandler {
     }
 
     fun sick(): Boolean {
-        isSick = (firstOccurrence != null) && ((System.currentTimeMillis() - firstOccurrence!!.time) > 5000)
+        isSick =
+            (firstOccurrence != null) && ((System.currentTimeMillis() - firstOccurrence!!.time) > 5000)
         if (isSick && !healing) {
             healing = true
             Thread {
@@ -63,7 +64,8 @@ class ErrorHandler {
                     Thread.sleep(10000)
                     reset()
                     println("FOOB Healing finished")
-                } catch (_: Exception){  }
+                } catch (_: Exception) {
+                }
             }.start()
         }
         return isSick

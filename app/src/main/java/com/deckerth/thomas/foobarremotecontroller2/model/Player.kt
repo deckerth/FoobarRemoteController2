@@ -42,25 +42,31 @@ data class Player(
             val duration = this.duration.toFloat()
             val position = this.position.toFloat()
             return position / duration * 1f
-        } catch (ex: NumberFormatException) {return 0f}
+        } catch (ex: NumberFormatException) {
+            return 0f
+        }
 
     }
 
     @SuppressLint("DefaultLocale")
-    fun getNiceDuration(): String{
+    fun getNiceDuration(): String {
         try {
             val duration = duration.toFloat().toInt()
-            val minutes:Int = duration/60
-            val seconds:Int = duration%60
+            val minutes: Int = duration / 60
+            val seconds: Int = duration % 60
             return String.format("%01d:%02d", minutes, seconds)
-        } catch (ex: NumberFormatException) {return ""}
+        } catch (ex: NumberFormatException) {
+            return ""
+        }
 
     }
 
     fun getIndex(): Int {
-        try{
+        try {
             val pos = index.toInt()
             return pos
-        } catch (ex: NumberFormatException) {return -1}
+        } catch (ex: NumberFormatException) {
+            return -1
+        }
     }
 }

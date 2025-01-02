@@ -208,10 +208,10 @@ fun startPlayerObserver() {
                     updatePlayer()
                     val playlists = PlaylistAccess.getInstance().playlists
                     if (player != null && playlists != null)
-                    if (autoscroll && player!!.playlistId.isNotEmpty() && player!!.playlistId != selectedPlaylist)
-                        setSelectedPlaylist(player!!.playlistId)
-                    else if(selectedPlaylist.isEmpty())
-                        setSelectedPlaylist(playlists.currentPlaylist.playlistId)
+                        if (autoscroll && player!!.playlistId.isNotEmpty() && player!!.playlistId != selectedPlaylist)
+                            setSelectedPlaylist(player!!.playlistId)
+                        else if (selectedPlaylist.isEmpty())
+                            setSelectedPlaylist(playlists.currentPlaylist.playlistId)
 
                     if (playlists != null)
                         setPlaylists(playlists)

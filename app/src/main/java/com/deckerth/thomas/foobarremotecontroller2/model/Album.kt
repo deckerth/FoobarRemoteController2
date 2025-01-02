@@ -6,11 +6,13 @@ import androidx.compose.runtime.setValue
 
 data class Album(
     val originalTitle: ITitle
-){
+) {
     private var _titles = mutableListOf<ITitle>()
 
     val titles: List<ITitle>
-        get() { return _titles.toList() }
+        get() {
+            return _titles.toList()
+        }
 
     var isSelected by mutableStateOf(false)
 
@@ -18,12 +20,12 @@ data class Album(
 
     var endIndex: Int = 0
 
-    fun hasIndex(index:Int): Boolean{
+    fun hasIndex(index: Int): Boolean {
         return index in originalTitle.index..endIndex
     }
 
     fun addTitle(title: ITitle) {
         _titles.add(title)
-        endIndex=title.index
+        endIndex = title.index
     }
 }

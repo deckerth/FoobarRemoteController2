@@ -1,5 +1,6 @@
 package com.deckerth.thomas.foobarremotecontroller2.connector
 
+import com.deckerth.thomas.foobarremotecontroller2.model.checkIpAddressSyntax
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.ip_address
 import java.io.IOException
 import java.io.InputStreamReader
@@ -55,7 +56,7 @@ class HTTPConnector {
     }
 
     fun checkConnection(ip:String): Boolean{
-        if (!ip.contains(":")) return false
+        if (!checkIpAddressSyntax(ip)) return false
         try {
             val url = URL("http://$ip/api/playlists")
             println("FOOB \"http://$ip/api/playlists\"")

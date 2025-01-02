@@ -3,6 +3,7 @@ package com.deckerth.thomas.foobarremotecontroller2
 import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.res.stringResource
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
@@ -51,14 +52,25 @@ private fun <T> saveValue(context: Context, value: T, key: Preferences.Key<T>) {
 }
 
 fun saveIpAddress(ip: String, context: Context) {
+    val effectiveValue = ip.ifEmpty { mainActivity.getString(R.string.ip_address_not_set) }
     runBlocking {
-        saveValue(context, ip, IP_ADDRESS_KEY)
+        saveValue(context, effectiveValue, IP_ADDRESS_KEY)
     }
 }
 
 @Composable
 fun getIpAddress(): String {
-    return getValue(mainActivity, IP_ADDRESS_KEY, "")
+    return getValue(mainActivity, IP_ADDRESS_KEY, stringResource(R.string.ip_address_not_set))
+}
+
+@Composable
+fun getIpAddressBlocking(): String {
+    var ipAddress = ""
+    do {
+        ipAddress = getIpAddress()
+        if (ipAddress.isEmpty()) Thread.sleep(100)
+    } while (ipAddress.isEmpty())
+    return ipAddress
 }
 
 fun saveViewMode(previousMode: Layouts, mode: Layouts, context: Context) {

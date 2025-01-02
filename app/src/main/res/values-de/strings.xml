@@ -110,5 +110,6 @@
     <string name="directory_not_found_heading">Keine Verzeichnisse gefunden</string>
     <string name="directory_not_found_start">"Um das Durchsuchen und Hinzufügen von Dateien über Foobar Link zu ermöglichen, geben Sie Musikverzeichnisse im Konfigurationsbildschirm des Beefweb-Plugins ein. Weitere Informationen finden Sie "</string>
     <string name="directory_not_found_start2">.</string>
-    <string name="button_refresh_roots">Erneit versuchen</string>
+    <string name="button_refresh_roots">Erneut versuchen</string>
+    <string name="ip_address_not_set">Noch nicht gesetzt</string>
 </resources>

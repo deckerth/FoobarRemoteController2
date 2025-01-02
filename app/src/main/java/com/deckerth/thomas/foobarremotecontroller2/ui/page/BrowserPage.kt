@@ -34,9 +34,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withLink
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -133,37 +135,23 @@ fun NoMusicDirectoriesConfiguredInfo(vm: BrowserViewModel?) {
         withStyle(textStyle) {
             append("\n\n" + stringResource(R.string.directory_not_found_start))
         }
-        pushStringAnnotation(
-            tag = "URL",
-            annotation = "https://github.com/hyperblast/beefweb/blob/master/README.md"
-        )
-        withStyle(linkStyle) {
-            append(stringResource(R.string.device_not_found_link))
+
+        withLink(LinkAnnotation.Url(url = "https://github.com/hyperblast/beefweb/blob/master/README.md")) {
+            withStyle(linkStyle) {
+                append(stringResource(R.string.device_not_found_link))
+            }
         }
-        pop()
 
         withStyle(textStyle) {
             append(stringResource(R.string.directory_not_found_start2) + "\n")
         }
     }
-    val context = LocalContext.current
 
-    BasicText(
+    Text(
         text = annotatedString,
         modifier = Modifier
             .fillMaxWidth()
             .padding(start = 16.dp, end = 16.dp)
-            .clickable {
-                val intent = Intent(
-                    Intent.ACTION_VIEW,
-                    Uri.parse(
-                        annotatedString
-                            .getStringAnnotations("URL", 0, annotatedString.length)
-                            .first().item
-                    )
-                )
-                context.startActivity(intent)
-            }
     )
     if (vm != null)
         Button(

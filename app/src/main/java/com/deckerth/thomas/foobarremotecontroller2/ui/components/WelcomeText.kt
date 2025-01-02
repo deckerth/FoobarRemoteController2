@@ -72,6 +72,7 @@ fun WelcomeText(modifier: Modifier = Modifier) {
 
 @Composable
 fun DeviceNotFoundText(modifier: Modifier = Modifier) {
+    
     val headingStyle = SpanStyle(
         color = MaterialTheme.colorScheme.secondary,
         fontSize = MaterialTheme.typography.titleLarge.fontSize,

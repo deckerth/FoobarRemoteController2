@@ -56,7 +56,7 @@ private var loading by mutableStateOf(true)
 val devices = mutableStateListOf<Device>()
 
 @Composable
-fun DeviceSelectionPage() {
+fun DeviceSelectionPage( onClick: (device: Device) -> Unit = {}) {
     // State to hold whether the search has already been done
     var hasSearched by rememberSaveable { mutableStateOf(false) }
 
@@ -76,7 +76,7 @@ fun DeviceSelectionPage() {
                     modifier = Modifier.fillMaxWidth()
                 )
             }
-            DeviceList(devices = devices)
+            DeviceList(devices = devices,onClick)
         }
 
 }
@@ -163,21 +163,20 @@ private fun getHostName(ip: String): String? {
 
 
 @Composable
-fun DeviceList(devices: List<Device>) {
+fun DeviceList(devices: List<Device>, onClick: (device: Device) -> Unit = {}) {
     LazyColumn {
         items(devices) { device ->
-            DeviceEntry(device)
+            DeviceEntry(device,onClick)
         }
     }
 }
 
 @Composable
-fun DeviceEntry(device: Device) {
+fun DeviceEntry(device: Device, onClick: (device: Device) -> Unit = {}) {
     Column(
         modifier = Modifier
             .clickable {
-                saveIpAddress("${device.ipAddress}:8880", mainActivity)
-                mainActivity.navigateTo("Settings")
+                onClick(device)
             }
             .padding(16.dp)
             .height(40.dp),

@@ -64,16 +64,21 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.deckerth.thomas.foobarremotecontroller2.FoobarMediaService
 import com.deckerth.thomas.foobarremotecontroller2.R
+import com.deckerth.thomas.foobarremotecontroller2.getIpAddress
 import com.deckerth.thomas.foobarremotecontroller2.model.PlaybackState
+import com.deckerth.thomas.foobarremotecontroller2.saveIpAddress
 import com.deckerth.thomas.foobarremotecontroller2.ui.components.TitleDetails
+import com.deckerth.thomas.foobarremotecontroller2.ui.layout.Layouts
 import com.deckerth.thomas.foobarremotecontroller2.ui.page.BrowserMainPage
 import com.deckerth.thomas.foobarremotecontroller2.ui.page.CustomDevicePage
+import com.deckerth.thomas.foobarremotecontroller2.ui.page.Device
 import com.deckerth.thomas.foobarremotecontroller2.ui.page.DeviceSelectionPage
 import com.deckerth.thomas.foobarremotecontroller2.ui.page.LayoutEditorMainPage
 import com.deckerth.thomas.foobarremotecontroller2.ui.page.LayoutSelection
 import com.deckerth.thomas.foobarremotecontroller2.ui.page.PlayingPage
 import com.deckerth.thomas.foobarremotecontroller2.ui.page.PlaylistPage
 import com.deckerth.thomas.foobarremotecontroller2.ui.page.SettingsPage
+import com.deckerth.thomas.foobarremotecontroller2.ui.page.WelcomePage
 import com.deckerth.thomas.foobarremotecontroller2.ui.theme.Foobar2000RemoteControllerTheme
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.UpdatePreferences
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.autoScrollIndex
@@ -117,7 +122,9 @@ class MainActivity : ComponentActivity() {
             UpdatePreferences()
             BackPressHandler()
             Foobar2000RemoteControllerTheme {
-                if (this.isTablet()) {
+                if (getIpAddress().isNullOrEmpty()){
+                    WelcomePage()
+                }else if (this.isTablet()) {
                     FoobarTabletLayout()
                 } else {
                     FoobarPhoneLayout()
@@ -325,7 +332,10 @@ class MainActivity : ComponentActivity() {
                 }
                 composable("DeviceSelectionPage") {
                     _appBarLabel = stringResource(R.string.title_device_selection)
-                    DeviceSelectionPage()
+                    DeviceSelectionPage(onClick = { device: Device ->
+                        saveIpAddress("${device.ipAddress}:8880", mainActivity)
+                        mainActivity.navigateTo("Settings")
+                    })
                 }
                 composable("CustomDevicePage") {
                     _appBarLabel = stringResource(R.string.title_device_selection)
@@ -502,7 +512,10 @@ class MainActivity : ComponentActivity() {
                 }
                 composable("DeviceSelectionPage") {
                     _appBarLabel = stringResource(R.string.title_device_selection)
-                    DeviceSelectionPage()
+                    DeviceSelectionPage(onClick = { device: Device ->
+                        saveIpAddress("${device.ipAddress}:8880", mainActivity)
+                        mainActivity.navigateTo("Settings")
+                    })
                 }
                 composable("CustomDevicePage") {
                     _appBarLabel = stringResource(R.string.title_device_selection)

@@ -96,7 +96,7 @@
     <string name="welcome_heading">Einführung</string>
     <string name="welcome_start">Beginnen wir mit dem Hinzufügen eines  foobar2000 Players. Stellen Sie sicher, dass Foobar läuft, das Beefweb plugin installiert und richtig konfiguriert ist. Außerdem muss sich der foobar2000 Player im selben Netzwerk wie dieses Gerät befinden.</string>
     <string name="welcome_next">Weiter</string>
-    <string name="welcome_start2">drücken.</string>
+    <string name="welcome_start2"> drücken.</string>
     <string name="welcome_then_press">"Anschließend auf "</string>
     <string name="device_not_found_heading">Es wurde kein foobar2000 Player gefunden</string>
     <string name="device_not_found_start">"Im lokalen Netzwerk konnte kein foobar2000 Player gefunden werden. Falls Hilfe beim Konfigurieren benötigt wird, "</string>

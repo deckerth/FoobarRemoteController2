@@ -58,7 +58,7 @@ fun saveIpAddress(ip: String, context: Context) {
 
 @Composable
 fun getIpAddress(): String {
-    return getValue(mainActivity, IP_ADDRESS_KEY, "0.0.0.0")
+    return getValue(mainActivity, IP_ADDRESS_KEY, "")
 }
 
 fun saveViewMode(previousMode: Layouts, mode: Layouts, context: Context) {

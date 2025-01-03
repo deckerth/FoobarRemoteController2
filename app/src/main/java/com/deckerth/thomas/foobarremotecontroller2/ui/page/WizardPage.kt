@@ -23,9 +23,7 @@ import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -47,6 +45,7 @@ import com.deckerth.thomas.foobarremotecontroller2.R
 import com.deckerth.thomas.foobarremotecontroller2.model.checkIpAddressSyntax
 import com.deckerth.thomas.foobarremotecontroller2.model.checkIpSyntax
 import com.deckerth.thomas.foobarremotecontroller2.model.checkPortSyntax
+import com.deckerth.thomas.foobarremotecontroller2.model.isWlanConnected
 import com.deckerth.thomas.foobarremotecontroller2.saveIpAddress
 import com.deckerth.thomas.foobarremotecontroller2.ui.components.DeviceNotFoundText
 import com.deckerth.thomas.foobarremotecontroller2.ui.components.WelcomeText
@@ -65,11 +64,13 @@ import java.net.URL
 
 data class Device(
     val hostName: String? = null,
-    val ipAddress: String){
+    val ipAddress: String
+) {
 
-    val isValid:Boolean get() {
-        return checkIpAddressSyntax(ipAddress)
-    }
+    val isValid: Boolean
+        get() {
+            return checkIpAddressSyntax(ipAddress)
+        }
 }
 
 internal class WizardState {
@@ -339,11 +340,18 @@ private fun getHostName(ip: String): String? {
 
 @Composable
 fun DeviceList(devices: List<Device>, onClick: (device: Device) -> Unit = {}) {
-    LazyColumn {
-        items(devices) { device ->
-            DeviceEntry(device, onClick)
+    if (isWlanConnected(mainActivity))
+        LazyColumn {
+            items(devices) { device ->
+                DeviceEntry(device, onClick)
+            }
         }
-    }
+    else
+        Text(
+            modifier = Modifier.padding(16.dp),
+            style = MaterialTheme.typography.bodyLarge,
+            text = stringResource(id = R.string.no_wifi_connection)
+        )
 }
 
 @Composable

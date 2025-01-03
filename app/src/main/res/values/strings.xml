@@ -114,4 +114,5 @@
     <string name="search_device_heading">Searching Network</string>
     <string name="button_next">Next</string>
     <string name="manual_device_heading">Set up Device</string>
+    <string name="no_wifi_connection">No Wifi connection</string>
 </resources>

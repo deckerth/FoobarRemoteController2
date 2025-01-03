@@ -115,4 +115,5 @@
     <string name="manual_device_heading">Gerät einrichten</string>
     <string name="button_refresh_roots">Erneut versuchen</string>
     <string name="ip_address_not_set">Noch nicht gesetzt</string>
+    <string name="no_wifi_connection">Keine WLAN Verbindunng</string>
 </resources>

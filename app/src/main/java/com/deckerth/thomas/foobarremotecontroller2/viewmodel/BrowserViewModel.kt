@@ -68,7 +68,6 @@ class BrowserViewModel : ViewModel() {
                     entry.setIsAdded(true)
                     loadingData = false
                     filesAdded = true
-                    invalidatePlaylist(displayedPlaylist!!)
                 }
             }.start()
     }

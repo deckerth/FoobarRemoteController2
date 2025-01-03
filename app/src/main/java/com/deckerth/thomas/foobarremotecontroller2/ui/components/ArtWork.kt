@@ -17,10 +17,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.imageResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
 import com.deckerth.thomas.foobarremotecontroller2.R
 import com.deckerth.thomas.foobarremotecontroller2.model.Player
 
@@ -38,11 +36,8 @@ fun ArtWork(player: Player, previewMode: Boolean = false, modifier: Modifier = M
                     .padding(top = 16.dp)
             )
         } else
-            AsyncImage(
-                model = player.artworkUrl,
-                contentDescription = stringResource(R.string.desc_album_picture),
-                contentScale = ContentScale.Fit,
-                placeholder = painterResource(id = R.drawable.icon),
+            ImageWithLoadingPlaceholder(
+                imageUrl = player.artworkUrl,
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(top = 16.dp)

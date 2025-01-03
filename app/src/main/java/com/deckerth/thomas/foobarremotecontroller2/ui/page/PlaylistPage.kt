@@ -48,7 +48,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
 import com.deckerth.thomas.foobarremotecontroller2.R
 import com.deckerth.thomas.foobarremotecontroller2.connector.PlayerAccess
 import com.deckerth.thomas.foobarremotecontroller2.model.Album
@@ -57,6 +56,7 @@ import com.deckerth.thomas.foobarremotecontroller2.model.Playlist
 import com.deckerth.thomas.foobarremotecontroller2.model.PlaylistEntity
 import com.deckerth.thomas.foobarremotecontroller2.model.Playlists
 import com.deckerth.thomas.foobarremotecontroller2.model.Title
+import com.deckerth.thomas.foobarremotecontroller2.ui.components.ImageWithLoadingPlaceholder
 import com.deckerth.thomas.foobarremotecontroller2.ui.components.LayoutComponent
 import com.deckerth.thomas.foobarremotecontroller2.ui.components.TitleDetails
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.Layout
@@ -152,10 +152,8 @@ fun AlbumCard(album: Album, layout: Layout?, previewMode: Boolean = false) {
                             .size(80.dp)
                     )
                 else
-                    AsyncImage(
-                        model = album.originalTitle.artworkUrl,
-                        placeholder = painterResource(R.drawable.ic_launcher_background),
-                        contentDescription = stringResource(id = R.string.desc_album_picture),
+                    ImageWithLoadingPlaceholder(
+                        imageUrl = album.originalTitle.artworkUrl,
                         modifier = Modifier
                             .size(80.dp)
                     )

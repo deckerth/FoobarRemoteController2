@@ -6,6 +6,10 @@ import android.app.NotificationManager
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.media.AudioAttributes
+import android.media.AudioAttributes.CONTENT_TYPE_MUSIC
+import android.media.AudioAttributes.USAGE_MEDIA
+import android.media.AudioFocusRequest
 import android.media.AudioManager
 import android.os.IBinder
 import android.support.v4.media.session.MediaSessionCompat
@@ -15,12 +19,48 @@ import androidx.media.VolumeProviderCompat
 import androidx.media.app.NotificationCompat.MediaStyle
 import com.deckerth.thomas.foobarremotecontroller2.connector.PlayerAccess
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.foobVolumeControl
+import kotlinx.coroutines.runBlocking
 import java.time.Instant
 
 var mediaSession: MediaSessionCompat? = null
 var foobarMediaService: FoobarMediaService? = null
 lateinit var volumeProvider: VolumeProviderCompat
 var lastChanged: Instant = Instant.now()
+
+val audioFocusRequest: AudioFocusRequest = AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
+    .setOnAudioFocusChangeListener { focusChange ->
+        var pause: Boolean
+        runBlocking {
+            pause = getPauseDuringPhoneCallsBlocking()
+        }
+
+        if (pause)
+            when (focusChange) {
+                AudioManager.AUDIOFOCUS_LOSS_TRANSIENT -> {
+                    PlayerAccess.getInstance().pausePlayback()
+                    // Handle audio focus loss (e.g., stop playback)
+                }
+
+                AudioManager.AUDIOFOCUS_GAIN -> {
+                    PlayerAccess.getInstance().startPlayback()
+                    // Handle audio focus gain (e.g., resume playback)
+                }
+            }
+    }
+
+    .setAudioAttributes(
+        AudioAttributes.Builder()
+            .setUsage(USAGE_MEDIA)
+            .setContentType(CONTENT_TYPE_MUSIC)
+            .build()
+    )
+    .build()
+
+fun enableVolumeControl() {
+    if(mediaSession != null) {
+         mediaSession!!.setPlaybackToRemote(volumeProvider)
+    }
+}
 
 class FoobarMediaService : Service() {
 
@@ -37,6 +77,7 @@ class FoobarMediaService : Service() {
 
         // Initialize AudioManager and MediaSessionCompat
         audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
+
         // Initialize the MediaSession
         mediaSession = MediaSessionCompat(this, "FoobarMediaService").apply {
 
@@ -74,26 +115,10 @@ class FoobarMediaService : Service() {
                     // Handle skip to previous action
                     PlayerAccess.getInstance().previousTrack()
                 }
-
-                override fun onStop() {
-                    // Handle stop action
-                    setPlaybackState(
-                        PlaybackStateCompat.Builder()
-                            .setState(PlaybackStateCompat.STATE_STOPPED, 0, 1f)
-                            .setActions(
-                                PlaybackStateCompat.ACTION_PLAY or
-                                        PlaybackStateCompat.ACTION_PLAY_PAUSE
-
-                            )
-                            .build()
-                    )
-                    //updateNotification(false)
-                }
             })
 
             isActive = true
 
-            println("FOOB Volume get")
             volumeProvider = object : VolumeProviderCompat(
                 VOLUME_CONTROL_ABSOLUTE,
                 100, // Max volume
@@ -114,8 +139,11 @@ class FoobarMediaService : Service() {
                 }
             }
 
+            var volumeControlEnabled: Boolean
+            runBlocking { volumeControlEnabled = getFoobarVolumeControlBlocking() }
 
-            setPlaybackToRemote(volumeProvider)
+            if (volumeControlEnabled)
+                setPlaybackToRemote(volumeProvider)
         }
     }
 
@@ -150,7 +178,7 @@ class FoobarMediaService : Service() {
         super.onDestroy()
         mediaSession!!.release()
         mediaSession = null
-        audioManager.abandonAudioFocus(null)
+        audioManager.abandonAudioFocusRequest(audioFocusRequest)
     }
 
     override fun onBind(intent: Intent?): IBinder? {
@@ -158,23 +186,8 @@ class FoobarMediaService : Service() {
     }
 
     private fun requestAudioFocus(): Boolean {
-        val result = audioManager.requestAudioFocus({ focusChange ->
-                when (focusChange) {
-                    AudioManager.AUDIOFOCUS_LOSS_TRANSIENT -> {
-                        PlayerAccess.getInstance().pausePlayback()
-                        // Handle audio focus loss (e.g., stop playback)
-                    }
 
-                    AudioManager.AUDIOFOCUS_GAIN -> {
-                        PlayerAccess.getInstance().startPlayback()
-                        // Handle audio focus gain (e.g., resume playback)
-                    }
-                }
-            },
-            AudioManager.STREAM_MUSIC,
-            AudioManager.AUDIOFOCUS_GAIN
-        )
-        return result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED
+        return audioManager.requestAudioFocus(audioFocusRequest) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED
     }
 
     override fun onTaskRemoved(rootIntent: Intent?) {

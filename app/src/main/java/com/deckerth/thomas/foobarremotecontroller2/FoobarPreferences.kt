@@ -117,6 +117,10 @@ fun getFoobarVolumeControl(): Boolean {
     return getValue(mainActivity, FOOBAR_VOLUME_CONTROL_KEY, true)
 }
 
+suspend fun getFoobarVolumeControlBlocking(): Boolean {
+    return getValueBlocking(mainActivity, FOOBAR_VOLUME_CONTROL_KEY, true)
+}
+
 fun savePauseDuringPhoneCalls(enabled: Boolean, context: Context) {
     runBlocking {
         saveValue(context, enabled, PAUSE_DURING_PHONE_CALLS_KEY)
@@ -128,6 +132,9 @@ fun getPauseDuringPhoneCalls(): Boolean {
     return getValue(mainActivity, PAUSE_DURING_PHONE_CALLS_KEY, true)
 }
 
+suspend fun getPauseDuringPhoneCallsBlocking(): Boolean {
+    return getValueBlocking(mainActivity, PAUSE_DURING_PHONE_CALLS_KEY, true)
+}
 fun saveAddTrackBehavior(behavior: AddTracksBehaviors, context: Context) {
     runBlocking {
         saveValue(context, behavior.ordinal, ADD_TRACK_BEHAVIOR_KEY)

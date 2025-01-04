@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
+import android.os.Process
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
@@ -133,6 +134,12 @@ class MainActivity : ComponentActivity() {
                     }
                 }
         }
+    }
+
+    fun restartService() {
+        val intent = Intent(this, FoobarMediaService::class.java)
+        mainActivity.stopService(intent)
+        startForegroundService(intent)
     }
 
     @OptIn(ExperimentalMaterial3Api::class)
@@ -514,7 +521,7 @@ class MainActivity : ComponentActivity() {
 
         BackHandler {
             if (backPressedTime + 2000 > System.currentTimeMillis()) {
-                (context as MainActivity).finish()
+                Process.killProcess(Process.myPid())
             } else {
                 backPressedTime = System.currentTimeMillis()
                 Toast.makeText(

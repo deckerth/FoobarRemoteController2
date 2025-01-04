@@ -115,4 +115,6 @@
     <string name="button_next">Next</string>
     <string name="manual_device_heading">Set up Device</string>
     <string name="no_wifi_connection">No Wifi connection</string>
+    <string name="effective_after_restart_message">This change will be effective after the app was restarted</string>
+    <string name="restart_app">Restart</string>
 </resources>

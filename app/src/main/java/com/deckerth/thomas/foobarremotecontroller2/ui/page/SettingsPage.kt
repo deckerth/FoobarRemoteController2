@@ -22,6 +22,9 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -40,6 +43,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.deckerth.thomas.foobarremotecontroller2.R
+import com.deckerth.thomas.foobarremotecontroller2.enableVolumeControl
 import com.deckerth.thomas.foobarremotecontroller2.getAddTrackBehavior
 import com.deckerth.thomas.foobarremotecontroller2.getFoobarVolumeControl
 import com.deckerth.thomas.foobarremotecontroller2.getIpAddress
@@ -55,81 +59,99 @@ import com.deckerth.thomas.foobarremotecontroller2.ui.mainActivity
 
 @Composable
 fun SettingsPage() {
-    Column(Modifier.verticalScroll(rememberScrollState())) {
-        Title(stringResource(R.string.settings_connectivity))
-        PreferenceItem<Boolean>(
-            stringResource(R.string.field_ip_address),
-            summary = getIpAddress(),
-            onClick = {
-                mainActivity.navigateTo("DeviceSelectionPage")
-            })
 
-        Title(stringResource(R.string.settings_appearance))
-        var isOpen by remember { mutableStateOf(false) }
-        val viewMode = getViewMode()
-        PreferenceItem<Boolean>(stringResource(R.string.settings_view_mode),
-            summary = viewMode.text,
-            showButton = viewMode == Layouts.LAYOUT_CUSTOM,
-            buttonText = stringResource(R.string.open_layout_editor),
-            onButtonClick = { mainActivity.navigateTo("Layout selection") },
-            onClick = {
-                isOpen = true
-            })
-        if (isOpen) {
-            ListPreference(
-                values = Layouts.entries,
-                title = stringResource(R.string.settings_view_mode),
-                selectedItem = getViewMode(),
-                onClick = { mode: Layouts? ->
-                    if (mode != null) {
-                        saveViewMode(viewMode, mode, mainActivity)
-                    }
-                    isOpen = false
+    val snackbarHostState = remember { SnackbarHostState() }
+     Scaffold(
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
+    ) { innerPadding ->
+        Column(
+            Modifier
+                .verticalScroll(rememberScrollState())
+                .padding(innerPadding)
+        ) {
+            Title(stringResource(R.string.settings_connectivity))
+            PreferenceItem<Boolean>(
+                stringResource(R.string.field_ip_address),
+                summary = getIpAddress(),
+                onClick = {
+                    mainActivity.navigateTo("DeviceSelectionPage")
+                })
+
+            Title(stringResource(R.string.settings_appearance))
+            var isOpen by remember { mutableStateOf(false) }
+            val viewMode = getViewMode()
+            PreferenceItem<Boolean>(stringResource(R.string.settings_view_mode),
+                summary = viewMode.text,
+                showButton = viewMode == Layouts.LAYOUT_CUSTOM,
+                buttonText = stringResource(R.string.open_layout_editor),
+                onButtonClick = { mainActivity.navigateTo("Layout selection") },
+                onClick = {
+                    isOpen = true
+                })
+            if (isOpen) {
+                ListPreference(
+                    values = Layouts.entries,
+                    title = stringResource(R.string.settings_view_mode),
+                    selectedItem = getViewMode(),
+                    onClick = { mode: Layouts? ->
+                        if (mode != null) {
+                            saveViewMode(viewMode, mode, mainActivity)
+                        }
+                        isOpen = false
+                    },
+                    getText = { v: Layouts -> v.text }
+                )
+            }
+
+            Title(stringResource(R.string.settings_playback))
+            PreferenceItem(
+                stringResource(R.string.settings_foobar_volume_control),
+                summary = "",
+                onClick = { enabled: Boolean ->
+                    val intendedSettingActive = !enabled
+                    saveFoobarVolumeControl(intendedSettingActive, mainActivity)
+                    if (intendedSettingActive)
+                        enableVolumeControl()
+                    else
+                        mainActivity.restartService()
                 },
-                getText = { v: Layouts -> v.text }
+                showToggle = true,
+                isChecked = getFoobarVolumeControl(),
+                isEnabled = true
             )
-        }
 
-        Title(stringResource(R.string.settings_playback))
-        PreferenceItem(
-            stringResource(R.string.settings_foobar_volume_control),
-            summary = "",
-            onClick = { enabled: Boolean -> saveFoobarVolumeControl(!enabled, mainActivity) },
-            showToggle = true,
-            isChecked = getFoobarVolumeControl(),
-            isEnabled = true
-        )
-        PreferenceItem(
-            stringResource(R.string.settings_pause_during_phone_call),
-            summary = "",
-            onClick = { enabled: Boolean -> savePauseDuringPhoneCalls(!enabled, mainActivity) },
-            showToggle = true,
-            isChecked = getPauseDuringPhoneCalls(),
-            isEnabled = true
-        )
-
-        Title(stringResource(R.string.settings_browser))
-        var isChooseAddOptionsOpen by remember { mutableStateOf(false) }
-        val behavior = getAddTrackBehavior()
-        PreferenceItem<Boolean>(stringResource(R.string.settings_add_behavior),
-            summary = behavior.text,
-            showButton = false,
-            onClick = {
-                isChooseAddOptionsOpen = true
-            })
-        if (isChooseAddOptionsOpen) {
-            ListPreference(
-                values = AddTracksBehaviors.entries,
-                title = stringResource(R.string.settings_add_behavior),
-                selectedItem = getAddTrackBehavior(),
-                onClick = { chosen: AddTracksBehaviors? ->
-                    if (chosen != null) {
-                        saveAddTrackBehavior(chosen, mainActivity)
-                    }
-                    isChooseAddOptionsOpen = false
-                },
-                getText = { v: AddTracksBehaviors -> v.text }
+            PreferenceItem(
+                stringResource(R.string.settings_pause_during_phone_call),
+                summary = "",
+                onClick = { enabled: Boolean -> savePauseDuringPhoneCalls(!enabled, mainActivity) },
+                showToggle = true,
+                isChecked = getPauseDuringPhoneCalls(),
+                isEnabled = true
             )
+
+            Title(stringResource(R.string.settings_browser))
+            var isChooseAddOptionsOpen by remember { mutableStateOf(false) }
+            val behavior = getAddTrackBehavior()
+            PreferenceItem<Boolean>(stringResource(R.string.settings_add_behavior),
+                summary = behavior.text,
+                showButton = false,
+                onClick = {
+                    isChooseAddOptionsOpen = true
+                })
+            if (isChooseAddOptionsOpen) {
+                ListPreference(
+                    values = AddTracksBehaviors.entries,
+                    title = stringResource(R.string.settings_add_behavior),
+                    selectedItem = getAddTrackBehavior(),
+                    onClick = { chosen: AddTracksBehaviors? ->
+                        if (chosen != null) {
+                            saveAddTrackBehavior(chosen, mainActivity)
+                        }
+                        isChooseAddOptionsOpen = false
+                    },
+                    getText = { v: AddTracksBehaviors -> v.text }
+                )
+            }
         }
     }
 }

@@ -168,6 +168,7 @@ fun updatePlayer() {
             )
         } else
             mediaSession!!.setMetadata(null)
+
         println("FOOB updatePlayer: ${player!!.position}")
 
         foobarMediaService?.updateNotification()

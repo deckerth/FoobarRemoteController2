@@ -3,6 +3,8 @@ package com.deckerth.thomas.foobarremotecontroller2.ui.page
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -10,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -94,24 +97,49 @@ fun LayoutEditorPage(
                     }
                 } else {
                     var isClicked by remember { mutableStateOf(false) }
-                    Column(
-                        modifier = Modifier
-                            .detectReorderAfterLongPress(state)
-                            .shadow(elevation.value)
-                            .fillMaxWidth()
-                            .background(MaterialTheme.colorScheme.surface)
-                            .clickable { isClicked = true }
-                    ) {
-                        Text(
-                            text = item.layoutItem!!.item.text,
-                            modifier = Modifier.padding(top = 16.dp, start = 16.dp, end = 16.dp)
-                        )
-                        Text(
-                            text = item.layoutItem.verbose(),
-                            modifier = Modifier.padding(bottom = 16.dp, start = 16.dp, end = 16.dp),
-                            maxLines = 2,
-                            style = MaterialTheme.typography.bodySmall
-                        )
+                    Box {
+                        Row(
+                            Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Column(
+                                modifier = Modifier
+                                    .detectReorderAfterLongPress(state)
+                                    .shadow(elevation.value)
+                                    .weight(1f)
+                                    .background(MaterialTheme.colorScheme.surface)
+                                    .clickable { isClicked = true }
+                            ) {
+                                Text(
+                                    text = item.layoutItem!!.item.text,
+                                    modifier = Modifier.padding(
+                                        top = 16.dp,
+                                        start = 16.dp,
+                                        end = 16.dp
+                                    )
+                                )
+                                Text(
+                                    text = item.layoutItem.verbose(),
+                                    modifier = Modifier.padding(
+                                        bottom = 16.dp,
+                                        start = 16.dp,
+                                        end = 16.dp
+                                    ),
+                                    maxLines = 2,
+                                    style = MaterialTheme.typography.bodySmall
+                                )
+
+                            }
+                            Icon(
+                                painter = painterResource(R.drawable.drag_handle),
+                                contentDescription = "Drag handle",
+                                modifier = Modifier
+                                    .size(24.dp)
+                                    .align(Alignment.CenterVertically)
+
+                            )
+                            Spacer(modifier = Modifier.width(16.dp))
+                        }
                         HorizontalDivider()
                     }
                     if (isClicked && item.layoutItem!!.item != LayoutItems.PROGRESS) {

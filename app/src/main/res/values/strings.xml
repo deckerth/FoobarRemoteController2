@@ -117,4 +117,15 @@
     <string name="no_wifi_connection">No Wifi connection</string>
     <string name="effective_after_restart_message">This change will be effective after the app was restarted</string>
     <string name="restart_app">Restart</string>
+    <string name="copyright_text">Copyright 2025 Paul and Thomas Decker</string>
+    <string name="version_text">Version: 2.0</string>
+    <string name="privacy_statement">Privacy Statement</string>
+    <string name="third_party_text">Third Party Licenses</string>
+    <string name="library_usage_text">"This project uses the library "</string>
+    <string name="compose_reorderable">ComposeReordarable (0.9.6)</string>
+    <string name="license_text">"License: "</string>
+    <string name="apache_2_0">Apache License, Version 2.0</string>
+    <string name="support_text">Support</string>
+    <string name="foobar_link_title">Foobar Link</string>
+    <string name="infos_text">Infos</string>
 </resources>

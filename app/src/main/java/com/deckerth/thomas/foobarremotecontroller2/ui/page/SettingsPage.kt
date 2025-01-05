@@ -54,6 +54,7 @@ import com.deckerth.thomas.foobarremotecontroller2.saveAddTrackBehavior
 import com.deckerth.thomas.foobarremotecontroller2.saveFoobarVolumeControl
 import com.deckerth.thomas.foobarremotecontroller2.savePauseDuringPhoneCalls
 import com.deckerth.thomas.foobarremotecontroller2.saveViewMode
+import com.deckerth.thomas.foobarremotecontroller2.ui.components.LicenseText
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.Layouts
 import com.deckerth.thomas.foobarremotecontroller2.ui.mainActivity
 
@@ -61,7 +62,7 @@ import com.deckerth.thomas.foobarremotecontroller2.ui.mainActivity
 fun SettingsPage() {
 
     val snackbarHostState = remember { SnackbarHostState() }
-     Scaffold(
+    Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) { innerPadding ->
         Column(
@@ -150,6 +151,31 @@ fun SettingsPage() {
                         isChooseAddOptionsOpen = false
                     },
                     getText = { v: AddTracksBehaviors -> v.text }
+                )
+            }
+
+            var isFoobarLinkOpen by remember { mutableStateOf(false) }
+            Title(stringResource(R.string.foobar_link_title))
+            PreferenceItem<Boolean>(
+                title = stringResource(
+                    R.string.infos_text
+                ),
+                onClick = {isFoobarLinkOpen = true },
+                summary = ""
+            )
+            if (isFoobarLinkOpen) {
+                AlertDialog(
+                    onDismissRequest = { isFoobarLinkOpen = false },
+                    dismissButton = {
+                        TextButton(onClick = { isFoobarLinkOpen = false }) {
+                            Text(
+                                stringResource(R.string.button_close),
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        }
+                    },
+                    confirmButton = { },
+                    text = { LicenseText() }
                 )
             }
         }

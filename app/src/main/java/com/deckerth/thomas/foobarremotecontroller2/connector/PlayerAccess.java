@@ -66,6 +66,12 @@ public class PlayerAccess {
         return parsePlayerState(response);
     }
 
+    public void setPosition(Float position) {
+            String jsonString = "{\"position\":" + position + "}";
+            mConnector.postData("player/", jsonString);
+            getPlayerState();
+    }
+
     private Player parsePlayerState(String input) {
         try {
             JSONObject contentObject = new JSONObject(input);

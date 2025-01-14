@@ -1,6 +1,8 @@
 package com.deckerth.thomas.foobarremotecontroller2.model
 
 import android.annotation.SuppressLint
+import com.deckerth.thomas.foobarremotecontroller2.connector.PlayerAccess
+import com.deckerth.thomas.foobarremotecontroller2.connector.errorHandler
 
 enum class PlaybackState {
     STOPPED,
@@ -31,7 +33,7 @@ data class Player(
     val playlistId: String,
     val index: String,
     val duration: String,
-    val position: String,
+    var position: String,
     val artworkUrl: String,
     val playbackState: PlaybackState,
     val playbackMode: PlaybackMode
@@ -45,7 +47,15 @@ data class Player(
         } catch (ex: NumberFormatException) {
             return 0f
         }
+    }
 
+    fun setPos(relativePos : Float) {
+        if (!errorHandler.sick())
+            Thread {
+                val position = relativePos * duration.toFloat()
+                this.position = position.toString()
+                PlayerAccess.getInstance().setPosition(position)
+            }.start()
     }
 
     @SuppressLint("DefaultLocale")

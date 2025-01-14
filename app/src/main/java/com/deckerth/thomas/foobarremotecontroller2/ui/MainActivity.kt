@@ -226,7 +226,7 @@ class MainActivity : ComponentActivity() {
                                     onCheckedChange = {
                                         if (getCurrentAlbumIndex() != -1)
                                             autoscroll = !autoscroll
-                                        if (autoscroll)
+                                        if (autoscroll && getCurrentAlbumIndex() != -1)
                                             CoroutineScope(Dispatchers.Main).launch {
                                                 playlistState.scrollToItem(
                                                     getCurrentAlbumIndex()

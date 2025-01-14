@@ -118,7 +118,11 @@ fun getFoobarVolumeControl(): Boolean {
 }
 
 suspend fun getFoobarVolumeControlBlocking(): Boolean {
-    return getValueBlocking(mainActivity, FOOBAR_VOLUME_CONTROL_KEY, true)
+    return try {
+        getValueBlocking(mainActivity, FOOBAR_VOLUME_CONTROL_KEY, true)
+    } catch(e: UninitializedPropertyAccessException) {
+        true
+    }
 }
 
 fun savePauseDuringPhoneCalls(enabled: Boolean, context: Context) {
@@ -133,8 +137,13 @@ fun getPauseDuringPhoneCalls(): Boolean {
 }
 
 suspend fun getPauseDuringPhoneCallsBlocking(): Boolean {
-    return getValueBlocking(mainActivity, PAUSE_DURING_PHONE_CALLS_KEY, true)
+    return try {
+        getValueBlocking(mainActivity, PAUSE_DURING_PHONE_CALLS_KEY, true)
+    } catch(e: UninitializedPropertyAccessException) {
+        true
+    }
 }
+
 fun saveAddTrackBehavior(behavior: AddTracksBehaviors, context: Context) {
     runBlocking {
         saveValue(context, behavior.ordinal, ADD_TRACK_BEHAVIOR_KEY)

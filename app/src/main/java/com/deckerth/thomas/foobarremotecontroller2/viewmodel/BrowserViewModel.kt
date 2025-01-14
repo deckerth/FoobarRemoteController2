@@ -28,6 +28,8 @@ class BrowserViewModel : ViewModel() {
     }
 
     fun getDirectory(): MusicDirectory {
+        if (directories[currentPath.value] == null)
+            return MusicDirectory(currentPath.value, "", "NULL") // return empty directory
         if (!directories[currentPath.value]!!.isExpanded())
             expand(directories[currentPath.value]!!)
         return directories[currentPath.value]!!

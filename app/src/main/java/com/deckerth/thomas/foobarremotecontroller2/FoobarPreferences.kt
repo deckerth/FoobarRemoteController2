@@ -121,7 +121,7 @@ suspend fun getFoobarVolumeControlBlocking(): Boolean {
     return try {
         getValueBlocking(mainActivity, FOOBAR_VOLUME_CONTROL_KEY, true)
     } catch(e: UninitializedPropertyAccessException) {
-        true
+        false // if the main activity is not active, do not allow volume control
     }
 }
 
@@ -140,7 +140,7 @@ suspend fun getPauseDuringPhoneCallsBlocking(): Boolean {
     return try {
         getValueBlocking(mainActivity, PAUSE_DURING_PHONE_CALLS_KEY, true)
     } catch(e: UninitializedPropertyAccessException) {
-        true
+        false // if the main activity is not active, do not allow pausing
     }
 }
 

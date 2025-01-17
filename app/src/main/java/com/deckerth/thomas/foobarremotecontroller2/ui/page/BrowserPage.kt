@@ -76,7 +76,9 @@ fun BrowserPage(vm: BrowserViewModel, navController: NavHostController) {
                     Text(modifier = Modifier.padding(8.dp), text = vm.getCurrentPath())
                 }
 
-            if (vm.loadingData)
+            println("FOOB BrowserPage loadingData ${vm.loadingData.value}")
+
+            if (vm.loadingData.value)
                 LinearProgressIndicator(
                     modifier = Modifier.fillMaxWidth()
                 )

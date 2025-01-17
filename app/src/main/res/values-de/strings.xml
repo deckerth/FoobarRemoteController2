@@ -129,4 +129,9 @@
     <string name="support_text">Support</string>
     <string name="foobar_link_title">Foobar Link</string>
     <string name="infos_text">Infos</string>
+    <string name="button_set_filter">Filter setzen</string>
+    <string name="filter_titles">Filter</string>
+    <string name="button_reset_filter">Filter löschen</string>
+    <string name="search_placeholder">Suchen</string>
+    <string name="menu_item_add_titles">Titel hinzufügen</string>
 </resources>

@@ -22,15 +22,22 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.automirrored.outlined.List
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledIconToggleButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.IconToggleButton
+import androidx.compose.material3.IconToggleButtonColors
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
@@ -77,10 +84,12 @@ import com.deckerth.thomas.foobarremotecontroller2.ui.theme.Foobar2000RemoteCont
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.UpdatePreferences
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.autoScrollIndex
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.autoscroll
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.filterValue
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.getCurrentAlbumIndex
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.initViewModel
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.player
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.playlistState
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.showFilter
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.updateList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -181,6 +190,7 @@ class MainActivity : ComponentActivity() {
         val navController = rememberNavController()
         _navController = navController
         appLabel = stringResource(R.string.app_name)
+        var dropdownMenuExpanded by remember { mutableStateOf(false) }
         val items = listOf(
             BottomNavigationItem(
                 title = stringResource(R.string.tab_playlist),
@@ -242,20 +252,59 @@ class MainActivity : ComponentActivity() {
                                             .size(24.dp)
                                     )
                                 }
-                                IconButton(onClick = {
-                                    navigateTo("Browser")
-                                }) {
-                                    Icon(
-                                        imageVector = Icons.Default.Add,
-                                        contentDescription = "Add music"
-                                    )
-                                }
+                                if (filterValue.value.isNotEmpty())
+                                    IconButton(onClick = {
+                                        showFilter.value = false
+                                        filterValue.value = ""
+                                    }) {
+                                        Icon(
+                                            painter = painterResource(R.drawable.filter_alt_off),
+                                            contentDescription = "Filter off"
+                                        )
+                                    }
                                 IconButton(onClick = {
                                     updateList()
                                 }) {
                                     Icon(
                                         imageVector = Icons.Default.Refresh,
                                         contentDescription = "Refresh"
+                                    )
+                                }
+                                IconToggleButton(
+                                    checked = dropdownMenuExpanded,
+                                    onCheckedChange = { dropdownMenuExpanded = !dropdownMenuExpanded },
+                                    colors = IconToggleButtonColors(
+                                        checkedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                                        checkedContentColor = IconButtonDefaults.iconButtonColors().contentColor,
+                                        containerColor = IconButtonDefaults.iconButtonColors().containerColor,
+                                        contentColor = IconButtonDefaults.iconButtonColors().contentColor,
+                                        disabledContainerColor = IconButtonDefaults.iconButtonColors().disabledContainerColor,
+                                        disabledContentColor = IconButtonDefaults.iconButtonColors().disabledContentColor,
+                                    )
+                                )
+                                {
+                                    Icon(
+                                        imageVector = Icons.Default.MoreVert,
+                                        contentDescription = "More"
+                                    )
+
+                                }
+                                DropdownMenu(expanded = dropdownMenuExpanded, onDismissRequest = { dropdownMenuExpanded = false }) {
+                                    DropdownMenuItem(
+                                        text = { Text(stringResource(R.string.menu_item_add_titles)) },
+                                        onClick = { dropdownMenuExpanded = false; navigateTo("Browser") },
+                                        leadingIcon = {  Icon(
+                                            imageVector = Icons.Default.Add,
+                                            contentDescription = "Add music"
+                                        ) }
+                                    )
+                                    DropdownMenuItem(
+                                        text = { Text(stringResource(R.string.filter_titles)) },
+                                        onClick = { dropdownMenuExpanded = false; showFilter.value = true },
+                                        leadingIcon = { Icon(
+                                            painter = painterResource(R.drawable.filter_alt),
+                                            contentDescription = "Filter"
+                                        )}
                                     )
                                 }
                             }

@@ -46,6 +46,8 @@ public interface ITitle {
 
     void setIsCurrentTitle(Boolean isCurrentTitle);
 
+    Boolean matches(String pattern);
+
     @NonNull
     ITitle clone();
 

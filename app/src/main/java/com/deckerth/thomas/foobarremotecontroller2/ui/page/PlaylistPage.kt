@@ -59,12 +59,14 @@ import com.deckerth.thomas.foobarremotecontroller2.model.Title
 import com.deckerth.thomas.foobarremotecontroller2.ui.components.ImageWithLoadingPlaceholder
 import com.deckerth.thomas.foobarremotecontroller2.ui.components.LayoutComponent
 import com.deckerth.thomas.foobarremotecontroller2.ui.components.TitleDetails
+import com.deckerth.thomas.foobarremotecontroller2.ui.components.TitleSearchBarDialog
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.Layout
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.layoutManager
 import com.deckerth.thomas.foobarremotecontroller2.ui.theme.Foobar2000RemoteControllerTheme
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.autoScrollIndex
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.autoscroll
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.displayedPlaylist
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.filterValue
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.getCurrentAlbumIndex
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.loadingList
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.player
@@ -73,6 +75,7 @@ import com.deckerth.thomas.foobarremotecontroller2.viewmodel.playlists
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.selectedPlaylistIndex
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.selectedPlaylistName
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.setSelectedPlaylist
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.showFilter
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.updatePlaylists
 
 @Composable
@@ -87,10 +90,28 @@ fun PlaylistPage() {
     if (displayedPlaylist != null)
         Column {
             PlaylistSwitcher(playlists = playlists)
+            /*if (showFilter.value)
+                TitleSearchBar(
+                    onClosed = {
+                        showFilter.value = false
+                        filterValue.value = ""
+                    },
+                    onSearch = { searchString -> filterValue.value = searchString }
+                )*/
             if (displayedPlaylist != null)
                 Playlist(displayedPlaylist!!)
         }
-
+    if (showFilter.value)
+        TitleSearchBarDialog(
+            onSearch = { searchString ->
+                filterValue.value = searchString
+                showFilter.value = false
+            },
+            onDismiss = {
+                showFilter.value = false
+                filterValue.value = ""
+            }
+        )
     if (loadingList || displayedPlaylist == null)
         LinearProgressIndicator(
             modifier = Modifier
@@ -221,7 +242,8 @@ fun AlbumCard(album: Album, layout: Layout?, previewMode: Boolean = false) {
                 if (album.isSelected) {
                     Column {
                         album.titles.forEach { title ->
-                            TitleEntry(album = album, title = title, previewMode = previewMode)
+                            if (title.matches(filterValue.value))
+                                TitleEntry(album = album, title = title, previewMode = previewMode)
                         }
                     }
                 }
@@ -243,8 +265,11 @@ fun TitleEntry(album: Album, title: ITitle, previewMode: Boolean = false) {
             title.index == player!!.getIndex() && title.playlistId == player!!.playlistId
     var modifier = Modifier
         .clickable {
-            if (!previewMode)
+            if (!previewMode) {
+                filterValue.value = ""
+                showFilter.value = false
                 PlayerAccess.getInstance().playTrack(title.playlistId, title.index)
+            }
         }
     if (titleSelected)
         modifier = modifier.background(MaterialTheme.colorScheme.primaryContainer)
@@ -363,7 +388,8 @@ fun Playlist(playlist: Playlist) {
         if (playlist.albums.isNotEmpty()) {
             try {
                 items(playlist.albums) { album ->
-                    AlbumCard(album, layoutManager.getLayout())
+                    if (album.matches(filterValue.value))
+                        AlbumCard(album, layoutManager.getLayout())
                 }
             } catch (e: Exception) {
                 e.printStackTrace()

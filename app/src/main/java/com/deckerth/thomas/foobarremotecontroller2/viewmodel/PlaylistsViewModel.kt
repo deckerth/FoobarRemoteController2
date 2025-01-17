@@ -1,6 +1,7 @@
 package com.deckerth.thomas.foobarremotecontroller2.viewmodel
 
 
+import androidx.compose.runtime.mutableStateOf
 import com.deckerth.thomas.foobarremotecontroller2.connector.PlaylistAccess
 import com.deckerth.thomas.foobarremotecontroller2.connector.errorHandler
 import com.deckerth.thomas.foobarremotecontroller2.model.Playlist
@@ -8,6 +9,9 @@ import com.deckerth.thomas.foobarremotecontroller2.model.PlaylistEntity
 import com.deckerth.thomas.foobarremotecontroller2.model.Playlists
 
 private val playlistRegistry = mutableListOf<Playlist>()
+
+var showFilter = mutableStateOf(false)
+var filterValue = mutableStateOf("")
 
 val playlists: Playlists
     get() {

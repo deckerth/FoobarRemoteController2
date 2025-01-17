@@ -10,12 +10,16 @@ import com.deckerth.thomas.foobarremotecontroller2.connector.errorHandler
 import com.deckerth.thomas.foobarremotecontroller2.model.AddTracksBehaviors
 import com.deckerth.thomas.foobarremotecontroller2.model.MusicDirectory
 import com.deckerth.thomas.foobarremotecontroller2.model.MusicDirectoryEntry
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class BrowserViewModel : ViewModel() {
 
     private var filesystem = mutableStateOf(MusicDirectory("ROOT", "", "NULL"))
     private var currentPath = mutableStateOf("")
-    var loadingData by mutableStateOf(false)
+    var loadingData = mutableStateOf(false)
     private var directories = HashMap<String, MusicDirectory>()
     var filesAdded by mutableStateOf(false)
 
@@ -36,19 +40,20 @@ class BrowserViewModel : ViewModel() {
     }
 
     private fun expand(musicDirectory: MusicDirectory) {
-        if (!loadingData && !errorHandler.sick()) {
-            loadingData = true
-            Thread {
+        if (!loadingData.value && !errorHandler.sick()) {
+            loadingData.value = true
+            CoroutineScope(Dispatchers.IO).launch {
                 try {
                     musicDirectory.expand()
                     for (entry in musicDirectory.getEntries())
                         if (entry is MusicDirectory && !entry.isParentDirectory())
                             directories[entry.path] = entry
-                    loadingData = false
+                    withContext(Dispatchers.Main) { loadingData.value = false }
+                    println("FOOB BrowserViewModel loadingData ${loadingData.value}")
                 } catch (e: Exception) {
-                    loadingData = false
+                    loadingData.value = false
                 }
-            }.start()
+            }
         }
     }
 
@@ -60,7 +65,7 @@ class BrowserViewModel : ViewModel() {
         if (!errorHandler.sick())
             Thread {
                 if (displayedPlaylist != null) {
-                    loadingData = true
+                    loadingData.value = true
                     PlaylistAccess.getInstance()
                         .addPathToPlaylist(
                             displayedPlaylist!!.playlistEntity.playlistId,
@@ -68,7 +73,7 @@ class BrowserViewModel : ViewModel() {
                             addBehavior
                         )
                     entry.setIsAdded(true)
-                    loadingData = false
+                    loadingData.value = false
                     filesAdded = true
                 }
             }.start()

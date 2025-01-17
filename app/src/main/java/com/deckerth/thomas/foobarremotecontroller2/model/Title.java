@@ -164,6 +164,18 @@ public class Title implements ITitle {
         mIsCurrent = isCurrentTitle;
     }
 
+    @Override
+    public Boolean matches(String pattern) {
+        if (pattern.isEmpty()) return true;
+        String upperPattern = pattern.toUpperCase();
+        if (mAlbum.toUpperCase().contains(upperPattern)) return true;
+        if (mArtist.toUpperCase().contains(upperPattern)) return true;
+        if (mTitle.toUpperCase().contains(upperPattern)) return true;
+        if (mComposer.toUpperCase().contains(upperPattern)) return true;
+        if (mCatalog.toUpperCase().contains(upperPattern)) return true;
+        return mLabel.toUpperCase().contains(upperPattern);
+    }
+
     @NonNull
     @Override
     public ITitle clone() {

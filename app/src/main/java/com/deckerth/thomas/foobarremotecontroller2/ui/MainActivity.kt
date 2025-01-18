@@ -272,7 +272,9 @@ class MainActivity : ComponentActivity() {
                                 }
                                 IconToggleButton(
                                     checked = dropdownMenuExpanded,
-                                    onCheckedChange = { dropdownMenuExpanded = !dropdownMenuExpanded },
+                                    onCheckedChange = {
+                                        dropdownMenuExpanded = !dropdownMenuExpanded
+                                    },
                                     colors = IconToggleButtonColors(
                                         checkedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
                                         checkedContentColor = IconButtonDefaults.iconButtonColors().contentColor,
@@ -289,22 +291,32 @@ class MainActivity : ComponentActivity() {
                                     )
 
                                 }
-                                DropdownMenu(expanded = dropdownMenuExpanded, onDismissRequest = { dropdownMenuExpanded = false }) {
+                                DropdownMenu(
+                                    expanded = dropdownMenuExpanded,
+                                    onDismissRequest = { dropdownMenuExpanded = false }) {
                                     DropdownMenuItem(
                                         text = { Text(stringResource(R.string.menu_item_add_titles)) },
-                                        onClick = { dropdownMenuExpanded = false; navigateTo("Browser") },
-                                        leadingIcon = {  Icon(
-                                            imageVector = Icons.Default.Add,
-                                            contentDescription = "Add music"
-                                        ) }
+                                        onClick = {
+                                            dropdownMenuExpanded = false; navigateTo("Browser")
+                                        },
+                                        leadingIcon = {
+                                            Icon(
+                                                imageVector = Icons.Default.Add,
+                                                contentDescription = "Add music"
+                                            )
+                                        }
                                     )
                                     DropdownMenuItem(
                                         text = { Text(stringResource(R.string.filter_titles)) },
-                                        onClick = { dropdownMenuExpanded = false; showFilter.value = true },
-                                        leadingIcon = { Icon(
-                                            painter = painterResource(R.drawable.filter_alt),
-                                            contentDescription = "Filter"
-                                        )}
+                                        onClick = {
+                                            dropdownMenuExpanded = false; showFilter.value = true
+                                        },
+                                        leadingIcon = {
+                                            Icon(
+                                                painter = painterResource(R.drawable.filter_alt),
+                                                contentDescription = "Filter"
+                                            )
+                                        }
                                     )
                                 }
                             }
@@ -452,6 +464,25 @@ class MainActivity : ComponentActivity() {
                                         contentDescription = "Add music"
                                     )
                                 }
+                                if (filterValue.value.isNotEmpty())
+                                    IconButton(onClick = {
+                                        showFilter.value = false
+                                        filterValue.value = ""
+                                    }) {
+                                        Icon(
+                                            painter = painterResource(R.drawable.filter_alt_off),
+                                            contentDescription = "Filter off"
+                                        )
+                                    }
+                                else
+                                    IconButton(onClick = {
+                                        showFilter.value = true
+                                    }) {
+                                        Icon(
+                                            painter = painterResource(R.drawable.filter_alt),
+                                            contentDescription = "Filter"
+                                        )
+                                    }
                             }
                         }
                     },

@@ -266,7 +266,6 @@ fun prepareDeviceSelectionPage() {
     }.start()
 }
 
-
 suspend fun scanForFoobarServers(port: Int, timeout: Int = 1000) {
     val baseIp: String
     try {

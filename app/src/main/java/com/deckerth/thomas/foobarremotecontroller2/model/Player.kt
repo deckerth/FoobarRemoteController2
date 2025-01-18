@@ -3,6 +3,10 @@ package com.deckerth.thomas.foobarremotecontroller2.model
 import android.annotation.SuppressLint
 import com.deckerth.thomas.foobarremotecontroller2.connector.PlayerAccess
 import com.deckerth.thomas.foobarremotecontroller2.connector.errorHandler
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 enum class PlaybackState {
     STOPPED,
@@ -51,11 +55,11 @@ data class Player(
 
     fun setPos(relativePos : Float) {
         if (!errorHandler.sick())
-            Thread {
-                val position = relativePos * duration.toFloat()
-                this.position = position.toString()
-                PlayerAccess.getInstance().setPosition(position)
-            }.start()
+            CoroutineScope(Dispatchers.IO).launch {
+                val absolutePosition = relativePos * duration.toFloat()
+                withContext(Dispatchers.Main) { position = absolutePosition.toString() }
+                PlayerAccess.getInstance().setPosition(absolutePosition)
+            }
     }
 
     @SuppressLint("DefaultLocale")

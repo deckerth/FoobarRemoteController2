@@ -149,13 +149,16 @@ fun AlbumCard(album: Album, layout: Layout?, previewMode: Boolean = false) {
             titleSelected =
                 album.titles[0].index == player!!.getIndex() && album.titles[0].playlistId == player!!.playlistId
 
-        modifier = modifier.clickable {
-            PlayerAccess.getInstance().playTrack(album.titles[0].playlistId, album.titles[0].index)
-        }
         if (titleSelected)
             modifier = modifier.background(MaterialTheme.colorScheme.primaryContainer)
     }
 
+    if (album.titles.isNotEmpty() && !previewMode)
+        modifier = modifier.clickable {
+            filterValue.value = ""
+            showFilter.value = false
+            PlayerAccess.getInstance().playTrack(album.titles[0].playlistId, album.titles[0].index)
+        }
 
     ElevatedCard(
         modifier = Modifier

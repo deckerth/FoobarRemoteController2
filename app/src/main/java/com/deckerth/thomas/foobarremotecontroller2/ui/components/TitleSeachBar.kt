@@ -101,7 +101,7 @@ fun TitleSearchBar(
                 placeholder = { Text(stringResource(R.string.search_placeholder),) },
                 leadingIcon = { Icon(Icons.Filled.Search, "Search Icon") },
                 trailingIcon = {
-                    if (alwaysShowClearButton || isSearching)
+                    if (alwaysShowClearButton || searchText.value.isNotBlank())
                         IconButton(onClick = {
                             searchText.value = ""
                             isSearching = false

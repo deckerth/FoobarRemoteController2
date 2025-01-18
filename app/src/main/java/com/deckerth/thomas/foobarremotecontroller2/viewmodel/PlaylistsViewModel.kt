@@ -7,6 +7,10 @@ import com.deckerth.thomas.foobarremotecontroller2.connector.errorHandler
 import com.deckerth.thomas.foobarremotecontroller2.model.Playlist
 import com.deckerth.thomas.foobarremotecontroller2.model.PlaylistEntity
 import com.deckerth.thomas.foobarremotecontroller2.model.Playlists
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 private val playlistRegistry = mutableListOf<Playlist>()
 
@@ -124,7 +128,7 @@ fun updatePlaylists() {
 
 private fun updatePlaylist(playlist: Playlist) {
     loadingList = true
-    Thread {
+    CoroutineScope(Dispatchers.IO).launch {
         try {
             var currentPlaylist: Playlist? = playlist
             println("FOOB starting updatePlaylist: ${currentPlaylist!!.playlistEntity.playlistId}, titles: ${currentPlaylist.titles.count()}")
@@ -138,17 +142,17 @@ private fun updatePlaylist(playlist: Playlist) {
                     for (title in playlistPart.titles)
                         currentPlaylist.addTitle(title)
                     if (playlist.playlistEntity.playlistId == selectedPlaylist)
-                        displayedPlaylist = currentPlaylist //.clone()
+                        withContext(Dispatchers.Main)  { displayedPlaylist = currentPlaylist }//.clone()
                     println("FOOB updatePlaylist: ${currentPlaylist.playlistEntity.playlistId}, titles: ${currentPlaylist.titles.count()}")
                 }
                 currentPlaylist = getPlaylistToBeUpdated()
             } while (currentPlaylist != null && !errorHandler.sick())
-            loadingList = false
+            withContext(Dispatchers.Main) {loadingList = false }
             println("FOOB updatePlaylist finished")
         } catch (e: Exception) {
-            loadingList = false
+            withContext(Dispatchers.Main) {loadingList = false }
         }
-    }.start()
+    }
 }
 
 fun invalidatePlaylist(playlistId: String) {

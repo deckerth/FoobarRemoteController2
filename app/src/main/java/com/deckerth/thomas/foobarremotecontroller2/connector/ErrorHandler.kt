@@ -1,6 +1,11 @@
 package com.deckerth.thomas.foobarremotecontroller2.connector
 
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.isSick
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.sql.Timestamp
 
 val errorHandler = ErrorHandler()
@@ -58,15 +63,15 @@ class ErrorHandler {
             (firstOccurrence != null) && ((System.currentTimeMillis() - firstOccurrence!!.time) > 5000)
         if (isSick && !healing) {
             healing = true
-            Thread {
+            CoroutineScope(Dispatchers.IO).launch {
                 try {
                     println("FOOB Healing")
-                    Thread.sleep(10000)
-                    reset()
+                    delay(10000L)
+                    withContext(Dispatchers.Main) { reset() }
                     println("FOOB Healing finished")
                 } catch (_: Exception) {
                 }
-            }.start()
+            }
         }
         return isSick
     }

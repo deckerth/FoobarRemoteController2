@@ -47,11 +47,10 @@ class BrowserViewModel : ViewModel() {
                     musicDirectory.expand()
                     for (entry in musicDirectory.getEntries())
                         if (entry is MusicDirectory && !entry.isParentDirectory())
-                            directories[entry.path] = entry
+                            withContext(Dispatchers.Main) { directories[entry.path] = entry }
                     withContext(Dispatchers.Main) { loadingData.value = false }
-                    println("FOOB BrowserViewModel loadingData ${loadingData.value}")
                 } catch (e: Exception) {
-                    loadingData.value = false
+                    withContext(Dispatchers.Main) { loadingData.value = false }
                 }
             }
         }
@@ -63,7 +62,7 @@ class BrowserViewModel : ViewModel() {
 
     fun addToPlaylist(entry: MusicDirectoryEntry, addBehavior: AddTracksBehaviors) {
         if (!errorHandler.sick())
-            Thread {
+            CoroutineScope(Dispatchers.IO).launch {
                 if (displayedPlaylist != null) {
                     loadingData.value = true
                     PlaylistAccess.getInstance()
@@ -76,7 +75,7 @@ class BrowserViewModel : ViewModel() {
                     loadingData.value = false
                     filesAdded = true
                 }
-            }.start()
+            }
     }
 
     fun refreshRoots() {

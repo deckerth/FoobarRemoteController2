@@ -1,31 +1,33 @@
 package com.deckerth.thomas.foobarremotecontroller2.connector
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import com.deckerth.thomas.foobarremotecontroller2.model.checkIpAddressSyntax
-import com.deckerth.thomas.foobarremotecontroller2.viewmodel.ip_address
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
 import java.io.IOException
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
 
-/** @noinspection BlockingMethodInNonBlockingContext
- */
-class HTTPConnector {
-    val serverAddress: String
-        get() {
-            if (ip_address != null) {
-                return "http://$ip_address/api/"
-            }
-            return ""
-        }
+data class Response(val usedIpAddress: String, var message: String = "")
 
-    fun getData(endpoint: String): String {
+class HTTPConnector(private val vm: AppViewModel) {
+    fun serverAddress(ipAddress: String?): String {
+        if (ipAddress != null) {
+            return "http://${ipAddress}/api/"
+        }
+        return ""
+    }
+
+    fun getData(endpoint: String): Response {
         // Fetch data from the API in the background.
+        val response = Response(vm.ipAddress!!)
         val result = StringBuilder()
         try {
             val url: URL
             var urlConnection: HttpURLConnection? = null
             try {
-                url = URL(serverAddress + endpoint)
+                url = URL(serverAddress(response.usedIpAddress) + endpoint)
                 //open a URL connection
                 urlConnection = url.openConnection() as HttpURLConnection
                 // Uncommenting the following can cause issues
@@ -38,12 +40,13 @@ class HTTPConnector {
                     data = isw.read()
 
                 }
-                errorHandler.reset()
+                vm.errorHandler.reset()
                 // return the data to onPostExecute method
-                return result.toString()
+                response.message = result.toString()
+                return response
             } catch (e: Exception) {
                 e.printStackTrace()
-                errorHandler.logError(
+                vm.errorHandler.logError(
                     ErrorType.NETWORK,
                     ErrorCode.CONNECTION_ERROR,
                     ErrorSource.HTTP_CONNECTOR,
@@ -55,7 +58,7 @@ class HTTPConnector {
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            errorHandler.logError(
+            vm.errorHandler.logError(
                 ErrorType.NETWORK,
                 ErrorCode.CONNECTION_ERROR,
                 ErrorSource.HTTP_CONNECTOR,
@@ -118,7 +121,7 @@ class HTTPConnector {
             val url: URL
             var urlConnection: HttpURLConnection? = null
             try {
-                url = URL(serverAddress + endpoint)
+                url = URL(serverAddress(vm.ipAddress!!) + endpoint)
                 //open an URL connection
                 urlConnection = url.openConnection() as HttpURLConnection
                 urlConnection.requestMethod = "POST"
@@ -148,7 +151,7 @@ class HTTPConnector {
             val url: URL
             var urlConnection: HttpURLConnection? = null
             try {
-                url = URL(serverAddress + endpoint)
+                url = URL(serverAddress(vm.ipAddress!!) + endpoint)
                 //open a URL connection
                 urlConnection = url.openConnection() as HttpURLConnection
                 urlConnection.requestMethod = "POST"
@@ -176,5 +179,23 @@ class HTTPConnector {
         } catch (e: Exception) {
             e.printStackTrace()
         }
+    }
+
+    fun getBitmapFromURL(src: String?): Bitmap? {
+        return if (!(src!!.contains("-1")))
+            try {
+                println("FOOB getBitmapFromURL: $src")
+                val url = URL(src)
+                val connection = url.openConnection() as HttpURLConnection
+                connection.doInput = true
+                connection.connect()
+                val input = connection.inputStream
+                BitmapFactory.decodeStream(input)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                null
+            }
+        else
+            null
     }
 }

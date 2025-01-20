@@ -1,12 +1,11 @@
 package com.deckerth.thomas.foobarremotecontroller2.connector;
 
-import android.annotation.SuppressLint;
-
 import com.deckerth.thomas.foobarremotecontroller2.model.AddTracksBehaviors;
 import com.deckerth.thomas.foobarremotecontroller2.model.Playlist;
 import com.deckerth.thomas.foobarremotecontroller2.model.PlaylistEntity;
 import com.deckerth.thomas.foobarremotecontroller2.model.Playlists;
 import com.deckerth.thomas.foobarremotecontroller2.model.Title;
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -14,25 +13,15 @@ import org.json.JSONObject;
 
 public class PlaylistAccess {
 
-    @SuppressLint("StaticFieldLeak")
-    private static PlaylistAccess INSTANCE;
     private final ErrorHandler errorHandler;
-    private HTTPConnector mConnector;
-
-    public PlaylistAccess() {
-        this.errorHandler = ErrorHandlerKt.getErrorHandler();
-    }
-
-    public static PlaylistAccess getInstance() {
-        if (INSTANCE == null)
-            INSTANCE = new PlaylistAccess();
-        return INSTANCE;
+    private final AppViewModel vm;
+    public PlaylistAccess(AppViewModel vm) {
+        this.vm = vm;
+        this.errorHandler = vm.getErrorHandler();
     }
 
     public Playlists getPlaylists() {
-        if (mConnector == null)
-            this.mConnector = new HTTPConnector();
-        String response = queryPlaylists();
+        Response response = queryPlaylists();
         if (response == null)
             return null;
         else
@@ -40,9 +29,9 @@ public class PlaylistAccess {
     }
 
     public Playlist getPlaylist(PlaylistEntity playlistEntity, int startIndex) {
-        String response;
+        Response response;
         try {
-            response = mConnector.getData("playlists/" + playlistEntity.getPlaylistId() +
+            response = vm.connector.getData("playlists/" + playlistEntity.getPlaylistId() +
                     "/items/" + startIndex + "%3A" + 1000 + "?columns=%25label%25,%25catalog%25,%25composer%25,%25album%25,%25title%25,%25artist%25,%25discnumber%25,%25track%25,%25length%25,%24filename%28%25path%25%29%24");
         } catch (Exception e) {
             errorHandler.logError(ErrorType.NETWORK, ErrorCode.CONNECTION_ERROR, ErrorSource.PLAYLIST_ITEMS, e);
@@ -51,10 +40,11 @@ public class PlaylistAccess {
         return parsePlaylist(response, playlistEntity, startIndex);
     }
 
-    private Playlist parsePlaylist(String input, PlaylistEntity playlistEntity, int startIndex) {
+    private Playlist parsePlaylist(Response input, PlaylistEntity playlistEntity, int startIndex) {
         Playlist playlist = new Playlist(playlistEntity);
+        playlist.setIpAddress(input.getUsedIpAddress());
         try {
-            JSONObject contentObject = new JSONObject(input);
+            JSONObject contentObject = new JSONObject(input.getMessage());
             JSONObject playlistItemsObject = contentObject.getJSONObject("playlistItems");
             JSONArray itemsArray = playlistItemsObject.getJSONArray("items");
 
@@ -109,7 +99,7 @@ public class PlaylistAccess {
                                 discNumber,
                                 track,
                                 length, "", "",
-                                mConnector.getServerAddress() + "artwork/" + playlistEntity.getPlaylistId() + "/" + (i + startIndex)));
+                                vm.connector.serverAddress(input.getUsedIpAddress()) + "artwork/" + playlistEntity.getPlaylistId() + "/" + (i + startIndex)));
             }
         } catch (JSONException e) {
             errorHandler.logError(ErrorType.API, ErrorCode.BAD_RESPONSE, ErrorSource.PLAYLIST_ITEMS, e);
@@ -120,10 +110,10 @@ public class PlaylistAccess {
         return playlist;
     }
 
-    private String queryPlaylists() {
-        String response;
+    private Response queryPlaylists() {
+        Response response;
         try {
-            response = mConnector.getData("playlists");
+            response = vm.connector.getData("playlists");
         } catch (Exception e) {
             errorHandler.logError(ErrorType.NETWORK, ErrorCode.CONNECTION_ERROR, ErrorSource.PLAYLIST_ITEMS, e);
             return null;
@@ -131,10 +121,11 @@ public class PlaylistAccess {
         return response;
     }
 
-    private Playlists parsePlaylists(String input) {
+    private Playlists parsePlaylists(Response input) {
         Playlists result = new Playlists();
+        result.ipAddress = input.getUsedIpAddress();
         try {
-            JSONObject playlistsObject = new JSONObject(input);
+            JSONObject playlistsObject = new JSONObject(input.getMessage());
             JSONArray playlistArray = playlistsObject.getJSONArray("playlists");
             for (int i = 0; i < playlistArray.length(); i++) {
                 JSONObject playlistObject = playlistArray.getJSONObject(i);
@@ -182,7 +173,6 @@ public class PlaylistAccess {
                 break;
         }
         String jsonString = "{\"items\":[\"" + path + "\"], \"play\":" + playValue + ", \"replace\":" + replaceValue + " }";
-        mConnector.postData("playlists/" + playlistId + "/items/add/", jsonString);
+        vm.connector.postData("playlists/" + playlistId + "/items/add/", jsonString);
     }
-
 }

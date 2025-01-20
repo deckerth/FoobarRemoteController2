@@ -6,6 +6,7 @@ import java.util.Optional;
 
 public class Playlists {
 
+    public String ipAddress = "";
     private final List<PlaylistEntity> mPlaylists = new ArrayList<>();
 
     public void addPlaylistEntity(PlaylistEntity playlistEntity) {

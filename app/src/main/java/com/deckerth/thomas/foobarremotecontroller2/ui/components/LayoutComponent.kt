@@ -15,6 +15,7 @@ import com.deckerth.thomas.foobarremotecontroller2.ui.layout.ItemSize
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.LayoutItem
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.LayoutItems
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.TextAlignment
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
 
 @Composable
 fun getTextStyle(itemSize: ItemSize): TextStyle {
@@ -44,7 +45,7 @@ fun TextComponent(text: String, item: LayoutItem) {
 }
 
 @Composable
-fun LayoutComponent(player: Player, layoutItem: LayoutItem) {
+fun LayoutComponent(vm: AppViewModel, player: Player, layoutItem: LayoutItem) {
     when (layoutItem.item) {
         LayoutItems.LABEL -> TextComponent(text = player.label, item = layoutItem)
         LayoutItems.CATALOG -> TextComponent(text = player.catalog, item = layoutItem)
@@ -56,7 +57,7 @@ fun LayoutComponent(player: Player, layoutItem: LayoutItem) {
         LayoutItems.TITLE -> TextComponent(text = player.title, item = layoutItem)
         LayoutItems.ALBUM -> TextComponent(text = player.album, item = layoutItem)
         LayoutItems.ARTIST -> TextComponent(text = player.artist, item = layoutItem)
-        LayoutItems.PROGRESS -> PlayerProgress(player)
+        LayoutItems.PROGRESS -> PlayerProgress(vm, player)
         LayoutItems.COMPOSER ->
             if (player.composer != "" && player.composer != "?") {
                 TextComponent(text = player.composer, item = layoutItem)

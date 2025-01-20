@@ -7,8 +7,8 @@ import androidx.compose.runtime.setValue
 class Playlist(var playlistEntity: PlaylistEntity) {
     val titles = mutableListOf<ITitle>()
     val albums = mutableListOf<Album>()
-
     var valid by mutableStateOf(true)
+    var ipAddress: String = ""
 
     fun clear() {
         titles.clear()

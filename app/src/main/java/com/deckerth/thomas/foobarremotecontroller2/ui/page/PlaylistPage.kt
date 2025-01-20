@@ -49,7 +49,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.deckerth.thomas.foobarremotecontroller2.R
-import com.deckerth.thomas.foobarremotecontroller2.connector.PlayerAccess
 import com.deckerth.thomas.foobarremotecontroller2.model.Album
 import com.deckerth.thomas.foobarremotecontroller2.model.ITitle
 import com.deckerth.thomas.foobarremotecontroller2.model.Playlist
@@ -63,33 +62,20 @@ import com.deckerth.thomas.foobarremotecontroller2.ui.components.TitleSearchBarD
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.Layout
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.layoutManager
 import com.deckerth.thomas.foobarremotecontroller2.ui.theme.Foobar2000RemoteControllerTheme
-import com.deckerth.thomas.foobarremotecontroller2.viewmodel.autoScrollIndex
-import com.deckerth.thomas.foobarremotecontroller2.viewmodel.autoscroll
-import com.deckerth.thomas.foobarremotecontroller2.viewmodel.displayedPlaylist
-import com.deckerth.thomas.foobarremotecontroller2.viewmodel.filterValue
-import com.deckerth.thomas.foobarremotecontroller2.viewmodel.getCurrentAlbumIndex
-import com.deckerth.thomas.foobarremotecontroller2.viewmodel.loadingList
-import com.deckerth.thomas.foobarremotecontroller2.viewmodel.player
-import com.deckerth.thomas.foobarremotecontroller2.viewmodel.playlistState
-import com.deckerth.thomas.foobarremotecontroller2.viewmodel.playlists
-import com.deckerth.thomas.foobarremotecontroller2.viewmodel.selectedPlaylistIndex
-import com.deckerth.thomas.foobarremotecontroller2.viewmodel.selectedPlaylistName
-import com.deckerth.thomas.foobarremotecontroller2.viewmodel.setSelectedPlaylist
-import com.deckerth.thomas.foobarremotecontroller2.viewmodel.showFilter
-import com.deckerth.thomas.foobarremotecontroller2.viewmodel.updatePlaylists
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
 
 @Composable
-fun PlaylistPage() {
-    if (displayedPlaylist != null &&
-        !displayedPlaylist!!.valid
+fun PlaylistPage(vm: AppViewModel) {
+    if (vm.displayedPlaylist != null &&
+        !vm.displayedPlaylist!!.valid
     ) {
-        displayedPlaylist!!.clear()
-        displayedPlaylist = null
-        updatePlaylists()  // delayed update to avoid crashes during layout update
+        vm.displayedPlaylist!!.clear()
+        vm.displayedPlaylist = null
+        vm.playlistsViewModel.updatePlaylists()  // delayed update to avoid crashes during layout update
     }
-    if (displayedPlaylist != null)
+    if (vm.displayedPlaylist != null)
         Column {
-            PlaylistSwitcher(playlists = playlists)
+            PlaylistSwitcher(vm, playlists = vm.playlistsViewModel.playlists)
             /*if (showFilter.value)
                 TitleSearchBar(
                     onClosed = {
@@ -98,21 +84,21 @@ fun PlaylistPage() {
                     },
                     onSearch = { searchString -> filterValue.value = searchString }
                 )*/
-            if (displayedPlaylist != null)
-                Playlist(displayedPlaylist!!)
+            if (vm.displayedPlaylist != null)
+                Playlist(vm, vm.displayedPlaylist!!)
         }
-    if (showFilter.value)
+    if (vm.playlistsViewModel.showFilter.value)
         TitleSearchBarDialog(
             onSearch = { searchString ->
-                filterValue.value = searchString
-                showFilter.value = false
+                vm.playlistsViewModel.filterValue.value = searchString
+                vm.playlistsViewModel.showFilter.value = false
             },
             onDismiss = {
-                showFilter.value = false
-                filterValue.value = ""
+                vm.playlistsViewModel.showFilter.value = false
+                vm.playlistsViewModel.filterValue.value = ""
             }
         )
-    if (loadingList || displayedPlaylist == null)
+    if (vm.loadingList || vm.displayedPlaylist == null)
         LinearProgressIndicator(
             modifier = Modifier
                 .fillMaxWidth()
@@ -120,7 +106,7 @@ fun PlaylistPage() {
 }
 
 @Composable
-fun AlbumCard(album: Album, layout: Layout?, previewMode: Boolean = false) {
+fun AlbumCard(vm: AppViewModel, album: Album, layout: Layout?, previewMode: Boolean = false) {
 
     /*
     in automatic mode (initial state):
@@ -129,10 +115,10 @@ fun AlbumCard(album: Album, layout: Layout?, previewMode: Boolean = false) {
     automatic mode is re-entered otherwise
     */
 
-    if (!previewMode && player != null) {
+    if (!previewMode && vm.player != null) {
         val currentlyPlaying =
-            album.originalTitle.playlistId == player!!.playlistId && album.hasIndex(
-                player!!.getIndex()
+            album.originalTitle.playlistId == vm.player!!.playlistId && album.hasIndex(
+                vm.player!!.getIndex()
             )
         if (album.isAutomaticSelection)
             album.isSelected = currentlyPlaying
@@ -145,9 +131,9 @@ fun AlbumCard(album: Album, layout: Layout?, previewMode: Boolean = false) {
     var modifier: Modifier = Modifier
     if (albumRepresentsTitle) {
         var titleSelected = false
-        if (player != null)
+        if (vm.player != null)
             titleSelected =
-                album.titles[0].index == player!!.getIndex() && album.titles[0].playlistId == player!!.playlistId
+                album.titles[0].index == vm.player!!.getIndex() && album.titles[0].playlistId == vm.player!!.playlistId
 
         if (titleSelected)
             modifier = modifier.background(MaterialTheme.colorScheme.primaryContainer)
@@ -155,9 +141,9 @@ fun AlbumCard(album: Album, layout: Layout?, previewMode: Boolean = false) {
 
     if (album.titles.isNotEmpty() && !previewMode)
         modifier = modifier.clickable {
-            filterValue.value = ""
-            showFilter.value = false
-            PlayerAccess.getInstance().playTrack(album.titles[0].playlistId, album.titles[0].index)
+            vm.playlistsViewModel.filterValue.value = ""
+            vm.playlistsViewModel.showFilter.value = false
+            vm.playerAccess.playTrack(album.titles[0].playlistId, album.titles[0].index)
         }
 
     ElevatedCard(
@@ -245,13 +231,13 @@ fun AlbumCard(album: Album, layout: Layout?, previewMode: Boolean = false) {
                 if (album.isSelected) {
                     Column {
                         album.titles.forEach { title ->
-                            if (title.matches(filterValue.value))
-                                TitleEntry(album = album, title = title, previewMode = previewMode)
+                            if (title.matches(vm.playlistsViewModel.filterValue.value))
+                                TitleEntry(vm = vm, album = album, title = title, previewMode = previewMode)
                         }
                     }
                 }
             } else if (!albumRepresentsTitle) {
-                TitleEntry(album = album, title = album.titles[0], previewMode = previewMode)
+                TitleEntry(vm = vm, album = album, title = album.titles[0], previewMode = previewMode)
             }
         }
     }
@@ -259,19 +245,19 @@ fun AlbumCard(album: Album, layout: Layout?, previewMode: Boolean = false) {
 }
 
 @Composable
-fun TitleEntry(album: Album, title: ITitle, previewMode: Boolean = false) {
+fun TitleEntry(vm: AppViewModel, album: Album, title: ITitle, previewMode: Boolean = false) {
     var titleSelected = false
     if (previewMode)
         titleSelected = title.index == 0
-    else if (player != null)
+    else if (vm.player != null)
         titleSelected =
-            title.index == player!!.getIndex() && title.playlistId == player!!.playlistId
+            title.index == vm.player!!.getIndex() && title.playlistId == vm.player!!.playlistId
     var modifier = Modifier
         .clickable {
             if (!previewMode) {
-                filterValue.value = ""
-                showFilter.value = false
-                PlayerAccess.getInstance().playTrack(title.playlistId, title.index)
+                vm.playlistsViewModel.filterValue.value = ""
+                vm.playlistsViewModel.showFilter.value = false
+                vm.playerAccess.playTrack(title.playlistId, title.index)
             }
         }
     if (titleSelected)
@@ -344,7 +330,7 @@ fun AlbumCardPreview() {
     //fields.items.add(LayoutItem(LayoutItems.COMPOSER, ItemSize.BODY_SMALL))
 
     //val layout = Layout(playerLayout = fields, albumLayout = fields, titleLayout = fields)
-    AlbumCard(album, null)
+    AlbumCard(AppViewModel(), album, null)
 }
 
 @Preview(showBackground = true)
@@ -377,22 +363,22 @@ fun AlbumCardPreview2() {
     //fields.items.add(LayoutItem(LayoutItems.COMPOSER, ItemSize.BODY_SMALL))
 
     //val layout = Layout(playerLayout = fields, albumLayout = fields, titleLayout = fields)
-    AlbumCard(album, null)
+    AlbumCard(AppViewModel(), album, null)
 }
 
 @Composable
-fun Playlist(playlist: Playlist) {
-    val currentAlbumIndex = getCurrentAlbumIndex()
-    playlistState =
-        rememberLazyListState(initialFirstVisibleItemIndex = if (!loadingList && autoscroll && currentAlbumIndex != -1) currentAlbumIndex else 0)
+fun Playlist(vm: AppViewModel, playlist: Playlist) {
+    val currentAlbumIndex = vm.getCurrentAlbumIndex()
+    val playlistState =
+        rememberLazyListState(initialFirstVisibleItemIndex = if (!vm.loadingList && vm.autoscroll && currentAlbumIndex != -1) currentAlbumIndex else 0)
     var animating by remember { mutableStateOf(false) }
 
     LazyColumn(state = playlistState) {
         if (playlist.albums.isNotEmpty()) {
             try {
                 items(playlist.albums) { album ->
-                    if (album.matches(filterValue.value))
-                        AlbumCard(album, layoutManager.getLayout())
+                    if (album.matches(vm.playlistsViewModel.filterValue.value))
+                        AlbumCard(vm, album, layoutManager.getLayout())
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -401,10 +387,10 @@ fun Playlist(playlist: Playlist) {
     }
 //        if (!animating && !loadingList && playlistState.firstVisibleItemIndex != autoScrollIndex)
 //            autoscroll = false
-    LaunchedEffect(autoScrollIndex) {
-        if (autoscroll) {
+    LaunchedEffect(vm.autoScrollIndex) {
+        if (vm.autoscroll) {
             animating = true
-            playlistState.animateScrollToItem(autoScrollIndex)
+            playlistState.animateScrollToItem(vm.autoScrollIndex)
             animating = false
         }
     }
@@ -412,12 +398,12 @@ fun Playlist(playlist: Playlist) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PlaylistSwitcher(playlists: Playlists) {
+fun PlaylistSwitcher(vm : AppViewModel, playlists: Playlists) {
     var expanded by remember {
         mutableStateOf(false)
     }
     var selectedIndex by remember {
-        mutableIntStateOf(selectedPlaylistIndex)
+        mutableIntStateOf(vm.playlistsViewModel.selectedPlaylistIndex)
     }
     val focusRequester = remember { FocusRequester() }
     ExposedDropdownMenuBox(
@@ -438,7 +424,7 @@ fun PlaylistSwitcher(playlists: Playlists) {
                 },
             label = { Text(text = stringResource(R.string.button_playlist_switcher)) },
             readOnly = true,
-            value = selectedPlaylistName,
+            value = vm.selectedPlaylistName,
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             onValueChange = {
             }
@@ -458,8 +444,8 @@ fun PlaylistSwitcher(playlists: Playlists) {
                     onClick = {
                         selectedIndex = index
                         expanded = false
-                        autoscroll = false
-                        setSelectedPlaylist(playlists.playlists[selectedIndex].playlistId)
+                        vm.autoscroll = false
+                        vm.playlistsViewModel.setSelectedPlaylist(playlists.playlists[selectedIndex].playlistId)
                     },
                     trailingIcon = {
                         if (playlistEntity.isCurrent) {
@@ -522,7 +508,7 @@ fun PlaylistSwitcherPreview() {
             false, 10
         )
     )
-    PlaylistSwitcher(playlists = playlists)
+    PlaylistSwitcher(AppViewModel(), playlists = playlists)
 }
 
 
@@ -579,7 +565,7 @@ fun PlaylistPreview() {
 //        }
         Column {
             PlaylistSwitcherPreview()
-            Playlist(playlist)
+            Playlist(AppViewModel(), playlist)
         }
     }
 }

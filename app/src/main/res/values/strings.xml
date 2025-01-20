@@ -110,7 +110,6 @@
     <string name="directory_not_found_start">"To allow browsing and adding files via Foobar Link, specify music directories in the Beefweb plugin configuration screen. For more information, press "</string>
     <string name="directory_not_found_start2">.</string>
     <string name="button_refresh_roots">Try again</string>
-    <string name="ip_address_not_set">Not yet set</string>
     <string name="search_device_heading">Searching Network</string>
     <string name="button_next">Next</string>
     <string name="manual_device_heading">Set up Device</string>

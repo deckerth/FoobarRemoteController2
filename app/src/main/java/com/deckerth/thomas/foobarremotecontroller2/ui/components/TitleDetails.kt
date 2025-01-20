@@ -15,13 +15,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.deckerth.thomas.foobarremotecontroller2.R
 import com.deckerth.thomas.foobarremotecontroller2.model.ITitle
-import com.deckerth.thomas.foobarremotecontroller2.model.Player
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.LayoutItems
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.ViewsWithLayout
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.getLayoutItemsFor
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.layoutManager
 import com.deckerth.thomas.foobarremotecontroller2.ui.mainActivity
-import com.deckerth.thomas.foobarremotecontroller2.viewmodel.getPlaylist
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
 
 @Composable
 fun TitleDetails(title: ITitle, onDismiss: () -> Unit) {
@@ -65,10 +64,11 @@ fun TitleDetails(title: ITitle, onDismiss: () -> Unit) {
 }
 
 @Composable
-fun TitleDetails(player: Player, onDismiss: () -> Unit) {
-    if (player.playlistId.isEmpty() || player.index.isEmpty()) return
-    val playlist = getPlaylist(player.playlistId)
-    val title = playlist.getTitle(player.index.toInt())
+fun TitleDetails(vm: AppViewModel, onDismiss: () -> Unit) {
+    if (vm.player == null) return
+    if (vm.player!!.playlistId.isEmpty() || vm.player!!.index.isEmpty()) return
+    val playlist = vm.playlistsViewModel.getPlaylist(vm.player!!.playlistId)
+    val title = playlist.getTitle(vm.player!!.index.toInt())
     if (title != null) {
         TitleDetails(title, onDismiss)
     }

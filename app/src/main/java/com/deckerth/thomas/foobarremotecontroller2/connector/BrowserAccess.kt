@@ -3,15 +3,12 @@ package com.deckerth.thomas.foobarremotecontroller2.connector
 import com.deckerth.thomas.foobarremotecontroller2.model.MusicDirectory
 import com.deckerth.thomas.foobarremotecontroller2.model.MusicDirectoryEntry
 import com.deckerth.thomas.foobarremotecontroller2.model.ParentDirectory
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
 import org.json.JSONObject
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 
-val browserAccess = BrowserAccess()
-
-class BrowserAccess {
-
-    private val connector = HTTPConnector()
+class BrowserAccess(private val vm: AppViewModel) {
     private var pathSeparator = "\\"
 
     fun getRoots(): MusicDirectory? {
@@ -20,7 +17,7 @@ class BrowserAccess {
     }
 
     private fun parseRoots(response: String): MusicDirectory {
-        val roots = MusicDirectory("ROOT", "", "NULL")
+        val roots = MusicDirectory(vm, "ROOT", "", "NULL")
         try {
             val rootsObject = JSONObject(response)
             pathSeparator = rootsObject.getString("pathSeparator")
@@ -41,7 +38,7 @@ class BrowserAccess {
             for (i in 0 until rootsArray.length()) {
                 val rootObject = rootsArray.getJSONObject(i)
                 roots.addEntry(
-                    MusicDirectory(
+                    MusicDirectory(vm,
                         rootObject.getString("name"),
                         rootObject.getString("path"),
                         ""
@@ -49,7 +46,7 @@ class BrowserAccess {
                 )
             }
         } catch (e: Exception) {
-            errorHandler.logError(
+            vm.errorHandler.logError(
                 ErrorType.API,
                 ErrorCode.BAD_RESPONSE,
                 ErrorSource.BROWSER,
@@ -60,11 +57,11 @@ class BrowserAccess {
     }
 
     private fun queryRoots(): String? {
-        val response: String?
+        val response : Response?
         try {
-            response = connector.getData("browser/roots")
+            response = vm.connector.getData("browser/roots")
         } catch (e: Exception) {
-            errorHandler.logError(
+            vm.errorHandler.logError(
                 ErrorType.NETWORK,
                 ErrorCode.CONNECTION_ERROR,
                 ErrorSource.BROWSER,
@@ -72,7 +69,7 @@ class BrowserAccess {
             )
             return null
         }
-        return response
+        return response.message
     }
 
     private fun encodePath(path: String): String {
@@ -86,11 +83,11 @@ class BrowserAccess {
     }
 
     private fun queryDirectory(encodedPath: String): String? {
-        val response: String?
+        val response: Response?
         try {
-            response = connector.getData("browser/entries?path=$encodedPath")
+            response = vm.connector.getData("browser/entries?path=$encodedPath")
         } catch (e: Exception) {
-            errorHandler.logError(
+            vm.errorHandler.logError(
                 ErrorType.NETWORK,
                 ErrorCode.CONNECTION_ERROR,
                 ErrorSource.BROWSER,
@@ -98,7 +95,7 @@ class BrowserAccess {
             )
             return null
         }
-        return response
+        return response.message
     }
 
     private fun parseDirectory(
@@ -106,7 +103,7 @@ class BrowserAccess {
         parentDirectory: String,
         response: String
     ): MusicDirectory {
-        val entries = MusicDirectory(path, path, parentDirectory)
+        val entries = MusicDirectory(vm, path, path, parentDirectory)
         try {
             val entriesObject = JSONObject(response)
             val entriesArray = entriesObject.getJSONArray("entries")
@@ -132,13 +129,14 @@ class BrowserAccess {
                 }
 
          */
-            entries.addEntry(ParentDirectory("..", parentDirectory))
+            entries.addEntry(ParentDirectory(vm,"..", parentDirectory))
             for (i in 0 until entriesArray.length()) {
                 val entryObject = entriesArray.getJSONObject(i)
                 val type = entryObject.getString("type")
                 entries.addEntry(
                     if (type == "D")
                         MusicDirectory(
+                            vm,
                             entryObject.getString("name"),
                             entryObject.getString("path"),
                             path
@@ -151,7 +149,7 @@ class BrowserAccess {
                 )
             }
         } catch (e: Exception) {
-            errorHandler.logError(
+            vm.errorHandler.logError(
                 ErrorType.API,
                 ErrorCode.BAD_RESPONSE,
                 ErrorSource.BROWSER,

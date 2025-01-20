@@ -43,13 +43,13 @@ import com.deckerth.thomas.foobarremotecontroller2.R
 import com.deckerth.thomas.foobarremotecontroller2.getAddTrackBehavior
 import com.deckerth.thomas.foobarremotecontroller2.model.MusicDirectoryEntry
 import com.deckerth.thomas.foobarremotecontroller2.ui.theme.Foobar2000RemoteControllerTheme
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.BrowserViewModel
-import com.deckerth.thomas.foobarremotecontroller2.viewmodel.displayedPlaylist
 import kotlinx.coroutines.launch
 
 @Composable
-fun BrowserPage(vm: BrowserViewModel, navController: NavHostController) {
-    val path = vm.getCurrentPath()
+fun BrowserPage(vm: AppViewModel, navController: NavHostController) {
+    val path = vm.browserViewModel.getCurrentPath()
 
     println("FOOB BrowserPage $path")
 
@@ -58,9 +58,9 @@ fun BrowserPage(vm: BrowserViewModel, navController: NavHostController) {
 
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
-    val filesAddedMessage = if (displayedPlaylist == null) "" else stringResource(
+    val filesAddedMessage = if (vm.displayedPlaylist == null) "" else stringResource(
         R.string.files_added,
-        displayedPlaylist!!.playlistEntity.name
+        vm.displayedPlaylist!!.playlistEntity.name
     )
 
     Scaffold(
@@ -73,33 +73,33 @@ fun BrowserPage(vm: BrowserViewModel, navController: NavHostController) {
         ) {
             if (path != "")
                 ElevatedCard(modifier = Modifier.fillMaxWidth()) {
-                    Text(modifier = Modifier.padding(8.dp), text = vm.getCurrentPath())
+                    Text(modifier = Modifier.padding(8.dp), text = vm.browserViewModel.getCurrentPath())
                 }
 
-            if (vm.loadingData.value)
+            if (vm.browserViewModel.loadingData.value)
                 LinearProgressIndicator(
                     modifier = Modifier.fillMaxWidth()
                 )
-            else if (path == "" && vm.getDirectory().getEntries().isEmpty())
-                NoMusicDirectoriesConfiguredInfo(vm)
+            else if (path == "" && vm.browserViewModel.getDirectory().getEntries().isEmpty())
+                NoMusicDirectoriesConfiguredInfo(vm.browserViewModel)
             else
                 LazyColumn(state = playlistState) {
-                    if (vm.getDirectory().getEntries().isNotEmpty()) {
-                        items(vm.getDirectory().getEntries()) { entry ->
-                            if (path == vm.getCurrentPath()) // stop drawing if the path was changed
-                                DirectoryEntry(vm, entry, navController)
+                    if (vm.browserViewModel.getDirectory().getEntries().isNotEmpty()) {
+                        items(vm.browserViewModel.getDirectory().getEntries()) { entry ->
+                            if (path == vm.browserViewModel.getCurrentPath()) // stop drawing if the path was changed
+                                DirectoryEntry(vm.browserViewModel, entry, navController)
                         }
                     }
                 }
 
-            LaunchedEffect(vm.filesAdded) {
-                if (vm.filesAdded)
+            LaunchedEffect(vm.browserViewModel.filesAdded) {
+                if (vm.browserViewModel.filesAdded)
                     scope.launch {
                         snackbarHostState.showSnackbar(
                             message = filesAddedMessage,
                             duration = SnackbarDuration.Short
                         )
-                        vm.filesAdded = false
+                        vm.browserViewModel.filesAdded = false
                     }
             }
         }

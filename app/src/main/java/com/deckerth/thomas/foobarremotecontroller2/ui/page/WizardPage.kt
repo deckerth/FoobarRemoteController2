@@ -50,6 +50,7 @@ import com.deckerth.thomas.foobarremotecontroller2.saveIpAddress
 import com.deckerth.thomas.foobarremotecontroller2.ui.components.DeviceNotFoundText
 import com.deckerth.thomas.foobarremotecontroller2.ui.components.WelcomeText
 import com.deckerth.thomas.foobarremotecontroller2.ui.mainActivity
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
@@ -84,6 +85,7 @@ val devices = mutableStateListOf<Device>()
 
 @Composable
 fun WizardPage(
+    vm: AppViewModel? = null,
     modifier: Modifier = Modifier,
     showIntroduction: Boolean = true,
     onCancel: () -> Unit = {},
@@ -142,6 +144,8 @@ fun WizardPage(
                     },
                     onFinished = { device: Device ->
                         saveIpAddress("${device.ipAddress}:8880", mainActivity)
+                        vm?.ipAddress = "${device.ipAddress}:8880"
+                        vm?.playlistsViewModel?.restartObserver()
                         onFinished()
                     }
                 )
@@ -212,6 +216,8 @@ fun WizardPage(
             CustomDevicePage(onFinished = { device: Device ->
                 if (device.isValid) {
                     saveIpAddress(device.ipAddress, mainActivity)
+                    vm?.ipAddress = device.ipAddress
+                    vm?.playlistsViewModel?.restartObserver()
                     onFinished()
                 }
             })
@@ -234,6 +240,7 @@ fun SearchDevices(
     LaunchedEffect(Unit) {
         if (!hasSearched) {
             hasSearched = true
+            loading = true
             prepareDeviceSelectionPage()
         }
     }
@@ -259,11 +266,11 @@ fun SearchDevices(
 
 fun prepareDeviceSelectionPage() {
     devices.clear()
-    Thread {
+    CoroutineScope(Dispatchers.IO).launch {
         runBlocking {
             scanForFoobarServers(8880)
         }
-    }.start()
+    }
 }
 
 suspend fun scanForFoobarServers(port: Int, timeout: Int = 1000) {

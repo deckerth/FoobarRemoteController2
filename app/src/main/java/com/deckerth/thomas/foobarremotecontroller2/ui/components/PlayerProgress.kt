@@ -9,13 +9,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -26,12 +26,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.deckerth.thomas.foobarremotecontroller2.R
 import com.deckerth.thomas.foobarremotecontroller2.model.Player
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PlayerProgress(player: Player) {
+fun PlayerProgress(vm: AppViewModel, player: Player) {
     val interactionSource = remember { MutableInteractionSource() }
-    var sliderValue by remember { mutableStateOf(0f) }
+    var sliderValue by remember { mutableFloatStateOf(0f) }
     var isDragging by remember { mutableStateOf(false) }
 
     LaunchedEffect(interactionSource) {
@@ -73,7 +73,7 @@ fun PlayerProgress(player: Player) {
         Slider(
             value = sliderValue,
             onValueChange = { newPosition -> sliderValue = newPosition },
-            onValueChangeFinished = { player.setPos(sliderValue) },
+            onValueChangeFinished = { player.setPos(vm, sliderValue) },
             interactionSource = interactionSource,
             modifier = Modifier
                 .clip(MaterialTheme.shapes.large)

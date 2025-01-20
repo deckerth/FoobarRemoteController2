@@ -22,8 +22,7 @@ import com.deckerth.thomas.foobarremotecontroller2.model.PlaylistEntity
 import com.deckerth.thomas.foobarremotecontroller2.model.Title
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.ViewsWithLayout
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.layoutManager
-import com.deckerth.thomas.foobarremotecontroller2.viewmodel.playlistState
-import com.deckerth.thomas.foobarremotecontroller2.viewmodel.selectedView
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
 
 val previewPlayerClassic = Player(
     "Decca",
@@ -41,7 +40,8 @@ val previewPlayerClassic = Player(
     "53.58589853333333",
     R.drawable.cover_tosca.toString(),
     PlaybackState.PLAYING,
-    PlaybackMode.DEFAULT
+    PlaybackMode.DEFAULT,
+    ""
 )
 
 val previewPlayerPop = Player(
@@ -60,7 +60,8 @@ val previewPlayerPop = Player(
     "51.080651833333334",
     R.drawable.cover_abba.toString(),
     PlaybackState.PLAYING,
-    PlaybackMode.DEFAULT
+    PlaybackMode.DEFAULT,
+    ""
 )
 
 val previewPlaylist = Playlist(PlaylistEntity("p4", "Preview", true, 2))
@@ -109,11 +110,11 @@ private fun setupPreviewPlaylist() {
 var currentPlayer by mutableStateOf(previewPlayerPop)
 
 @Composable
-fun LayoutPreviewPage() {
+fun LayoutPreviewPage(appViewModel: AppViewModel) {
     var maxBoxHeight by remember { mutableStateOf(0.dp) }
     var maxBoxWidth by remember { mutableStateOf(0.dp) }
 
-    if (selectedView == ViewsWithLayout.PLAYER) {
+    if (appViewModel.selectedView == ViewsWithLayout.PLAYER) {
         BoxWithConstraints(
             modifier = Modifier
                 .fillMaxSize()
@@ -121,6 +122,7 @@ fun LayoutPreviewPage() {
             maxBoxHeight = maxHeight
             maxBoxWidth = maxWidth
             PlayerCard(
+                appViewModel,
                 currentPlayer,
                 true,
                 { currentPlayer = previewPlayerPop },
@@ -130,19 +132,19 @@ fun LayoutPreviewPage() {
         }
     } else {
         setupPreviewPlaylist()
-        PlaylistPreview(previewPlaylist)
+        PlaylistPreview(appViewModel, previewPlaylist)
     }
 }
 
 @Composable
-fun PlaylistPreview(playlist: Playlist) {
-    playlistState =
+fun PlaylistPreview(vm: AppViewModel, playlist: Playlist) {
+    val playlistState =
         rememberLazyListState(initialFirstVisibleItemIndex = 0)
 
     LazyColumn(state = playlistState) {
         try {
             items(playlist.albums) { album ->
-                AlbumCard(album, layoutManager.getLayout(), true)
+                AlbumCard(vm, album, layoutManager.getLayout(), true)
             }
         } catch (e: Exception) {
             e.printStackTrace()

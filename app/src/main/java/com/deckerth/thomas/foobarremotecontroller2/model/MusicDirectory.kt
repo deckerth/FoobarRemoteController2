@@ -1,9 +1,9 @@
 package com.deckerth.thomas.foobarremotecontroller2.model
 
 import androidx.compose.runtime.mutableStateOf
-import com.deckerth.thomas.foobarremotecontroller2.connector.browserAccess
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
 
-open class MusicDirectory(name: String, path: String, private val parentDirectory: String) :
+open class MusicDirectory(val vm: AppViewModel, name: String, path: String, private val parentDirectory: String) :
     MusicDirectoryEntry(name, path) {
 
     private val entries = mutableListOf<MusicDirectoryEntry>()
@@ -39,9 +39,9 @@ open class MusicDirectory(name: String, path: String, private val parentDirector
     fun expand() {
         val result =
             if (path == "")
-                browserAccess.getRoots()
+                vm.browserAccess.getRoots()
             else
-                browserAccess.getDirectory(path, parentDirectory)
+                vm.browserAccess.getDirectory(path, parentDirectory)
         if (result != null) {
             for (entry in result.entries) {
                 println("FOOB addEntry: ${entry.name}")
@@ -53,7 +53,7 @@ open class MusicDirectory(name: String, path: String, private val parentDirector
     }
 }
 
-class ParentDirectory(name: String, path: String) : MusicDirectory(name, path, "?") {
+class ParentDirectory(vm: AppViewModel, name: String, path: String) : MusicDirectory(vm, name, path, "?") {
     init {
         expanded.value = true
     }

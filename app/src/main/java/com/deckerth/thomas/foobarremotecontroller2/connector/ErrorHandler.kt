@@ -1,14 +1,12 @@
 package com.deckerth.thomas.foobarremotecontroller2.connector
 
-import com.deckerth.thomas.foobarremotecontroller2.viewmodel.isSick
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.sql.Timestamp
-
-val errorHandler = ErrorHandler()
 
 enum class ErrorType {
     NETWORK,
@@ -31,7 +29,7 @@ enum class ErrorSource {
     BROWSER
 }
 
-class ErrorHandler {
+class ErrorHandler(private val vm: AppViewModel) {
 
     private var firstOccurrence: Timestamp? = null
     private var errorType: ErrorType = ErrorType.UNKNOWN
@@ -59,9 +57,9 @@ class ErrorHandler {
     }
 
     fun sick(): Boolean {
-        isSick =
+        vm.isSick =
             (firstOccurrence != null) && ((System.currentTimeMillis() - firstOccurrence!!.time) > 5000)
-        if (isSick && !healing) {
+        if (vm.isSick && !healing) {
             healing = true
             CoroutineScope(Dispatchers.IO).launch {
                 try {
@@ -73,7 +71,7 @@ class ErrorHandler {
                 }
             }
         }
-        return isSick
+        return vm.isSick
     }
 
     fun reset() {

@@ -5,14 +5,13 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.deckerth.thomas.foobarremotecontroller2.viewmodel.BrowserViewModel
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
 
 sealed class Screen(val route: String) {
     data object Root : Screen("root")
@@ -25,7 +24,7 @@ sealed class Screen(val route: String) {
 }
 
 @Composable
-fun BrowserMainPage(vm: BrowserViewModel = viewModel()) {
+fun BrowserMainPage(vm: AppViewModel) {
 
     val navController = rememberNavController()
 
@@ -49,20 +48,20 @@ fun BrowserMainPage(vm: BrowserViewModel = viewModel()) {
 }
 
 @Composable
-fun RootScreen(vm: BrowserViewModel, navController: NavHostController) {
+fun RootScreen(vm: AppViewModel, navController: NavHostController) {
     // Display root directory contents
     // Use navController.navigate() to navigate to subdirectories or files
 
-    vm.setCurrentPath("")
+    vm.browserViewModel.setCurrentPath("")
     BrowserPage(vm, navController)
 }
 
 @Composable
-fun DirectoryScreen(vm: BrowserViewModel, navController: NavHostController, path: String) {
+fun DirectoryScreen(vm: AppViewModel, navController: NavHostController, path: String) {
     // Display directory contents at the given path
     // Use navController.navigate() to navigate to subdirectories or files
 
-    vm.setCurrentPath(
+    vm.browserViewModel.setCurrentPath(
         if (path.startsWith("{path}"))
             path.replace("{path}", "")
         else

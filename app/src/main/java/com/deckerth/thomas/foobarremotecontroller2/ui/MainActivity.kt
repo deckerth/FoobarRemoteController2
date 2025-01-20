@@ -68,7 +68,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.deckerth.thomas.foobarremotecontroller2.FoobarMediaService
 import com.deckerth.thomas.foobarremotecontroller2.R
-import com.deckerth.thomas.foobarremotecontroller2.getIpAddressBlocking
+import com.deckerth.thomas.foobarremotecontroller2.getIpAddress
 import com.deckerth.thomas.foobarremotecontroller2.model.PlaybackState
 import com.deckerth.thomas.foobarremotecontroller2.model.checkIpAddressSyntax
 import com.deckerth.thomas.foobarremotecontroller2.ui.components.TitleDetails
@@ -81,16 +81,7 @@ import com.deckerth.thomas.foobarremotecontroller2.ui.page.SettingsPage
 import com.deckerth.thomas.foobarremotecontroller2.ui.page.WelcomePage
 import com.deckerth.thomas.foobarremotecontroller2.ui.page.WizardPage
 import com.deckerth.thomas.foobarremotecontroller2.ui.theme.Foobar2000RemoteControllerTheme
-import com.deckerth.thomas.foobarremotecontroller2.viewmodel.UpdatePreferences
-import com.deckerth.thomas.foobarremotecontroller2.viewmodel.autoScrollIndex
-import com.deckerth.thomas.foobarremotecontroller2.viewmodel.autoscroll
-import com.deckerth.thomas.foobarremotecontroller2.viewmodel.filterValue
-import com.deckerth.thomas.foobarremotecontroller2.viewmodel.getCurrentAlbumIndex
-import com.deckerth.thomas.foobarremotecontroller2.viewmodel.initViewModel
-import com.deckerth.thomas.foobarremotecontroller2.viewmodel.player
-import com.deckerth.thomas.foobarremotecontroller2.viewmodel.playlistState
-import com.deckerth.thomas.foobarremotecontroller2.viewmodel.showFilter
-import com.deckerth.thomas.foobarremotecontroller2.viewmodel.updateList
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -112,30 +103,33 @@ class MainActivity : ComponentActivity() {
     var appBarLabel by mutableStateOf("Foobar Link")
 
     private lateinit var appLabel: String
-
-    //lateinit var imageLoader: ImageLoader
+    private lateinit var appViewModel : AppViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mainActivity = this
-        initViewModel()
+
+        appViewModel = AppViewModel()
+        appViewModel.initialize()
+
+        //start FoobarMediaSessionService
+        val intent = Intent(this, FoobarMediaService::class.java)
+        startForegroundService(intent)
         enableEdgeToEdge()
         setContent {
-            // Read ip address and start observer
-            var ipAddress by remember { mutableStateOf("") }
+            appViewModel.ipAddress = getIpAddress()
 
-            LaunchedEffect(Unit) {
-                ipAddress = getIpAddressBlocking()
+            LaunchedEffect( Unit ) {
+                appViewModel.playlistsViewModel.startPlayerObserver()
             }
 
-            UpdatePreferences()
             BackPressHandler()
-            if (ipAddress.isEmpty())
+            if (appViewModel.ipAddress!!.isEmpty())
                 BlackPage()
             else
                 Foobar2000RemoteControllerTheme {
-                    if (!checkIpAddressSyntax(ipAddress)) {
-                        WelcomePage()
+                    if (!checkIpAddressSyntax(appViewModel.ipAddress!!)) {
+                        WelcomePage(appViewModel)
                     } else if (this.isTablet()) {
                         FoobarTabletLayout()
                     } else {
@@ -175,13 +169,6 @@ class MainActivity : ComponentActivity() {
 
     fun navigateTo(route: String) {
         navController.navigate(route)
-    }
-
-    override fun onStart() {
-        super.onStart()
-        //start FoobarMediaSessionService
-        val intent = Intent(this, FoobarMediaService::class.java)
-        startForegroundService(intent)
     }
 
     @OptIn(ExperimentalMaterial3Api::class)
@@ -232,16 +219,16 @@ class MainActivity : ComponentActivity() {
                         when (getCurrentRoute(navController)) {
                             "Playlist" -> Row {
                                 FilledIconToggleButton(
-                                    checked = autoscroll,
+                                    checked = appViewModel.autoscroll,
                                     onCheckedChange = {
-                                        if (getCurrentAlbumIndex() != -1)
-                                            autoscroll = !autoscroll
-                                        if (autoscroll && getCurrentAlbumIndex() != -1)
+                                        if (appViewModel.getCurrentAlbumIndex() != -1)
+                                            appViewModel.autoscroll = !appViewModel.autoscroll
+                                        if (appViewModel.autoscroll && appViewModel.getCurrentAlbumIndex() != -1)
                                             CoroutineScope(Dispatchers.Main).launch {
-                                                playlistState.scrollToItem(
-                                                    getCurrentAlbumIndex()
+                                                appViewModel.playlistState.scrollToItem(
+                                                    appViewModel.getCurrentAlbumIndex()
                                                 )
-                                                autoScrollIndex = getCurrentAlbumIndex()
+                                                appViewModel.autoScrollIndex = appViewModel.getCurrentAlbumIndex()
                                             }
                                     })
                                 {
@@ -252,10 +239,10 @@ class MainActivity : ComponentActivity() {
                                             .size(24.dp)
                                     )
                                 }
-                                if (filterValue.value.isNotEmpty())
+                                if (appViewModel.playlistsViewModel.filterValue.value.isNotEmpty())
                                     IconButton(onClick = {
-                                        showFilter.value = false
-                                        filterValue.value = ""
+                                        appViewModel.playlistsViewModel.showFilter.value = false
+                                        appViewModel.playlistsViewModel.filterValue.value = ""
                                     }) {
                                         Icon(
                                             painter = painterResource(R.drawable.filter_alt_off),
@@ -263,7 +250,7 @@ class MainActivity : ComponentActivity() {
                                         )
                                     }
                                 IconButton(onClick = {
-                                    updateList()
+                                    appViewModel.playlistsViewModel.updateList()
                                 }) {
                                     Icon(
                                         imageVector = Icons.Default.Refresh,
@@ -309,7 +296,7 @@ class MainActivity : ComponentActivity() {
                                     DropdownMenuItem(
                                         text = { Text(stringResource(R.string.filter_titles)) },
                                         onClick = {
-                                            dropdownMenuExpanded = false; showFilter.value = true
+                                            dropdownMenuExpanded = false; appViewModel.playlistsViewModel.showFilter.value = true
                                         },
                                         leadingIcon = {
                                             Icon(
@@ -325,16 +312,16 @@ class MainActivity : ComponentActivity() {
                                 val infoButtonClicked = remember { mutableStateOf(false) }
                                 IconButton(
                                     onClick = { infoButtonClicked.value = true },
-                                    enabled = player != null && player!!.playbackState != PlaybackState.STOPPED
+                                    enabled = appViewModel.player != null && appViewModel.player!!.playbackState != PlaybackState.STOPPED
                                 ) {
                                     Icon(
                                         painter = painterResource(R.drawable.info_i),
                                         contentDescription = "Refresh"
                                     )
                                 }
-                                if (player != null && infoButtonClicked.value)
+                                if (appViewModel.player != null && infoButtonClicked.value)
                                     TitleDetails(
-                                        player = player!!,
+                                        vm = appViewModel,
                                         onDismiss = { infoButtonClicked.value = false })
                             }
                         }
@@ -381,11 +368,11 @@ class MainActivity : ComponentActivity() {
             ) {
                 composable("Playlist") {
                     appBarLabel = appLabel
-                    PlaylistPage()
+                    PlaylistPage(appViewModel)
                 }
                 composable("Now Playing") {
                     appBarLabel = appLabel
-                    PlayingPage()
+                    PlayingPage(appViewModel)
                 }
                 composable("Settings") {
                     appBarLabel = appLabel
@@ -394,6 +381,7 @@ class MainActivity : ComponentActivity() {
                 composable("DeviceSelectionPage") {
                     appBarLabel = stringResource(R.string.title_device_selection)
                     WizardPage(
+                        vm = appViewModel,
                         showIntroduction = false,
                         onCancel = {
                             navController.navigateUp()
@@ -404,15 +392,15 @@ class MainActivity : ComponentActivity() {
                 }
                 composable("Layout selection") {
                     appBarLabel = stringResource(R.string.choose_layout_to_change)
-                    LayoutSelection()
+                    LayoutSelection(appViewModel)
                 }
                 composable("Layout editor") {
                     appBarLabel = stringResource(R.string.choose_layout_to_change)
-                    LayoutEditorMainPage()
+                    LayoutEditorMainPage(appViewModel = appViewModel)
                 }
                 composable("Browser") {
                     appBarLabel = stringResource(R.string.browser)
-                    BrowserMainPage()
+                    BrowserMainPage(appViewModel)
                 }
 
             }
@@ -436,16 +424,16 @@ class MainActivity : ComponentActivity() {
                             if (getCurrentRoute(navController) == "Now Playing And Playlist") {
                                 FilledIconToggleButton(
                                     modifier = Modifier.padding(start = 10.dp),
-                                    checked = autoscroll,
+                                    checked = appViewModel.autoscroll,
                                     onCheckedChange = {
-                                        if (getCurrentAlbumIndex() != -1)
-                                            autoscroll = !autoscroll
-                                        if (autoscroll)
+                                        if (appViewModel.getCurrentAlbumIndex() != -1)
+                                            appViewModel.autoscroll = !appViewModel.autoscroll
+                                        if (appViewModel.autoscroll)
                                             CoroutineScope(Dispatchers.Main).launch {
-                                                playlistState.scrollToItem(
-                                                    getCurrentAlbumIndex()
+                                                appViewModel.playlistState.scrollToItem(
+                                                    appViewModel.getCurrentAlbumIndex()
                                                 )
-                                                autoScrollIndex = getCurrentAlbumIndex()
+                                                appViewModel.autoScrollIndex = appViewModel.getCurrentAlbumIndex()
                                             }
                                     })
                                 {
@@ -464,10 +452,10 @@ class MainActivity : ComponentActivity() {
                                         contentDescription = "Add music"
                                     )
                                 }
-                                if (filterValue.value.isNotEmpty())
+                                if (appViewModel.playlistsViewModel.filterValue.value.isNotEmpty())
                                     IconButton(onClick = {
-                                        showFilter.value = false
-                                        filterValue.value = ""
+                                        appViewModel.playlistsViewModel.showFilter.value = false
+                                        appViewModel.playlistsViewModel.filterValue.value = ""
                                     }) {
                                         Icon(
                                             painter = painterResource(R.drawable.filter_alt_off),
@@ -476,7 +464,7 @@ class MainActivity : ComponentActivity() {
                                     }
                                 else
                                     IconButton(onClick = {
-                                        showFilter.value = true
+                                        appViewModel.playlistsViewModel.showFilter.value = true
                                     }) {
                                         Icon(
                                             painter = painterResource(R.drawable.filter_alt),
@@ -505,7 +493,7 @@ class MainActivity : ComponentActivity() {
                             "Now Playing And Playlist" -> Row {
                                 IconButton(
                                     onClick = { infoButtonClicked = true },
-                                    enabled = player != null && player!!.playbackState != PlaybackState.STOPPED
+                                    enabled = appViewModel.player != null && appViewModel.player!!.playbackState != PlaybackState.STOPPED
                                 ) {
                                     Icon(
                                         painter = painterResource(R.drawable.info_i),
@@ -514,11 +502,11 @@ class MainActivity : ComponentActivity() {
                                 }
                                 if (infoButtonClicked)
                                     TitleDetails(
-                                        player = player!!,
+                                        vm = appViewModel,
                                         onDismiss = { infoButtonClicked = false },
                                     )
                                 IconButton(onClick = {
-                                    updateList()
+                                    appViewModel.playlistsViewModel.updateList()
                                 }) {
                                     Icon(
                                         imageVector = Icons.Default.Refresh,
@@ -554,12 +542,12 @@ class MainActivity : ComponentActivity() {
                         Box(
                             modifier = Modifier.weight(1f)
                         ) {
-                            PlaylistPage()
+                            PlaylistPage(appViewModel)
                         }
                         Box(
                             modifier = Modifier.weight(1f)
                         ) {
-                            PlayingPage()
+                            PlayingPage(appViewModel)
                         }
                     }
                 }
@@ -570,6 +558,7 @@ class MainActivity : ComponentActivity() {
                 composable("DeviceSelectionPage") {
                     appBarLabel = stringResource(R.string.title_device_selection)
                     WizardPage(
+                        vm = appViewModel,
                         showIntroduction = false,
                         onCancel = {
                             navController.navigateUp()
@@ -580,15 +569,15 @@ class MainActivity : ComponentActivity() {
                 }
                 composable("Layout selection") {
                     appBarLabel = stringResource(R.string.choose_layout_to_change)
-                    LayoutSelection()
+                    LayoutSelection(appViewModel)
                 }
                 composable("Layout editor") {
                     appBarLabel = stringResource(R.string.choose_layout_to_change)
-                    LayoutEditorMainPage()
+                    LayoutEditorMainPage(appViewModel = appViewModel)
                 }
                 composable("Browser") {
                     appBarLabel = stringResource(R.string.browser)
-                    BrowserMainPage()
+                    BrowserMainPage(appViewModel)
                 }
             }
         }

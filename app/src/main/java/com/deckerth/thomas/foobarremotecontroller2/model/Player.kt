@@ -1,8 +1,7 @@
 package com.deckerth.thomas.foobarremotecontroller2.model
 
 import android.annotation.SuppressLint
-import com.deckerth.thomas.foobarremotecontroller2.connector.PlayerAccess
-import com.deckerth.thomas.foobarremotecontroller2.connector.errorHandler
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -40,7 +39,8 @@ data class Player(
     var position: String,
     val artworkUrl: String,
     val playbackState: PlaybackState,
-    val playbackMode: PlaybackMode
+    val playbackMode: PlaybackMode,
+    val ipAddress: String
 ) {
 
     fun getPos(): Float {
@@ -53,12 +53,12 @@ data class Player(
         }
     }
 
-    fun setPos(relativePos : Float) {
-        if (!errorHandler.sick())
+    fun setPos(vm: AppViewModel, relativePos : Float) {
+        if (!vm.errorHandler.sick())
             CoroutineScope(Dispatchers.IO).launch {
                 val absolutePosition = relativePos * duration.toFloat()
                 withContext(Dispatchers.Main) { position = absolutePosition.toString() }
-                PlayerAccess.getInstance().setPosition(absolutePosition)
+                vm.playerAccess.setPosition(absolutePosition)
             }
     }
 

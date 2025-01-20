@@ -114,7 +114,6 @@
     <string name="button_next">Weiter</string>
     <string name="manual_device_heading">Gerät einrichten</string>
     <string name="button_refresh_roots">Erneut versuchen</string>
-    <string name="ip_address_not_set">Noch nicht gesetzt</string>
     <string name="no_wifi_connection">Keine WLAN Verbindunng</string>
     <string name="effective_after_restart_message">Die Änderung wird erst nach einem Neustart der App wirksam.</string>
     <string name="restart_app">Restart</string>

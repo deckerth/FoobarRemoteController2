@@ -2,6 +2,7 @@ package com.deckerth.thomas.foobarremotecontroller2.viewmodel
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import com.deckerth.thomas.foobarremotecontroller2.R
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.ItemSize
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.LayoutDescription
@@ -21,7 +22,7 @@ data class LayoutField(
     val isEndMarker: Boolean = false,
 )
 
-class LayoutViewModel : ViewModel() {
+class LayoutViewModel(private val vm: AppViewModel) : ViewModel() {
     var layoutFields = mutableStateOf(listOf<LayoutField>())
     var currentView: ViewsWithLayout = ViewsWithLayout.UNDEFINED
         set(value) {
@@ -55,7 +56,7 @@ class LayoutViewModel : ViewModel() {
             }
             description.items.add(field.layoutItem!!)
         }
-        layoutManager.setCustomLayoutDescription(selectedView, description)
+        layoutManager.setCustomLayoutDescription(vm.selectedView, description)
     }
 
     fun isFieldDraggable(draggedOver: ItemPosition, dragging: ItemPosition) =
@@ -64,14 +65,14 @@ class LayoutViewModel : ViewModel() {
         )?.isSectionTitle != true
 
     private fun initializeViewModel() {
-        layoutDescription = layoutManager.getCustomLayoutDescription(selectedView)
+        layoutDescription = layoutManager.getCustomLayoutDescription(vm.selectedView)
 
         val layoutItems = layoutDescription!!.items
-        val allItems = getLayoutItemsFor(selectedView)
+        val allItems = getLayoutItemsFor(vm.selectedView)
         val unusedItems = allItems.filter { item -> !layoutItems.any { it.item == item } }
         val fields = mutableListOf<LayoutField>()
 
-        fields.add(LayoutField(0, null, selectedView.text, true))
+        fields.add(LayoutField(0, null, vm.selectedView.text, true))
         var i = 1
         for (item in layoutItems) {
             if (item.item == LayoutItems.ARTWORK)
@@ -95,5 +96,20 @@ class LayoutViewModel : ViewModel() {
         }
         fields.add(LayoutField(i, null, "", isSectionTitle = false, isEndMarker = true))
         layoutFields.value = fields
+    }
+
+    class Factory(private val vm: AppViewModel) : ViewModelProvider.Factory {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            // Check if the requested ViewModel is LayoutViewModel
+            if (modelClass.isAssignableFrom(LayoutViewModel::class.java))
+            // Create and return an instance of MyViewModel with the dependency
+            {
+                // Create and return an instance of MyViewModel with the dependency
+                @Suppress("UNCHECKED_CAST")
+                return LayoutViewModel(vm) as T
+            }
+            // If the requested ViewModel is not LayoutViewModel, throw an exception
+            throw IllegalArgumentException("Unknown ViewModel class")
+        }
     }
 }

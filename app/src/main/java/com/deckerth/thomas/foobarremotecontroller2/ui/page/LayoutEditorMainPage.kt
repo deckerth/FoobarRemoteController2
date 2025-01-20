@@ -22,18 +22,23 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.deckerth.thomas.foobarremotecontroller2.R
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.LayoutViewModel
-import com.deckerth.thomas.foobarremotecontroller2.viewmodel.selectedView
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LayoutEditorMainPage(vm: LayoutViewModel = viewModel()) {
+fun LayoutEditorMainPage(
+    appViewModel: AppViewModel,
+    vm: LayoutViewModel = viewModel(
+        factory = LayoutViewModel.Factory(appViewModel)
+    )
+) {
     val navController = rememberNavController()
     var editorMode by remember {
         mutableStateOf(true)
     }
 
-    vm.currentView = selectedView
+    vm.currentView = appViewModel.selectedView
 
     Scaffold(
         topBar = {
@@ -77,7 +82,7 @@ fun LayoutEditorMainPage(vm: LayoutViewModel = viewModel()) {
             modifier = Modifier.padding(innerPadding)
         ) {
             composable("Preview") {
-                LayoutPreviewPage()
+                LayoutPreviewPage(appViewModel = appViewModel )
             }
             composable("Editor") {
                 LayoutEditorPage(vm = vm)

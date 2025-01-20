@@ -1,13 +1,11 @@
 package com.deckerth.thomas.foobarremotecontroller2.connector;
 
-import android.annotation.SuppressLint;
-
 import com.deckerth.thomas.foobarremotecontroller2.FoobarMediaServiceKt;
 import com.deckerth.thomas.foobarremotecontroller2.model.PlaybackMode;
 import com.deckerth.thomas.foobarremotecontroller2.model.PlaybackState;
 import com.deckerth.thomas.foobarremotecontroller2.model.Player;
 import com.deckerth.thomas.foobarremotecontroller2.model.VolumeControl;
-import com.deckerth.thomas.foobarremotecontroller2.viewmodel.ViewModelKt;
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -18,20 +16,10 @@ import java.time.Instant;
 
 public class PlayerAccess {
 
-    @SuppressLint("StaticFieldLeak")
-    private static PlayerAccess INSTANCE;
-    private final HTTPConnector mConnector;
-    private final ErrorHandler errorHandler;
+    private final AppViewModel vm;
 
-    public PlayerAccess() {
-        this.errorHandler = ErrorHandlerKt.getErrorHandler();
-        this.mConnector = new HTTPConnector();
-    }
-
-    public static PlayerAccess getInstance() {
-        if (INSTANCE == null)
-            INSTANCE = new PlayerAccess();
-        return INSTANCE;
+    public PlayerAccess(AppViewModel vm) {
+        this.vm = vm;
     }
 
 //    public void startPlayerObserver() {
@@ -41,7 +29,7 @@ public class PlayerAccess {
 //        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 //
 //        final Runnable task = () -> {
-//            mLastPlayerState = mConnector.getData("player?columns=%25catalog%25,%25composer%25,%25album%25,%25title%25,%25artist%25,%25discnumber%25,%25track%25,%25playback_time%25");
+//            mLastPlayerState = vm.connector.getData("player?columns=%25catalog%25,%25composer%25,%25album%25,%25title%25,%25artist%25,%25discnumber%25,%25track%25,%25playback_time%25");
 //            mActivity.runOnUiThread(() -> {
 //                parsePlayerState(mLastPlayerState);
 //                getArtwork();
@@ -55,12 +43,12 @@ public class PlayerAccess {
 //    }
 
     public Player getPlayerState() {
-        String response;
+        Response response;
         try {
-            //response = mConnector.getData("player?columns=%25label%25,%25catalog%25,%25composer%25,%25album%25,%25title%25,%25artist%25,%25discnumber%25,%25track%25,%25playback_time%25");
-            response = mConnector.getData("player?columns=%25label%25,%25catalog%25,%25composer%25,%25album%25,%25title%25,%25artist%25,%25discnumber%25,%25track%25,%25playback_time%25,%24filename%28%25path%25%29%24");
+            //response = vm.connector.getData("player?columns=%25label%25,%25catalog%25,%25composer%25,%25album%25,%25title%25,%25artist%25,%25discnumber%25,%25track%25,%25playback_time%25");
+            response = vm.connector.getData("player?columns=%25label%25,%25catalog%25,%25composer%25,%25album%25,%25title%25,%25artist%25,%25discnumber%25,%25track%25,%25playback_time%25,%24filename%28%25path%25%29%24");
         } catch (Exception e) {
-            errorHandler.logError(ErrorType.NETWORK, ErrorCode.CONNECTION_ERROR, ErrorSource.PLAYER_STATE, e);
+            vm.errorHandler.logError(ErrorType.NETWORK, ErrorCode.CONNECTION_ERROR, ErrorSource.PLAYER_STATE, e);
             return null;
         }
         return parsePlayerState(response);
@@ -68,13 +56,13 @@ public class PlayerAccess {
 
     public void setPosition(Float position) {
             String jsonString = "{\"position\":" + position + "}";
-            mConnector.postData("player/", jsonString);
+            vm.connector.postData("player/", jsonString);
             getPlayerState();
     }
 
-    private Player parsePlayerState(String input) {
+    private Player parsePlayerState(Response input) {
         try {
-            JSONObject contentObject = new JSONObject(input);
+            JSONObject contentObject = new JSONObject(input.getMessage());
             JSONObject playerObject = contentObject.getJSONObject("player");
             JSONObject activeItemObject = playerObject.getJSONObject("activeItem");
             JSONObject volumeObject = playerObject.getJSONObject("volume");
@@ -123,7 +111,7 @@ public class PlayerAccess {
             }
             if (Duration.between(FoobarMediaServiceKt.getLastChanged(), Instant.now()).toMillis() > 500) {
                 System.out.println("FOOB Volume set");
-                VolumeControl volumeControl = ViewModelKt.getFoobVolumeControl();
+                VolumeControl volumeControl = vm.getFoobVolumeControl();
                 volumeControl.setMuted(volumeObject.getBoolean("isMuted"));
                 volumeControl.setMin(volumeObject.getInt("min"));
                 volumeControl.setMax(volumeObject.getInt("max"));
@@ -151,9 +139,10 @@ public class PlayerAccess {
                         activeItemObject.getString("index"),
                         activeItemObject.getString("duration"),
                         activeItemObject.getString("position"),
-                        mConnector.getServerAddress() + "artwork/" + activeItemObject.getString("playlistId") + "/" + activeItemObject.getString("index"),
+                        vm.connector.serverAddress(input.getUsedIpAddress()) + "artwork/" + activeItemObject.getString("playlistId") + "/" + activeItemObject.getString("index"),
                         playbackState,
-                        PlaybackMode.getEntries().get(playerObject.getInt("playbackMode")));
+                        PlaybackMode.getEntries().get(playerObject.getInt("playbackMode")),
+                        input.getUsedIpAddress());
             } else
                 return new Player(
                         "",
@@ -171,42 +160,43 @@ public class PlayerAccess {
                         "",
                         "",
                         playbackState,
-                        PlaybackMode.getEntries().get(playerObject.getInt("playbackMode")));
+                        PlaybackMode.getEntries().get(playerObject.getInt("playbackMode")),
+                        input.getUsedIpAddress());
         } catch (JSONException e) {
             e.printStackTrace();
-            errorHandler.logError(ErrorType.API, ErrorCode.BAD_RESPONSE, ErrorSource.PLAYER_STATE, e);
+            vm.errorHandler.logError(ErrorType.API, ErrorCode.BAD_RESPONSE, ErrorSource.PLAYER_STATE, e);
             return null;
         }
     }
 
     public void startPlayback() {
         new Thread(() -> {
-            mConnector.postData("player/play");
+            vm.connector.postData("player/play");
             getPlayerState();
         }).start();
     }
 
     public void pausePlayback() {
         new Thread(() -> {
-            mConnector.postData("player/pause");
+            vm.connector.postData("player/pause");
             getPlayerState();
         }).start();
     }
 
     public void previousTrack() {
         new Thread(() -> {
-            mConnector.postData("player/previous");
+            vm.connector.postData("player/previous");
             getPlayerState();
         }).start();
     }
 
     public void nextTrack() {
-        new Thread(() -> mConnector.postData("player/next")).start();
+        new Thread(() -> vm.connector.postData("player/next")).start();
     }
 
     public void playTrack(String playlistId, Integer index) {
         new Thread(() -> {
-            mConnector.postData("player/play/" + playlistId + "/" + index.toString());
+            vm.connector.postData("player/play/" + playlistId + "/" + index.toString());
             getPlayerState();
         }).start();
     }
@@ -214,7 +204,7 @@ public class PlayerAccess {
     public void setVolume(Integer value) {
         new Thread(() -> {
             String jsonString = "{\"volume\":" + value + "}";
-            mConnector.postData("player/", jsonString);
+            vm.connector.postData("player/", jsonString);
             getPlayerState();
         }).start();
     }
@@ -222,7 +212,7 @@ public class PlayerAccess {
     public void setPlaybackMode(PlaybackMode mode) {
         new Thread(() -> {
             String jsonString = "{\"options\":[{\"id\": \"playbackOrder\", \"value\": " + mode.ordinal() + "}]}";
-            mConnector.postData("player/", jsonString);
+            vm.connector.postData("player/", jsonString);
             getPlayerState();
         }).start();
     }

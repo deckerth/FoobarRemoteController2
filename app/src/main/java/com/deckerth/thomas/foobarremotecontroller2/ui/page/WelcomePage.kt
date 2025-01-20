@@ -15,10 +15,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.deckerth.thomas.foobarremotecontroller2.ui.mainActivity
 import com.deckerth.thomas.foobarremotecontroller2.ui.theme.Foobar2000RemoteControllerTheme
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun WelcomePage() {
+fun WelcomePage(vm : AppViewModel? = null) {
 
     Scaffold(
         topBar = {
@@ -32,7 +34,7 @@ fun WelcomePage() {
         },
         modifier = Modifier.fillMaxSize()
     ) { innerPadding ->
-        WizardPage(Modifier.padding(innerPadding),
+        WizardPage(vm = vm, Modifier.padding(innerPadding),
             onCancel = {
                 mainActivity.finish()
             },

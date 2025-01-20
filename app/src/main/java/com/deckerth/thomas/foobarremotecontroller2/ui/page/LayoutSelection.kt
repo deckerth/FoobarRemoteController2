@@ -11,29 +11,29 @@ import androidx.compose.ui.unit.dp
 import com.deckerth.thomas.foobarremotecontroller2.R
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.ViewsWithLayout
 import com.deckerth.thomas.foobarremotecontroller2.ui.mainActivity
-import com.deckerth.thomas.foobarremotecontroller2.viewmodel.selectedView
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
 
 @Composable
-fun LayoutSelection() {
+fun LayoutSelection(appViewModel: AppViewModel) {
     Column {
         Spacer(Modifier.height(40.dp))
         PageTitle("Layouts")
         Title(stringResource(R.string.layout_item_title))
         PreferenceItem<Boolean>(title = stringResource(R.string.choose_player_layout), summary = "",
             onClick = {
-                selectedView = ViewsWithLayout.PLAYER
+                appViewModel.selectedView = ViewsWithLayout.PLAYER
                 mainActivity.navigateTo("Layout editor")
             })
 
         Title(stringResource(R.string.layout_playlist))
         PreferenceItem<Boolean>(title = stringResource(R.string.choose_album_layout), summary = "",
             onClick = {
-                selectedView = ViewsWithLayout.ALBUM
+                appViewModel.selectedView = ViewsWithLayout.ALBUM
                 mainActivity.navigateTo("Layout editor")
             })
         PreferenceItem<Boolean>(title = stringResource(R.string.choose_title_layout), summary = "",
             onClick = {
-                selectedView = ViewsWithLayout.TITLE
+                appViewModel.selectedView = ViewsWithLayout.TITLE
                 mainActivity.navigateTo("Layout editor")
             })
 
@@ -45,5 +45,5 @@ fun LayoutSelection() {
 )
 @Composable
 fun LayoutSelectionPreview() {
-    LayoutSelection()
+    LayoutSelection(AppViewModel())
 }

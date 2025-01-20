@@ -46,7 +46,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.deckerth.thomas.foobarremotecontroller2.R
-import com.deckerth.thomas.foobarremotecontroller2.connector.PlayerAccess
 import com.deckerth.thomas.foobarremotecontroller2.model.PlaybackMode
 import com.deckerth.thomas.foobarremotecontroller2.model.PlaybackState
 import com.deckerth.thomas.foobarremotecontroller2.model.Player
@@ -55,17 +54,13 @@ import com.deckerth.thomas.foobarremotecontroller2.ui.components.LayoutComponent
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.LayoutItems
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.layoutManager
 import com.deckerth.thomas.foobarremotecontroller2.ui.theme.Foobar2000RemoteControllerTheme
-import com.deckerth.thomas.foobarremotecontroller2.viewmodel.isSick
-import com.deckerth.thomas.foobarremotecontroller2.viewmodel.loadingList
-import com.deckerth.thomas.foobarremotecontroller2.viewmodel.observer
-import com.deckerth.thomas.foobarremotecontroller2.viewmodel.player
-import com.deckerth.thomas.foobarremotecontroller2.viewmodel.startPlayerObserver
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PlayingPage() {
+fun PlayingPage(vm: AppViewModel) {
     val pullToRefreshState = rememberPullToRefreshState()
-    var showLoading = loadingList
+    var showLoading = vm.loadingList
     var maxBoxHeight by remember { mutableStateOf(0.dp) }
     var maxBoxWidth by remember { mutableStateOf(0.dp) }
     layoutManager.InitLayoutManager()
@@ -82,8 +77,8 @@ fun PlayingPage() {
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState(), enabled = true)
         ) {
-            if (player == null) {
-                showLoading = !isSick
+            if (vm.player == null) {
+                showLoading = !vm.isSick
                 Column(
                     modifier = Modifier
                         .align(Alignment.Center)
@@ -107,12 +102,12 @@ fun PlayingPage() {
                     OutlinedButton(
                         modifier = Modifier
                             .align(Alignment.CenterHorizontally),
-                        onClick = { onRefresh() }
+                        onClick = { onRefresh(vm) }
                     ) {
                         Text(text = "Refresh")
                     }
                 }
-            } else if (player!!.playbackState == PlaybackState.STOPPED) {
+            } else if (vm.player!!.playbackState == PlaybackState.STOPPED) {
                 Column(
                     modifier = Modifier
                         .align(Alignment.Center)
@@ -135,13 +130,14 @@ fun PlayingPage() {
                 }
             } else {
                 PlayerCard(
-                    player = player!!,
+                    vm,
+                    player = vm.player!!,
                     boxSize = IntSize(maxBoxWidth.value.toInt(), maxBoxHeight.value.toInt())
                 )
             }
             if (pullToRefreshState.isRefreshing) {
                 LaunchedEffect(true) {
-                    onRefresh()
+                    onRefresh(vm)
                     pullToRefreshState.endRefresh()
                 }
             }
@@ -159,17 +155,16 @@ fun PlayingPage() {
         )
 }
 
-
-fun onRefresh() {
-    observer?.cancel(true)
-    startPlayerObserver()
+fun onRefresh(vm: AppViewModel) {
+    vm.playlistsViewModel.restartObserver()
 }
 
 @Composable
 fun PlayerButtons(
+    vm: AppViewModel,
     player: Player,
-    onPreviousTrack: () -> Unit = { PlayerAccess.getInstance().previousTrack() },
-    onNextTrack: () -> Unit = { PlayerAccess.getInstance().nextTrack() },
+    onPreviousTrack: () -> Unit = { vm.playerAccess.previousTrack() },
+    onNextTrack: () -> Unit = { vm.playerAccess.nextTrack() },
     previewMode: Boolean = false
 ) {
     Spacer(modifier = Modifier.height(10.dp))
@@ -183,13 +178,13 @@ fun PlayerButtons(
             onClick = {
                 if (!previewMode)
                     when (player.playbackMode) {
-                        PlaybackMode.REPEAT_TRACK -> PlayerAccess.getInstance()
+                        PlaybackMode.REPEAT_TRACK -> vm.playerAccess
                             .setPlaybackMode(PlaybackMode.DEFAULT)
 
-                        PlaybackMode.REPEAT_PLAYLIST -> PlayerAccess.getInstance()
+                        PlaybackMode.REPEAT_PLAYLIST -> vm.playerAccess
                             .setPlaybackMode(PlaybackMode.REPEAT_TRACK)
 
-                        else -> PlayerAccess.getInstance()
+                        else -> vm.playerAccess
                             .setPlaybackMode(PlaybackMode.REPEAT_PLAYLIST)
                     }
             },
@@ -227,9 +222,9 @@ fun PlayerButtons(
             onClick = {
                 if (!previewMode)
                     if (player.playbackState == PlaybackState.PLAYING)
-                        PlayerAccess.getInstance().pausePlayback()
+                        vm.playerAccess.pausePlayback()
                     else
-                        PlayerAccess.getInstance().startPlayback()
+                        vm.playerAccess.startPlayback()
             },
             modifier = Modifier
                 .size(60.dp)
@@ -272,16 +267,16 @@ fun PlayerButtons(
             onClick = {
                 if (!previewMode)
                     when (player.playbackMode) {
-                        PlaybackMode.SHUFFLE_TRACKS -> PlayerAccess.getInstance()
+                        PlaybackMode.SHUFFLE_TRACKS -> vm.playerAccess
                             .setPlaybackMode(PlaybackMode.DEFAULT)
 
-                        PlaybackMode.SHUFFLE_ALBUMS -> PlayerAccess.getInstance()
+                        PlaybackMode.SHUFFLE_ALBUMS -> vm.playerAccess
                             .setPlaybackMode(PlaybackMode.DEFAULT)
 
-                        PlaybackMode.SHUFFLE_FOLDERS -> PlayerAccess.getInstance()
+                        PlaybackMode.SHUFFLE_FOLDERS -> vm.playerAccess
                             .setPlaybackMode(PlaybackMode.DEFAULT)
 
-                        else -> PlayerAccess.getInstance()
+                        else -> vm.playerAccess
                             .setPlaybackMode(PlaybackMode.SHUFFLE_TRACKS)
                     }
             },
@@ -306,6 +301,7 @@ fun PlayerButtons(
 
 @Composable
 fun PlayerCard(
+    vm: AppViewModel,
     player: Player,
     previewMode: Boolean = false,
     onPreviousTrack: (() -> Unit)? = null,
@@ -334,12 +330,12 @@ fun PlayerCard(
 
             for (item in layout.playerLayout.items) {
                 if (item.item != LayoutItems.ARTWORK)
-                    LayoutComponent(player, item)
+                    LayoutComponent(vm, player, item)
             }
             if (onPreviousTrack != null && onNextTrack != null)
-                PlayerButtons(player, onPreviousTrack, onNextTrack, previewMode)
+                PlayerButtons(vm, player, onPreviousTrack, onNextTrack, previewMode)
             else
-                PlayerButtons(player)
+                PlayerButtons(vm, player)
         }
     }
 }
@@ -359,6 +355,7 @@ fun PlayerCardPreview() {
     Foobar2000RemoteControllerTheme {
         Surface {
             PlayerCard(
+                vm = AppViewModel(),
                 player = Player(
                     "label",
                     "xyz",
@@ -375,7 +372,8 @@ fun PlayerCardPreview() {
                     "28.9795",
                     "",
                     PlaybackState.PLAYING,
-                    PlaybackMode.DEFAULT
+                    PlaybackMode.DEFAULT,
+                    ""
                 ),
                 boxSize = IntSize(200, 200)
             )

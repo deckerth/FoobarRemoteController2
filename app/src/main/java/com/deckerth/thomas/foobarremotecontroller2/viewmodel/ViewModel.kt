@@ -33,16 +33,17 @@ class AppViewModel : ViewModel() {
     var ipAddress: String? = null
     var valid = false
 
-    lateinit var errorHandler : ErrorHandler
-    lateinit var playerAccess : PlayerAccess
-    lateinit var playlistAccess : PlaylistAccess
-    lateinit var browserAccess : BrowserAccess
-    lateinit var playlistsViewModel : PlaylistsViewModel
-    lateinit var browserViewModel : BrowserViewModel
-    lateinit var connector : HTTPConnector
+    lateinit var errorHandler: ErrorHandler
+    lateinit var playerAccess: PlayerAccess
+    lateinit var playlistAccess: PlaylistAccess
+    lateinit var browserAccess: BrowserAccess
+    lateinit var playlistsViewModel: PlaylistsViewModel
+    lateinit var browserViewModel: BrowserViewModel
+    lateinit var connector: HTTPConnector
     lateinit var foobVolumeControl: VolumeControl
 
     var autoscroll by mutableStateOf(true)
+    var autoscrollSave by mutableStateOf(true)
     var autoScrollIndex by mutableIntStateOf(0)
     var displayedPlaylist by mutableStateOf<Playlist?>(null)
     var loadingList by mutableStateOf(false)
@@ -51,6 +52,10 @@ class AppViewModel : ViewModel() {
     var selectedPlaylist by mutableStateOf("")
     var selectedPlaylistName by mutableStateOf("")
     var isSick by mutableStateOf(false)
+    var removeTitlesMode by mutableStateOf(false)
+    var showTopAppBar by mutableStateOf(true)
+    var noOfTitlesToRemove by mutableIntStateOf(0)
+    var titleToRemoveWasSelected by mutableStateOf(false)
 
     fun initialize() {
         connector = HTTPConnector(this)
@@ -70,6 +75,32 @@ class AppViewModel : ViewModel() {
         selectedView = ViewsWithLayout.PLAYER
         isSick = false
         errorHandler.reset()
+    }
+
+    fun increaseNoOfTitlesToRemove() {
+        noOfTitlesToRemove++
+    }
+
+    fun decreaseNoOfTitlesToRemove() {
+        noOfTitlesToRemove--
+    }
+
+    fun enableRemoveTitlesMode() {
+        if (removeTitlesMode) return
+        showTopAppBar = false
+        autoscrollSave = autoscroll
+        autoscroll = false
+        //appViewModel.removeTitlesMode = true - Is done later in a LaunchedEffect to realize a delay
+    }
+
+    fun disableRemoveTitlesMode(resetSelection: Boolean) {
+        if (!removeTitlesMode) return
+        removeTitlesMode = false
+        showTopAppBar = true
+        autoscroll = autoscrollSave
+        if (resetSelection) // not done when titles shall be removed
+            if (displayedPlaylist != null)
+                displayedPlaylist!!.resetSelectedTracks(this)
     }
 
     fun getCurrentAlbumIndex(): Int {

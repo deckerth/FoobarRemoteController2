@@ -11,10 +11,13 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.List;
+
 public class PlaylistAccess {
 
     private final ErrorHandler errorHandler;
     private final AppViewModel vm;
+
     public PlaylistAccess(AppViewModel vm) {
         this.vm = vm;
         this.errorHandler = vm.getErrorHandler();
@@ -174,5 +177,26 @@ public class PlaylistAccess {
         }
         String jsonString = "{\"items\":[\"" + path + "\"], \"play\":" + playValue + ", \"replace\":" + replaceValue + " }";
         vm.connector.postData("playlists/" + playlistId + "/items/add/", jsonString);
+    }
+
+    public void removeTitles(String playlistId, List<Integer> indexes) {
+
+        //        {
+        //            "items": [
+        //               1,
+        //               4
+        //             ]
+        //        }
+
+        StringBuilder jsonString = new StringBuilder("{\"items\":[ ");
+        int pos = 0;
+        for (Integer index : indexes) {
+            jsonString.append(index);
+            if (pos < indexes.size() - 1) // 0, 1 : indexes.size() = 2
+                jsonString.append(", ");
+            pos++;
+        }
+        jsonString.append(" ] }");
+        vm.connector.postData("playlists/" + playlistId + "/items/remove", jsonString.toString());
     }
 }

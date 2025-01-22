@@ -3,27 +3,77 @@ package com.deckerth.thomas.foobarremotecontroller2.model
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.state.ToggleableState
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.viewModelInstance
+
+data class SelectableTitle(val album: Album, val details: ITitle) {
+    var isSelected by mutableStateOf(false)
+
+    fun toggleIsSelected(appViewModel: AppViewModel) {
+        setSelected(appViewModel, !isSelected)
+    }
+
+    fun setSelected(appViewModel: AppViewModel, value: Boolean) {
+        if (isSelected == value) return
+        isSelected = value
+        if (isSelected) {
+            appViewModel.titleToRemoveWasSelected = true
+            appViewModel.increaseNoOfTitlesToRemove()
+        } else {
+            appViewModel.decreaseNoOfTitlesToRemove()
+        }
+        album.adjustIsSelected()
+    }
+}
 
 data class Album(
     val originalTitle: ITitle
 ) {
-    private var _titles = mutableListOf<ITitle>()
+    private var _tracks = mutableListOf<SelectableTitle>()
 
-    val titles: List<ITitle>
+    val tracks: List<SelectableTitle>
         get() {
-            return _titles.toList()
+            return _tracks.toList()
         }
 
-    var isSelected by mutableStateOf(false)
+    var isExpanded by mutableStateOf(false)
+
+    var isSelected by mutableStateOf(ToggleableState.Off)
+
+    fun setIsSelected(value: ToggleableState) {
+        isSelected = value
+        if (value == ToggleableState.On)
+            for (title in _tracks) title.setSelected(viewModelInstance!!, true)
+        else if (value == ToggleableState.Off)
+            for (title in _tracks) title.setSelected(viewModelInstance!!, false)
+    }
+
+    fun adjustIsSelected() {
+        if (_tracks.any { it.isSelected })
+            if (_tracks.all { it.isSelected })
+                setIsSelected(ToggleableState.On)
+            else
+                setIsSelected(ToggleableState.Indeterminate)
+        else
+            setIsSelected(ToggleableState.Off)
+    }
+
+    fun toggleIsSelected() {
+        if (isSelected == ToggleableState.On)
+            setIsSelected(ToggleableState.Off)
+        else
+            setIsSelected(ToggleableState.On)
+    }
 
     var isAutomaticSelection = true
 
-    var endIndex: Int = 0
+    private var endIndex: Int = 0
 
     fun matches(pattern: String): Boolean {
         if (pattern.isEmpty()) return true
-        for (title in _titles)
-            if (title.matches(pattern)) return true
+        for (title in _tracks)
+            if (title.details.matches(pattern)) return true
         return false
     }
 
@@ -32,7 +82,7 @@ data class Album(
     }
 
     fun addTitle(title: ITitle) {
-        _titles.add(title)
+        _tracks.add(SelectableTitle(this, title))
         endIndex = title.index
     }
 }

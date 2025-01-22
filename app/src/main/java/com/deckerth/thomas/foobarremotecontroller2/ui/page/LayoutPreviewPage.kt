@@ -104,7 +104,7 @@ private fun setupPreviewPlaylist() {
             R.drawable.cover_tosca.toString()
         )
     )
-    previewPlaylist.albums[0].isSelected = true
+    previewPlaylist.albums[0].isExpanded = true
 }
 
 var currentPlayer by mutableStateOf(previewPlayerPop)

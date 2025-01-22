@@ -133,4 +133,8 @@
     <string name="button_reset_filter">Filter löschen</string>
     <string name="search_placeholder">Suchen</string>
     <string name="menu_item_add_titles">Titel hinzufügen</string>
+    <string name="menu_item_remove_titles">Titel entfernen</string>
+    <string name="selected_titles">Titel ausgewählt</string>
+    <string name="zero_or_one_title_selected">Titel ausgewählt</string>
+    <string name="playlist_changed_in_foobar">Playlist was changed in foobar</string>
 </resources>

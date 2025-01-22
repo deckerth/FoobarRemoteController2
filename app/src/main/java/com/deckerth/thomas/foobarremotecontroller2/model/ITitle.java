@@ -52,4 +52,5 @@ public interface ITitle {
     ITitle clone();
 
     void clearAlbum();
+
 }

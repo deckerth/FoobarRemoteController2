@@ -108,7 +108,6 @@ public class Title implements ITitle {
     public void clearAlbum() {
         mAlbum = "";
     }
-
     @Override
     public String getDiscNumber() {
         return mDiscNumber;

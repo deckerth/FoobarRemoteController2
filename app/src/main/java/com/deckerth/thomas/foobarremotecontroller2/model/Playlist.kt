@@ -3,6 +3,11 @@ package com.deckerth.thomas.foobarremotecontroller2.model
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.state.ToggleableState
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class Playlist(var playlistEntity: PlaylistEntity) {
     val titles = mutableListOf<ITitle>()
@@ -39,4 +44,31 @@ class Playlist(var playlistEntity: PlaylistEntity) {
         return titles.find { it.index == index }
     }
 
+    fun removeSelectedTracks(vm: AppViewModel) {
+        if (vm.noOfTitlesToRemove > 0) {
+            val titlesToRemove = mutableListOf<Int>()
+            for (album in albums)
+                for (title in album.tracks)
+                    if (title.isSelected) {
+                        titlesToRemove.add(title.details.index)
+
+                    }
+            CoroutineScope(Dispatchers.IO).launch {
+                if (vm.displayedPlaylist != null)
+                    vm.playlistAccess.removeTitles(
+                        vm.displayedPlaylist!!.playlistEntity.playlistId,
+                        titlesToRemove
+                    )
+            }
+        }
+        vm.noOfTitlesToRemove = 0
+        vm.disableRemoveTitlesMode(false)
+    }
+
+    fun resetSelectedTracks(vm: AppViewModel) {
+        if (vm.noOfTitlesToRemove > 0) {
+            for (album in albums)
+                album.setIsSelected(ToggleableState.Off)
+            }
+    }
 }

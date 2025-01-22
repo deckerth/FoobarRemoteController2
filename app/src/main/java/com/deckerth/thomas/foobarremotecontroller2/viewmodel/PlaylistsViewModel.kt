@@ -78,45 +78,50 @@ class PlaylistsViewModel(private val vm: AppViewModel) : ViewModel() {
         return list
     }
 
-    fun setPlaylists(playlists: Playlists) {
+    fun setPlaylists(newPlaylists: Playlists) {
         // update registry
         var playingPlaylistId = ""
 
         if (vm.player != null)
             playingPlaylistId = vm.player!!.playlistId
 
-        for (entity in playlists.playlists) {
-            val entry = getPlaylist(entity.playlistId)
-            if (entity.noOfTracks < entry.playlistEntity.noOfTracks) {
-                if (vm.displayedPlaylist == null || vm.displayedPlaylist!!.playlistEntity.playlistId != entity.playlistId) {
-                    entry.clear()
-                    updatePlaylists()
-                } else entry.valid = false
-                println("FOOB invalidatePlaylist: ${entry.playlistEntity.playlistId}")
+        // Check is any playlist has now a different number of tracks than before
+        // Clear changed playlists so that they are loaded from scratch
+        for (newEntity in newPlaylists.playlists) {
+            val currentEntry = getPlaylist(newEntity.playlistId)
+            if (newEntity.noOfTracks != currentEntry.playlistEntity.noOfTracks) {
+                if (vm.displayedPlaylist == null || vm.displayedPlaylist!!.playlistEntity.playlistId != newEntity.playlistId) {
+                    currentEntry.clear()
+                } else
+                    // Do not clear the playlist if it is currently displayed.
+                    // It is set to invalid, and will later be loaded again when recompose begins.
+                    currentEntry.valid = false
+                println("FOOB invalidatePlaylist: ${currentEntry.playlistEntity.playlistId}")
             }
-            entry.playlistEntity.apply {
-                name = entity.name
-                isCurrent = entity.isCurrent
-                noOfTracks = entity.noOfTracks
-                if (vm.selectedPlaylist == entry.playlistEntity.playlistId)
-                    vm.selectedPlaylistName = entity.name
+            // Update the current entry with the new data
+            currentEntry.playlistEntity.apply {
+                name = newEntity.name
+                isCurrent = newEntity.isCurrent
+                noOfTracks = newEntity.noOfTracks
+                if (vm.selectedPlaylist == currentEntry.playlistEntity.playlistId)
+                    vm.selectedPlaylistName = newEntity.name
             }
 
-            if (vm.selectedPlaylist == "" && entity.playlistId == playingPlaylistId) {
+            if (vm.selectedPlaylist == "" && newEntity.playlistId == playingPlaylistId) {
                 // select first playlist setSelectedPlaylist(entity.playlistId)
-                vm.selectedPlaylist = entity.playlistId
-                vm.selectedPlaylistName = entity.name
-                vm.displayedPlaylist = getPlaylist(entity.playlistId) //.clone()
-                println("FOOB setSelectedPlaylist: ${entity.playlistId}")
+                vm.selectedPlaylist = newEntity.playlistId
+                vm.selectedPlaylistName = newEntity.name
+                vm.displayedPlaylist = getPlaylist(newEntity.playlistId) //.clone()
+                println("FOOB setSelectedPlaylist: ${newEntity.playlistId}")
             }
         }
 
         // process removed playlists
-        for (list in playlistRegistry) {
-            if (!playlists.playlists.any { it.playlistId == list.playlistEntity.playlistId }) {
-                list.playlistEntity.noOfTracks = 0
-                invalidatePlaylist(list)
-                println("FOOB invalidating removed playlist ${list.playlistEntity.playlistId}")
+        for (currentList in playlistRegistry) {
+            if (!newPlaylists.playlists.any { it.playlistId == currentList.playlistEntity.playlistId }) {
+                currentList.playlistEntity.noOfTracks = 0
+                invalidatePlaylist(currentList)
+                println("FOOB invalidating removed playlist ${currentList.playlistEntity.playlistId}")
             }
         }
 
@@ -131,6 +136,7 @@ class PlaylistsViewModel(private val vm: AppViewModel) : ViewModel() {
                 }
             }
         }
+
         updatePlaylists()
     }
 

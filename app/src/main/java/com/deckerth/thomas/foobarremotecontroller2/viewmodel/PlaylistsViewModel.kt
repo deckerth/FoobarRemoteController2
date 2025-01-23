@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import com.deckerth.thomas.foobarremotecontroller2.connector.PlayerObserver
 import com.deckerth.thomas.foobarremotecontroller2.model.Playlist
 import com.deckerth.thomas.foobarremotecontroller2.model.PlaylistEntity
+import com.deckerth.thomas.foobarremotecontroller2.model.PlaylistLifecycleState
 import com.deckerth.thomas.foobarremotecontroller2.model.Playlists
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -20,11 +21,17 @@ class PlaylistsViewModel(private val vm: AppViewModel) : ViewModel() {
 
     private val playerObserver = PlayerObserver(vm, vm.playlistAccess, this)
 
-    val playlists: Playlists
+/**
+ *   @return all known playlists that are not invalid
+ *   @see Playlists
+ *   @see PlaylistLifecycleState
+ */
+val playlists: Playlists
         get() {
             val playlists = Playlists()
             for (list in playlistRegistry)
-                playlists.playlists.add(list.playlistEntity)
+                if (list.lifecycleState != PlaylistLifecycleState.Invalid)
+                    playlists.playlists.add(list.playlistEntity)
             return playlists
         }
 
@@ -93,10 +100,10 @@ class PlaylistsViewModel(private val vm: AppViewModel) : ViewModel() {
                 if (vm.displayedPlaylist == null || vm.displayedPlaylist!!.playlistEntity.playlistId != newEntity.playlistId) {
                     currentEntry.clear()
                 } else
-                    // Do not clear the playlist if it is currently displayed.
-                    // It is set to invalid, and will later be loaded again when recompose begins.
-                    currentEntry.valid = false
-                println("FOOB invalidatePlaylist: ${currentEntry.playlistEntity.playlistId}")
+                // Do not clear the playlist if it is currently displayed.
+                // It is set to invalid, and will later be loaded again when recompose begins.
+                    currentEntry.lifecycleState = PlaylistLifecycleState.RequiresUpdate
+                println("FOOB triggerUpdatePlaylist: ${currentEntry.playlistEntity.playlistId}")
             }
             // Update the current entry with the new data
             currentEntry.playlistEntity.apply {
@@ -120,7 +127,12 @@ class PlaylistsViewModel(private val vm: AppViewModel) : ViewModel() {
         for (currentList in playlistRegistry) {
             if (!newPlaylists.playlists.any { it.playlistId == currentList.playlistEntity.playlistId }) {
                 currentList.playlistEntity.noOfTracks = 0
-                invalidatePlaylist(currentList)
+                currentList.lifecycleState = PlaylistLifecycleState.Invalid
+                if (vm.selectedPlaylist == currentList.playlistEntity.playlistId) {
+                    vm.selectedPlaylist = ""
+                    vm.selectedPlaylistName = ""
+                    // vm.displayedPlaylist = null
+                }
                 println("FOOB invalidating removed playlist ${currentList.playlistEntity.playlistId}")
             }
         }
@@ -131,7 +143,7 @@ class PlaylistsViewModel(private val vm: AppViewModel) : ViewModel() {
             if (vm.player!!.getIndex() >= 0 && playingList.titles.count() > vm.player!!.getIndex()) {  // otherwise do not yet check
                 val playlistTitle = playingList.titles[vm.player!!.getIndex()]
                 if (playlistTitle.album != vm.player?.album || playlistTitle.title != vm.player?.title) {
-                    invalidatePlaylist(playingList)
+                    triggerPlaylistUpdate(playingList)
                     println("FOOB clearing changed playlist")
                 }
             }
@@ -144,14 +156,14 @@ class PlaylistsViewModel(private val vm: AppViewModel) : ViewModel() {
         // check selected playlist
         if (vm.selectedPlaylist.isNotBlank()) {
             val selected = getPlaylist(vm.selectedPlaylist)
-            if (selected.valid && selected.titles.count() < selected.playlistEntity.noOfTracks)
+            if (selected.lifecycleState == PlaylistLifecycleState.Valid && selected.titles.count() < selected.playlistEntity.noOfTracks)
                 return selected
         }
         // check player
         if (vm.player != null && vm.player!!.playlistId.isNotBlank()) {
             if (vm.player!!.playlistId != vm.selectedPlaylist) {
                 val played = getPlaylist(vm.player!!.playlistId)
-                if (played.valid && played.titles.count() < played.playlistEntity.noOfTracks)
+                if (played.lifecycleState == PlaylistLifecycleState.Valid && played.titles.count() < played.playlistEntity.noOfTracks)
                     return played
             }
         }
@@ -197,20 +209,21 @@ class PlaylistsViewModel(private val vm: AppViewModel) : ViewModel() {
         }
     }
 
-    private fun invalidatePlaylist(playlistId: String) {
+    private fun triggerPlaylistUpdate(playlistId: String) {
         if (playlistId != "")
-            invalidatePlaylist(getPlaylist(playlistId))
+            triggerPlaylistUpdate(getPlaylist(playlistId))
     }
 
-    private fun invalidatePlaylist(playlist: Playlist) {
+    private fun triggerPlaylistUpdate(playlist: Playlist) {
         if (vm.displayedPlaylist == null || vm.displayedPlaylist!!.playlistEntity.playlistId != playlist.playlistEntity.playlistId) {
             playlist.clear()
             updatePlaylists()
-        } else playlist.valid = false
+        } else
+            playlist.lifecycleState = PlaylistLifecycleState.RequiresUpdate
     }
 
     fun updateList() {
-        invalidatePlaylist(vm.selectedPlaylist)
+        triggerPlaylistUpdate(vm.selectedPlaylist)
     }
 
     fun setSelectedPlaylist(id: String) {

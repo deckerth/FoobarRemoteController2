@@ -55,6 +55,7 @@ import com.deckerth.thomas.foobarremotecontroller2.R
 import com.deckerth.thomas.foobarremotecontroller2.model.Album
 import com.deckerth.thomas.foobarremotecontroller2.model.Playlist
 import com.deckerth.thomas.foobarremotecontroller2.model.PlaylistEntity
+import com.deckerth.thomas.foobarremotecontroller2.model.PlaylistLifecycleState
 import com.deckerth.thomas.foobarremotecontroller2.model.Playlists
 import com.deckerth.thomas.foobarremotecontroller2.model.SelectableTitle
 import com.deckerth.thomas.foobarremotecontroller2.model.Title
@@ -72,56 +73,57 @@ import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
 @Composable
 fun PlaylistPage(vm: AppViewModel) {
     // The currently displayed playlists may have been changed in foobar so that is got invalidated
-    if (vm.displayedPlaylist != null &&
-        !vm.displayedPlaylist!!.valid
+
+     if (vm.displayedPlaylist != null &&
+        vm.displayedPlaylist!!.lifecycleState != PlaylistLifecycleState.Valid
     ) {
-        if (vm.removeTitlesMode) {
+        if (vm.removeTitlesMode)
             vm.disableRemoveTitlesMode(true)
-            Toast.makeText(
-                mainActivity,
-                stringResource(R.string.playlist_changed_in_foobar),
-                Toast.LENGTH_SHORT
-            ).show()
+
+
+        if (vm.playlistsViewModel.showFilter.value) {
+            vm.playlistsViewModel.showFilter.value = false
+            vm.playlistsViewModel.filterValue.value = ""
         }
 
         vm.displayedPlaylist!!.clear()
+        if (vm.displayedPlaylist!!.lifecycleState == PlaylistLifecycleState.RequiresUpdate)
+            vm.playlistsViewModel.updatePlaylists()  // delayed update to avoid crashes during layout update
+
         vm.displayedPlaylist = null
-        vm.playlistsViewModel.updatePlaylists()  // delayed update to avoid crashes during layout update
+
+        Toast.makeText(
+            mainActivity,
+            stringResource(R.string.playlist_changed_in_foobar),
+            Toast.LENGTH_SHORT
+        ).show()
     }
 
-    if (vm.displayedPlaylist != null) {
-        Column {
-            PlaylistSwitcher(vm, playlists = vm.playlistsViewModel.playlists)
-            /*if (showFilter.value)
-                TitleSearchBar(
-                    onClosed = {
-                        showFilter.value = false
-                        filterValue.value = ""
-                    },
-                    onSearch = { searchString -> filterValue.value = searchString }
-                )*/
-            if (vm.displayedPlaylist != null)
-                Playlist(vm, vm.displayedPlaylist!!)
-        }
+    Column {
+        PlaylistSwitcher(vm, playlists = vm.playlistsViewModel.playlists)
 
-        if (vm.playlistsViewModel.showFilter.value)
-            TitleSearchBarDialog(
-                onSearch = { searchString ->
-                    vm.playlistsViewModel.filterValue.value = searchString
-                    vm.playlistsViewModel.showFilter.value = false
-                },
-                onDismiss = {
-                    vm.playlistsViewModel.showFilter.value = false
-                    vm.playlistsViewModel.filterValue.value = ""
-                }
-            )
-        if (vm.loadingList || vm.displayedPlaylist == null)
-            LinearProgressIndicator(
-                modifier = Modifier
-                    .fillMaxWidth()
-            )
+        if (vm.displayedPlaylist != null && vm.displayedPlaylist!!.lifecycleState == PlaylistLifecycleState.Valid)
+            Playlist(vm, vm.displayedPlaylist!!)
     }
+
+    if (vm.playlistsViewModel.showFilter.value)
+        TitleSearchBarDialog(
+            onSearch = { searchString ->
+                vm.playlistsViewModel.filterValue.value = searchString
+                vm.playlistsViewModel.showFilter.value = false
+            },
+            onDismiss = {
+                vm.playlistsViewModel.showFilter.value = false
+                vm.playlistsViewModel.filterValue.value = ""
+            }
+        )
+    if (vm.loadingList || vm.displayedPlaylist == null)
+        LinearProgressIndicator(
+            modifier = Modifier
+                .fillMaxWidth()
+        )
 }
+
 
 @Composable
 fun AlbumCard(vm: AppViewModel, album: Album, layout: Layout?, previewMode: Boolean = false) {

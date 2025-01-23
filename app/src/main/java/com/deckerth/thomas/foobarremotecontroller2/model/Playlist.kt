@@ -9,16 +9,22 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
+enum class PlaylistLifecycleState {
+    Valid,           // can be updated anytime
+    RequiresUpdate,  // for late update at the beginning of next playlist recompose
+    Invalid          // will not be updated or displayed
+}
+
 class Playlist(var playlistEntity: PlaylistEntity) {
     val titles = mutableListOf<ITitle>()
     val albums = mutableListOf<Album>()
-    var valid by mutableStateOf(true)
+    var lifecycleState by mutableStateOf(PlaylistLifecycleState.Valid)
     var ipAddress: String = ""
 
     fun clear() {
         titles.clear()
         albums.clear()
-        valid = true
+        lifecycleState = PlaylistLifecycleState.Valid
     }
 
     fun addTitle(title: ITitle) {

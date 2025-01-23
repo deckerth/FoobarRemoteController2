@@ -74,9 +74,12 @@ import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
 fun PlaylistPage(vm: AppViewModel) {
     // The currently displayed playlists may have been changed in foobar so that is got invalidated
 
-     if (vm.displayedPlaylist != null &&
+    if (vm.displayedPlaylist != null &&
         vm.displayedPlaylist!!.lifecycleState != PlaylistLifecycleState.Valid
     ) {
+        val displayToast =
+            vm.removeTitlesMode || vm.playlistsViewModel.showFilter.value
+
         if (vm.removeTitlesMode)
             vm.disableRemoveTitlesMode(true)
 
@@ -92,11 +95,12 @@ fun PlaylistPage(vm: AppViewModel) {
 
         vm.displayedPlaylist = null
 
-        Toast.makeText(
-            mainActivity,
-            stringResource(R.string.playlist_changed_in_foobar),
-            Toast.LENGTH_SHORT
-        ).show()
+        if (displayToast)
+            Toast.makeText(
+                mainActivity,
+                stringResource(R.string.playlist_changed_in_foobar),
+                Toast.LENGTH_SHORT
+            ).show()
     }
 
     Column {
@@ -371,6 +375,7 @@ fun AlbumCardPreview() {
         "Ibrahim Ferrer (Buena Vista Social Club Presents)",
         "Mamí Me Gustó",
         "Ibrahim Ferrer",
+        "44100",
         "",
         "",
         "",
@@ -408,6 +413,7 @@ fun AlbumCardPreview2() {
         "Ibrahim Ferrer (Buena Vista Social Club Presents)",
         "",
         "Ibrahim Ferrer",
+        "44100",
         "",
         "",
         "",
@@ -595,6 +601,7 @@ fun PlaylistPreview() {
             "Ibrahim Ferrer (Buena Vista Social Club Presents)",
             "Mamí Me Gustó",
             "Ibrahim Ferrer",
+            "44100",
             "",
             "",
             "",
@@ -618,6 +625,7 @@ fun PlaylistPreview() {
             "Ibrahim Ferrer (Buena Vista Social Club Presents)",
             "",
             "Ibrahim Ferrer",
+            "44100",
             "",
             "",
             "",

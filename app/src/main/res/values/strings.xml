@@ -136,4 +136,5 @@
     <string name="selected_titles">Titles Selected</string>
     <string name="zero_or_one_title_selected">Title Selected</string>
     <string name="playlist_changed_in_foobar">Playlist was changed in foobar</string>
+    <string name="layout_item_samplerate">Sampling rate</string>
 </resources>

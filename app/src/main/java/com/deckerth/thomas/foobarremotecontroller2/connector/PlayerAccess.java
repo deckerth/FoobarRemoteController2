@@ -46,7 +46,7 @@ public class PlayerAccess {
         Response response;
         try {
             //response = vm.connector.getData("player?columns=%25label%25,%25catalog%25,%25composer%25,%25album%25,%25title%25,%25artist%25,%25discnumber%25,%25track%25,%25playback_time%25");
-            response = vm.connector.getData("player?columns=%25label%25,%25catalog%25,%25composer%25,%25album%25,%25title%25,%25artist%25,%25discnumber%25,%25track%25,%25playback_time%25,%24filename%28%25path%25%29%24");
+            response = vm.connector.getData("player?columns=%25label%25,%25catalog%25,%25composer%25,%25album%25,%25title%25,%25artist%25,%25samplerate%25,%25discnumber%25,%25track%25,%25playback_time%25,%24filename%28%25path%25%29%24");
         } catch (Exception e) {
             vm.errorHandler.logError(ErrorType.NETWORK, ErrorCode.CONNECTION_ERROR, ErrorSource.PLAYER_STATE, e);
             return null;
@@ -77,6 +77,9 @@ public class PlayerAccess {
                             "Klavierquintett f-Moll", !! OPTIONAL may be just ""
                             "1. Molto moderato quasi lento - Allegro",
                             "Khatia Buniatishvili, Klavier / Gidon Kremer & Marija Nemanytė, Violine / Maxim Rysanov, Viola / Giedrė Dirvanauskaitė, Cello",
+                            "44100",
+                            "01",
+                            "01",
                             "?",
                             "02",
                             "0:28"
@@ -135,6 +138,7 @@ public class PlayerAccess {
                         columns.getString(6),
                         columns.getString(7),
                         columns.getString(8),
+                        columns.getString(9),
                         activeItemObject.getString("playlistId"),
                         activeItemObject.getString("index"),
                         activeItemObject.getString("duration"),
@@ -145,6 +149,7 @@ public class PlayerAccess {
                         input.getUsedIpAddress());
             } else
                 return new Player(
+                        "",
                         "",
                         "",
                         "",

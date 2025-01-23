@@ -363,6 +363,7 @@ fun PlayerCardPreview() {
                     "Album",
                     "Title",
                     "Artist",
+                    "44100",
                     "0",
                     "02",
                     "0:28",

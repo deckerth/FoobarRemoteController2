@@ -30,6 +30,7 @@ data class Player(
     val album: String,
     val title: String,
     val artist: String,
+    val sampleRate: String,
     val discNumber: String,
     val track: String,
     val playbackTime: String,

@@ -84,6 +84,7 @@ fun DisplayItemDetail(title: ITitle, item: LayoutItems) {
         LayoutItems.COMPOSER -> title.composer
         LayoutItems.CATALOG -> title.catalog
         LayoutItems.LABEL -> title.label
+        LayoutItems.SAMPLE_RATE -> title.sampleRate + "kHz"
         else -> ""
     }
 

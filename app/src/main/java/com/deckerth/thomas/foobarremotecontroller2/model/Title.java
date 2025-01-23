@@ -163,8 +163,8 @@ public class Title implements ITitle {
         mIsCurrent = isCurrentTitle;
     }
 
-    @Override
-    public Boolean matches(String pattern) {
+
+    private Boolean matchesExact(String pattern) {
         if (pattern.isEmpty()) return true;
         String upperPattern = pattern.toUpperCase();
         if (mAlbum.toUpperCase().contains(upperPattern)) return true;
@@ -173,6 +173,14 @@ public class Title implements ITitle {
         if (mComposer.toUpperCase().contains(upperPattern)) return true;
         if (mCatalog.toUpperCase().contains(upperPattern)) return true;
         return mLabel.toUpperCase().contains(upperPattern);
+    }
+    @Override
+    public Boolean matches(String pattern) {
+        if (pattern.isEmpty()) return true;
+        String[] tokens = pattern.trim().split("\\s+");
+        for (String token : tokens)
+            if (!matchesExact(token)) return false;
+        return true;
     }
 
     @NonNull

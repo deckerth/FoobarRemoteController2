@@ -74,7 +74,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.deckerth.thomas.foobarremotecontroller2.FoobarMediaService
 import com.deckerth.thomas.foobarremotecontroller2.R
-import com.deckerth.thomas.foobarremotecontroller2.getIpAddress
+import com.deckerth.thomas.foobarremotecontroller2.getIpAddressBlocking
 import com.deckerth.thomas.foobarremotecontroller2.model.PlaybackState
 import com.deckerth.thomas.foobarremotecontroller2.model.checkIpAddressSyntax
 import com.deckerth.thomas.foobarremotecontroller2.ui.components.RemoveTitlesAppBar
@@ -125,14 +125,24 @@ class MainActivity : ComponentActivity() {
         startForegroundService(intent)
         enableEdgeToEdge()
         setContent {
-            appViewModel.ipAddress = getIpAddress()
+            // The ip address in the view model must be set to an invalid value until it is sure
+            // that the preference was read. Therefore the value is read into a temporary variable.
+            // Only after it was set, the value is taken over to the view model.
+
+            var ipAddress by remember { mutableStateOf("<invalid>") }
+            appViewModel.ipAddress = ipAddress
 
             LaunchedEffect(Unit) {
+                ipAddress = getIpAddressBlocking() // executed exactly once
+            }
+
+            LaunchedEffect(ipAddress) { // executed exactly once
+                appViewModel.ipAddress = ipAddress
                 appViewModel.playlistsViewModel.startPlayerObserver()
             }
 
             BackPressHandler()
-            if (appViewModel.ipAddress!!.isEmpty())
+            if (appViewModel.ipAddress == "<invalid>")
                 BlackPage()
             else
                 Foobar2000RemoteControllerTheme {
@@ -143,6 +153,7 @@ class MainActivity : ComponentActivity() {
                     } else {
                         FoobarPhoneLayout()
                     }
+
                 }
         }
     }

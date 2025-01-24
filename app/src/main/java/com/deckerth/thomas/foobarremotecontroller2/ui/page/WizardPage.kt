@@ -239,7 +239,6 @@ fun SearchDevices(
     // LaunchedEffect triggers when the key changes (here, `true`)
     LaunchedEffect(Unit) {
         if (!hasSearched) {
-            hasSearched = true
             loading = true
             prepareDeviceSelectionPage()
         }

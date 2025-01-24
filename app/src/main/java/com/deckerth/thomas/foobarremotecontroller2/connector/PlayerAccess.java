@@ -125,7 +125,7 @@ public class PlayerAccess {
 
             if (columns.length() > 0) {
                 String title = columns.getString(4);
-                String filename = columns.getString(9);
+                String filename = columns.getString(10);
                 String effectiveTitle = "";
                 if (!title.equals(filename)) effectiveTitle = title;
                 return new Player(

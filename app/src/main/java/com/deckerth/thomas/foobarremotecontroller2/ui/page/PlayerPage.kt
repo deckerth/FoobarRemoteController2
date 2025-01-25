@@ -107,34 +107,13 @@ fun PlayingPage(vm: AppViewModel) {
                         Text(text = "Refresh")
                     }
                 }
-            } else if (vm.player!!.playbackState == PlaybackState.STOPPED) {
-                Column(
-                    modifier = Modifier
-                        .align(Alignment.Center)
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.stop_circle),
-                        contentDescription = stringResource(R.string.desc_album_picture),
-                        modifier = Modifier
-                            .align(Alignment.CenterHorizontally)
-                            .size(180.dp)
-                            .clip(MaterialTheme.shapes.medium)
-                    )
-                    Text(
-                        modifier = Modifier.fillMaxWidth(),
-                        maxLines = 1,
-                        textAlign = TextAlign.Center,
-                        text = stringResource(R.string.info_no_track_playing),
-                        style = MaterialTheme.typography.bodyLarge
-                    )
-                }
-            } else {
+            } else
                 PlayerCard(
                     vm,
                     player = vm.player!!,
                     boxSize = IntSize(maxBoxWidth.value.toInt(), maxBoxHeight.value.toInt())
                 )
-            }
+
             if (pullToRefreshState.isRefreshing) {
                 LaunchedEffect(true) {
                     onRefresh(vm)
@@ -206,6 +185,7 @@ fun PlayerButtons(
         Spacer(modifier = Modifier.width(space))
         IconButton(
             onClick = onPreviousTrack,
+            enabled = player.playbackState != PlaybackState.STOPPED,
             modifier = Modifier
                 .size(60.dp)
         ) {
@@ -229,7 +209,7 @@ fun PlayerButtons(
             modifier = Modifier
                 .size(60.dp)
         ) {
-            if (player.playbackState == PlaybackState.PAUSED) {
+            if (player.playbackState == PlaybackState.PAUSED || player.playbackState == PlaybackState.STOPPED) {
                 Icon(
                     painter = painterResource(R.drawable.play),
                     contentDescription = stringResource(R.string.desc_play),
@@ -251,6 +231,7 @@ fun PlayerButtons(
         Spacer(modifier = Modifier.width(space))
         IconButton(
             onClick = onNextTrack,
+            enabled = player.playbackState != PlaybackState.STOPPED,
             modifier = Modifier
                 .size(60.dp)
         ) {
@@ -300,6 +281,27 @@ fun PlayerButtons(
 }
 
 @Composable
+fun PlayerStopped(modifier: Modifier = Modifier) {
+    Column(modifier = modifier.fillMaxWidth()) {
+        Icon(
+            painter = painterResource(R.drawable.stop_circle),
+            contentDescription = stringResource(R.string.desc_album_picture),
+            modifier = modifier
+                .align(Alignment.CenterHorizontally)
+                .size(180.dp)
+                .clip(MaterialTheme.shapes.medium)
+        )
+        Text(
+            modifier = Modifier.fillMaxWidth(),
+            maxLines = 1,
+            textAlign = TextAlign.Center,
+            text = stringResource(R.string.info_no_track_playing),
+            style = MaterialTheme.typography.bodyLarge
+        )
+    }
+}
+
+@Composable
 fun PlayerCard(
     vm: AppViewModel,
     player: Player,
@@ -321,16 +323,23 @@ fun PlayerCard(
                 // Makes the Box occupy the full width of the screen.
                 .fillMaxWidth()
         ) {
-            ArtWork(player, previewMode = previewMode)
+            if (player.playbackState == PlaybackState.STOPPED)
+                PlayerStopped(modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.Center))
+            else
+                ArtWork(player, previewMode = previewMode)
         }
 
         // This Column contains the text fields and other controls.
         Column(modifier = Modifier.padding(16.dp)) {
-            val layout = layoutManager.getLayout()
+            if (player.playbackState != PlaybackState.STOPPED) {
+                val layout = layoutManager.getLayout()
 
-            for (item in layout.playerLayout.items) {
-                if (item.item != LayoutItems.ARTWORK)
-                    LayoutComponent(vm, player, item)
+                for (item in layout.playerLayout.items) {
+                    if (item.item != LayoutItems.ARTWORK)
+                        LayoutComponent(vm, player, item)
+                }
             }
             if (onPreviousTrack != null && onNextTrack != null)
                 PlayerButtons(vm, player, onPreviousTrack, onNextTrack, previewMode)
@@ -350,6 +359,7 @@ fun PlayerCard(
     showBackground = true,
     uiMode = Configuration.UI_MODE_NIGHT_YES
 )
+
 @Composable
 fun PlayerCardPreview() {
     Foobar2000RemoteControllerTheme {

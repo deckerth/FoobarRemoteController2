@@ -4,6 +4,8 @@ import android.graphics.Bitmap;
 
 import androidx.annotation.NonNull;
 
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.TitleFilter;
+
 public interface ITitle {
 
     String getCatalog();
@@ -48,7 +50,7 @@ public interface ITitle {
 
     void setIsCurrentTitle(Boolean isCurrentTitle);
 
-    Boolean matches(String pattern);
+    Boolean matches(TitleFilter filter);
 
     @NonNull
     ITitle clone();

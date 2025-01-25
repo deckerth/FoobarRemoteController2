@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.state.ToggleableState
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.TitleFilter
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.viewModelInstance
 
 data class SelectableTitle(val album: Album, val details: ITitle) {
@@ -70,10 +71,10 @@ data class Album(
 
     private var endIndex: Int = 0
 
-    fun matches(pattern: String): Boolean {
-        if (pattern.isEmpty()) return true
+    fun matches(filter: TitleFilter): Boolean {
+        if (!filter.isActive) return true
         for (title in _tracks)
-            if (title.details.matches(pattern)) return true
+            if (title.details.matches(filter)) return true
         return false
     }
 

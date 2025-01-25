@@ -4,6 +4,8 @@ import android.graphics.Bitmap;
 
 import androidx.annotation.NonNull;
 
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.TitleFilter;
+
 public class Title implements ITitle {
 
     // mPlaylistId, mCatalog, mIndex, mComposer, mAlbum, mArtist
@@ -180,9 +182,9 @@ public class Title implements ITitle {
         return mLabel.toUpperCase().contains(upperPattern);
     }
     @Override
-    public Boolean matches(String pattern) {
-        if (pattern.isEmpty()) return true;
-        String[] tokens = pattern.trim().split("\\s+");
+    public Boolean matches(TitleFilter filter) {
+        if (!filter.isActive()) return true;
+        String[] tokens = filter.getPattern().trim().split("\\s+");
         for (String token : tokens)
             if (!matchesExact(token)) return false;
         return true;

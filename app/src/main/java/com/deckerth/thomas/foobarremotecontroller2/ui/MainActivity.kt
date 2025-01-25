@@ -266,10 +266,10 @@ class MainActivity : ComponentActivity() {
                                                 .size(24.dp)
                                         )
                                     }
-                                    if (appViewModel.playlistsViewModel.filterValue.value.isNotEmpty())
+                                    if (appViewModel.playlistsViewModel.filterValue.isActive)
                                         IconButton(onClick = {
-                                            appViewModel.playlistsViewModel.showFilter.value = false
-                                            appViewModel.playlistsViewModel.filterValue.value = ""
+                                            appViewModel.playlistsViewModel.showFilter  = false
+                                            appViewModel.playlistsViewModel.filterValue.clear()
                                         }) {
                                             Icon(
                                                 painter = painterResource(R.drawable.filter_alt_off),
@@ -337,7 +337,7 @@ class MainActivity : ComponentActivity() {
                                             text = { Text(stringResource(R.string.filter_titles)) },
                                             onClick = {
                                                 dropdownMenuExpanded =
-                                                    false; appViewModel.playlistsViewModel.showFilter.value =
+                                                    false; appViewModel.playlistsViewModel.showFilter =
                                                 true
                                             },
                                             leadingIcon = {
@@ -519,10 +519,10 @@ class MainActivity : ComponentActivity() {
                                             contentDescription = "Remove tracks"
                                         )
                                     }
-                                    if (appViewModel.playlistsViewModel.filterValue.value.isNotEmpty())
+                                    if (appViewModel.playlistsViewModel.filterValue.isActive)
                                         IconButton(onClick = {
-                                            appViewModel.playlistsViewModel.showFilter.value = false
-                                            appViewModel.playlistsViewModel.filterValue.value = ""
+                                            appViewModel.playlistsViewModel.showFilter = false
+                                            appViewModel.playlistsViewModel.filterValue.clear()
                                         }) {
                                             Icon(
                                                 painter = painterResource(R.drawable.filter_alt_off),
@@ -531,7 +531,7 @@ class MainActivity : ComponentActivity() {
                                         }
                                     else
                                         IconButton(onClick = {
-                                            appViewModel.playlistsViewModel.showFilter.value = true
+                                            appViewModel.playlistsViewModel.showFilter = true
                                         }) {
                                             Icon(
                                                 painter = painterResource(R.drawable.filter_alt),

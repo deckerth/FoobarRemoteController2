@@ -1,7 +1,9 @@
 package com.deckerth.thomas.foobarremotecontroller2.viewmodel
 
 
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.deckerth.thomas.foobarremotecontroller2.connector.PlayerObserver
 import com.deckerth.thomas.foobarremotecontroller2.model.Playlist
@@ -13,11 +15,50 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+class TitleFilter {
+    var isActive by mutableStateOf(false)
+
+    private fun setIsActive() {
+        isActive = pattern.isNotBlank() || genre.isNotBlank() || highRes
+    }
+
+    private var _pattern : String = ""
+    var pattern : String
+        get() = _pattern
+        set(value) {
+            _pattern = value
+            setIsActive()
+        }
+
+    private var _genre : String = ""
+    var genre : String
+        get() = _genre
+        set(value) {
+            _genre = value
+            setIsActive()
+        }
+
+    private var _highRes : Boolean = false
+    var highRes : Boolean
+        get() = _highRes
+        set(value) {
+            _highRes= value
+            setIsActive()
+        }
+
+    fun clear() {
+        _pattern = ""
+        _genre = ""
+        _highRes = false
+        isActive = false
+    }
+}
+
 class PlaylistsViewModel(private val vm: AppViewModel) : ViewModel() {
     private val playlistRegistry = mutableListOf<Playlist>()
 
-    var showFilter = mutableStateOf(false)
-    var filterValue = mutableStateOf("")
+    var showFilter by mutableStateOf(false)
+    var filterValue by mutableStateOf(TitleFilter())
 
     private val playerObserver = PlayerObserver(vm, vm.playlistAccess, this)
 

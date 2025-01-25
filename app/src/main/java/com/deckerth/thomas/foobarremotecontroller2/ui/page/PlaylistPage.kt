@@ -69,7 +69,6 @@ import com.deckerth.thomas.foobarremotecontroller2.ui.mainActivity
 import com.deckerth.thomas.foobarremotecontroller2.ui.theme.Foobar2000RemoteControllerTheme
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlaylistPage(vm: AppViewModel) {
     // The currently displayed playlists may have been changed in foobar so that is got invalidated
@@ -78,15 +77,15 @@ fun PlaylistPage(vm: AppViewModel) {
         vm.displayedPlaylist!!.lifecycleState != PlaylistLifecycleState.Valid
     ) {
         val displayToast =
-            vm.removeTitlesMode || vm.playlistsViewModel.showFilter.value
+            vm.removeTitlesMode || vm.playlistsViewModel.showFilter
 
         if (vm.removeTitlesMode)
             vm.disableRemoveTitlesMode(true)
 
 
-        if (vm.playlistsViewModel.showFilter.value) {
-            vm.playlistsViewModel.showFilter.value = false
-            vm.playlistsViewModel.filterValue.value = ""
+        if (vm.playlistsViewModel.showFilter) {
+            vm.playlistsViewModel.showFilter = false
+            vm.playlistsViewModel.filterValue.clear()
         }
 
         vm.displayedPlaylist!!.clear()
@@ -110,15 +109,15 @@ fun PlaylistPage(vm: AppViewModel) {
             Playlist(vm, vm.displayedPlaylist!!)
     }
 
-    if (vm.playlistsViewModel.showFilter.value)
+    if (vm.playlistsViewModel.showFilter)
         TitleSearchBarDialog(
             onSearch = { searchString ->
-                vm.playlistsViewModel.filterValue.value = searchString
-                vm.playlistsViewModel.showFilter.value = false
+                vm.playlistsViewModel.filterValue.pattern = searchString
+                vm.playlistsViewModel.showFilter = false
             },
             onDismiss = {
-                vm.playlistsViewModel.showFilter.value = false
-                vm.playlistsViewModel.filterValue.value = ""
+                vm.playlistsViewModel.showFilter = false
+                vm.playlistsViewModel.filterValue.clear()
             }
         )
     if (vm.loadingList || vm.displayedPlaylist == null)
@@ -168,8 +167,8 @@ fun AlbumCard(vm: AppViewModel, album: Album, layout: Layout?, previewMode: Bool
             if (vm.removeTitlesMode)
                 album.toggleIsSelected()
             else {
-                vm.playlistsViewModel.filterValue.value = ""
-                vm.playlistsViewModel.showFilter.value = false
+                vm.playlistsViewModel.filterValue.clear()
+                vm.playlistsViewModel.showFilter = false
                 vm.playerAccess.playTrack(
                     album.tracks[0].details.playlistId,
                     album.tracks[0].details.index
@@ -270,7 +269,7 @@ fun AlbumCard(vm: AppViewModel, album: Album, layout: Layout?, previewMode: Bool
                 if (album.isExpanded) {
                     Column {
                         album.tracks.forEach { title ->
-                            if (title.details.matches(vm.playlistsViewModel.filterValue.value))
+                            if (title.details.matches(vm.playlistsViewModel.filterValue))
                                 TitleEntry(
                                     vm = vm,
                                     album = album,
@@ -312,8 +311,8 @@ fun TitleEntry(
                 if (vm.removeTitlesMode)
                     title.toggleIsSelected(vm)
                 else {
-                    vm.playlistsViewModel.filterValue.value = ""
-                    vm.playlistsViewModel.showFilter.value = false
+                    vm.playlistsViewModel.filterValue.clear()
+                    vm.playlistsViewModel.showFilter = false
                     vm.playerAccess.playTrack(title.details.playlistId, title.details.index)
                 }
             }
@@ -446,7 +445,7 @@ fun Playlist(vm: AppViewModel, playlist: Playlist) {
         if (playlist.albums.isNotEmpty()) {
             try {
                 items(playlist.albums) { album ->
-                    if (album.matches(vm.playlistsViewModel.filterValue.value))
+                    if (album.matches(vm.playlistsViewModel.filterValue))
                         AlbumCard(vm, album, layoutManager.getLayout())
                 }
             } catch (e: Exception) {

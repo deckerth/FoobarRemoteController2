@@ -46,7 +46,7 @@ public class PlayerAccess {
         Response response;
         try {
             //response = vm.connector.getData("player?columns=%25label%25,%25catalog%25,%25composer%25,%25album%25,%25title%25,%25artist%25,%25discnumber%25,%25track%25,%25playback_time%25");
-            response = vm.connector.getData("player?columns=%25label%25,%25catalog%25,%25composer%25,%25album%25,%25title%25,%25artist%25,%25samplerate%25,%25discnumber%25,%25track%25,%25playback_time%25,%24filename%28%25path%25%29%24");
+            response = vm.connector.getData("player?columns=%25label%25,%25catalog%25,%25composer%25,%25album%25,%25title%25,%25artist%25,%25samplerate%25,%25genre%25,%25discnumber%25,%25track%25,%25playback_time%25,%24filename%28%25path%25%29%24");
         } catch (Exception e) {
             vm.errorHandler.logError(ErrorType.NETWORK, ErrorCode.CONNECTION_ERROR, ErrorSource.PLAYER_STATE, e);
             return null;
@@ -78,6 +78,7 @@ public class PlayerAccess {
                             "1. Molto moderato quasi lento - Allegro",
                             "Khatia Buniatishvili, Klavier / Gidon Kremer & Marija Nemanytė, Violine / Maxim Rysanov, Viola / Giedrė Dirvanauskaitė, Cello",
                             "44100",
+                            "Orchestral",
                             "01",
                             "01",
                             "?",
@@ -125,7 +126,7 @@ public class PlayerAccess {
 
             if (columns.length() > 0) {
                 String title = columns.getString(4);
-                String filename = columns.getString(10);
+                String filename = columns.getString(11);
                 String effectiveTitle = "";
                 if (!title.equals(filename)) effectiveTitle = title;
                 return new Player(
@@ -139,6 +140,7 @@ public class PlayerAccess {
                         columns.getString(7),
                         columns.getString(8),
                         columns.getString(9),
+                        columns.getString(10),
                         activeItemObject.getString("playlistId"),
                         activeItemObject.getString("index"),
                         activeItemObject.getString("duration"),
@@ -149,6 +151,7 @@ public class PlayerAccess {
                         input.getUsedIpAddress());
             } else
                 return new Player(
+                        "",
                         "",
                         "",
                         "",

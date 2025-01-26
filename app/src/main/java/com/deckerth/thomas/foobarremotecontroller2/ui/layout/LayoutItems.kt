@@ -11,7 +11,7 @@ Required steps when adding new metadata fields:
 2. add the field to the ITitle interface
 3. adapt the Title class accordingly (also matches())
 4. add the field to Player
-5. adjust the classes PlayerAccess and PlaylistAccess
+5. adjust the classes PlayerAccess and PlaylistAccess. Play attention to computation of effectiveTitle
 6. extend LayoutComponent
 7. adapt the example objects in LayoutPreviewPage
 8. extend TitleDetails with the new field (DisplayItemDetail)
@@ -29,6 +29,7 @@ enum class LayoutItems(
     ALBUM(mainActivity.baseContext.getString(R.string.layout_item_album)),
     TITLE(mainActivity.baseContext.getString(R.string.layout_item_title), onAlbum = false),
     ARTIST(mainActivity.baseContext.getString(R.string.layout_item_artist)),
+    GENRE(mainActivity.baseContext.getString(R.string.layout_item_genre)),
     SMART_ARTIST(
         mainActivity.baseContext.getString(R.string.layout_item_smart_artist),
         onAlbum = false,

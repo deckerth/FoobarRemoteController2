@@ -4,6 +4,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.state.ToggleableState
+import com.deckerth.thomas.foobarremotecontroller2.R
+import com.deckerth.thomas.foobarremotecontroller2.ui.mainActivity
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -18,17 +20,30 @@ enum class PlaylistLifecycleState {
 class Playlist(var playlistEntity: PlaylistEntity) {
     val titles = mutableListOf<ITitle>()
     val albums = mutableListOf<Album>()
+    val genres = mutableListOf<String>()
     var lifecycleState by mutableStateOf(PlaylistLifecycleState.Valid)
     var ipAddress: String = ""
 
     fun clear() {
         titles.clear()
         albums.clear()
+        genres.clear()
         lifecycleState = PlaylistLifecycleState.Valid
+    }
+
+    fun getGenres(addAllGenresText : Boolean = false): List<String> {
+        val result = mutableListOf<String>()
+        if (addAllGenresText)
+            result.add(mainActivity.getString(R.string.all_genres))
+        result.addAll(genres)
+        return result
     }
 
     fun addTitle(title: ITitle) {
         titles.add(title)
+        if (title.genre.isNotBlank() && !genres.contains(title.genre)) {
+            genres.add(title.genre)
+        }
 
         if (titles.count() == 1) {
             val currentAlbum = Album(title)
@@ -75,6 +90,6 @@ class Playlist(var playlistEntity: PlaylistEntity) {
         if (vm.noOfTitlesToRemove > 0) {
             for (album in albums)
                 album.setIsSelected(ToggleableState.Off)
-            }
+        }
     }
 }

@@ -58,6 +58,7 @@ fun LayoutComponent(vm: AppViewModel, player: Player, layoutItem: LayoutItem) {
         LayoutItems.ALBUM -> TextComponent(text = player.album, item = layoutItem)
         LayoutItems.ARTIST -> TextComponent(text = player.artist, item = layoutItem)
         LayoutItems.SAMPLE_RATE -> TextComponent(text = player.sampleRate+ " Hz", item = layoutItem)
+        LayoutItems.GENRE -> TextComponent(text = player.genre, item = layoutItem)
         LayoutItems.PROGRESS -> PlayerProgress(vm, player)
         LayoutItems.COMPOSER ->
             if (player.composer != "" && player.composer != "?") {

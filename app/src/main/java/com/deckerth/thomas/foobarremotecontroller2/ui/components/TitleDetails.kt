@@ -85,6 +85,7 @@ fun DisplayItemDetail(title: ITitle, item: LayoutItems) {
         LayoutItems.CATALOG -> title.catalog
         LayoutItems.LABEL -> title.label
         LayoutItems.SAMPLE_RATE -> title.sampleRate + " Hz"
+        LayoutItems.GENRE -> title.genre
         else -> ""
     }
 

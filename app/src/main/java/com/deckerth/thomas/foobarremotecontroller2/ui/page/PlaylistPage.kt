@@ -90,7 +90,7 @@ fun PlaylistPage(vm: AppViewModel) {
 
         vm.displayedPlaylist!!.clear()
         if (vm.displayedPlaylist!!.lifecycleState == PlaylistLifecycleState.RequiresUpdate)
-            vm.playlistsViewModel.updatePlaylists()  // delayed update to avoid crashes during layout update
+            vm.displayedPlaylist!!.lifecycleState = PlaylistLifecycleState.Valid // for delayed update to avoid crashes during layout update
 
         vm.displayedPlaylist = null
 
@@ -111,8 +111,11 @@ fun PlaylistPage(vm: AppViewModel) {
 
     if (vm.playlistsViewModel.showFilter)
         TitleSearchBarDialog(
-            onSearch = { searchString ->
+            vm = vm,
+            onSearch = { searchString, genre, highRes ->
                 vm.playlistsViewModel.filterValue.pattern = searchString
+                vm.playlistsViewModel.filterValue.genre = genre
+                vm.playlistsViewModel.filterValue.highRes = highRes
                 vm.playlistsViewModel.showFilter = false
             },
             onDismiss = {
@@ -375,6 +378,7 @@ fun AlbumCardPreview() {
         "Mamí Me Gustó",
         "Ibrahim Ferrer",
         "44100",
+        "Classical",
         "",
         "",
         "",
@@ -413,6 +417,7 @@ fun AlbumCardPreview2() {
         "",
         "Ibrahim Ferrer",
         "44100",
+        "Classical",
         "",
         "",
         "",
@@ -601,6 +606,7 @@ fun PlaylistPreview() {
             "Mamí Me Gustó",
             "Ibrahim Ferrer",
             "44100",
+            "Classical",
             "",
             "",
             "",
@@ -625,6 +631,7 @@ fun PlaylistPreview() {
             "",
             "Ibrahim Ferrer",
             "44100",
+            "Classical",
             "",
             "",
             "",

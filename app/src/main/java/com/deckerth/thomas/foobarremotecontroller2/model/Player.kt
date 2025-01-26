@@ -31,6 +31,7 @@ data class Player(
     val title: String,
     val artist: String,
     val sampleRate: String,
+    val genre: String,
     val discNumber: String,
     val track: String,
     val playbackTime: String,

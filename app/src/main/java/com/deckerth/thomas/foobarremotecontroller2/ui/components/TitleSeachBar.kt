@@ -11,6 +11,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -31,15 +32,20 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.deckerth.thomas.foobarremotecontroller2.R
+import com.deckerth.thomas.foobarremotecontroller2.ui.page.DropdownSelector
 import com.deckerth.thomas.foobarremotecontroller2.ui.theme.Foobar2000RemoteControllerTheme
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
 
-var searchText = mutableStateOf("")
+private var searchText = mutableStateOf("")
+private var genre = mutableStateOf("")
+private var genreSelected = mutableStateOf(false)
+private var highRes = mutableStateOf(false)
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TitleSearchBarDialog(
+    vm: AppViewModel? = null,
     modifier: Modifier = Modifier,
-    onSearch: (String) -> Unit,
+    onSearch: (String, String, Boolean) -> Unit,
     onDismiss: () -> Unit
 ) {
     AlertDialog(
@@ -53,7 +59,14 @@ fun TitleSearchBarDialog(
             }
         },
         confirmButton = {
-            TextButton(onClick = { onSearch(searchText.value) }) {
+            TextButton(onClick = {
+                onSearch(
+                    searchText.value,
+                    if (genreSelected.value) genre.value else "",
+                    highRes.value
+                )
+            }
+            ) {
                 Text(
                     stringResource(R.string.button_set_filter),
                     style = MaterialTheme.typography.bodyMedium
@@ -67,7 +80,23 @@ fun TitleSearchBarDialog(
             )
         },
         text = {
-            TitleSearchBar(onSearch = onSearch)
+            Column {
+                TitleSearchBar(onSearch = { searchText.value = it })
+                GenreDropDown(vm)
+                Row {
+                    Checkbox(
+                        checked = highRes.value,
+                        onCheckedChange = { highRes.value = it }
+                    )
+                    Text(
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .align(Alignment.CenterVertically),
+                        text = stringResource(R.string.filter_high_res),
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+            }
         },
         modifier = modifier
             .padding(16.dp)
@@ -98,7 +127,7 @@ fun TitleSearchBar(
                 modifier = modifier
                     .weight(1f)
                     .padding(8.dp),
-                placeholder = { Text(stringResource(R.string.search_placeholder),) },
+                placeholder = { Text(stringResource(R.string.search_placeholder)) },
                 leadingIcon = { Icon(Icons.Filled.Search, "Search Icon") },
                 trailingIcon = {
                     if (alwaysShowClearButton || searchText.value.isNotBlank())
@@ -119,44 +148,75 @@ fun TitleSearchBar(
             )
         }
     }
+}
 
-    @OptIn(ExperimentalMaterial3Api::class)
-    @Composable
-    fun TitleSearchBarWithResultList(
-        modifier: Modifier = Modifier,
-        onClosed: () -> Unit,
-        onSearch: (String) -> Unit
+@Composable
+fun GenreDropDown(vm: AppViewModel? = null, modifier: Modifier = Modifier) {
+    val genres = if (vm == null)
+        listOf("All Genres")
+    else
+        vm.displayedPlaylist!!.getGenres(addAllGenresText = true)
+    if (genre.value.isBlank()) genre.value = genres[0]
+    Row {
+        Text(
+            modifier = Modifier
+                .padding(8.dp)
+                .align(Alignment.CenterVertically),
+            text = stringResource(R.string.filter_genre),
+            style = MaterialTheme.typography.bodyMedium
+        )
+        DropdownSelector(
+            modifier = modifier,
+            values = genres,
+            selectedItem = genre.value,
+            onClick = {
+                if (it != null) {
+                    genre.value = it
+                    genreSelected.value = genre.value != genres[0]
+                }
+            }
+        )
+    }
+
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TitleSearchBarWithResultList(
+    modifier: Modifier = Modifier,
+    onClosed: () -> Unit,
+    onSearch: (String) -> Unit
+) {
+    var searchText by remember { mutableStateOf("") }
+    var isSearching by remember { mutableStateOf(false) }
+    var active by remember { mutableStateOf(false) }
+
+    Column(
+        modifier = modifier
     ) {
-        var searchText by remember { mutableStateOf("") }
-        var isSearching by remember { mutableStateOf(false) }
-        var active by remember { mutableStateOf(false) }
-
-        Column(
-            modifier = modifier
-        ) {
-            SearchBar(
-                query = searchText,
-                onQueryChange = { searchText = it },
-                active = active,
-                onActiveChange = { active = it },
-                onSearch = { onSearch(searchText) },
-                placeholder = { Text("Search...") },
-                leadingIcon = { Icon(Icons.Filled.Search, "Search Icon") },
-                trailingIcon = {
-                    if (isSearching) {
-                        IconButton(onClick = {
-                            searchText = ""
-                            isSearching = false
-                            onClosed()
-                        }) {
-                            Icon(Icons.Filled.Clear, "Clear Icon")
-                        }
+        SearchBar(
+            query = searchText,
+            onQueryChange = { searchText = it },
+            active = active,
+            onActiveChange = { active = it },
+            onSearch = { onSearch(searchText) },
+            placeholder = { Text("Search...") },
+            leadingIcon = { Icon(Icons.Filled.Search, "Search Icon") },
+            trailingIcon = {
+                if (isSearching) {
+                    IconButton(onClick = {
+                        searchText = ""
+                        isSearching = false
+                        onClosed()
+                    }) {
+                        Icon(Icons.Filled.Clear, "Clear Icon")
                     }
-                },
-                content = { })
-        }
+                }
+            },
+            content = { })
     }
 }
+
 
 /*
 @OptIn(ExperimentalMaterial3Api::class)
@@ -245,6 +305,6 @@ fun SearchPreview() {
 @Composable
 fun SearchBoxPreview() {
     Foobar2000RemoteControllerTheme {
-        TitleSearchBarDialog(onSearch = {}, onDismiss = {})
+        TitleSearchBarDialog(onSearch = { _, _, _ -> }, onDismiss = {})
     }
 }

@@ -25,6 +25,7 @@ public interface ITitle {
     String getArtist();
 
     String getSampleRate();
+    String getGenre();
 
     void clearArtist();
 

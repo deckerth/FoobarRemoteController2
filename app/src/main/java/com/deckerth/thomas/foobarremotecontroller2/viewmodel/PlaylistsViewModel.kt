@@ -133,7 +133,7 @@ val playlists: Playlists
         if (vm.player != null)
             playingPlaylistId = vm.player!!.playlistId
 
-        // Check is any playlist has now a different number of tracks than before
+        // Check if any playlist has now a different number of tracks than before
         // Clear changed playlists so that they are loaded from scratch
         for (newEntity in newPlaylists.playlists) {
             val currentEntry = getPlaylist(newEntity.playlistId)
@@ -211,7 +211,7 @@ val playlists: Playlists
         return null
     }
 
-    fun updatePlaylists() {
+    private fun updatePlaylists() {
         if (!vm.loadingList && !vm.errorHandler.sick()) {
             val next = getPlaylistToBeUpdated()
             if (next != null)

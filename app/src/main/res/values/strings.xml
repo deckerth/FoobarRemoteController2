@@ -137,4 +137,8 @@
     <string name="zero_or_one_title_selected">Title Selected</string>
     <string name="playlist_changed_in_foobar">Playlist was changed in foobar</string>
     <string name="layout_item_samplerate">Sampling rate</string>
+    <string name="layout_item_genre">Genre</string>
+    <string name="all_genres">All genres</string>
+    <string name="filter_genre">Genre:</string>
+    <string name="filter_high_res">High Resolution</string>
 </resources>

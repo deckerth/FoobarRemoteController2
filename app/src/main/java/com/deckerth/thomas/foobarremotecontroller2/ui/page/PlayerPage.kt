@@ -49,10 +49,13 @@ import com.deckerth.thomas.foobarremotecontroller2.R
 import com.deckerth.thomas.foobarremotecontroller2.model.PlaybackMode
 import com.deckerth.thomas.foobarremotecontroller2.model.PlaybackState
 import com.deckerth.thomas.foobarremotecontroller2.model.Player
+import com.deckerth.thomas.foobarremotecontroller2.model.PlaylistLifecycleState
 import com.deckerth.thomas.foobarremotecontroller2.ui.components.ArtWork
 import com.deckerth.thomas.foobarremotecontroller2.ui.components.LayoutComponent
+import com.deckerth.thomas.foobarremotecontroller2.ui.isTablet
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.LayoutItems
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.layoutManager
+import com.deckerth.thomas.foobarremotecontroller2.ui.mainActivity
 import com.deckerth.thomas.foobarremotecontroller2.ui.theme.Foobar2000RemoteControllerTheme
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
 
@@ -310,6 +313,13 @@ fun PlayerCard(
     onNextTrack: (() -> Unit)? = null,
     boxSize: IntSize
 ) {
+    // In phone mode: Trigger loading of the current playlist if it is not already loaded.
+    if (!mainActivity.isTablet())
+        if(vm.displayedPlaylist != null && vm.displayedPlaylist!!.lifecycleState == PlaylistLifecycleState.RequiresUpdate) {
+            vm.displayedPlaylist!!.lifecycleState = PlaylistLifecycleState.Valid
+            vm.displayedPlaylist = null
+        }
+
     // The main layout container, occupying the entire screen.
     Column(
         modifier = Modifier
@@ -374,6 +384,7 @@ fun PlayerCardPreview() {
                     "Title",
                     "Artist",
                     "44100",
+                    "Pop",
                     "0",
                     "02",
                     "0:28",

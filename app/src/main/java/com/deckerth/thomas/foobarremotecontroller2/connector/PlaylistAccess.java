@@ -35,7 +35,7 @@ public class PlaylistAccess {
         Response response;
         try {
             response = vm.connector.getData("playlists/" + playlistEntity.getPlaylistId() +
-                    "/items/" + startIndex + "%3A" + 1000 + "?columns=%25label%25,%25catalog%25,%25composer%25,%25album%25,%25title%25,%25artist%25,%25samplerate%25,%25discnumber%25,%25track%25,%25length%25,%24filename%28%25path%25%29%24");
+                    "/items/" + startIndex + "%3A" + 1000 + "?columns=%25label%25,%25catalog%25,%25composer%25,%25album%25,%25title%25,%25artist%25,%25samplerate%25,%25genre%25,%25discnumber%25,%25track%25,%25length%25,%24filename%28%25path%25%29%24");
         } catch (Exception e) {
             errorHandler.logError(ErrorType.NETWORK, ErrorCode.CONNECTION_ERROR, ErrorSource.PLAYLIST_ITEMS, e);
             return null;
@@ -67,6 +67,7 @@ public class PlaylistAccess {
                                     "Amazing Things",
                                     "Runrig",
                                     "44100",
+                                    "Orchestral"
                                     "?",
                                     "01",
                                     "4:18"
@@ -83,10 +84,11 @@ public class PlaylistAccess {
                 String title = columnsArray.getString(4);
                 String artist = columnsArray.getString(5);
                 String samplerRate = columnsArray.getString(6);
-                String discNumber = columnsArray.getString(7);
-                String track = columnsArray.getString(8);
-                String length = columnsArray.getString(9);
-                String filename = columnsArray.getString(10);
+                String genre = columnsArray.getString(7);
+                String discNumber = columnsArray.getString(8);
+                String track = columnsArray.getString(9);
+                String length = columnsArray.getString(10);
+                String filename = columnsArray.getString(11);
 
                 String effectiveTitle = "";
                 if (!title.equals(filename)) effectiveTitle = title;
@@ -102,6 +104,7 @@ public class PlaylistAccess {
                                 effectiveTitle,
                                 artist,
                                 samplerRate,
+                                genre,
                                 discNumber,
                                 track,
                                 length, "", "",

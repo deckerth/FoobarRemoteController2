@@ -24,10 +24,11 @@ public class Title implements ITitle {
     protected String mAlbum;
     protected String mArtist;
     protected String mSampleRate;
+    protected String mGenre;
     protected Bitmap mArtwork;
     private Boolean mIsCurrent = false;
 
-    public Title(String mPlaylistId, int mIndex, String mLabel, String mCatalog, String mComposer, String mAlbum, String mTitle, String mArtist, String mSampleRate, String mDiscNumber, String mTrack, String mPlaybackTime, String duration, String position, String mArtworkUrl) {
+    public Title(String mPlaylistId, int mIndex, String mLabel, String mCatalog, String mComposer, String mAlbum, String mTitle, String mArtist, String mSampleRate, String mGenre, String mDiscNumber, String mTrack, String mPlaybackTime, String duration, String position, String mArtworkUrl) {
         this.mLabel = set(mLabel);
         this.mCatalog = set(mCatalog);
         this.mPlaylistId = set(mPlaylistId);
@@ -41,6 +42,7 @@ public class Title implements ITitle {
         this.mPlaybackTime = set(mPlaybackTime);
         this.mArtworkUrl = set(mArtworkUrl);
         this.mSampleRate = set(mSampleRate);
+        this.mGenre = set(mGenre);
         double value;
         try {
             value = Double.parseDouble(duration);
@@ -110,6 +112,9 @@ public class Title implements ITitle {
 
     @Override
     public String getSampleRate() { return mSampleRate; }
+
+    @Override
+    public String getGenre() { return mGenre; }
 
     @Override
     public void clearAlbum() {
@@ -187,13 +192,23 @@ public class Title implements ITitle {
         String[] tokens = filter.getPattern().trim().split("\\s+");
         for (String token : tokens)
             if (!matchesExact(token)) return false;
+        if (filter.getHighRes()) {
+            try {
+                int bitRate = Integer.parseInt(mSampleRate);
+                if (bitRate <= 48000) return false;
+            } catch (NumberFormatException e) {
+                return false;
+            }
+        }
+        if (!filter.getGenre().isBlank())
+            return getGenre().equals(filter.getGenre());
         return true;
     }
 
     @NonNull
     @Override
     public ITitle clone() {
-        ITitle result = new Title(mPlaylistId, mIndex, mLabel, mCatalog, mComposer, mAlbum, mTitle, mArtist, mDiscNumber, mTrack, mPlaybackTime, mDuration.toString(), mPosition.toString(), mArtworkUrl, mSampleRate);
+        ITitle result = new Title(mPlaylistId, mIndex, mLabel, mCatalog, mComposer, mAlbum, mTitle, mArtist, mSampleRate, mGenre, mDiscNumber, mTrack, mPlaybackTime, mDuration.toString(), mPosition.toString(), mArtworkUrl);
         result.setArtwork(mArtwork);
         result.setIsCurrentTitle(mIsCurrent);
         return result;

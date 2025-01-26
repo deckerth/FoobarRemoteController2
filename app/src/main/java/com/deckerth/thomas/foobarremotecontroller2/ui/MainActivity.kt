@@ -268,7 +268,7 @@ class MainActivity : ComponentActivity() {
                                     }
                                     if (appViewModel.playlistsViewModel.filterValue.isActive)
                                         IconButton(onClick = {
-                                            appViewModel.playlistsViewModel.showFilter  = false
+                                            appViewModel.playlistsViewModel.showFilter = false
                                             appViewModel.playlistsViewModel.filterValue.clear()
                                         }) {
                                             Icon(
@@ -354,7 +354,9 @@ class MainActivity : ComponentActivity() {
                                     val infoButtonClicked = remember { mutableStateOf(false) }
                                     IconButton(
                                         onClick = { infoButtonClicked.value = true },
-                                        enabled = appViewModel.player != null && appViewModel.player!!.playbackState != PlaybackState.STOPPED
+                                        enabled = appViewModel.player != null &&
+                                                appViewModel.player!!.playbackState != PlaybackState.STOPPED &&
+                                                !appViewModel.loadingList
                                     ) {
                                         Icon(
                                             painter = painterResource(R.drawable.info_i),

@@ -142,4 +142,14 @@
     <string name="all_genres">Beliebig</string>
     <string name="filter_genre">Genre:</string>
     <string name="filter_high_res">High Resolution</string>
+    <string name="create_playlist">Neue Playlist</string>
+    <string name="cancel">Abbrechen</string>
+    <string name="button_create_playlist">Neue Playlist</string>
+    <string name="invalid_playlist_name">Es existiert bereits eine Playlist mit diesem Namen.</string>
+    <string name="playlist_name">Name der Playlist</string>
+    <string name="playlist_name_placeholder">Name</string>
+    <string name="connection_successful">Verbindung hergestellt</string>
+    <string name="connection_failed">Es konnte keine Verbindung hergestellt werden</string>
+    <string name="playlist_added">Playlist hinzugefügt</string>
+    <string name="playlist_adding_failed">Die Playlist konnte nicht erzeugt werden</string>
 </resources>

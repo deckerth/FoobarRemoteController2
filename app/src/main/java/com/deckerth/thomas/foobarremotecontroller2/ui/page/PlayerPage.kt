@@ -147,11 +147,12 @@ fun PlayerButtons(
     player: Player,
     onPreviousTrack: () -> Unit = { vm.playerAccess.previousTrack() },
     onNextTrack: () -> Unit = { vm.playerAccess.nextTrack() },
-    previewMode: Boolean = false
+    previewMode: Boolean = false,
+    modifier: Modifier = Modifier
 ) {
     Spacer(modifier = Modifier.height(10.dp))
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center
     ) {
@@ -352,9 +353,9 @@ fun PlayerCard(
                 }
             }
             if (onPreviousTrack != null && onNextTrack != null)
-                PlayerButtons(vm, player, onPreviousTrack, onNextTrack, previewMode)
+                PlayerButtons(vm, player, onPreviousTrack, onNextTrack, previewMode, modifier = Modifier.padding(bottom = 24.dp))
             else
-                PlayerButtons(vm, player)
+                PlayerButtons(vm, player, modifier = Modifier.padding(bottom = 24.dp))
         }
     }
 }

@@ -1,15 +1,18 @@
 package com.deckerth.thomas.foobarremotecontroller2.viewmodel
 
 
+import android.widget.Toast
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import com.deckerth.thomas.foobarremotecontroller2.R
 import com.deckerth.thomas.foobarremotecontroller2.connector.PlayerObserver
 import com.deckerth.thomas.foobarremotecontroller2.model.Playlist
 import com.deckerth.thomas.foobarremotecontroller2.model.PlaylistEntity
 import com.deckerth.thomas.foobarremotecontroller2.model.PlaylistLifecycleState
 import com.deckerth.thomas.foobarremotecontroller2.model.Playlists
+import com.deckerth.thomas.foobarremotecontroller2.ui.mainActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -22,27 +25,27 @@ class TitleFilter {
         isActive = pattern.isNotBlank() || genre.isNotBlank() || highRes
     }
 
-    private var _pattern : String = ""
-    var pattern : String
+    private var _pattern: String = ""
+    var pattern: String
         get() = _pattern
         set(value) {
             _pattern = value
             setIsActive()
         }
 
-    private var _genre : String = ""
-    var genre : String
+    private var _genre: String = ""
+    var genre: String
         get() = _genre
         set(value) {
             _genre = value
             setIsActive()
         }
 
-    private var _highRes : Boolean = false
-    var highRes : Boolean
+    private var _highRes: Boolean = false
+    var highRes: Boolean
         get() = _highRes
         set(value) {
-            _highRes= value
+            _highRes = value
             setIsActive()
         }
 
@@ -55,6 +58,7 @@ class TitleFilter {
 }
 
 class PlaylistsViewModel(private val vm: AppViewModel) : ViewModel() {
+
     private val playlistRegistry = mutableListOf<Playlist>()
 
     var showFilter by mutableStateOf(false)
@@ -62,12 +66,12 @@ class PlaylistsViewModel(private val vm: AppViewModel) : ViewModel() {
 
     private val playerObserver = PlayerObserver(vm, vm.playlistAccess, this)
 
-/**
- *   @return all known playlists that are not invalid
- *   @see Playlists
- *   @see PlaylistLifecycleState
- */
-val playlists: Playlists
+    /**
+     *   @return all known playlists that are not invalid
+     *   @see Playlists
+     *   @see PlaylistLifecycleState
+     */
+    val playlists: Playlists
         get() {
             val playlists = Playlists()
             for (list in playlistRegistry)
@@ -276,5 +280,36 @@ val playlists: Playlists
             vm.selectedPlaylistName = vm.displayedPlaylist!!.playlistEntity.name
             updatePlaylists()
         }
+    }
+
+    fun playlistExists(name: String): Boolean {
+        return playlistRegistry.any { it.playlistEntity.name == name && it.lifecycleState != PlaylistLifecycleState.Invalid }
+    }
+
+    fun addPlaylist(name: String) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                vm.playlistAccess.addPlaylist(noOfValidPlaylists(), name)
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(
+                        mainActivity,
+                        mainActivity.getString(R.string.playlist_added),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(
+                        mainActivity,
+                        mainActivity.getString(R.string.playlist_adding_failed),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        }
+    }
+
+    private fun noOfValidPlaylists(): Int {
+        return playlistRegistry.count { it.lifecycleState == PlaylistLifecycleState.Valid || it.lifecycleState == PlaylistLifecycleState.RequiresUpdate }
     }
 }

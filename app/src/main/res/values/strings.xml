@@ -141,4 +141,14 @@
     <string name="all_genres">All genres</string>
     <string name="filter_genre">Genre:</string>
     <string name="filter_high_res">High Resolution</string>
+    <string name="create_playlist">New playlist</string>
+    <string name="cancel">Cancel</string>
+    <string name="button_create_playlist">Create playlist</string>
+    <string name="invalid_playlist_name">A playlist with this name already exists.</string>
+    <string name="playlist_name">Playlist name</string>
+    <string name="playlist_name_placeholder">Name</string>
+    <string name="connection_successful">Connection successful</string>
+    <string name="connection_failed">Connection failed</string>
+    <string name="playlist_added">Playlist added</string>
+    <string name="playlist_adding_failed">The playlist could not be created</string>
 </resources>

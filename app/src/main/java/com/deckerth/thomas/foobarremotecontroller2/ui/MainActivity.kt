@@ -347,6 +347,20 @@ class MainActivity : ComponentActivity() {
                                                 )
                                             }
                                         )
+                                        DropdownMenuItem(
+                                            text = { Text(stringResource(R.string.create_playlist)) },
+                                            onClick = {
+                                                dropdownMenuExpanded =
+                                                    false; appViewModel.createPlaylistRequest =
+                                                true
+                                            },
+                                            leadingIcon = {
+                                                Icon(
+                                                    painter = painterResource(R.drawable.format_list_bulleted_add),
+                                                    contentDescription = "New playlist"
+                                                )
+                                            }
+                                        )
                                     }
                                 }
 
@@ -540,6 +554,14 @@ class MainActivity : ComponentActivity() {
                                                 contentDescription = "Filter"
                                             )
                                         }
+                                    IconButton(onClick = {
+                                        appViewModel.createPlaylistRequest = true
+                                    }) {
+                                        Icon(
+                                            painter = painterResource(R.drawable.format_list_bulleted_add),
+                                            contentDescription = "Add playlist"
+                                        )
+                                    }
                                 }
                             }
                         },

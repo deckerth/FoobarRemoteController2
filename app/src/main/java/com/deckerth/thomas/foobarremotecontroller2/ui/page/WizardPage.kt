@@ -234,7 +234,7 @@ fun SearchDevices(
     onFinished: (device: Device) -> Unit
 ) {
     // State to hold whether the search has already been done
-    var hasSearched by rememberSaveable { mutableStateOf(false) }
+    val hasSearched by rememberSaveable { mutableStateOf(false) }
 
     // LaunchedEffect triggers when the key changes (here, `true`)
     LaunchedEffect(Unit) {
@@ -495,13 +495,13 @@ fun CustomDevicePage(
                             if (success) {
                                 Toast.makeText(
                                     mainActivity,
-                                    "Connection successful",
+                                    mainActivity.getString(R.string.connection_successful),
                                     Toast.LENGTH_SHORT
                                 ).show()
                             } else {
                                 Toast.makeText(
                                     mainActivity,
-                                    "Connection failed",
+                                    mainActivity.getString(R.string.connection_failed),
                                     Toast.LENGTH_SHORT
                                 ).show()
                             }

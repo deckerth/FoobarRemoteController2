@@ -1,5 +1,7 @@
 package com.deckerth.thomas.foobarremotecontroller2.connector;
 
+import android.os.Build;
+
 import com.deckerth.thomas.foobarremotecontroller2.model.AddTracksBehaviors;
 import com.deckerth.thomas.foobarremotecontroller2.model.Playlist;
 import com.deckerth.thomas.foobarremotecontroller2.model.PlaylistEntity;
@@ -7,10 +9,14 @@ import com.deckerth.thomas.foobarremotecontroller2.model.Playlists;
 import com.deckerth.thomas.foobarremotecontroller2.model.Title;
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel;
 
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 public class PlaylistAccess {
@@ -204,5 +210,18 @@ public class PlaylistAccess {
         }
         jsonString.append(" ] }");
         vm.connector.postData("playlists/" + playlistId + "/items/remove", jsonString.toString());
+    }
+
+    public void addPlaylist(int position, @NotNull String name) {
+        // http://localhost:8880/api/playlists/add?index=11&title=test
+        String encodedName = name;
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+                encodedName = URLEncoder.encode(name, StandardCharsets.UTF_8);
+            else
+                encodedName = URLEncoder.encode(name, "UTF-8");
+        } catch (UnsupportedEncodingException ignored) {
+        }
+        vm.connector.postData("playlists/add?index=" + position + "&title=" + encodedName);
     }
 }

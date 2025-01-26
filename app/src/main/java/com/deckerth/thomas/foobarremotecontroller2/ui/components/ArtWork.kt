@@ -40,7 +40,7 @@ fun ArtWork(player: Player, previewMode: Boolean = false, modifier: Modifier = M
                 imageUrl = player.artworkUrl,
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(top = 16.dp)
+                    .padding(top = 16.dp, start = 16.dp, end = 16.dp)
             )
     } else {
         Box(

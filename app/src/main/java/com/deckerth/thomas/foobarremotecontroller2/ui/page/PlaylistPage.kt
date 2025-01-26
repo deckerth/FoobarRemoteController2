@@ -61,6 +61,7 @@ import com.deckerth.thomas.foobarremotecontroller2.model.SelectableTitle
 import com.deckerth.thomas.foobarremotecontroller2.model.Title
 import com.deckerth.thomas.foobarremotecontroller2.ui.components.ImageWithLoadingPlaceholder
 import com.deckerth.thomas.foobarremotecontroller2.ui.components.LayoutComponent
+import com.deckerth.thomas.foobarremotecontroller2.ui.components.PlaylistNameDialog
 import com.deckerth.thomas.foobarremotecontroller2.ui.components.TitleDetails
 import com.deckerth.thomas.foobarremotecontroller2.ui.components.TitleSearchBarDialog
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.Layout
@@ -123,13 +124,19 @@ fun PlaylistPage(vm: AppViewModel) {
                 vm.playlistsViewModel.filterValue.clear()
             }
         )
+
+    if (vm.createPlaylistRequest)
+        PlaylistNameDialog(
+            vm = vm,
+            onConfirm = { vm.playlistsViewModel.addPlaylist(it) }
+        )
+
     if (vm.loadingList || vm.displayedPlaylist == null)
         LinearProgressIndicator(
             modifier = Modifier
                 .fillMaxWidth()
         )
 }
-
 
 @Composable
 fun AlbumCard(vm: AppViewModel, album: Album, layout: Layout?, previewMode: Boolean = false) {

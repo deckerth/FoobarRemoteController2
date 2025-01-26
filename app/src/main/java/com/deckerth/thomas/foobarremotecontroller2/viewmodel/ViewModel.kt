@@ -56,6 +56,7 @@ class AppViewModel : ViewModel() {
     var showTopAppBar by mutableStateOf(true)
     var noOfTitlesToRemove by mutableIntStateOf(0)
     var titleToRemoveWasSelected by mutableStateOf(false)
+    var createPlaylistRequest by mutableStateOf(false)
 
     fun initialize() {
         connector = HTTPConnector(this)

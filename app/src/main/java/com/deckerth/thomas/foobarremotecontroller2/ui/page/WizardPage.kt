@@ -234,7 +234,7 @@ fun SearchDevices(
     onFinished: (device: Device) -> Unit
 ) {
     // State to hold whether the search has already been done
-    val hasSearched by rememberSaveable { mutableStateOf(false) }
+    var hasSearched by rememberSaveable { mutableStateOf(false) }
 
     // LaunchedEffect triggers when the key changes (here, `true`)
     LaunchedEffect(Unit) {
@@ -246,6 +246,7 @@ fun SearchDevices(
     LaunchedEffect(loading) {
         if (!loading) {
             onFinishedLoading()
+            hasSearched = true  // Maybe this line solves the bug? Otherwise, this variable is useless
         }
     }
     if (devices.isEmpty() && !loading)

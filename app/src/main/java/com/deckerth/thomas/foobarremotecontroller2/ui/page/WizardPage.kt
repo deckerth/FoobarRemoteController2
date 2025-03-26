@@ -454,7 +454,7 @@ fun CustomDevicePage(
                 value = ip,
                 maxLines = 1,
                 onValueChange = { value ->
-                    ip = value
+                    ip = value.replace(Regex("[\r\n]+"), "")
                 },
                 modifier = Modifier.fillMaxWidth(),
                 label = { Text(stringResource(id = R.string.field_ip_address)) }
@@ -465,7 +465,7 @@ fun CustomDevicePage(
                 value = port,
                 maxLines = 1,
                 onValueChange = { value ->
-                    port = value
+                    port = value.replace(Regex("[\r\n]+"), "")
                 },
                 modifier = Modifier.fillMaxWidth(),
                 label = { Text(stringResource(id = R.string.field_port)) }

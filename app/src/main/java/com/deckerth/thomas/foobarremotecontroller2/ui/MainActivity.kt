@@ -7,6 +7,7 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
 import android.os.Process
+import android.view.WindowManager
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
@@ -74,11 +75,10 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.deckerth.thomas.foobarremotecontroller2.FoobarMediaService
 import com.deckerth.thomas.foobarremotecontroller2.R
+import com.deckerth.thomas.foobarremotecontroller2.getAlwaysOnDisplay
 import com.deckerth.thomas.foobarremotecontroller2.getIpAddressBlocking
-import com.deckerth.thomas.foobarremotecontroller2.model.PlaybackState
 import com.deckerth.thomas.foobarremotecontroller2.model.checkIpAddressSyntax
 import com.deckerth.thomas.foobarremotecontroller2.ui.components.RemoveTitlesAppBar
-import com.deckerth.thomas.foobarremotecontroller2.ui.components.TitleDetails
 import com.deckerth.thomas.foobarremotecontroller2.ui.page.BrowserMainPage
 import com.deckerth.thomas.foobarremotecontroller2.ui.page.LayoutEditorMainPage
 import com.deckerth.thomas.foobarremotecontroller2.ui.page.LayoutSelection
@@ -144,7 +144,13 @@ class MainActivity : ComponentActivity() {
             BackPressHandler()
             if (appViewModel.ipAddress == "<invalid>")
                 BlackPage()
-            else
+            else {
+                if (getAlwaysOnDisplay())
+                // Acquire the wake lock
+                    keepScreenOn()
+                else
+                    disableScreenOn()
+
                 Foobar2000RemoteControllerTheme {
                     if (!checkIpAddressSyntax(appViewModel.ipAddress!!)) {
                         WelcomePage(appViewModel)
@@ -155,7 +161,22 @@ class MainActivity : ComponentActivity() {
                     }
 
                 }
+            }
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        // Release the wake lock
+        disableScreenOn()
+    }
+
+    fun keepScreenOn() {
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+    }
+
+    fun disableScreenOn() {
+        window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
     }
 
     fun restartService() {
@@ -364,24 +385,7 @@ class MainActivity : ComponentActivity() {
                                     }
                                 }
 
-                                "Now Playing" -> Row {
-                                    val infoButtonClicked = remember { mutableStateOf(false) }
-                                    IconButton(
-                                        onClick = { infoButtonClicked.value = true },
-                                        enabled = appViewModel.player != null &&
-                                                appViewModel.player!!.playbackState != PlaybackState.STOPPED &&
-                                                !appViewModel.loadingList
-                                    ) {
-                                        Icon(
-                                            painter = painterResource(R.drawable.info_i),
-                                            contentDescription = "Refresh"
-                                        )
-                                    }
-                                    if (appViewModel.player != null && infoButtonClicked.value)
-                                        TitleDetails(
-                                            vm = appViewModel,
-                                            onDismiss = { infoButtonClicked.value = false })
-                                }
+                                "Now Playing" -> {}
                             }
                         },
                         colors = TopAppBarDefaults.topAppBarColors(
@@ -579,23 +583,8 @@ class MainActivity : ComponentActivity() {
                                 }
                         },
                         actions = {
-                            var infoButtonClicked by remember { mutableStateOf(false) }
                             when (getCurrentRoute(navController)) {
                                 "Now Playing And Playlist" -> Row {
-                                    IconButton(
-                                        onClick = { infoButtonClicked = true },
-                                        enabled = appViewModel.player != null && appViewModel.player!!.playbackState != PlaybackState.STOPPED
-                                    ) {
-                                        Icon(
-                                            painter = painterResource(R.drawable.info_i),
-                                            contentDescription = stringResource(R.string.button_details),
-                                        )
-                                    }
-                                    if (infoButtonClicked)
-                                        TitleDetails(
-                                            vm = appViewModel,
-                                            onDismiss = { infoButtonClicked = false },
-                                        )
                                     IconButton(onClick = {
                                         appViewModel.playlistsViewModel.updateList()
                                     }) {

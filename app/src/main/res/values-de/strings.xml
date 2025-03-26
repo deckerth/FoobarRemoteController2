@@ -152,4 +152,5 @@
     <string name="connection_failed">Es konnte keine Verbindung hergestellt werden</string>
     <string name="playlist_added">Playlist hinzugefügt</string>
     <string name="playlist_adding_failed">Die Playlist konnte nicht erzeugt werden</string>
+    <string name="settings_always_on_display">Display aktiv lassen</string>
 </resources>

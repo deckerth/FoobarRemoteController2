@@ -45,12 +45,14 @@ import androidx.compose.ui.unit.sp
 import com.deckerth.thomas.foobarremotecontroller2.R
 import com.deckerth.thomas.foobarremotecontroller2.enableVolumeControl
 import com.deckerth.thomas.foobarremotecontroller2.getAddTrackBehavior
+import com.deckerth.thomas.foobarremotecontroller2.getAlwaysOnDisplay
 import com.deckerth.thomas.foobarremotecontroller2.getFoobarVolumeControl
 import com.deckerth.thomas.foobarremotecontroller2.getIpAddress
 import com.deckerth.thomas.foobarremotecontroller2.getPauseDuringPhoneCalls
 import com.deckerth.thomas.foobarremotecontroller2.getViewMode
 import com.deckerth.thomas.foobarremotecontroller2.model.AddTracksBehaviors
 import com.deckerth.thomas.foobarremotecontroller2.saveAddTrackBehavior
+import com.deckerth.thomas.foobarremotecontroller2.saveAlwaysOnDisplay
 import com.deckerth.thomas.foobarremotecontroller2.saveFoobarVolumeControl
 import com.deckerth.thomas.foobarremotecontroller2.savePauseDuringPhoneCalls
 import com.deckerth.thomas.foobarremotecontroller2.saveViewMode
@@ -79,6 +81,24 @@ fun SettingsPage() {
                 })
 
             Title(stringResource(R.string.settings_appearance))
+
+            PreferenceItem(
+                stringResource(R.string.settings_always_on_display),
+                summary = "",
+                onClick = { enabled: Boolean ->
+                    val intendedSettingActive = !enabled
+                    saveAlwaysOnDisplay(intendedSettingActive, mainActivity)
+                    if (intendedSettingActive)
+                        mainActivity.keepScreenOn()
+                    else
+                        mainActivity.disableScreenOn()
+
+                },
+                showToggle = true,
+                isChecked = getAlwaysOnDisplay(),
+                isEnabled = true
+            )
+
             var isOpen by remember { mutableStateOf(false) }
             val viewMode = getViewMode()
             PreferenceItem<Boolean>(stringResource(R.string.settings_view_mode),

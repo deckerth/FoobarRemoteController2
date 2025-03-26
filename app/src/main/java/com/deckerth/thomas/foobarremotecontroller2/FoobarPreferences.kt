@@ -29,6 +29,7 @@ private val CUSTOM_LAYOUT_KEY = stringPreferencesKey("custom_layout")
 private val FOOBAR_VOLUME_CONTROL_KEY = booleanPreferencesKey("foobar_volume_control")
 private val PAUSE_DURING_PHONE_CALLS_KEY = booleanPreferencesKey("pause_during_phone_calls")
 private val ADD_TRACK_BEHAVIOR_KEY = intPreferencesKey("add_track_behavior")
+private val ALWAYS_ON_DISPLAY_KEY = booleanPreferencesKey("always_on_display")
 
 private fun <T> getFlow(context: Context, key: Preferences.Key<T>): Flow<T?> {
     return context.dataStore.data.map { preferences ->
@@ -127,6 +128,17 @@ fun savePauseDuringPhoneCalls(enabled: Boolean, context: Context) {
     runBlocking {
         saveValue(context, enabled, PAUSE_DURING_PHONE_CALLS_KEY)
     }
+}
+
+fun saveAlwaysOnDisplay(enabled: Boolean, context: Context) {
+    runBlocking {
+        saveValue(context, enabled, ALWAYS_ON_DISPLAY_KEY)
+    }
+}
+
+@Composable
+fun getAlwaysOnDisplay(): Boolean {
+    return getValue(mainActivity, ALWAYS_ON_DISPLAY_KEY, false)
 }
 
 @Composable

@@ -52,6 +52,7 @@ import com.deckerth.thomas.foobarremotecontroller2.model.Player
 import com.deckerth.thomas.foobarremotecontroller2.model.PlaylistLifecycleState
 import com.deckerth.thomas.foobarremotecontroller2.ui.components.ArtWork
 import com.deckerth.thomas.foobarremotecontroller2.ui.components.LayoutComponent
+import com.deckerth.thomas.foobarremotecontroller2.ui.components.TitleDetails
 import com.deckerth.thomas.foobarremotecontroller2.ui.isTablet
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.LayoutItems
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.layoutManager
@@ -343,19 +344,44 @@ fun PlayerCard(
         }
 
         // This Column contains the text fields and other controls.
-        Column(modifier = Modifier.padding(16.dp)) {
-            if (player.playbackState != PlaybackState.STOPPED) {
-                val layout = layoutManager.getLayout()
+        Box {
+            Column(modifier = Modifier.padding(16.dp)) {
+                if (player.playbackState != PlaybackState.STOPPED) {
+                    val layout = layoutManager.getLayout()
 
-                for (item in layout.playerLayout.items) {
-                    if (item.item != LayoutItems.ARTWORK)
-                        LayoutComponent(vm, player, item)
+                    for (item in layout.playerLayout.items) {
+                        if (item.item != LayoutItems.ARTWORK)
+                            LayoutComponent(vm, player, item)
+                    }
                 }
+                if (onPreviousTrack != null && onNextTrack != null)
+                    PlayerButtons(
+                        vm,
+                        player,
+                        onPreviousTrack,
+                        onNextTrack,
+                        previewMode,
+                        modifier = Modifier.padding(bottom = 24.dp)
+                    )
+                else
+                    PlayerButtons(vm, player, modifier = Modifier.padding(bottom = 24.dp))
             }
-            if (onPreviousTrack != null && onNextTrack != null)
-                PlayerButtons(vm, player, onPreviousTrack, onNextTrack, previewMode, modifier = Modifier.padding(bottom = 24.dp))
-            else
-                PlayerButtons(vm, player, modifier = Modifier.padding(bottom = 24.dp))
+            var infoButtonClicked by remember { mutableStateOf(false) }
+            IconButton(
+                modifier = Modifier.align(Alignment.TopEnd),
+                onClick = { infoButtonClicked = true }
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.info_i),
+                    contentDescription = stringResource(R.string.button_details),
+                    modifier = Modifier.size(16.dp)
+                )
+            }
+            if (infoButtonClicked)
+                TitleDetails(
+                    vm = vm,
+                    onDismiss = { infoButtonClicked = false },
+                )
         }
     }
 }

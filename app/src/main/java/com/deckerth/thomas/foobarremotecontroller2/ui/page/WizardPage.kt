@@ -246,7 +246,7 @@ fun SearchDevices(
     LaunchedEffect(loading) {
         if (!loading) {
             onFinishedLoading()
-            hasSearched = true  // Maybe this line solves the bug? Otherwise, this variable is useless
+            hasSearched = true
         }
     }
     if (devices.isEmpty() && !loading)

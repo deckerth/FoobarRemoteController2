@@ -377,7 +377,7 @@ fun PlayerCard(
                     modifier = Modifier.size(16.dp)
                 )
             }
-            if (infoButtonClicked)
+            if (infoButtonClicked && !previewMode)
                 TitleDetails(
                     vm = vm,
                     onDismiss = { infoButtonClicked = false },

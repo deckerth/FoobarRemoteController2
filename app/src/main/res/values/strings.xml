@@ -151,5 +151,5 @@
     <string name="connection_failed">Connection failed</string>
     <string name="playlist_added">Playlist added</string>
     <string name="playlist_adding_failed">The playlist could not be created</string>
-    <string name="settings_always_on_display">K</string>
+    <string name="settings_always_on_display">Keep display active</string>
 </resources>

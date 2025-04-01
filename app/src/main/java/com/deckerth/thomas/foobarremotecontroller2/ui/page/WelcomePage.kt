@@ -2,6 +2,8 @@
 
 package com.deckerth.thomas.foobarremotecontroller2.ui.page
 
+import android.os.Process
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -22,6 +24,7 @@ import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
 @Composable
 fun WelcomePage(vm : AppViewModel? = null) {
 
+    WelcomePageBackPressHandler()
     Scaffold(
         topBar = {
             TopAppBar(
@@ -42,7 +45,13 @@ fun WelcomePage(vm : AppViewModel? = null) {
                 mainActivity.recreate()
             })
     }
+}
 
+@Composable
+fun WelcomePageBackPressHandler() {
+    BackHandler {
+            Process.killProcess(Process.myPid())
+    }
 }
 
 @Preview(

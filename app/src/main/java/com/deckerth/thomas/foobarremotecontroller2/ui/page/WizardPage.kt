@@ -1,6 +1,7 @@
 package com.deckerth.thomas.foobarremotecontroller2.ui.page
 
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
@@ -92,6 +93,7 @@ fun WizardPage(
     onFinished: () -> Unit = {}
 ) {
     state.navController = rememberNavController()
+    WizardPageBackPressHandler()
     NavHost(
         navController = state.navController!!,
         startDestination = if (showIntroduction) "Introduction" else "Search Device",
@@ -102,6 +104,8 @@ fun WizardPage(
         popExitTransition = { slideOutHorizontally(targetOffsetX = { 1000 }) + fadeOut() },
     ) {
         composable("Introduction") {
+            if (state.navController != null)
+                println("FOOB navstack: ${state.navController!!.graph.nodes.size()}")
             mainActivity.appBarLabel = stringResource(R.string.welcome_heading)
             Box(
                 modifier = Modifier.fillMaxSize()
@@ -133,6 +137,8 @@ fun WizardPage(
 
         }
         composable("Search Device") {
+            if (state.navController != null)
+                println("FOOB navstack: ${state.navController!!.graph.nodes.size()}")
             mainActivity.appBarLabel = stringResource(R.string.search_device_heading)
             Box(
                 modifier = Modifier.fillMaxSize()
@@ -160,6 +166,7 @@ fun WizardPage(
                         FilledTonalButton(
                             onClick = {
                                 prepareDeviceSelectionPage()
+                                hasSearched = false
                                 state.navController!!.navigate("Search Device")
                             }
                         ) {
@@ -179,6 +186,8 @@ fun WizardPage(
             }
         }
         composable("No Device Found") {
+            if (state.navController != null)
+                println("FOOB navstack: ${state.navController!!.graph.nodes.size()}")
             mainActivity.appBarLabel = stringResource(R.string.device_not_found_heading)
             Box(
                 modifier = Modifier.fillMaxSize()
@@ -212,6 +221,8 @@ fun WizardPage(
             }
         }
         composable("Manual Device") {
+            if (state.navController != null)
+                println("FOOB navstack: ${state.navController!!.graph.nodes.size()}")
             mainActivity.appBarLabel = stringResource(R.string.manual_device_heading)
             CustomDevicePage(onFinished = { device: Device ->
                 if (device.isValid) {
@@ -225,6 +236,13 @@ fun WizardPage(
     }
 
 
+}
+
+@Composable
+fun WizardPageBackPressHandler() {
+    BackHandler {
+        state.navController?.popBackStack()
+    }
 }
 
 @Composable
@@ -247,21 +265,20 @@ fun SearchDevices(
         if (!loading) {
             onFinishedLoading()
             hasSearched = true
+            if (devices.isEmpty())
+                state.navController!!.navigate("No Device Found")
         }
     }
-    if (devices.isEmpty() && !loading)
-        state.navController!!.navigate("No Device Found")
-    else
-        Column(modifier) {
-            if (loading) {
-                LinearProgressIndicator(
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-            DeviceList(devices = devices) {
-                onFinished(it)
-            }
+    Column(modifier) {
+        if (loading) {
+            LinearProgressIndicator(
+                modifier = Modifier.fillMaxWidth()
+            )
         }
+        DeviceList(devices = devices) {
+            onFinished(it)
+        }
+    }
 }
 
 fun prepareDeviceSelectionPage() {

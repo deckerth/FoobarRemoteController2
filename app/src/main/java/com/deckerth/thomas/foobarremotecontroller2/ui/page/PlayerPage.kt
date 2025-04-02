@@ -33,6 +33,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -57,6 +58,8 @@ import com.deckerth.thomas.foobarremotecontroller2.ui.layout.layoutManager
 import com.deckerth.thomas.foobarremotecontroller2.ui.mainActivity
 import com.deckerth.thomas.foobarremotecontroller2.ui.theme.Foobar2000RemoteControllerTheme
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -66,11 +69,20 @@ fun PlayingPage(vm: AppViewModel) {
     var isRefreshing by remember { mutableStateOf(false) }
     var maxBoxHeight by remember { mutableStateOf(0.dp) }
     var maxBoxWidth by remember { mutableStateOf(0.dp) }
+    val coroutineScope = rememberCoroutineScope()
     layoutManager.InitLayoutManager()
     PullToRefreshBox(
         state = pullToRefreshState,
         isRefreshing = isRefreshing,
-        onRefresh = { isRefreshing = true; onRefresh(vm); isRefreshing = false },
+        onRefresh =
+            {
+                isRefreshing = true
+                coroutineScope.launch  {
+                    onRefresh(vm)
+                    delay(1000)
+                    isRefreshing = false
+                }
+            },
         modifier = Modifier
             .fillMaxSize()
     ) {

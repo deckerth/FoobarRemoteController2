@@ -20,7 +20,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -76,7 +75,6 @@ fun PlayerProgress(vm: AppViewModel, player: Player) {
             onValueChangeFinished = { player.setPos(vm, sliderValue) },
             interactionSource = interactionSource,
             modifier = Modifier
-                .clip(MaterialTheme.shapes.large)
                 .fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(2.dp))

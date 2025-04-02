@@ -1,17 +1,18 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    alias(libs.plugins.compose.compiler)
     id("org.jetbrains.kotlin.plugin.serialization") version "2.1.0-RC"
 }
 
 android {
     namespace = "com.deckerth.thomas.foobarremotecontroller2"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.deckerth.thomas.foobarremotecontroller2"
         minSdk = 31
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 17
         versionName = "2.06"
 
@@ -31,17 +32,17 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "17"
     }
     buildFeatures {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
+        kotlinCompilerExtensionVersion = "1.5.11"
     }
     packaging {
         resources {
@@ -68,7 +69,6 @@ dependencies {
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.androidx.foundation.layout.android)
     implementation(libs.reorderable)
-    implementation(libs.androidx.foundation.layout.android)
     implementation(libs.jetbrains.kotlinx.serialization.json.jvm)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

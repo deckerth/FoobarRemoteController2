@@ -27,10 +27,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,7 +37,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -65,71 +63,66 @@ import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
 fun PlayingPage(vm: AppViewModel) {
     val pullToRefreshState = rememberPullToRefreshState()
     var showLoading = vm.loadingList
+    var isRefreshing by remember { mutableStateOf(false) }
     var maxBoxHeight by remember { mutableStateOf(0.dp) }
     var maxBoxWidth by remember { mutableStateOf(0.dp) }
     layoutManager.InitLayoutManager()
-    BoxWithConstraints(
+    PullToRefreshBox(
+        state = pullToRefreshState,
+        isRefreshing = isRefreshing,
+        onRefresh = { isRefreshing = true; onRefresh(vm); isRefreshing = false },
         modifier = Modifier
-            .nestedScroll(pullToRefreshState.nestedScrollConnection)
             .fillMaxSize()
-    )
-    {
-        maxBoxHeight = maxHeight
-        maxBoxWidth = maxWidth
-        Box(
+    ) {
+        BoxWithConstraints(
             modifier = Modifier
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState(), enabled = true)
-        ) {
-            if (vm.player == null) {
-                showLoading = !vm.isSick
-                Column(
-                    modifier = Modifier
-                        .align(Alignment.Center)
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.signal_disconnected),
-                        contentDescription = stringResource(R.string.desc_album_picture),
-                        modifier = Modifier
-                            .align(Alignment.CenterHorizontally)
-                            .size(180.dp)
-                            .clip(MaterialTheme.shapes.medium)
-                    )
-                    Text(
-                        modifier = Modifier.fillMaxWidth(),
-                        maxLines = 1,
-                        textAlign = TextAlign.Center,
-                        text = stringResource(R.string.info_no_connection),
-                        style = MaterialTheme.typography.bodyLarge
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    OutlinedButton(
-                        modifier = Modifier
-                            .align(Alignment.CenterHorizontally),
-                        onClick = { onRefresh(vm) }
-                    ) {
-                        Text(text = "Refresh")
-                    }
-                }
-            } else
-                PlayerCard(
-                    vm,
-                    player = vm.player!!,
-                    boxSize = IntSize(maxBoxWidth.value.toInt(), maxBoxHeight.value.toInt())
-                )
-
-            if (pullToRefreshState.isRefreshing) {
-                LaunchedEffect(true) {
-                    onRefresh(vm)
-                    pullToRefreshState.endRefresh()
-                }
-            }
-            PullToRefreshContainer(
-                state = pullToRefreshState,
+        )
+        {
+            maxBoxHeight = maxHeight
+            maxBoxWidth = maxWidth
+            Box(
                 modifier = Modifier
-                    .align(Alignment.TopCenter),
-
-                )
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState(), enabled = true)
+            ) {
+                if (vm.player == null) {
+                    showLoading = !vm.isSick
+                    Column(
+                        modifier = Modifier
+                            .align(Alignment.Center)
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.signal_disconnected),
+                            contentDescription = stringResource(R.string.desc_album_picture),
+                            modifier = Modifier
+                                .align(Alignment.CenterHorizontally)
+                                .size(180.dp)
+                                .clip(MaterialTheme.shapes.medium)
+                        )
+                        Text(
+                            modifier = Modifier.fillMaxWidth(),
+                            maxLines = 1,
+                            textAlign = TextAlign.Center,
+                            text = stringResource(R.string.info_no_connection),
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        OutlinedButton(
+                            modifier = Modifier
+                                .align(Alignment.CenterHorizontally),
+                            onClick = { onRefresh(vm) }
+                        ) {
+                            Text(text = "Refresh")
+                        }
+                    }
+                } else
+                    PlayerCard(
+                        vm,
+                        player = vm.player!!,
+                        boxSize = IntSize(maxBoxWidth.value.toInt(), maxBoxHeight.value.toInt())
+                    )
+            }
         }
     }
     if (showLoading)

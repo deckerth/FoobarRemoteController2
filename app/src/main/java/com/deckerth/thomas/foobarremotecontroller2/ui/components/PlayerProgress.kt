@@ -1,5 +1,6 @@
 package com.deckerth.thomas.foobarremotecontroller2.ui.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.DragInteraction
 import androidx.compose.foundation.interaction.FocusInteraction
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -9,8 +10,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -19,6 +25,7 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -27,6 +34,7 @@ import com.deckerth.thomas.foobarremotecontroller2.R
 import com.deckerth.thomas.foobarremotecontroller2.model.Player
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlayerProgress(vm: AppViewModel, player: Player) {
     val interactionSource = remember { MutableInteractionSource() }
@@ -75,7 +83,40 @@ fun PlayerProgress(vm: AppViewModel, player: Player) {
             onValueChangeFinished = { player.setPos(vm, sliderValue) },
             interactionSource = interactionSource,
             modifier = Modifier
-                .fillMaxWidth()
+                .fillMaxWidth(),
+            track = { sliderState ->
+
+                // Calculate fraction of the slider that is active
+                val fraction =
+                    (sliderState.value - sliderState.valueRange.start) / (sliderState.valueRange.endInclusive - sliderState.valueRange.start)
+
+                Box(Modifier.fillMaxWidth()) {
+                    Box(
+                        Modifier
+                            .fillMaxWidth(fraction)
+                            .align(Alignment.CenterStart)
+                            .height(6.dp)
+                            .padding(end = 6.dp)
+                            .background(SliderDefaults.colors().activeTrackColor, CircleShape)
+                    )
+                    Box(
+                        Modifier
+                            .fillMaxWidth(1f - fraction)
+                            .align(Alignment.CenterEnd)
+                            .height(1.dp)
+                            .padding(start = 6.dp)
+                            .background(SliderDefaults.colors().inactiveTrackColor, CircleShape)
+                    )
+                }
+            },
+            thumb = {
+                Box(
+                    Modifier
+                        .width(4.dp)
+                        .height(16.dp)
+                        .background(SliderDefaults.colors().thumbColor)
+                )
+            }
         )
         Spacer(modifier = Modifier.height(2.dp))
 

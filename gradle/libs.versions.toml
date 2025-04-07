@@ -19,6 +19,9 @@ foundationLayoutAndroid = "1.6.8"
 reorderable = "0.9.6"
 kotlinxSerializationJsonJvmVersion = "1.6.0"
 media3CommonKtx = "1.5.1"
+materialColorUtilities = "1.1.1"
+paletteKtx = "1.0.0"
+materialKolor = "2.1.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version = "1.15.0" }
@@ -46,6 +49,9 @@ androidx-foundation-layout-android = { group = "androidx.compose.foundation", na
 reorderable = { group = "org.burnoutcrew.composereorderable", name = "reorderable", version.ref = "reorderable" }
 jetbrains-kotlinx-serialization-json-jvm = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json-jvm", version = "1.8.1" }
 androidx-media3-common-ktx = { group = "androidx.media3", name = "media3-common-ktx", version.ref = "media3CommonKtx" }
+material-color-utilities = { group = "com.google.android.material", name = "material-color-utilities", version.ref = "materialColorUtilities" }
+androidx-palette-ktx = { group = "androidx.palette", name = "palette-ktx", version.ref = "paletteKtx" }
+material-kolor = { group = "com.materialkolor", name = "material-kolor", version.ref = "materialKolor" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

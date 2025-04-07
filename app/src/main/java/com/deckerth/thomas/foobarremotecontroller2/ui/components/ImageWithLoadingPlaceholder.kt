@@ -1,5 +1,6 @@
 package com.deckerth.thomas.foobarremotecontroller2.ui.components
 
+import android.graphics.drawable.Drawable
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
@@ -14,6 +15,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -26,11 +28,11 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.res.stringResource
 import coil.compose.AsyncImage
 import com.deckerth.thomas.foobarremotecontroller2.R
+import com.deckerth.thomas.foobarremotecontroller2.ui.theme.updateColorScheme
 
 @Composable
-fun ImageWithLoadingPlaceholder(imageUrl: String, modifier: Modifier = Modifier) {
+fun ImageWithLoadingPlaceholder(imageUrl: String, modifier: Modifier = Modifier, updateColors: Boolean = false) {
     var isLoading by remember { mutableStateOf(true) }
-
     Box {
         AsyncImage(
             modifier = modifier,
@@ -38,7 +40,7 @@ fun ImageWithLoadingPlaceholder(imageUrl: String, modifier: Modifier = Modifier)
             contentDescription = stringResource(R.string.desc_album_picture),
             //contentScale = ContentScale.Fit,
             onLoading = { isLoading = true },
-            onSuccess = { isLoading = false },
+            onSuccess = { success -> if (updateColors) updateColorScheme(success.result.drawable);  isLoading = false },
             onError = { isLoading = false } // Handle error state as well
         )
 

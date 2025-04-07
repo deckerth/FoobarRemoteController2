@@ -70,6 +70,8 @@ dependencies {
     implementation(libs.androidx.foundation.layout.android)
     implementation(libs.reorderable)
     implementation(libs.jetbrains.kotlinx.serialization.json.jvm)
+    implementation(libs.androidx.palette.ktx)
+    implementation(libs.material.kolor)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

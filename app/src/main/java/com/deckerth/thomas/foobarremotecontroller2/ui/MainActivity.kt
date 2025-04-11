@@ -2,8 +2,10 @@
 
 package com.deckerth.thomas.foobarremotecontroller2.ui
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.content.res.Configuration
 import android.os.Bundle
 import android.os.Process
@@ -113,6 +115,7 @@ class MainActivity : ComponentActivity() {
     private lateinit var appLabel: String
     private lateinit var appViewModel: AppViewModel
 
+    @SuppressLint("SourceLockedOrientationActivity")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mainActivity = this
@@ -163,6 +166,9 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+        if (!this.isTablet())
+            // Enforce portrait orientation
+            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
     }
 
     override fun onDestroy() {
@@ -268,15 +274,28 @@ class MainActivity : ComponentActivity() {
                                     FilledIconToggleButton(
                                         checked = appViewModel.autoscroll,
                                         onCheckedChange = {
-                                            if (appViewModel.getCurrentAlbumIndex() != -1)
-                                                appViewModel.autoscroll = !appViewModel.autoscroll
-                                            if (appViewModel.autoscroll && appViewModel.getCurrentAlbumIndex() != -1)
+                                            appViewModel.autoscroll = !appViewModel.autoscroll
+
+                                            if (appViewModel.autoscroll)
                                                 CoroutineScope(Dispatchers.Main).launch {
-                                                    appViewModel.playlistState.scrollToItem(
+                                                    // Change the selected playlist if required
+                                                    if (appViewModel.player != null && appViewModel.displayedPlaylist != null &&
+                                                        appViewModel.player!!.playlistId != "" &&
+                                                        appViewModel.player!!.playlistId != appViewModel.displayedPlaylist?.playlistEntity!!.playlistId
+                                                    ) {
+                                                        appViewModel.playlistsViewModel.setSelectedPlaylist(
+                                                            appViewModel.player!!.playlistId
+                                                        )
+                                                    }
+
+                                                    val currentAlbumIndex =
                                                         appViewModel.getCurrentAlbumIndex()
-                                                    )
-                                                    appViewModel.autoScrollIndex =
-                                                        appViewModel.getCurrentAlbumIndex()
+                                                    if (currentAlbumIndex != -1) {
+                                                        appViewModel.autoScrollIndex =
+                                                            currentAlbumIndex
+                                                        appViewModel.enforceAutoscroll =
+                                                            true // first scrolls to index 0
+                                                    }
                                                 }
                                         })
                                     {
@@ -504,15 +523,28 @@ class MainActivity : ComponentActivity() {
                                         modifier = Modifier.padding(start = 10.dp),
                                         checked = appViewModel.autoscroll,
                                         onCheckedChange = {
-                                            if (appViewModel.getCurrentAlbumIndex() != -1)
-                                                appViewModel.autoscroll = !appViewModel.autoscroll
+                                            appViewModel.autoscroll = !appViewModel.autoscroll
+
                                             if (appViewModel.autoscroll)
                                                 CoroutineScope(Dispatchers.Main).launch {
-                                                    appViewModel.playlistState.scrollToItem(
+                                                    // Change the selected playlist if required
+                                                    if (appViewModel.player != null && appViewModel.displayedPlaylist != null &&
+                                                        appViewModel.player!!.playlistId != "" &&
+                                                        appViewModel.player!!.playlistId != appViewModel.displayedPlaylist?.playlistEntity!!.playlistId
+                                                    ) {
+                                                        appViewModel.playlistsViewModel.setSelectedPlaylist(
+                                                            appViewModel.player!!.playlistId
+                                                        )
+                                                    }
+
+                                                    val currentAlbumIndex =
                                                         appViewModel.getCurrentAlbumIndex()
-                                                    )
-                                                    appViewModel.autoScrollIndex =
-                                                        appViewModel.getCurrentAlbumIndex()
+                                                    if (currentAlbumIndex != -1) {
+                                                        appViewModel.autoScrollIndex =
+                                                            currentAlbumIndex
+                                                        appViewModel.enforceAutoscroll =
+                                                            true // first scrolls to index 0
+                                                    }
                                                 }
                                         })
                                     {

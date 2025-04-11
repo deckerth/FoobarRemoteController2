@@ -28,6 +28,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -465,12 +466,15 @@ fun Playlist(vm: AppViewModel, playlist: Playlist) {
             }
         }
     }
-//        if (!animating && !loadingList && playlistState.firstVisibleItemIndex != autoScrollIndex)
-//            autoscroll = false
-    LaunchedEffect(vm.autoScrollIndex) {
-        if (vm.autoscroll) {
+    LaunchedEffect(vm.autoScrollIndex, vm.enforceAutoscroll) {
+        if (vm.autoscroll && vm.autoScrollIndex != -1) {
             animating = true
-            playlistState.animateScrollToItem(vm.autoScrollIndex)
+            if (vm.enforceAutoscroll) {
+                vm.enforceAutoscroll = false
+                playlistState.scrollToItem(if (vm.autoScrollIndex > 0) vm.autoScrollIndex - 1 else 1 )
+            }
+
+            playlistState.scrollToItem(vm.autoScrollIndex)
             animating = false
         }
     }
@@ -496,7 +500,7 @@ fun PlaylistSwitcher(vm: AppViewModel, playlists: Playlists) {
         OutlinedTextField(
             modifier = Modifier
                 .fillMaxWidth()
-                .menuAnchor()
+                .menuAnchor(MenuAnchorType.PrimaryNotEditable, true)
                 .focusRequester(focusRequester)
                 .onFocusChanged {
                     if (it.isFocused) // clear focus immediately

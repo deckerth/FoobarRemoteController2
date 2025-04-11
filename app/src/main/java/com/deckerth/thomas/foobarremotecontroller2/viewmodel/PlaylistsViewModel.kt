@@ -238,10 +238,10 @@ class PlaylistsViewModel(private val vm: AppViewModel) : ViewModel() {
                     if (playlistPart != null && playlistPart.ipAddress == vm.ipAddress && currentPlaylist.titles.count() == startIndex) {
                         for (title in playlistPart.titles)
                             currentPlaylist.addTitle(title)
-                        if (playlist.playlistEntity.playlistId == vm.selectedPlaylist)
+                        if (currentPlaylist.playlistEntity.playlistId == vm.selectedPlaylist)
                             withContext(Dispatchers.Main) {
                                 vm.displayedPlaylist = currentPlaylist
-                            }//.clone()
+                            }
                         println("FOOB updatePlaylist: ${currentPlaylist.playlistEntity.playlistId}, titles: ${currentPlaylist.titles.count()}")
                     }
                     currentPlaylist = getPlaylistToBeUpdated()
@@ -276,8 +276,13 @@ class PlaylistsViewModel(private val vm: AppViewModel) : ViewModel() {
             if (id != vm.selectedPlaylist)
                 println("FOOB changing from playlist: $vm.selectedPlaylist to $id")
             vm.selectedPlaylist = id
-            vm.displayedPlaylist = getPlaylist(id) //.clone()
-            vm.selectedPlaylistName = vm.displayedPlaylist!!.playlistEntity.name
+            val playlist = getPlaylist(id)
+            vm.selectedPlaylistName = playlist.playlistEntity.name
+            if (playlist.lifecycleState != PlaylistLifecycleState.Valid || playlist.titles.count() < playlist.playlistEntity.noOfTracks)
+                vm.displayedPlaylist = null  // invalidate displayed playlist
+            else
+                vm.displayedPlaylist = playlist
+
             updatePlaylists()
         }
     }

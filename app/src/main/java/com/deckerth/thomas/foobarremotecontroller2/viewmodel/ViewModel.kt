@@ -2,7 +2,6 @@ package com.deckerth.thomas.foobarremotecontroller2.viewmodel
 
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.PlaybackStateCompat
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -43,11 +42,11 @@ class AppViewModel : ViewModel() {
     lateinit var foobVolumeControl: VolumeControl
 
     var autoscroll by mutableStateOf(true)
-    var autoscrollSave by mutableStateOf(true)
+    var enforceAutoscroll by mutableStateOf(false)
+    private var autoscrollSave by mutableStateOf(true)
     var autoScrollIndex by mutableIntStateOf(0)
     var displayedPlaylist by mutableStateOf<Playlist?>(null)
     var loadingList by mutableStateOf(false)
-    var playlistState by mutableStateOf(LazyListState())
     var selectedView by mutableStateOf(ViewsWithLayout.PLAYER)
     var selectedPlaylist by mutableStateOf("")
     var selectedPlaylistName by mutableStateOf("")

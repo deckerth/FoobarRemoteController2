@@ -3,6 +3,7 @@ package com.deckerth.thomas.foobarremotecontroller2.viewmodel
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -47,6 +48,7 @@ class AppViewModel : ViewModel() {
     var autoScrollIndex by mutableIntStateOf(0)
     var displayedPlaylist by mutableStateOf<Playlist?>(null)
     var loadingList by mutableStateOf(false)
+    var loadingListProgress by mutableFloatStateOf(0f)
     var selectedView by mutableStateOf(ViewsWithLayout.PLAYER)
     var selectedPlaylist by mutableStateOf("")
     var selectedPlaylistName by mutableStateOf("")

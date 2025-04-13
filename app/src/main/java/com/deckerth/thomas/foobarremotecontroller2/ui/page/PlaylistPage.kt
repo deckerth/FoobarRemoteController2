@@ -134,8 +134,11 @@ fun PlaylistPage(vm: AppViewModel) {
 
     if (vm.loadingList || vm.displayedPlaylist == null)
         LinearProgressIndicator(
+            progress = {
+                vm.loadingListProgress
+            },
             modifier = Modifier
-                .fillMaxWidth()
+                .fillMaxWidth(),
         )
 }
 

@@ -12,12 +12,10 @@ import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -179,113 +177,6 @@ fun GenreDropDown(vm: AppViewModel? = null, modifier: Modifier = Modifier) {
     }
 
 }
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun TitleSearchBarWithResultList(
-    modifier: Modifier = Modifier,
-    onClosed: () -> Unit,
-    onSearch: (String) -> Unit
-) {
-    var searchText by remember { mutableStateOf("") }
-    var isSearching by remember { mutableStateOf(false) }
-    var active by remember { mutableStateOf(false) }
-
-    Column(
-        modifier = modifier
-    ) {
-        SearchBar(
-            query = searchText,
-            onQueryChange = { searchText = it },
-            active = active,
-            onActiveChange = { active = it },
-            onSearch = { onSearch(searchText) },
-            placeholder = { Text("Search...") },
-            leadingIcon = { Icon(Icons.Filled.Search, "Search Icon") },
-            trailingIcon = {
-                if (isSearching) {
-                    IconButton(onClick = {
-                        searchText = ""
-                        isSearching = false
-                        onClosed()
-                    }) {
-                        Icon(Icons.Filled.Clear, "Clear Icon")
-                    }
-                }
-            },
-            content = { })
-    }
-}
-
-
-/*
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun TitleSearchBar2() {
-
-    val textFieldState = rememberTextFieldState()
-    var expanded by remember { mutableStateOf(false) }
-
-    Box(Modifier
-        .fillMaxSize()
-        .semantics { isTraversalGroup = true }) {
-        SearchBar(
-            modifier = Modifier
-                .align(Alignment.TopCenter)
-                .semantics { traversalIndex = 0f },
-            inputField = {
-                SearchBarDefaults.InputField(
-                    state = textFieldState,
-                    onSearch = { expanded = false },
-                    expanded = expanded,
-                    onExpandedChange = { expanded = it },
-                    placeholder = { Text("Hinted search text") },
-                    leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
-                    trailingIcon = { Icon(Icons.Default.MoreVert, contentDescription = null) },
-                )
-            },
-            expanded = expanded,
-            onExpandedChange = { expanded = it },
-        ) {
-            Column(Modifier.verticalScroll(rememberScrollState())) {
-                repeat(4) { idx ->
-                    val resultText = "Suggestion $idx"
-                    ListItem(
-                        headlineContent = { Text(resultText) },
-                        supportingContent = { Text("Additional info") },
-                        leadingContent = { Icon(Icons.Filled.Star, contentDescription = null) },
-                        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
-                        modifier =
-                        Modifier
-                            .clickable {
-                                textFieldState.setTextAndPlaceCursorAtEnd(resultText)
-                                expanded = false
-                            }
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 4.dp)
-                    )
-                }
-            }
-        }
-
-        LazyColumn(
-            contentPadding = PaddingValues(start = 16.dp, top = 72.dp, end = 16.dp, bottom = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier.semantics { traversalIndex = 1f },
-        ) {
-            val list = List(100) { "Text $it" }
-            items(count = list.size) {
-                Text(
-                    text = list[it],
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-                )
-            }
-        }
-    }
-}*/
-
 
 @Preview(
     showBackground = true,

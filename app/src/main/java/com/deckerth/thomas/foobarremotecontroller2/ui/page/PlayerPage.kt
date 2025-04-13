@@ -139,7 +139,8 @@ fun PlayingPage(vm: AppViewModel) {
     }
     if (showLoading)
         LinearProgressIndicator(
-            modifier = Modifier.fillMaxWidth()
+            progress = { vm.loadingListProgress },
+            modifier = Modifier.fillMaxWidth(),
         )
 }
 

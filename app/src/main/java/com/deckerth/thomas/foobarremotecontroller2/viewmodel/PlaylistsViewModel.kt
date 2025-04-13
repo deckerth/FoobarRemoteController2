@@ -230,6 +230,7 @@ class PlaylistsViewModel(private val vm: AppViewModel) : ViewModel() {
                 var currentPlaylist: Playlist? = playlist
                 println("FOOB starting updatePlaylist: ${currentPlaylist!!.playlistEntity.playlistId}, titles: ${currentPlaylist.titles.count()}")
                 do {
+                    withContext(Dispatchers.Main) { vm.loadingListProgress = currentPlaylist!!.titles.count().toFloat() / currentPlaylist!!.playlistEntity.noOfTracks }
                     // invariant: currentPlaylist is not null
                     val startIndex = currentPlaylist!!.titles.count()
                     val playlistPart = vm.playlistAccess

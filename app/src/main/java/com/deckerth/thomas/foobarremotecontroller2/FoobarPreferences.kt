@@ -30,6 +30,7 @@ private val FOOBAR_VOLUME_CONTROL_KEY = booleanPreferencesKey("foobar_volume_con
 private val PAUSE_DURING_PHONE_CALLS_KEY = booleanPreferencesKey("pause_during_phone_calls")
 private val ADD_TRACK_BEHAVIOR_KEY = intPreferencesKey("add_track_behavior")
 private val ALWAYS_ON_DISPLAY_KEY = booleanPreferencesKey("always_on_display")
+private val DYNAMIC_COLOR_SCHEME_KEY = booleanPreferencesKey("dynamic_color_scheme")
 
 private fun <T> getFlow(context: Context, key: Preferences.Key<T>): Flow<T?> {
     return context.dataStore.data.map { preferences ->
@@ -168,4 +169,23 @@ fun getAddTrackBehavior(): AddTracksBehaviors {
         AddTracksBehaviors.ADD_BEHAVIOR_ADD_PLAY.ordinal
     )]
 
+}
+
+fun saveDynamicColorScheme(enabled: Boolean, context: Context) {
+    runBlocking {
+        saveValue(context, enabled, DYNAMIC_COLOR_SCHEME_KEY)
+    }
+}
+
+@Composable
+fun getDynamicColorSchemeEnabled(): Boolean {
+    return getValue(mainActivity, DYNAMIC_COLOR_SCHEME_KEY, true)
+}
+
+suspend fun getDynamicColorSchemeEnabledBlocking(): Boolean {
+    return getValueBlocking(
+        mainActivity,
+        DYNAMIC_COLOR_SCHEME_KEY,
+        true
+    )
 }

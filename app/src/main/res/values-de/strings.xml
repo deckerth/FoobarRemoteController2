@@ -153,4 +153,6 @@
     <string name="playlist_added">Playlist hinzugefügt</string>
     <string name="playlist_adding_failed">Die Playlist konnte nicht erzeugt werden</string>
     <string name="settings_always_on_display">Display aktiv lassen</string>
+    <string name="settings_dynamic_color_scheme">Dynamisches Farbschema</string>
+    <string name="settings_dynamic_color_scheme_desc">Farbschema passt sich dem Cover Bild an</string>
 </resources>

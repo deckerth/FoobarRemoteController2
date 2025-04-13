@@ -38,7 +38,6 @@ fun ArtWork(player: Player, previewMode: Boolean = false, modifier: Modifier = M
         } else
             ImageWithLoadingPlaceholder(
                 imageUrl = player.artworkUrl,
-                updateColors = true,
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(top = 16.dp, start = 16.dp, end = 16.dp)

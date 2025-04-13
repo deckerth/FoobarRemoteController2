@@ -8,6 +8,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.deckerth.thomas.foobarremotecontroller2.connector.BrowserAccess
 import com.deckerth.thomas.foobarremotecontroller2.connector.ErrorHandler
 import com.deckerth.thomas.foobarremotecontroller2.connector.HTTPConnector
@@ -20,6 +21,8 @@ import com.deckerth.thomas.foobarremotecontroller2.model.Player
 import com.deckerth.thomas.foobarremotecontroller2.model.Playlist
 import com.deckerth.thomas.foobarremotecontroller2.model.VolumeControl
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.ViewsWithLayout
+import com.deckerth.thomas.foobarremotecontroller2.ui.theme.updateColorScheme
+import kotlinx.coroutines.launch
 import kotlin.math.floor
 
 var viewModelInstance: AppViewModel? = null
@@ -138,13 +141,18 @@ class AppViewModel : ViewModel() {
             }
 
             if (player!!.getIndex() != -1) {
+                val bitmap = connector.getBitmapFromURL(player!!.artworkUrl)
+                if (bitmap != null) {
+                    // Update the color scheme with the new bitmap
+                    updateColorScheme(bitmap)
+                }
                 mediaSession!!.setMetadata(
                     MediaMetadataCompat.Builder()
                         .putString(MediaMetadataCompat.METADATA_KEY_TITLE, player!!.title)
                         .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, player!!.artist)
                         .putBitmap(
                             MediaMetadataCompat.METADATA_KEY_ALBUM_ART,
-                            connector.getBitmapFromURL(player!!.artworkUrl)
+                            bitmap
                         )
                         .putLong(
                             MediaMetadataCompat.METADATA_KEY_DURATION,

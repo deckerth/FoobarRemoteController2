@@ -36,6 +36,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -46,6 +47,7 @@ import com.deckerth.thomas.foobarremotecontroller2.R
 import com.deckerth.thomas.foobarremotecontroller2.enableVolumeControl
 import com.deckerth.thomas.foobarremotecontroller2.getAddTrackBehavior
 import com.deckerth.thomas.foobarremotecontroller2.getAlwaysOnDisplay
+import com.deckerth.thomas.foobarremotecontroller2.getDynamicColorSchemeEnabled
 import com.deckerth.thomas.foobarremotecontroller2.getFoobarVolumeControl
 import com.deckerth.thomas.foobarremotecontroller2.getIpAddress
 import com.deckerth.thomas.foobarremotecontroller2.getPauseDuringPhoneCalls
@@ -53,12 +55,14 @@ import com.deckerth.thomas.foobarremotecontroller2.getViewMode
 import com.deckerth.thomas.foobarremotecontroller2.model.AddTracksBehaviors
 import com.deckerth.thomas.foobarremotecontroller2.saveAddTrackBehavior
 import com.deckerth.thomas.foobarremotecontroller2.saveAlwaysOnDisplay
+import com.deckerth.thomas.foobarremotecontroller2.saveDynamicColorScheme
 import com.deckerth.thomas.foobarremotecontroller2.saveFoobarVolumeControl
 import com.deckerth.thomas.foobarremotecontroller2.savePauseDuringPhoneCalls
 import com.deckerth.thomas.foobarremotecontroller2.saveViewMode
 import com.deckerth.thomas.foobarremotecontroller2.ui.components.LicenseText
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.Layouts
 import com.deckerth.thomas.foobarremotecontroller2.ui.mainActivity
+import com.deckerth.thomas.foobarremotecontroller2.ui.theme.seedColor
 
 @Composable
 fun SettingsPage() {
@@ -96,6 +100,20 @@ fun SettingsPage() {
                 },
                 showToggle = true,
                 isChecked = getAlwaysOnDisplay(),
+                isEnabled = true
+            )
+
+            PreferenceItem(
+                stringResource(R.string.settings_dynamic_color_scheme),
+                summary = stringResource(R.string.settings_dynamic_color_scheme_desc),
+                onClick = { enabled: Boolean ->
+                    val intendedSettingActive = !enabled
+                    saveDynamicColorScheme(intendedSettingActive, mainActivity)
+                    if (!intendedSettingActive)
+                        seedColor = Color.Black
+                },
+                showToggle = true,
+                isChecked = getDynamicColorSchemeEnabled(),
                 isEnabled = true
             )
 

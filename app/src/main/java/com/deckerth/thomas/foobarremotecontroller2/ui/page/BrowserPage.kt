@@ -80,9 +80,7 @@ fun BrowserPage(vm: AppViewModel, navController: NavHostController) {
                 LinearProgressIndicator(
                     modifier = Modifier.fillMaxWidth()
                 )
-            else if (path == "" && vm.browserViewModel.getDirectory().getEntries().isEmpty())
-                NoMusicDirectoriesConfiguredInfo(vm.browserViewModel)
-            else
+            else if (path != "" || vm.browserViewModel.getDirectory().getEntries().isNotEmpty())
                 LazyColumn(state = playlistState) {
                     if (vm.browserViewModel.getDirectory().getEntries().isNotEmpty()) {
                         items(vm.browserViewModel.getDirectory().getEntries()) { entry ->
@@ -108,54 +106,56 @@ fun BrowserPage(vm: AppViewModel, navController: NavHostController) {
 
 @Composable
 fun NoMusicDirectoriesConfiguredInfo(vm: BrowserViewModel?) {
-    val headingStyle = SpanStyle(
-        color = MaterialTheme.colorScheme.secondary,
-        fontSize = MaterialTheme.typography.titleMedium.fontSize,
-        fontWeight = MaterialTheme.typography.titleMedium.fontWeight
-    )
-    val textStyle = SpanStyle(
-        color = MaterialTheme.colorScheme.secondary,
-        fontSize = MaterialTheme.typography.bodyMedium.fontSize,
-        fontWeight = MaterialTheme.typography.bodyMedium.fontWeight
-    )
-    val linkStyle = SpanStyle(
-        color = MaterialTheme.colorScheme.primary,
-        textDecoration = TextDecoration.Underline,
-        fontSize = MaterialTheme.typography.bodyMedium.fontSize,
-        fontWeight = MaterialTheme.typography.bodyMedium.fontWeight
-    )
-    val annotatedString = buildAnnotatedString {
-        withStyle(headingStyle) {
-            append(stringResource(R.string.directory_not_found_heading))
-        }
-        withStyle(textStyle) {
-            append("\n\n" + stringResource(R.string.directory_not_found_start))
-        }
+    Column {
+        val headingStyle = SpanStyle(
+            color = MaterialTheme.colorScheme.secondary,
+            fontSize = MaterialTheme.typography.titleMedium.fontSize,
+            fontWeight = MaterialTheme.typography.titleMedium.fontWeight
+        )
+        val textStyle = SpanStyle(
+            color = MaterialTheme.colorScheme.secondary,
+            fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+            fontWeight = MaterialTheme.typography.bodyMedium.fontWeight
+        )
+        val linkStyle = SpanStyle(
+            color = MaterialTheme.colorScheme.primary,
+            textDecoration = TextDecoration.Underline,
+            fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+            fontWeight = MaterialTheme.typography.bodyMedium.fontWeight
+        )
+        val annotatedString = buildAnnotatedString {
+            withStyle(headingStyle) {
+                append(stringResource(R.string.directory_not_found_heading))
+            }
+            withStyle(textStyle) {
+                append("\n\n" + stringResource(R.string.directory_not_found_start))
+            }
 
-        withLink(LinkAnnotation.Url(url = "https://github.com/hyperblast/beefweb/blob/master/README.md")) {
-            withStyle(linkStyle) {
-                append(stringResource(R.string.device_not_found_link))
+            withLink(LinkAnnotation.Url(url = "https://github.com/hyperblast/beefweb/blob/master/README.md")) {
+                withStyle(linkStyle) {
+                    append(stringResource(R.string.device_not_found_link))
+                }
+            }
+
+            withStyle(textStyle) {
+                append(stringResource(R.string.directory_not_found_start2) + "\n")
             }
         }
 
-        withStyle(textStyle) {
-            append(stringResource(R.string.directory_not_found_start2) + "\n")
-        }
-    }
-
-    Text(
-        text = annotatedString,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(start = 16.dp, end = 16.dp)
-    )
-    if (vm != null)
-        Button(
+        Text(
+            text = annotatedString,
             modifier = Modifier
-                .padding(top = 16.dp, start = 16.dp, end = 16.dp),
-            onClick = { vm.refreshRoots() },
-            content = { Text(stringResource(R.string.button_refresh_roots)) }
+                .fillMaxWidth()
+                .padding(start = 16.dp, end = 16.dp, top = 16.dp)
         )
+        if (vm != null)
+            Button(
+                modifier = Modifier
+                    .padding(top = 16.dp, start = 16.dp, end = 16.dp),
+                onClick = { vm.refreshRoots() },
+                content = { Text(stringResource(R.string.button_refresh_roots)) }
+            )
+    }
 }
 
 @Preview(

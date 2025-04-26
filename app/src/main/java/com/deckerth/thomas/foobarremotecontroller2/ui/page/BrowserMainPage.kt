@@ -15,6 +15,7 @@ import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
 
 sealed class Screen(val route: String) {
     data object Root : Screen("root")
+    data object BeefwebNotConfigured : Screen("beefweb_not_configured")
     data class Directory(val path: String) : Screen("directory/{path}") {
         // Add this companion object to access the route template
         companion object {
@@ -30,13 +31,14 @@ fun BrowserMainPage(vm: AppViewModel) {
 
     NavHost(
         navController = navController,
-        startDestination = Screen.Root.route,
+        startDestination = if (!vm.browserViewModel.loadingData.value && vm.browserViewModel.getDirectory().getEntries().isEmpty()) Screen.BeefwebNotConfigured.route else Screen.Root.route,
         enterTransition = { slideInHorizontally(initialOffsetX = { 1000 }) + fadeIn() },
         exitTransition = { slideOutHorizontally(targetOffsetX = { -1000 }) + fadeOut() },
         popEnterTransition = { slideInHorizontally(initialOffsetX = { -1000 }) + fadeIn() },
         popExitTransition = { slideOutHorizontally(targetOffsetX = { 1000 }) + fadeOut() },
     ) {
         composable(Screen.Root.route) { RootScreen(vm, navController) }
+        composable(Screen.BeefwebNotConfigured.route) { NotConfiguredScreen(vm) }
         composable(
             Screen.Directory.ROUTE_TEMPLATE,
             arguments = listOf(navArgument("path") { type = NavType.StringType })
@@ -48,6 +50,11 @@ fun BrowserMainPage(vm: AppViewModel) {
 }
 
 @Composable
+fun NotConfiguredScreen(vm: AppViewModel) {
+    NoMusicDirectoriesConfiguredInfo(vm.browserViewModel)
+}
+
+@Composable
 fun RootScreen(vm: AppViewModel, navController: NavHostController) {
     // Display root directory contents
     // Use navController.navigate() to navigate to subdirectories or files
@@ -55,6 +62,7 @@ fun RootScreen(vm: AppViewModel, navController: NavHostController) {
     vm.browserViewModel.setCurrentPath("")
     BrowserPage(vm, navController)
 }
+
 
 @Composable
 fun DirectoryScreen(vm: AppViewModel, navController: NavHostController, path: String) {

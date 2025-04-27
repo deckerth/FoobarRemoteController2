@@ -10,8 +10,12 @@ import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.TitleFilter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlin.math.min
+import kotlin.system.measureTimeMillis
 
 enum class PlaylistLifecycleState {
     Valid,           // can be updated anytime
@@ -23,6 +27,7 @@ class Playlist(var playlistEntity: PlaylistEntity) {
     val titles = mutableListOf<ITitle>()
     val albums = mutableListOf<Album>()
     val filteredAlbums = mutableListOf<Album>()
+    val filteredTitles = mutableListOf<ITitle>()
     private val genres = mutableListOf<String>()
     var lifecycleState by mutableStateOf(PlaylistLifecycleState.Valid)
     var ipAddress: String = ""
@@ -43,53 +48,103 @@ class Playlist(var playlistEntity: PlaylistEntity) {
         return result
     }
 
-    fun applyFilterSync(filter: TitleFilter) {
-        if (filter.isActive && filter.hasChanged) {
-            filteredAlbums.clear()
-            for (album in albums) {
-                if (album.matches(filter)) {
-                    filteredAlbums.add(album)
-                }
-            }
-        }
-        filter.hasChanged = false
-    }
-
     private var applyingFilter = false
 
     fun applyFilter(vm: AppViewModel) {
         val filter = vm.playlistsViewModel.filterValue
         if (!applyingFilter && filter.isActive && filter.hasChanged) {
+            vm.loadingListProgress = 0f
+            vm.loadingList = true
             applyingFilter = true
             filteredAlbums.clear()
+            filteredTitles.clear()
             CoroutineScope(Dispatchers.IO).launch {
-                applyFilterAsync(vm)
+                applyFilterParallelAsync(vm)
             }
         }
     }
 
-    private suspend fun applyFilterAsync(vm: AppViewModel) {
+    private suspend fun applyFilterParallelAsync(vm: AppViewModel) {
         val filter = vm.playlistsViewModel.filterValue
-        val result = mutableListOf<Album>()
-        withContext(Dispatchers.Main) {
-            vm.loadingListProgress = 0f
-            vm.loadingList = true
-        }
-        for ((index, album) in albums.withIndex()) {
-            if (!filter.isActive) break
+        val result = Playlist(PlaylistEntity("", "", false, 0))
+
+        val timeTaken = measureTimeMillis {
+            val filterResult = parallelTitleFilter(vm, filter)
+            filterResult.forEach(result::addTitle)
             withContext(Dispatchers.Main) {
-                vm.loadingListProgress = index.toFloat() / albums.size
-            }
-            if (album.matches(filter)) {
-                result.add(album)
+                if (filter.isActive) {
+                    filteredAlbums.addAll(result.albums)
+                    filteredTitles.addAll(result.titles)
+                    filter.hasChanged = false
+                }
             }
         }
+        println("FOOB Filtering took $timeTaken ms")
         withContext(Dispatchers.Main) {
-            if (filter.isActive) filteredAlbums.addAll(result)
             vm.loadingList = false
-            filter.hasChanged = false
         }
         applyingFilter = false
+    }
+
+    private fun partitionTitleList(): List<List<ITitle>> {
+        val minChunkSize = 100
+        val maxChunkNumber = 80
+        val numChunks = min((titles.size + minChunkSize - 1) / minChunkSize, maxChunkNumber)
+        val chunkSize = (titles.size + numChunks - 1) / numChunks
+        var transferredForChunk = 0
+        val result = mutableListOf<List<ITitle>>()
+        var currentChunk = mutableListOf<ITitle>()
+
+        println("FOOB Filtering: Chunks: $numChunks, approx. size $chunkSize")
+
+        // albums must not be split between chunks
+        albums.forEach { album ->
+            // add all tracks to current chunk
+            album.tracks.forEach { track ->
+                transferredForChunk++
+                currentChunk.add(track.details)
+            }
+            if (transferredForChunk >= chunkSize) {
+                result.add(currentChunk)
+                currentChunk = mutableListOf<ITitle>()
+                transferredForChunk = 0
+            }
+        }
+        result.add(currentChunk)
+        return result
+    }
+
+    private suspend fun parallelTitleFilter(
+        vm: AppViewModel,
+        filter: TitleFilter,
+    ): List<ITitle> {
+        val filteredItems = mutableListOf<ITitle>()
+        val chunkedTitles = partitionTitleList()
+        val resultArray = Array(chunkedTitles.count()) { mutableListOf<ITitle>() }
+
+        coroutineScope {
+            chunkedTitles.forEachIndexed { i, items ->
+                launch(Dispatchers.Default) { // Use Dispatchers.Default for CPU-bound tasks
+                    for ((index, title) in items.withIndex()) {
+                        if (!filter.isActive) break
+                        if (i == 0) // progress bar is visualizes progress for first chunk
+                            withContext(Dispatchers.Main) {
+                                vm.loadingListProgress = index.toFloat() / items.size
+                            }
+                        if (title.matches(filter)) {
+                            resultArray[i].add(title)
+                        }
+                    }
+                }
+            }
+            launch {
+                // Ensure all worker coroutines are completed
+                coroutineContext[Job]!!.children.forEach { it.join() }
+            }
+        }
+        for (element in resultArray)
+            filteredItems.addAll(element)
+        return filteredItems
     }
 
     fun addTitle(title: ITitle) {

@@ -458,11 +458,13 @@ fun Playlist(vm: AppViewModel, playlist: Playlist) {
         rememberLazyListState(initialFirstVisibleItemIndex = if (!vm.loadingList && vm.autoscroll && currentAlbumIndex != -1) currentAlbumIndex else 0)
     var animating by remember { mutableStateOf(false) }
 
-    LazyColumn(state = playlistState) {
-        if (vm.playlistsViewModel.filterValue.isActive) {
-            playlist.applyFilter(vm)
-            if (playlist.filteredAlbums.isNotEmpty()) {
-                println("FOOB filtered albums")
+    if (vm.playlistsViewModel.filterValue.isActive)
+        playlist.applyFilter(vm)
+
+    if (!vm.loadingList)
+        LazyColumn(state = playlistState) {
+            if (vm.playlistsViewModel.filterValue.isActive) {
+                println("FOOB filtered albums: ${playlist.filteredAlbums.size}")
                 try {
                     items(playlist.filteredAlbums) { album ->
                         if (album.matches(vm.playlistsViewModel.filterValue))
@@ -471,17 +473,16 @@ fun Playlist(vm: AppViewModel, playlist: Playlist) {
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
-            }
-        } else if (playlist.albums.isNotEmpty())
-            try {
-                items(playlist.albums) { album ->
-                    AlbumCard(vm, album, layoutManager.getLayout())
+            } else if (playlist.albums.isNotEmpty())
+                try {
+                    items(playlist.albums) { album ->
+                        AlbumCard(vm, album, layoutManager.getLayout())
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
                 }
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
+        }
 
-    }
     LaunchedEffect(vm.autoScrollIndex, vm.enforceAutoscroll) {
         if (vm.autoscroll && vm.autoScrollIndex != -1) {
             animating = true

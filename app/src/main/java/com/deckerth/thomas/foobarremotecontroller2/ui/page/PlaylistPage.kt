@@ -92,7 +92,8 @@ fun PlaylistPage(vm: AppViewModel) {
 
         vm.displayedPlaylist!!.clear()
         if (vm.displayedPlaylist!!.lifecycleState == PlaylistLifecycleState.RequiresUpdate)
-            vm.displayedPlaylist!!.lifecycleState = PlaylistLifecycleState.Valid // for delayed update to avoid crashes during layout update
+            vm.displayedPlaylist!!.lifecycleState =
+                PlaylistLifecycleState.Valid // for delayed update to avoid crashes during layout update
 
         vm.displayedPlaylist = null
 
@@ -458,23 +459,35 @@ fun Playlist(vm: AppViewModel, playlist: Playlist) {
     var animating by remember { mutableStateOf(false) }
 
     LazyColumn(state = playlistState) {
-        if (playlist.albums.isNotEmpty()) {
+        if (vm.playlistsViewModel.filterValue.isActive) {
+            playlist.applyFilter(vm)
+            if (playlist.filteredAlbums.isNotEmpty()) {
+                println("FOOB filtered albums")
+                try {
+                    items(playlist.filteredAlbums) { album ->
+                        if (album.matches(vm.playlistsViewModel.filterValue))
+                            AlbumCard(vm, album, layoutManager.getLayout())
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+        } else if (playlist.albums.isNotEmpty())
             try {
                 items(playlist.albums) { album ->
-                    if (album.matches(vm.playlistsViewModel.filterValue))
-                        AlbumCard(vm, album, layoutManager.getLayout())
+                    AlbumCard(vm, album, layoutManager.getLayout())
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
             }
-        }
+
     }
     LaunchedEffect(vm.autoScrollIndex, vm.enforceAutoscroll) {
         if (vm.autoscroll && vm.autoScrollIndex != -1) {
             animating = true
             if (vm.enforceAutoscroll) {
                 vm.enforceAutoscroll = false
-                playlistState.scrollToItem(if (vm.autoScrollIndex > 0) vm.autoScrollIndex - 1 else 1 )
+                playlistState.scrollToItem(if (vm.autoScrollIndex > 0) vm.autoScrollIndex - 1 else 1)
             }
 
             playlistState.scrollToItem(vm.autoScrollIndex)

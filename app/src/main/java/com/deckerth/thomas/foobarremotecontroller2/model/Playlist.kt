@@ -7,9 +7,11 @@ import androidx.compose.ui.state.ToggleableState
 import com.deckerth.thomas.foobarremotecontroller2.R
 import com.deckerth.thomas.foobarremotecontroller2.ui.mainActivity
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.TitleFilter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 enum class PlaylistLifecycleState {
     Valid,           // can be updated anytime
@@ -20,23 +22,74 @@ enum class PlaylistLifecycleState {
 class Playlist(var playlistEntity: PlaylistEntity) {
     val titles = mutableListOf<ITitle>()
     val albums = mutableListOf<Album>()
-    val genres = mutableListOf<String>()
+    val filteredAlbums = mutableListOf<Album>()
+    private val genres = mutableListOf<String>()
     var lifecycleState by mutableStateOf(PlaylistLifecycleState.Valid)
     var ipAddress: String = ""
 
     fun clear() {
         titles.clear()
         albums.clear()
+        filteredAlbums.clear()
         genres.clear()
         lifecycleState = PlaylistLifecycleState.Valid
     }
 
-    fun getGenres(addAllGenresText : Boolean = false): List<String> {
+    fun getGenres(addAllGenresText: Boolean = false): List<String> {
         val result = mutableListOf<String>()
         if (addAllGenresText)
             result.add(mainActivity.getString(R.string.all_genres))
         result.addAll(genres)
         return result
+    }
+
+    fun applyFilterSync(filter: TitleFilter) {
+        if (filter.isActive && filter.hasChanged) {
+            filteredAlbums.clear()
+            for (album in albums) {
+                if (album.matches(filter)) {
+                    filteredAlbums.add(album)
+                }
+            }
+        }
+        filter.hasChanged = false
+    }
+
+    private var applyingFilter = false
+
+    fun applyFilter(vm: AppViewModel) {
+        val filter = vm.playlistsViewModel.filterValue
+        if (!applyingFilter && filter.isActive && filter.hasChanged) {
+            applyingFilter = true
+            filteredAlbums.clear()
+            CoroutineScope(Dispatchers.IO).launch {
+                applyFilterAsync(vm)
+            }
+        }
+    }
+
+    private suspend fun applyFilterAsync(vm: AppViewModel) {
+        val filter = vm.playlistsViewModel.filterValue
+        val result = mutableListOf<Album>()
+        withContext(Dispatchers.Main) {
+            vm.loadingListProgress = 0f
+            vm.loadingList = true
+        }
+        for ((index, album) in albums.withIndex()) {
+            if (!filter.isActive) break
+            withContext(Dispatchers.Main) {
+                vm.loadingListProgress = index.toFloat() / albums.size
+            }
+            if (album.matches(filter)) {
+                result.add(album)
+            }
+        }
+        withContext(Dispatchers.Main) {
+            if (filter.isActive) filteredAlbums.addAll(result)
+            vm.loadingList = false
+            filter.hasChanged = false
+        }
+        applyingFilter = false
     }
 
     fun addTitle(title: ITitle) {

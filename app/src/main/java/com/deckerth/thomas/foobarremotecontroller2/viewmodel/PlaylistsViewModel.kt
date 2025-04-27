@@ -20,6 +20,7 @@ import kotlinx.coroutines.withContext
 
 class TitleFilter {
     var isActive by mutableStateOf(false)
+    var hasChanged by mutableStateOf(false)
 
     private fun setIsActive() {
         isActive = pattern.isNotBlank() || genre.isNotBlank() || highRes
@@ -30,6 +31,7 @@ class TitleFilter {
         get() = _pattern
         set(value) {
             _pattern = value
+            hasChanged = true
             setIsActive()
         }
 
@@ -38,6 +40,7 @@ class TitleFilter {
         get() = _genre
         set(value) {
             _genre = value
+            hasChanged = true
             setIsActive()
         }
 
@@ -46,6 +49,7 @@ class TitleFilter {
         get() = _highRes
         set(value) {
             _highRes = value
+            hasChanged = true
             setIsActive()
         }
 
@@ -54,6 +58,7 @@ class TitleFilter {
         _genre = ""
         _highRes = false
         isActive = false
+        hasChanged = false
     }
 }
 
@@ -278,6 +283,7 @@ class PlaylistsViewModel(private val vm: AppViewModel) : ViewModel() {
                 println("FOOB changing from playlist: $vm.selectedPlaylist to $id")
             vm.selectedPlaylist = id
             val playlist = getPlaylist(id)
+            filterValue.clear()
             vm.selectedPlaylistName = playlist.playlistEntity.name
             if (playlist.lifecycleState != PlaylistLifecycleState.Valid || playlist.titles.count() < playlist.playlistEntity.noOfTracks)
                 vm.displayedPlaylist = null  // invalidate displayed playlist

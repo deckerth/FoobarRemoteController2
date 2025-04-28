@@ -46,6 +46,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.IconToggleButtonColors
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -652,7 +653,13 @@ class MainActivity : ComponentActivity() {
             ) {
                 composable("Now Playing And Playlist") {
                     appBarLabel = appLabel
-                    Row { // Row for the two pages
+                    Row { // Row for the two pages with shared progress indicator
+                        if (mainActivity.isTablet() && appViewModel.loadingList)
+                            LinearProgressIndicator(
+                                progress = { appViewModel.loadingListProgress },
+                                modifier = Modifier.fillMaxWidth(),
+                            )
+
                         Box(
                             modifier = Modifier.weight(1f)
                         ) {

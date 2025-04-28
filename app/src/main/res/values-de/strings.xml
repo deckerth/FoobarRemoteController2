@@ -155,4 +155,8 @@
     <string name="settings_always_on_display">Display aktiv lassen</string>
     <string name="settings_dynamic_color_scheme">Dynamisches Farbschema</string>
     <string name="settings_dynamic_color_scheme_desc">Farbschema passt sich dem Cover Bild an</string>
+    <string name="playlist_title_count">Titel: %1$s</string>
+    <string name="playlist_filtered_indicator">" (gefiltert)"</string>
+    <string name="playlist_titles_singular">1 Titel</string>
+    <string name="playlist_titles_plural">%1$s Titel</string>
 </resources>

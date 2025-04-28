@@ -49,6 +49,7 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -65,6 +66,7 @@ import com.deckerth.thomas.foobarremotecontroller2.ui.components.LayoutComponent
 import com.deckerth.thomas.foobarremotecontroller2.ui.components.PlaylistNameDialog
 import com.deckerth.thomas.foobarremotecontroller2.ui.components.TitleDetails
 import com.deckerth.thomas.foobarremotecontroller2.ui.components.TitleSearchBarDialog
+import com.deckerth.thomas.foobarremotecontroller2.ui.isTablet
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.Layout
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.layoutManager
 import com.deckerth.thomas.foobarremotecontroller2.ui.mainActivity
@@ -75,14 +77,10 @@ import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
 fun PlaylistPage(vm: AppViewModel) {
     // The currently displayed playlists may have been changed in foobar so that is got invalidated
 
-    if (vm.displayedPlaylist != null &&
-        vm.displayedPlaylist!!.lifecycleState != PlaylistLifecycleState.Valid
-    ) {
-        val displayToast =
-            vm.removeTitlesMode || vm.playlistsViewModel.showFilter
+    if (vm.displayedPlaylist != null && vm.displayedPlaylist!!.lifecycleState != PlaylistLifecycleState.Valid) {
+        val displayToast = vm.removeTitlesMode || vm.playlistsViewModel.showFilter
 
-        if (vm.removeTitlesMode)
-            vm.disableRemoveTitlesMode(true)
+        if (vm.removeTitlesMode) vm.disableRemoveTitlesMode(true)
 
 
         if (vm.playlistsViewModel.showFilter) {
@@ -91,56 +89,67 @@ fun PlaylistPage(vm: AppViewModel) {
         }
 
         vm.displayedPlaylist!!.clear()
-        if (vm.displayedPlaylist!!.lifecycleState == PlaylistLifecycleState.RequiresUpdate)
-            vm.displayedPlaylist!!.lifecycleState =
-                PlaylistLifecycleState.Valid // for delayed update to avoid crashes during layout update
+        if (vm.displayedPlaylist!!.lifecycleState == PlaylistLifecycleState.RequiresUpdate) vm.displayedPlaylist!!.lifecycleState =
+            PlaylistLifecycleState.Valid // for delayed update to avoid crashes during layout update
 
         vm.displayedPlaylist = null
 
-        if (displayToast)
-            Toast.makeText(
-                mainActivity,
-                stringResource(R.string.playlist_changed_in_foobar),
-                Toast.LENGTH_SHORT
-            ).show()
+        if (displayToast) Toast.makeText(
+            mainActivity, stringResource(R.string.playlist_changed_in_foobar), Toast.LENGTH_SHORT
+        ).show()
     }
 
     Column {
         PlaylistSwitcher(vm, playlists = vm.playlistsViewModel.playlists)
 
         if (vm.displayedPlaylist != null && vm.displayedPlaylist!!.lifecycleState == PlaylistLifecycleState.Valid)
-            Playlist(vm, vm.displayedPlaylist!!)
+            Playlist(
+                vm,
+                vm.displayedPlaylist!!
+            )
     }
 
-    if (vm.playlistsViewModel.showFilter)
-        TitleSearchBarDialog(
-            vm = vm,
-            onSearch = { searchString, genre, highRes ->
-                vm.playlistsViewModel.filterValue.pattern = searchString
-                vm.playlistsViewModel.filterValue.genre = genre
-                vm.playlistsViewModel.filterValue.highRes = highRes
-                vm.playlistsViewModel.showFilter = false
-            },
-            onDismiss = {
-                vm.playlistsViewModel.showFilter = false
-                vm.playlistsViewModel.filterValue.clear()
-            }
-        )
+    if (vm.playlistsViewModel.showFilter) TitleSearchBarDialog(
+        vm = vm,
+        onSearch = { searchString, genre, highRes ->
+            vm.playlistsViewModel.filterValue.pattern = searchString
+            vm.playlistsViewModel.filterValue.genre = genre
+            vm.playlistsViewModel.filterValue.highRes = highRes
+            vm.playlistsViewModel.showFilter = false
+        },
+        onDismiss = {
+            vm.playlistsViewModel.showFilter = false
+            vm.playlistsViewModel.filterValue.clear()
+        })
 
-    if (vm.createPlaylistRequest)
-        PlaylistNameDialog(
-            vm = vm,
-            onConfirm = { vm.playlistsViewModel.addPlaylist(it) }
-        )
+    if (vm.createPlaylistRequest) PlaylistNameDialog(
+        vm = vm, onConfirm = { vm.playlistsViewModel.addPlaylist(it) })
 
-    if (vm.loadingList || vm.displayedPlaylist == null)
-        LinearProgressIndicator(
-            progress = {
-                vm.loadingListProgress
-            },
-            modifier = Modifier
-                .fillMaxWidth(),
-        )
+    if (!mainActivity.isTablet() && ( vm.loadingList || vm.displayedPlaylist == null) ) LinearProgressIndicator(
+        progress = {
+            vm.loadingListProgress
+        },
+        modifier = Modifier.fillMaxWidth(),
+    )
+}
+
+fun playlistInfoString(vm: AppViewModel): String {
+    val count = if (vm.displayedPlaylist != null) {
+        if (vm.playlistsViewModel.filterValue.isActive) vm.displayedPlaylist!!.filteredTitles.count() else vm.displayedPlaylist!!.titles.count()
+    } else 0
+    return if (vm.playlistsViewModel.filterValue.isActive)
+        if (count == 1)
+            mainActivity.getString(
+                R.string.playlist_titles_singular
+            ) + mainActivity.getString(R.string.playlist_filtered_indicator)
+        else
+            mainActivity.getString(
+                R.string.playlist_titles_plural, count.toString()
+            ) + mainActivity.getString(R.string.playlist_filtered_indicator)
+    else
+        if (count == 1) mainActivity.getString(R.string.playlist_titles_singular)
+        else
+            mainActivity.getString(R.string.playlist_titles_plural, count.toString())
 }
 
 @Composable
@@ -158,10 +167,8 @@ fun AlbumCard(vm: AppViewModel, album: Album, layout: Layout?, previewMode: Bool
             album.originalTitle.playlistId == vm.player!!.playlistId && album.hasIndex(
                 vm.player!!.getIndex()
             )
-        if (album.isAutomaticSelection)
-            album.isExpanded = currentlyPlaying
-        else
-            album.isAutomaticSelection = album.isExpanded == currentlyPlaying
+        if (album.isAutomaticSelection) album.isExpanded = currentlyPlaying
+        else album.isAutomaticSelection = album.isExpanded == currentlyPlaying
     }
 
     // if the album contains a single title without name, the album itself represents the title, and can be selected
@@ -169,27 +176,23 @@ fun AlbumCard(vm: AppViewModel, album: Album, layout: Layout?, previewMode: Bool
     var modifier: Modifier = Modifier
     if (albumRepresentsTitle) {
         var titleSelected = false
-        if (vm.player != null)
-            titleSelected =
-                album.tracks[0].details.index == vm.player!!.getIndex() && album.tracks[0].details.playlistId == vm.player!!.playlistId
+        if (vm.player != null) titleSelected =
+            album.tracks[0].details.index == vm.player!!.getIndex() && album.tracks[0].details.playlistId == vm.player!!.playlistId
 
-        if (titleSelected)
-            modifier = modifier.background(MaterialTheme.colorScheme.primaryContainer)
+        if (titleSelected) modifier =
+            modifier.background(MaterialTheme.colorScheme.primaryContainer)
     }
 
-    if (album.tracks.isNotEmpty() && !previewMode)
-        modifier = modifier.clickable {
-            if (vm.removeTitlesMode)
-                album.toggleIsSelected()
-            else {
-                vm.playlistsViewModel.filterValue.clear()
-                vm.playlistsViewModel.showFilter = false
-                vm.playerAccess.playTrack(
-                    album.tracks[0].details.playlistId,
-                    album.tracks[0].details.index
-                )
-            }
+    if (album.tracks.isNotEmpty() && !previewMode) modifier = modifier.clickable {
+        if (vm.removeTitlesMode) album.toggleIsSelected()
+        else {
+            vm.playlistsViewModel.filterValue.clear()
+            vm.playlistsViewModel.showFilter = false
+            vm.playerAccess.playTrack(
+                album.tracks[0].details.playlistId, album.tracks[0].details.index
+            )
         }
+    }
 
     ElevatedCard(
         modifier = Modifier
@@ -199,27 +202,20 @@ fun AlbumCard(vm: AppViewModel, album: Album, layout: Layout?, previewMode: Bool
     ) {
         Column(modifier = modifier) {
             Row {
-                if (vm.removeTitlesMode)
-                    TriStateCheckbox(
-                        modifier = Modifier.align(Alignment.CenterVertically),
-                        state = album.isSelected,
-                        onClick = {
-                            album.toggleIsSelected()
-                        }
-                    )
-                if (previewMode)
-                    Image(
-                        bitmap = ImageBitmap.imageResource(id = album.originalTitle.artworkUrl.toInt()),
-                        contentDescription = stringResource(R.string.desc_album_picture),
-                        modifier = Modifier
-                            .size(80.dp)
-                    )
-                else
-                    ImageWithLoadingPlaceholder(
-                        imageUrl = album.originalTitle.artworkUrl,
-                        modifier = Modifier
-                            .size(80.dp)
-                    )
+                if (vm.removeTitlesMode) TriStateCheckbox(
+                    modifier = Modifier.align(Alignment.CenterVertically),
+                    state = album.isSelected,
+                    onClick = {
+                        album.toggleIsSelected()
+                    })
+                if (previewMode) Image(
+                    bitmap = ImageBitmap.imageResource(id = album.originalTitle.artworkUrl.toInt()),
+                    contentDescription = stringResource(R.string.desc_album_picture),
+                    modifier = Modifier.size(80.dp)
+                )
+                else ImageWithLoadingPlaceholder(
+                    imageUrl = album.originalTitle.artworkUrl, modifier = Modifier.size(80.dp)
+                )
                 Column(
                     verticalArrangement = Arrangement.Center,
                     modifier = Modifier
@@ -227,43 +223,37 @@ fun AlbumCard(vm: AppViewModel, album: Album, layout: Layout?, previewMode: Bool
                         .padding(horizontal = 16.dp)
                         .height(80.dp)
                 ) {
-                    if (layout != null)
-                        for (item in layout.albumLayout.items) {
-                            LayoutComponent(album, item)
-                        }
+                    if (layout != null) for (item in layout.albumLayout.items) {
+                        LayoutComponent(album, item)
+                    }
                 }
                 if (albumRepresentsTitle) {
                     var infoButtonClicked by remember { mutableStateOf(false) }
                     IconButton(
                         modifier = Modifier.align(Alignment.CenterVertically),
-                        onClick = { infoButtonClicked = true }
-                    ) {
+                        onClick = { infoButtonClicked = true }) {
                         Icon(
                             painter = painterResource(R.drawable.info_i),
                             contentDescription = stringResource(R.string.button_details),
                             modifier = Modifier.size(16.dp)
                         )
                     }
-                    if (infoButtonClicked)
-                        TitleDetails(
-                            title = album.tracks[0].details,
-                            onDismiss = { infoButtonClicked = false },
-                        )
+                    if (infoButtonClicked) TitleDetails(
+                        title = album.tracks[0].details,
+                        onDismiss = { infoButtonClicked = false },
+                    )
                 }
             }
             if (album.tracks.size > 1) {
                 HorizontalDivider()
                 Box {
                     TextButton(
-                        modifier = Modifier
-                            .padding(horizontal = 8.dp, vertical = 2.dp),
-                        onClick = {
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp), onClick = {
                             if (!previewMode) {
                                 album.isAutomaticSelection = false
                                 album.isExpanded = !album.isExpanded
                             }
-                        }
-                    ) {
+                        }) {
                         if (album.isExpanded) {
                             Text(text = stringResource(R.string.button_collapse))
                         } else {
@@ -284,22 +274,15 @@ fun AlbumCard(vm: AppViewModel, album: Album, layout: Layout?, previewMode: Bool
                 if (album.isExpanded) {
                     Column {
                         album.tracks.forEach { title ->
-                            if (title.details.matches(vm.playlistsViewModel.filterValue))
-                                TitleEntry(
-                                    vm = vm,
-                                    album = album,
-                                    title = title,
-                                    previewMode = previewMode
-                                )
+                            if (title.details.matches(vm.playlistsViewModel.filterValue)) TitleEntry(
+                                vm = vm, album = album, title = title, previewMode = previewMode
+                            )
                         }
                     }
                 }
             } else if (!albumRepresentsTitle) {
                 TitleEntry(
-                    vm = vm,
-                    album = album,
-                    title = album.tracks[0],
-                    previewMode = previewMode
+                    vm = vm, album = album, title = album.tracks[0], previewMode = previewMode
                 )
             }
         }
@@ -309,47 +292,36 @@ fun AlbumCard(vm: AppViewModel, album: Album, layout: Layout?, previewMode: Bool
 
 @Composable
 fun TitleEntry(
-    vm: AppViewModel,
-    album: Album,
-    title: SelectableTitle,
-    previewMode: Boolean = false
+    vm: AppViewModel, album: Album, title: SelectableTitle, previewMode: Boolean = false
 ) {
     var titleSelected = false
-    if (previewMode)
-        titleSelected = title.details.index == 0
-    else if (vm.player != null)
-        titleSelected =
-            title.details.index == vm.player!!.getIndex() && title.details.playlistId == vm.player!!.playlistId
-    var modifier = Modifier
-        .clickable {
-            if (!previewMode) {
-                if (vm.removeTitlesMode)
-                    title.toggleIsSelected(vm)
-                else {
-                    vm.playlistsViewModel.filterValue.clear()
-                    vm.playlistsViewModel.showFilter = false
-                    vm.playerAccess.playTrack(title.details.playlistId, title.details.index)
-                }
+    if (previewMode) titleSelected = title.details.index == 0
+    else if (vm.player != null) titleSelected =
+        title.details.index == vm.player!!.getIndex() && title.details.playlistId == vm.player!!.playlistId
+    var modifier = Modifier.clickable {
+        if (!previewMode) {
+            if (vm.removeTitlesMode) title.toggleIsSelected(vm)
+            else {
+                vm.playlistsViewModel.filterValue.clear()
+                vm.playlistsViewModel.showFilter = false
+                vm.playerAccess.playTrack(title.details.playlistId, title.details.index)
             }
         }
-    if (titleSelected)
-        modifier = modifier.background(MaterialTheme.colorScheme.primaryContainer)
+    }
+    if (titleSelected) modifier = modifier.background(MaterialTheme.colorScheme.primaryContainer)
     Column(
         modifier = modifier
     ) {
         var infoButtonClicked by remember { mutableStateOf(false) }
         HorizontalDivider()
         Row {
-            if (vm.removeTitlesMode)
-                Checkbox(
-                    modifier = Modifier.align(Alignment.CenterVertically),
-                    checked = title.isSelected,
-                    onCheckedChange = { title.setSelected(vm, it) }
-                )
+            if (vm.removeTitlesMode) Checkbox(
+                modifier = Modifier.align(Alignment.CenterVertically),
+                checked = title.isSelected,
+                onCheckedChange = { title.setSelected(vm, it) })
             Box {
                 Column(
-                    modifier = Modifier
-                        .padding(16.dp)
+                    modifier = Modifier.padding(16.dp)
                 ) {
                     val layout = layoutManager.getLayout()
                     for (item in layout.titleLayout.items) {
@@ -358,19 +330,17 @@ fun TitleEntry(
                 }
                 IconButton(
                     modifier = Modifier.align(Alignment.CenterEnd),
-                    onClick = { infoButtonClicked = true }
-                ) {
+                    onClick = { infoButtonClicked = true }) {
                     Icon(
                         painter = painterResource(R.drawable.info_i),
                         contentDescription = stringResource(R.string.button_details),
                         modifier = Modifier.size(16.dp)
                     )
                 }
-                if (infoButtonClicked)
-                    TitleDetails(
-                        title = title.details,
-                        onDismiss = { infoButtonClicked = false },
-                    )
+                if (infoButtonClicked) TitleDetails(
+                    title = title.details,
+                    onDismiss = { infoButtonClicked = false },
+                )
             }
         }
     }
@@ -453,46 +423,55 @@ fun AlbumCardPreview2() {
 
 @Composable
 fun Playlist(vm: AppViewModel, playlist: Playlist) {
-    val currentAlbumIndex = vm.getCurrentAlbumIndex()
-    val playlistState =
-        rememberLazyListState(initialFirstVisibleItemIndex = if (!vm.loadingList && vm.autoscroll && currentAlbumIndex != -1) currentAlbumIndex else 0)
-    var animating by remember { mutableStateOf(false) }
+    if (vm.playlistsViewModel.filterValue.isActive) playlist.applyFilter(vm)
 
-    if (vm.playlistsViewModel.filterValue.isActive)
-        playlist.applyFilter(vm)
+    if (!vm.loadingList) {
+        val currentAlbumIndex = vm.getCurrentAlbumIndex()
+        val playlistState =
+            rememberLazyListState(initialFirstVisibleItemIndex = if (!vm.loadingList && vm.autoscroll && currentAlbumIndex != -1) currentAlbumIndex else 0)
+        var animating by remember { mutableStateOf(false) }
 
-    if (!vm.loadingList)
+        Text(
+            modifier = Modifier.padding(start = 8.dp),
+            text = playlistInfoString(vm),
+            style = MaterialTheme.typography.titleMedium,
+            fontStyle = FontStyle.Normal
+        )
+
         LazyColumn(state = playlistState) {
             if (vm.playlistsViewModel.filterValue.isActive) {
                 println("FOOB filtered albums: ${playlist.filteredAlbums.size}")
                 try {
                     items(playlist.filteredAlbums) { album ->
-                        if (album.matches(vm.playlistsViewModel.filterValue))
-                            AlbumCard(vm, album, layoutManager.getLayout())
+                        if (album.matches(vm.playlistsViewModel.filterValue)) AlbumCard(
+                            vm,
+                            album,
+                            layoutManager.getLayout()
+                        )
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
-            } else if (playlist.albums.isNotEmpty())
-                try {
-                    items(playlist.albums) { album ->
-                        AlbumCard(vm, album, layoutManager.getLayout())
-                    }
-                } catch (e: Exception) {
-                    e.printStackTrace()
+            } else if (playlist.albums.isNotEmpty()) try {
+                items(playlist.albums) { album ->
+                    AlbumCard(vm, album, layoutManager.getLayout())
                 }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
 
-    LaunchedEffect(vm.autoScrollIndex, vm.enforceAutoscroll) {
-        if (vm.autoscroll && vm.autoScrollIndex != -1) {
-            animating = true
-            if (vm.enforceAutoscroll) {
-                vm.enforceAutoscroll = false
-                playlistState.scrollToItem(if (vm.autoScrollIndex > 0) vm.autoScrollIndex - 1 else 1)
-            }
+        LaunchedEffect(vm.autoScrollIndex, vm.enforceAutoscroll) {
+            if (vm.autoscroll && vm.autoScrollIndex != -1) {
+                animating = true
+                if (vm.enforceAutoscroll) {
+                    vm.enforceAutoscroll = false
+                    playlistState.scrollToItem(if (vm.autoScrollIndex > 0) vm.autoScrollIndex - 1 else 1)
+                }
 
-            playlistState.scrollToItem(vm.autoScrollIndex)
-            animating = false
+                playlistState.scrollToItem(vm.autoScrollIndex)
+                animating = false
+            }
         }
     }
 }
@@ -512,8 +491,7 @@ fun PlaylistSwitcher(vm: AppViewModel, playlists: Playlists) {
             .padding(8.dp)
             .fillMaxWidth(),
         expanded = expanded,
-        onExpandedChange = { if (!vm.removeTitlesMode) expanded = !expanded }
-    ) {
+        onExpandedChange = { if (!vm.removeTitlesMode) expanded = !expanded }) {
         OutlinedTextField(
             modifier = Modifier
                 .fillMaxWidth()
@@ -532,36 +510,27 @@ fun PlaylistSwitcher(vm: AppViewModel, playlists: Playlists) {
                     expanded = expanded
                 )
             },
-            onValueChange = {
-            }
-        )
+            onValueChange = {})
         DropdownMenu(
-            modifier = Modifier
-                .exposedDropdownSize(),
+            modifier = Modifier.exposedDropdownSize(),
             expanded = expanded,
-            onDismissRequest = { expanded = false }
-        ) {
+            onDismissRequest = { expanded = false }) {
             playlists.playlists.forEachIndexed { index, playlistEntity ->
-                DropdownMenuItem(
-                    text = {
-                        Text(text = playlistEntity.name)
-                    },
-                    contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
-                    onClick = {
-                        selectedIndex = index
-                        expanded = false
-                        vm.autoscroll = false
-                        vm.playlistsViewModel.setSelectedPlaylist(playlists.playlists[selectedIndex].playlistId)
-                    },
-                    trailingIcon = {
-                        if (playlistEntity.isCurrent) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.equalizer),
-                                contentDescription = "Playing"
-                            )
-                        }
+                DropdownMenuItem(text = {
+                    Text(text = playlistEntity.name)
+                }, contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding, onClick = {
+                    selectedIndex = index
+                    expanded = false
+                    vm.autoscroll = false
+                    vm.playlistsViewModel.setSelectedPlaylist(playlists.playlists[selectedIndex].playlistId)
+                }, trailingIcon = {
+                    if (playlistEntity.isCurrent) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.equalizer),
+                            contentDescription = "Playing"
+                        )
                     }
-                )
+                })
             }
         }
     }
@@ -588,30 +557,22 @@ fun PlaylistSwitcherPreview() {
     val playlists = Playlists()
     playlists.addPlaylistEntity(
         PlaylistEntity(
-            "p1",
-            "name1",
-            false, 10
+            "p1", "name1", false, 10
         )
     )
     playlists.addPlaylistEntity(
         PlaylistEntity(
-            "p2",
-            "name2",
-            false, 10
+            "p2", "name2", false, 10
         )
     )
     playlists.addPlaylistEntity(
         PlaylistEntity(
-            "p3",
-            "name3",
-            true, 10
+            "p3", "name3", true, 10
         )
     )
     playlists.addPlaylistEntity(
         PlaylistEntity(
-            "p4",
-            "name4",
-            false, 10
+            "p4", "name4", false, 10
         )
     )
     PlaylistSwitcher(AppViewModel(), playlists = playlists)

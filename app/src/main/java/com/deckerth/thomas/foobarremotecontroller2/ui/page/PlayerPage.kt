@@ -137,7 +137,7 @@ fun PlayingPage(vm: AppViewModel) {
             }
         }
     }
-    if (showLoading)
+    if (!mainActivity.isTablet() && showLoading)
         LinearProgressIndicator(
             progress = { vm.loadingListProgress },
             modifier = Modifier.fillMaxWidth(),

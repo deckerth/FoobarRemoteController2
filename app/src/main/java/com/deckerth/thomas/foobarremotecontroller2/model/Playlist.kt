@@ -88,7 +88,7 @@ class Playlist(var playlistEntity: PlaylistEntity) {
 
     private fun partitionTitleList(): List<List<ITitle>> {
         val minChunkSize = 100
-        val maxChunkNumber = 80
+        val maxChunkNumber = 100
         val numChunks = min((titles.size + minChunkSize - 1) / minChunkSize, maxChunkNumber)
         val chunkSize = (titles.size + numChunks - 1) / numChunks
         var transferredForChunk = 0

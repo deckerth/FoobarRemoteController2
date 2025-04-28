@@ -154,4 +154,8 @@
     <string name="settings_always_on_display">Keep display active</string>
     <string name="settings_dynamic_color_scheme">Dynamic color scheme</string>
     <string name="settings_dynamic_color_scheme_desc">Change colors based on current album art</string>
+    <string name="playlist_title_count">Titles: %1$s</string>
+    <string name="playlist_filtered_indicator">" (filtered)"</string>
+    <string name="playlist_titles_singular">1 Title</string>
+    <string name="playlist_titles_plural">%1$s Titles</string>
 </resources>

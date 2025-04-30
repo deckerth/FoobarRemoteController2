@@ -21,6 +21,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -168,7 +169,7 @@ class MainActivity : ComponentActivity() {
             }
         }
         if (!this.isTablet())
-            // Enforce portrait orientation
+        // Enforce portrait orientation
             requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
     }
 
@@ -653,22 +654,23 @@ class MainActivity : ComponentActivity() {
             ) {
                 composable("Now Playing And Playlist") {
                     appBarLabel = appLabel
-                    Row { // Row for the two pages with shared progress indicator
+                    Column { // Row for the two pages with shared progress indicator
                         if (mainActivity.isTablet() && appViewModel.loadingList)
                             LinearProgressIndicator(
                                 progress = { appViewModel.loadingListProgress },
                                 modifier = Modifier.fillMaxWidth(),
                             )
-
-                        Box(
-                            modifier = Modifier.weight(1f)
-                        ) {
-                            PlaylistPage(appViewModel)
-                        }
-                        Box(
-                            modifier = Modifier.weight(1f)
-                        ) {
-                            PlayingPage(appViewModel)
+                        Row {
+                            Box(
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                PlaylistPage(appViewModel)
+                            }
+                            Box(
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                PlayingPage(appViewModel)
+                            }
                         }
                     }
                 }

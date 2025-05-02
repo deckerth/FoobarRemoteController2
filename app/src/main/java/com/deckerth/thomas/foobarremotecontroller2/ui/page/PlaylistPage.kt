@@ -112,10 +112,13 @@ fun PlaylistPage(vm: AppViewModel) {
     if (vm.playlistsViewModel.showFilter) TitleSearchBarDialog(
         vm = vm,
         onSearch = { searchString, genre, highRes ->
+            // activates the filter automatically if values are not initial
             vm.playlistsViewModel.filterValue.pattern = searchString
             vm.playlistsViewModel.filterValue.genre = genre
             vm.playlistsViewModel.filterValue.highRes = highRes
             vm.playlistsViewModel.showFilter = false
+            if (vm.playlistsViewModel.filterValue.isActive) vm.autoscroll = false
+            vm.displayedPlaylist!!.applyFilter(vm)
         },
         onDismiss = {
             vm.playlistsViewModel.showFilter = false
@@ -191,6 +194,7 @@ fun AlbumCard(vm: AppViewModel, album: Album, layout: Layout?, previewMode: Bool
             vm.playerAccess.playTrack(
                 album.tracks[0].details.playlistId, album.tracks[0].details.index
             )
+            vm.autoscroll = true
         }
     }
 
@@ -305,6 +309,7 @@ fun TitleEntry(
                 vm.playlistsViewModel.filterValue.clear()
                 vm.playlistsViewModel.showFilter = false
                 vm.playerAccess.playTrack(title.details.playlistId, title.details.index)
+                vm.autoscroll = true
             }
         }
     }

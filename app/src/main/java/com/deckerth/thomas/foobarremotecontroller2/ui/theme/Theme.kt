@@ -15,17 +15,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.viewModelScope
 import com.deckerth.thomas.foobarremotecontroller2.getDynamicColorSchemeEnabledBlocking
-import com.deckerth.thomas.foobarremotecontroller2.ui.mainActivity
-import com.deckerth.thomas.foobarremotecontroller2.viewmodel.viewModelInstance
 import com.materialkolor.dynamicColorScheme
 import com.materialkolor.ktx.animateColorScheme
 import com.materialkolor.ktx.themeColors
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.time.Instant
 
 private val DarkColorScheme = darkColorScheme(
     primary = Purple80,
@@ -73,9 +69,13 @@ fun Foobar2000RemoteControllerTheme(
 
 fun calculateSeedColor(bitmap: Bitmap): Color {
     // convert Bitmap to ImageBitmap
-    val imageBitmap = bitmap.asImageBitmap()
-    val suitableColors = imageBitmap.themeColors(fallback = Color.Blue)
-    return suitableColors.first()
+    try {
+        val imageBitmap = bitmap.asImageBitmap()
+        val suitableColors = imageBitmap.themeColors(fallback = Color.Blue)
+        return suitableColors.first()
+    } catch (e: Exception) {
+        return Color.Blue
+    }
 }
 
 fun updateColorScheme(

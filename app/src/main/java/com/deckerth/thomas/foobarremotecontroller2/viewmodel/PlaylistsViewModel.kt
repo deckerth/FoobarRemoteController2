@@ -8,6 +8,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.deckerth.thomas.foobarremotecontroller2.R
 import com.deckerth.thomas.foobarremotecontroller2.connector.PlayerObserver
+import com.deckerth.thomas.foobarremotecontroller2.model.AddTracksBehaviors
 import com.deckerth.thomas.foobarremotecontroller2.model.Playlist
 import com.deckerth.thomas.foobarremotecontroller2.model.PlaylistEntity
 import com.deckerth.thomas.foobarremotecontroller2.model.PlaylistLifecycleState
@@ -68,6 +69,7 @@ class PlaylistsViewModel(private val vm: AppViewModel) : ViewModel() {
 
     var showFilter by mutableStateOf(false)
     var filterValue by mutableStateOf(TitleFilter())
+    var nameOfNewPlaylist by mutableStateOf("")
 
     private val playerObserver = PlayerObserver(vm, vm.playlistAccess, this)
 
@@ -235,7 +237,10 @@ class PlaylistsViewModel(private val vm: AppViewModel) : ViewModel() {
                 var currentPlaylist: Playlist? = playlist
                 println("FOOB starting updatePlaylist: ${currentPlaylist!!.playlistEntity.playlistId}, titles: ${currentPlaylist.titles.count()}")
                 do {
-                    withContext(Dispatchers.Main) { vm.loadingListProgress = currentPlaylist!!.titles.count().toFloat() / currentPlaylist!!.playlistEntity.noOfTracks }
+                    withContext(Dispatchers.Main) {
+                        vm.loadingListProgress = currentPlaylist!!.titles.count()
+                            .toFloat() / currentPlaylist!!.playlistEntity.noOfTracks
+                    }
                     // invariant: currentPlaylist is not null
                     val startIndex = currentPlaylist!!.titles.count()
                     val playlistPart = vm.playlistAccess
@@ -298,10 +303,31 @@ class PlaylistsViewModel(private val vm: AppViewModel) : ViewModel() {
         return playlistRegistry.any { it.playlistEntity.name == name && it.lifecycleState != PlaylistLifecycleState.Invalid }
     }
 
-    fun addPlaylist(name: String) {
+    fun addPlaylist(addBehavior: AddTracksBehaviors = AddTracksBehaviors.ADD_BEHAVIOR_ADD) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                vm.playlistAccess.addPlaylist(noOfValidPlaylists(), name)
+                if (vm.addTitlesMode) {
+                    if (vm.displayedPlaylist != null) {
+                        val paths = vm.displayedPlaylist!!.getPathsOfSelectedTracks(vm)
+                        vm.disableAddTitlesMode()
+                        vm.playlistAccess.addPlaylist(
+                            noOfValidPlaylists(),
+                            nameOfNewPlaylist,
+                            paths,
+                            addBehavior
+                        )
+                    } else {
+                        vm.disableAddTitlesMode()
+                        vm.playlistAccess.addPlaylist(
+                            noOfValidPlaylists(),
+                            nameOfNewPlaylist )
+                    }
+
+                } else
+                    vm.playlistAccess.addPlaylist(
+                        noOfValidPlaylists(),
+                        nameOfNewPlaylist)
+
                 withContext(Dispatchers.Main) {
                     Toast.makeText(
                         mainActivity,

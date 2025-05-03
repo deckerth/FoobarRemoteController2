@@ -43,6 +43,8 @@ public interface ITitle {
 
     Bitmap getArtwork();
 
+    String getPath();
+
     void setArtwork(Bitmap artwork);
 
     String getArtworkUrl();

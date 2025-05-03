@@ -81,7 +81,7 @@ fun PlaylistPage(vm: AppViewModel) {
         val displayToast = vm.removeTitlesMode || vm.playlistsViewModel.showFilter
 
         if (vm.removeTitlesMode) vm.disableRemoveTitlesMode(true)
-
+        if (vm.addTitlesMode) vm.disableAddTitlesMode()
 
         if (vm.playlistsViewModel.showFilter) {
             vm.playlistsViewModel.showFilter = false
@@ -126,7 +126,12 @@ fun PlaylistPage(vm: AppViewModel) {
         })
 
     if (vm.createPlaylistRequest) PlaylistNameDialog(
-        vm = vm, onConfirm = { vm.playlistsViewModel.addPlaylist(it) })
+        vm = vm, onConfirm = { playlistName, createEmpty ->
+            vm.playlistsViewModel.nameOfNewPlaylist = playlistName
+            if (createEmpty) {
+                vm.playlistsViewModel.addPlaylist()
+            } else vm.addTitlesMode = true
+        })
 
     if (!mainActivity.isTablet() && ( vm.loadingList || vm.displayedPlaylist == null) ) LinearProgressIndicator(
         progress = {
@@ -187,7 +192,7 @@ fun AlbumCard(vm: AppViewModel, album: Album, layout: Layout?, previewMode: Bool
     }
 
     if (album.tracks.isNotEmpty() && !previewMode) modifier = modifier.clickable {
-        if (vm.removeTitlesMode) album.toggleIsSelected()
+        if (vm.removeTitlesMode || vm.addTitlesMode) album.toggleIsSelected()
         else {
             vm.playlistsViewModel.filterValue.clear()
             vm.playlistsViewModel.showFilter = false
@@ -206,7 +211,7 @@ fun AlbumCard(vm: AppViewModel, album: Album, layout: Layout?, previewMode: Bool
     ) {
         Column(modifier = modifier) {
             Row {
-                if (vm.removeTitlesMode) TriStateCheckbox(
+                if (vm.removeTitlesMode || vm.addTitlesMode) TriStateCheckbox(
                     modifier = Modifier.align(Alignment.CenterVertically),
                     state = album.isSelected,
                     onClick = {
@@ -278,7 +283,7 @@ fun AlbumCard(vm: AppViewModel, album: Album, layout: Layout?, previewMode: Bool
                 if (album.isExpanded) {
                     Column {
                         album.tracks.forEach { title ->
-                            if (title.details.matches(vm.playlistsViewModel.filterValue)) TitleEntry(
+                            TitleEntry(
                                 vm = vm, album = album, title = title, previewMode = previewMode
                             )
                         }
@@ -304,7 +309,7 @@ fun TitleEntry(
         title.details.index == vm.player!!.getIndex() && title.details.playlistId == vm.player!!.playlistId
     var modifier = Modifier.clickable {
         if (!previewMode) {
-            if (vm.removeTitlesMode) title.toggleIsSelected(vm)
+            if (vm.removeTitlesMode || vm.addTitlesMode) title.toggleIsSelected(vm)
             else {
                 vm.playlistsViewModel.filterValue.clear()
                 vm.playlistsViewModel.showFilter = false
@@ -320,7 +325,7 @@ fun TitleEntry(
         var infoButtonClicked by remember { mutableStateOf(false) }
         HorizontalDivider()
         Row {
-            if (vm.removeTitlesMode) Checkbox(
+            if (vm.removeTitlesMode || vm.addTitlesMode) Checkbox(
                 modifier = Modifier.align(Alignment.CenterVertically),
                 checked = title.isSelected,
                 onCheckedChange = { title.setSelected(vm, it) })
@@ -371,7 +376,7 @@ fun AlbumCardPreview() {
         "",
         "",
         "",
-        "",
+        "", ""
     )
     val album = Album(title)
     album.addTitle(title)
@@ -410,7 +415,7 @@ fun AlbumCardPreview2() {
         "",
         "",
         "",
-        "",
+        "", ""
     )
     val album = Album(title)
     album.addTitle(title)
@@ -496,7 +501,7 @@ fun PlaylistSwitcher(vm: AppViewModel, playlists: Playlists) {
             .padding(8.dp)
             .fillMaxWidth(),
         expanded = expanded,
-        onExpandedChange = { if (!vm.removeTitlesMode) expanded = !expanded }) {
+        onExpandedChange = { if (!vm.removeTitlesMode &&!vm.addTitlesMode) expanded = !expanded }) {
         OutlinedTextField(
             modifier = Modifier
                 .fillMaxWidth()
@@ -508,10 +513,10 @@ fun PlaylistSwitcher(vm: AppViewModel, playlists: Playlists) {
                 },
             label = { Text(text = stringResource(R.string.button_playlist_switcher)) },
             readOnly = true,
-            enabled = !vm.removeTitlesMode,
+            enabled = !vm.removeTitlesMode && !vm.addTitlesMode,
             value = vm.selectedPlaylistName,
             trailingIcon = {
-                if (!vm.removeTitlesMode) ExposedDropdownMenuDefaults.TrailingIcon(
+                if (!vm.removeTitlesMode && !vm.addTitlesMode) ExposedDropdownMenuDefaults.TrailingIcon(
                     expanded = expanded
                 )
             },
@@ -606,7 +611,7 @@ fun PlaylistPreview() {
             "",
             "",
             "",
-            "",
+            "", ""
         )
         val playlist = Playlist(PlaylistEntity("p4", "main", true, 10))
         playlist.addTitle(title)
@@ -631,7 +636,7 @@ fun PlaylistPreview() {
             "",
             "",
             "",
-            "",
+            "", ""
         )
         playlist.addTitle(title2)
         playlist.addTitle(title2)

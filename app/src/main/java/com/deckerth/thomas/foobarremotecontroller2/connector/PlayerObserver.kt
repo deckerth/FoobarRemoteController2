@@ -24,7 +24,7 @@ class PlayerObserver(private val vm: AppViewModel, private val playlistAccess: P
                         if (vm.player != null && playlists != null)
                             if (vm.autoscroll && vm.player!!.playlistId.isNotEmpty() && vm.player!!.playlistId != vm.selectedPlaylist)
                                 playlistsViewModel.setSelectedPlaylist(vm.player!!.playlistId)
-                            else if (vm.selectedPlaylist.isEmpty())
+                            else if (vm.selectedPlaylist.isEmpty() && playlists.currentPlaylist != null)
                                 playlistsViewModel.setSelectedPlaylist(playlists.currentPlaylist.playlistId)
 
                         if (playlists != null && playlists.ipAddress == vm.ipAddress)

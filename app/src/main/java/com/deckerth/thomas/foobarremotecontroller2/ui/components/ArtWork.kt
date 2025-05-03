@@ -4,10 +4,10 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -23,7 +23,7 @@ import com.deckerth.thomas.foobarremotecontroller2.R
 import com.deckerth.thomas.foobarremotecontroller2.model.Player
 
 @Composable
-fun ArtWork(player: Player, previewMode: Boolean = false, modifier: Modifier = Modifier) {
+fun ArtWork(player: Player, previewMode: Boolean = false) {
     val index = player.getIndex()
     if (index >= 0) {
         if (previewMode) {
@@ -45,14 +45,14 @@ fun ArtWork(player: Player, previewMode: Boolean = false, modifier: Modifier = M
     } else {
         Box(
             modifier = Modifier
-                .aspectRatio(1f)
                 .fillMaxSize()
                 .clip(MaterialTheme.shapes.medium)
         ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.surfaceContainerHigh)
+            Box(modifier = Modifier
+                .size(300.dp)
+                .align(Alignment.Center)
+                .background(MaterialTheme.colorScheme.surfaceContainerHigh)
+                .padding(32.dp)
             ) {
                 Text(
                     modifier = Modifier

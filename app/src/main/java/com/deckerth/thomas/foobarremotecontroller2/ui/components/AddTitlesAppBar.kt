@@ -5,7 +5,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -14,13 +14,15 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import com.deckerth.thomas.foobarremotecontroller2.R
+import com.deckerth.thomas.foobarremotecontroller2.getAddTrackBehavior
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RemoveTitlesAppBar(appViewModel: AppViewModel){
+fun AddTitlesAppBar(appViewModel: AppViewModel) {
+    val addBehavior = getAddTrackBehavior()
     AnimatedVisibility(
-        visible = appViewModel.removeTitlesMode,
+        visible = appViewModel.addTitlesMode,
         enter = fadeIn()
     ) {
         TopAppBar(
@@ -38,7 +40,8 @@ fun RemoveTitlesAppBar(appViewModel: AppViewModel){
             },
             navigationIcon = {
                 IconButton(onClick = {
-                    appViewModel.disableRemoveTitlesMode(true)
+                    appViewModel.playlistsViewModel.nameOfNewPlaylist = ""
+                    appViewModel.disableAddTitlesMode()
                 }) {
                     Icon(
                         imageVector = Icons.Default.Clear,
@@ -49,15 +52,10 @@ fun RemoveTitlesAppBar(appViewModel: AppViewModel){
             },
             actions = {
                 Row {
-                    IconButton(onClick = {
-                        appViewModel.displayedPlaylist!!.removeSelectedTracks(
-                            appViewModel
-                        )
+                    Button(onClick = {
+                        appViewModel.playlistsViewModel.addPlaylist(addBehavior)
                     }) {
-                        Icon(
-                            imageVector = Icons.Default.Delete,
-                            contentDescription = "Delete"
-                        )
+                        Text(stringResource(R.string.button_create_playlist))
                     }
                 }
             }

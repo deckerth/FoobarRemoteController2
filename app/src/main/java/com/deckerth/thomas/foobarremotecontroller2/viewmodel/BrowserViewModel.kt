@@ -63,7 +63,7 @@ class BrowserViewModel(private val vm : AppViewModel) : ViewModel() {
                 if (vm.displayedPlaylist != null) {
                     loadingData.value = true
                     vm.playlistAccess
-                        .addPathToPlaylist(
+                        .addPathsToPlaylist(
                             vm.displayedPlaylist!!.playlistEntity.playlistId,
                             vm.browserAccess.escapePathSeparator(entry.path),
                             addBehavior

@@ -173,10 +173,21 @@ class Playlist(var playlistEntity: PlaylistEntity) {
         return titles.find { it.index == index }
     }
 
+    fun getPathsOfSelectedTracks(vm: AppViewModel): List<String> {
+        val result = mutableListOf<String>()
+        val albumList = if (vm.playlistsViewModel.filterValue.isActive) filteredAlbums else albums
+        for (album in albumList)
+            for (title in album.tracks)
+                if (title.isSelected)
+                    result.add(title.details.path)
+        return result
+    }
+
     fun removeSelectedTracks(vm: AppViewModel) {
-        if (vm.noOfTitlesToRemove > 0) {
+        if (vm.noOfSelectedTitles > 0) {
             val titlesToRemove = mutableListOf<Int>()
-            for (album in albums)
+            val albumList = if (vm.playlistsViewModel.filterValue.isActive) filteredAlbums else albums
+            for (album in albumList)
                 for (title in album.tracks)
                     if (title.isSelected) {
                         titlesToRemove.add(title.details.index)
@@ -190,14 +201,19 @@ class Playlist(var playlistEntity: PlaylistEntity) {
                     )
             }
         }
-        vm.noOfTitlesToRemove = 0
+        vm.noOfSelectedTitles = 0
         vm.disableRemoveTitlesMode(false)
     }
 
     fun resetSelectedTracks(vm: AppViewModel) {
-        if (vm.noOfTitlesToRemove > 0) {
-            for (album in albums)
+        if (vm.noOfSelectedTitles > 0) {
+            val albumList = if (vm.playlistsViewModel.filterValue.isActive) filteredAlbums else albums
+            for (album in albumList)
                 album.setIsSelected(ToggleableState.Off)
         }
+    }
+
+    fun isNotEmpty(vm: AppViewModel): Boolean {
+        return if (vm.playlistsViewModel.filterValue.isActive) filteredAlbums.isNotEmpty() else albums.isNotEmpty()
     }
 }

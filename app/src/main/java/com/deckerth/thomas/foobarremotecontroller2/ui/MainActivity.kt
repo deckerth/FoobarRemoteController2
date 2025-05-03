@@ -82,6 +82,7 @@ import com.deckerth.thomas.foobarremotecontroller2.R
 import com.deckerth.thomas.foobarremotecontroller2.getAlwaysOnDisplay
 import com.deckerth.thomas.foobarremotecontroller2.getIpAddressBlocking
 import com.deckerth.thomas.foobarremotecontroller2.model.checkIpAddressSyntax
+import com.deckerth.thomas.foobarremotecontroller2.ui.components.AddTitlesAppBar
 import com.deckerth.thomas.foobarremotecontroller2.ui.components.RemoveTitlesAppBar
 import com.deckerth.thomas.foobarremotecontroller2.ui.page.BrowserMainPage
 import com.deckerth.thomas.foobarremotecontroller2.ui.page.LayoutEditorMainPage
@@ -277,6 +278,7 @@ class MainActivity : ComponentActivity() {
                                         checked = appViewModel.autoscroll,
                                         onCheckedChange = {
                                             appViewModel.autoscroll = !appViewModel.autoscroll
+                                            appViewModel.playlistsViewModel.filterValue.isActive = false
 
                                             if (appViewModel.autoscroll)
                                                 CoroutineScope(Dispatchers.Main).launch {
@@ -415,13 +417,14 @@ class MainActivity : ComponentActivity() {
                     )
                 }
                 RemoveTitlesAppBar(appViewModel)
+                AddTitlesAppBar(appViewModel)
             },
             bottomBar = {
                 if (getCurrentRoute(navController) in items.map { it.key }) {
                     NavigationBar {
                         items.forEachIndexed { index, item ->
                             NavigationBarItem(
-                                enabled = !appViewModel.removeTitlesMode,
+                                enabled = !appViewModel.removeTitlesMode && !appViewModel.addTitlesMode,
                                 selected = selectedItemIndex == index,
                                 onClick = {
                                     selectedItemIndex = index
@@ -644,6 +647,7 @@ class MainActivity : ComponentActivity() {
                     )
                 }
                 RemoveTitlesAppBar(appViewModel)
+                AddTitlesAppBar(appViewModel)
             },
             modifier = Modifier.fillMaxSize()
         ) { innerPadding ->

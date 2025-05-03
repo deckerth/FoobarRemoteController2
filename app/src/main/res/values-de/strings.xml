@@ -144,7 +144,7 @@
     <string name="filter_high_res">High Resolution</string>
     <string name="create_playlist">Neue Playlist</string>
     <string name="cancel">Abbrechen</string>
-    <string name="button_create_playlist">Neue Playlist</string>
+    <string name="button_create_playlist">Playlist erzeugen</string>
     <string name="invalid_playlist_name">Es existiert bereits eine Playlist mit diesem Namen.</string>
     <string name="playlist_name">Name der Playlist</string>
     <string name="playlist_name_placeholder">Name</string>
@@ -159,4 +159,6 @@
     <string name="playlist_filtered_indicator">" (gefiltert)"</string>
     <string name="playlist_titles_singular">1 Titel</string>
     <string name="playlist_titles_plural">%1$s Titel</string>
+    <string name="create_empty_playlist">Leere Playlist anlegen</string>
+    <string name="choose_titles_from_current_playlist">Titel von der aktuellen Playlist hinzufügen</string>
 </resources>

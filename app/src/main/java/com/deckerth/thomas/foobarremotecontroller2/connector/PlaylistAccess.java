@@ -9,14 +9,13 @@ import com.deckerth.thomas.foobarremotecontroller2.model.Playlists;
 import com.deckerth.thomas.foobarremotecontroller2.model.Title;
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel;
 
-import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 
 public class PlaylistAccess {
@@ -37,11 +36,23 @@ public class PlaylistAccess {
             return parsePlaylists(response);
     }
 
+    private String getFilenameWithoutExtension(String fullPath) {
+        int lastSeparatorIndex = fullPath.lastIndexOf('\\');
+        String filenameWithExtension = (lastSeparatorIndex != -1) ?
+                fullPath.substring(lastSeparatorIndex + 1) :
+                fullPath;
+
+        int lastDotIndex = filenameWithExtension.lastIndexOf('.');
+        return (lastDotIndex != -1) ?
+                filenameWithExtension.substring(0, lastDotIndex) :
+                filenameWithExtension;
+    }
+
     public Playlist getPlaylist(PlaylistEntity playlistEntity, int startIndex) {
         Response response;
         try {
             response = vm.connector.getData("playlists/" + playlistEntity.getPlaylistId() +
-                    "/items/" + startIndex + "%3A" + 1000 + "?columns=%25label%25,%25catalog%25,%25composer%25,%25album%25,%25title%25,%25artist%25,%25samplerate%25,%25genre%25,%25discnumber%25,%25track%25,%25length%25,%24filename%28%25path%25%29%24");
+                    "/items/" + startIndex + "%3A" + 1000 + "?columns=%25label%25,%25catalog%25,%25composer%25,%25album%25,%25title%25,%25artist%25,%25samplerate%25,%25genre%25,%25discnumber%25,%25track%25,%25length%25,%25path%25");
         } catch (Exception e) {
             errorHandler.logError(ErrorType.NETWORK, ErrorCode.CONNECTION_ERROR, ErrorSource.PLAYLIST_ITEMS, e);
             return null;
@@ -77,7 +88,7 @@ public class PlaylistAccess {
                                     "?",
                                     "01",
                                     "4:18"
-                                    "<filename>"
+                                    "<path>"
                                 ]
                             },
                             {
@@ -94,7 +105,8 @@ public class PlaylistAccess {
                 String discNumber = columnsArray.getString(8);
                 String track = columnsArray.getString(9);
                 String length = columnsArray.getString(10);
-                String filename = columnsArray.getString(11);
+                String path = columnsArray.getString(11);
+                String filename = getFilenameWithoutExtension(path);
 
                 String effectiveTitle = "";
                 if (!title.equals(filename)) effectiveTitle = title;
@@ -114,7 +126,8 @@ public class PlaylistAccess {
                                 discNumber,
                                 track,
                                 length, "", "",
-                                vm.connector.serverAddress(input.getUsedIpAddress()) + "artwork/" + playlistEntity.getPlaylistId() + "/" + (i + startIndex)));
+                                vm.connector.serverAddress(input.getUsedIpAddress()) + "artwork/" + playlistEntity.getPlaylistId() + "/" + (i + startIndex),
+                                path));
             }
         } catch (JSONException e) {
             errorHandler.logError(ErrorType.API, ErrorCode.BAD_RESPONSE, ErrorSource.PLAYLIST_ITEMS, e);
@@ -164,7 +177,13 @@ public class PlaylistAccess {
         return result;
     }
 
-    public void addPathToPlaylist(String playlistId, String path, AddTracksBehaviors addBehavior) {
+    public void addPathsToPlaylist(String playlistId, String path, AddTracksBehaviors addBehavior) {
+        List<String> paths = new ArrayList<>();
+        paths.add(path);
+        addPathsToPlaylist(playlistId, paths, addBehavior);
+    }
+
+    public void addPathsToPlaylist(String playlistId, List<String> paths, AddTracksBehaviors addBehavior) {
 //        {
 //            "items": [
 //            "T:\\Music\\Alpha\\Alpha 634"
@@ -172,22 +191,29 @@ public class PlaylistAccess {
 //            "play": true
 //        }
         String playValue = "false";
-        String replaceValue = "true";
-        switch (addBehavior) {
-            case ADD_BEHAVIOR_ADD:
+        String replaceValue = switch (addBehavior) {
+            case ADD_BEHAVIOR_ADD -> {
                 playValue = "false";
-                replaceValue = "false";
-                break;
-            case ADD_BEHAVIOR_ADD_PLAY:
+                yield "false";
+            }
+            case ADD_BEHAVIOR_ADD_PLAY -> {
                 playValue = "true";
-                replaceValue = "false";
-                break;
-            case ADD_BEHAVIOR_REPLACE_PLAY:
+                yield "false";
+            }
+            case ADD_BEHAVIOR_REPLACE_PLAY -> {
                 playValue = "true";
-                replaceValue = "true";
-                break;
+                yield "true";
+            }
+        };
+        int pos = 0;
+        StringBuilder pathString = new StringBuilder();
+        for (String path : paths) {
+            pathString.append("\"").append(path.replace("\\", "\\\\")).append("\"");
+            if (pos < paths.size() - 1) // 0, 1 : indexes.size() = 2
+                pathString.append(", ");
+            pos++;
         }
-        String jsonString = "{\"items\":[\"" + path + "\"], \"play\":" + playValue + ", \"replace\":" + replaceValue + " }";
+        String jsonString = "{\"items\":[ " + pathString + "], \"play\":" + playValue + ", \"replace\":" + replaceValue + " }";
         vm.connector.postData("playlists/" + playlistId + "/items/add/", jsonString);
     }
 
@@ -212,16 +238,19 @@ public class PlaylistAccess {
         vm.connector.postData("playlists/" + playlistId + "/items/remove", jsonString.toString());
     }
 
-    public void addPlaylist(int position, @NotNull String name) {
+    public void addPlaylist(int position, String name) {
+        addPlaylist(position, name, null, null);
+    }
+
+    public void addPlaylist(int position, String name, List<String> paths, AddTracksBehaviors addBehavior) {
         // http://localhost:8880/api/playlists/add?index=11&title=test
-        String encodedName = name;
-        try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
-                encodedName = URLEncoder.encode(name, StandardCharsets.UTF_8);
-            else
-                encodedName = URLEncoder.encode(name, "UTF-8");
-        } catch (UnsupportedEncodingException ignored) {
-        }
+        String encodedName;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+            encodedName = URLEncoder.encode(name, StandardCharsets.UTF_8);
+        else
+            encodedName = URLEncoder.encode(name, StandardCharsets.UTF_8);
         vm.connector.postData("playlists/add?index=" + position + "&title=" + encodedName);
+        if (paths != null)
+            addPathsToPlaylist("" + position, paths, addBehavior);
     }
 }

@@ -8,7 +8,6 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.deckerth.thomas.foobarremotecontroller2.connector.BrowserAccess
 import com.deckerth.thomas.foobarremotecontroller2.connector.ErrorHandler
 import com.deckerth.thomas.foobarremotecontroller2.connector.HTTPConnector
@@ -22,7 +21,6 @@ import com.deckerth.thomas.foobarremotecontroller2.model.Playlist
 import com.deckerth.thomas.foobarremotecontroller2.model.VolumeControl
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.ViewsWithLayout
 import com.deckerth.thomas.foobarremotecontroller2.ui.theme.updateColorScheme
-import kotlinx.coroutines.launch
 import kotlin.math.floor
 
 var viewModelInstance: AppViewModel? = null
@@ -57,8 +55,9 @@ class AppViewModel : ViewModel() {
     var selectedPlaylistName by mutableStateOf("")
     var isSick by mutableStateOf(false)
     var removeTitlesMode by mutableStateOf(false)
+    var addTitlesMode by mutableStateOf(false)
     var showTopAppBar by mutableStateOf(true)
-    var noOfTitlesToRemove by mutableIntStateOf(0)
+    var noOfSelectedTitles by mutableIntStateOf(0)
     var titleToRemoveWasSelected by mutableStateOf(false)
     var createPlaylistRequest by mutableStateOf(false)
 
@@ -83,11 +82,11 @@ class AppViewModel : ViewModel() {
     }
 
     fun increaseNoOfTitlesToRemove() {
-        noOfTitlesToRemove++
+        noOfSelectedTitles++
     }
 
     fun decreaseNoOfTitlesToRemove() {
-        noOfTitlesToRemove--
+        noOfSelectedTitles--
     }
 
     fun enableRemoveTitlesMode() {
@@ -106,6 +105,15 @@ class AppViewModel : ViewModel() {
         if (resetSelection) // not done when titles shall be removed
             if (displayedPlaylist != null)
                 displayedPlaylist!!.resetSelectedTracks(this)
+    }
+
+    fun disableAddTitlesMode() {
+        if (!addTitlesMode) return
+        addTitlesMode = false
+        showTopAppBar = true
+        autoscroll = autoscrollSave
+        if (displayedPlaylist != null)
+            displayedPlaylist!!.resetSelectedTracks(this)
     }
 
     fun getCurrentAlbumIndex(): Int {

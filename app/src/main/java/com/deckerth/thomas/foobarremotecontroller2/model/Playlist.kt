@@ -44,6 +44,7 @@ class Playlist(var playlistEntity: PlaylistEntity) {
         val result = mutableListOf<String>()
         if (addAllGenresText)
             result.add(mainActivity.getString(R.string.all_genres))
+        genres.sort()
         result.addAll(genres)
         return result
     }

@@ -56,7 +56,7 @@ data class Player(
     }
 
     fun setPos(vm: AppViewModel, relativePos : Float) {
-        if (!vm.errorHandler.sick())
+        if (!vm.errorHandler.sick() && duration.isNotBlank())
             CoroutineScope(Dispatchers.IO).launch {
                 val absolutePosition = relativePos * duration.toFloat()
                 withContext(Dispatchers.Main) { position = absolutePosition.toString() }

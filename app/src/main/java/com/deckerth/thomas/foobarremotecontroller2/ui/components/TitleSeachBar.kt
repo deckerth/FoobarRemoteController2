@@ -150,7 +150,7 @@ fun TitleSearchBar(
 
 @Composable
 fun GenreDropDown(vm: AppViewModel? = null, modifier: Modifier = Modifier) {
-    val genres = if (vm == null)
+    val genres = if (vm?.displayedPlaylist == null)
         listOf("All Genres")
     else
         vm.displayedPlaylist!!.getGenres(addAllGenresText = true)

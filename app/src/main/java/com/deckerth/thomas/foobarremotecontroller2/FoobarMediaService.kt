@@ -36,7 +36,7 @@ fun enableVolumeControl() {
 
 class FoobarMediaService : Service() {
     private lateinit var audioManager: AudioManager
-    private val vm: AppViewModel = viewModelInstance!!
+    private val vm: AppViewModel = viewModelInstance
 
     private val audioFocusRequest: AudioFocusRequest = AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
         .setOnAudioFocusChangeListener { focusChange ->

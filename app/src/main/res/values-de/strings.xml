@@ -87,7 +87,6 @@
     <string name="preview_layout">Vorschau</string>
     <string name="files_added">Die Tracks wurden zur Playlist %1$s hinzugefügt</string>
     <string name="button_back">Zurück</string>
-    <string name="settings_browser">Browser</string>
     <string name="add_behavior_add">Hinzufügen</string>
     <string name="add_behavior_add_play">Hinzufügen und wiedergeben</string>
     <string name="add_behavior_replace_play">Ersetzen und wiedergeben</string>
@@ -161,4 +160,9 @@
     <string name="playlist_titles_plural">%1$s Titel</string>
     <string name="create_empty_playlist">Leere Playlist anlegen</string>
     <string name="choose_titles_from_current_playlist">Titel von der aktuellen Playlist hinzufügen</string>
+    <string name="settings_browser">Playlists</string>
+    <string name="settings_create_empty_playlists">Create empty playlists</string>
+    <string name="settings_create_empty_playlists_enabled_desc">New playlists are created empty</string>
+    <string name="settings_create_empty_playlists_disabled_desc">Neue Playlsists können durch Auswählen von Tracks aus der aktuellen Playlist befüllt werden. (Erfordert mehr Speicher für die Pfade aller Titel.)</string>
+    <string name="settings_create_prefilled_playlists">Übertragen ausgewählter Titel in neue Playlists</string>
 </resources>

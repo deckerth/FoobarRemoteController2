@@ -27,6 +27,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.deckerth.thomas.foobarremotecontroller2.R
+import com.deckerth.thomas.foobarremotecontroller2.getCreationOfNonEmptyPlaylists
 import com.deckerth.thomas.foobarremotecontroller2.ui.theme.Foobar2000RemoteControllerTheme
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
 
@@ -106,52 +107,58 @@ fun PlaylistNameDialog(
                     style = MaterialTheme.typography.bodyMedium
                 )
 
-            Row(
-                Modifier
-                    .fillMaxWidth()
-                    .height(56.dp)
-                    .selectable(
+            if (getCreationOfNonEmptyPlaylists()) {
+                Row(
+                    Modifier
+                        .fillMaxWidth()
+                        .height(56.dp)
+                        .selectable(
+                            selected = (createEmptyPlaylist),
+                            onClick = { createEmptyPlaylist = !createEmptyPlaylist },
+                            role = Role.RadioButton
+                        )
+                        .padding(horizontal = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    RadioButton(
                         selected = (createEmptyPlaylist),
-                        onClick = { createEmptyPlaylist = !createEmptyPlaylist },
-                        role = Role.RadioButton
+                        onClick = null // null recommended for accessibility with screen readers
                     )
-                    .padding(horizontal = 16.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                RadioButton(
-                    selected = (createEmptyPlaylist),
-                    onClick = null // null recommended for accessibility with screen readers
-                )
-                Text(
-                    text = stringResource(R.string.create_empty_playlist),
-                    style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier.padding(start = 16.dp)
-                )
-            }
+                    Text(
+                        text = stringResource(R.string.create_empty_playlist),
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.padding(start = 16.dp)
+                    )
+                }
 
-            Row(
-                Modifier
-                    .fillMaxWidth()
-                    .height(56.dp)
-                    .selectable(
+                Row(
+                    Modifier
+                        .fillMaxWidth()
+                        .height(56.dp)
+                        .selectable(
+                            selected = (!createEmptyPlaylist),
+                            onClick = { createEmptyPlaylist = !createEmptyPlaylist },
+                            enabled = vm?.displayedPlaylist != null && vm.displayedPlaylist!!.isNotEmpty(
+                                vm
+                            ),
+                            role = Role.RadioButton
+                        )
+                        .padding(horizontal = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    RadioButton(
                         selected = (!createEmptyPlaylist),
-                        onClick = { createEmptyPlaylist = !createEmptyPlaylist },
-                        enabled = vm?.displayedPlaylist != null && vm.displayedPlaylist!!.isNotEmpty(vm),
-                        role = Role.RadioButton
+                        enabled = vm?.displayedPlaylist != null && vm.displayedPlaylist!!.isNotEmpty(
+                            vm
+                        ),
+                        onClick = null // null recommended for accessibility with screen readers
                     )
-                    .padding(horizontal = 16.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                RadioButton(
-                    selected = (!createEmptyPlaylist),
-                    enabled = vm?.displayedPlaylist != null && vm.displayedPlaylist!!.isNotEmpty(vm),
-                    onClick = null // null recommended for accessibility with screen readers
-                )
-                Text(
-                    text = stringResource(R.string.choose_titles_from_current_playlist),
-                    style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier.padding(start = 16.dp)
-                )
+                    Text(
+                        text = stringResource(R.string.choose_titles_from_current_playlist),
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.padding(start = 16.dp)
+                    )
+                }
             }
         }
     }, modifier = modifier

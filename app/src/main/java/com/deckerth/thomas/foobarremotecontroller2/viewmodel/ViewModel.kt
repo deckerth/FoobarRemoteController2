@@ -23,12 +23,19 @@ import com.deckerth.thomas.foobarremotecontroller2.ui.layout.ViewsWithLayout
 import com.deckerth.thomas.foobarremotecontroller2.ui.theme.updateColorScheme
 import kotlin.math.floor
 
-var viewModelInstance: AppViewModel? = null
+private var instance: AppViewModel? = null
+val viewModelInstance: AppViewModel get() {
+    if (instance == null) {
+        instance = AppViewModel()
+        instance!!.initialize()
+    }
+    return instance!!
+}
 
 class AppViewModel : ViewModel() {
 
     init {
-        viewModelInstance = this
+        instance = this
     }
 
     var ipAddress: String? = null

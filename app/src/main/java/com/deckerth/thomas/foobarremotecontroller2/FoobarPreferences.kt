@@ -18,7 +18,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 val Context.dataStore by preferencesDataStore(name = "settings")
@@ -31,6 +30,7 @@ private val PAUSE_DURING_PHONE_CALLS_KEY = booleanPreferencesKey("pause_during_p
 private val ADD_TRACK_BEHAVIOR_KEY = intPreferencesKey("add_track_behavior")
 private val ALWAYS_ON_DISPLAY_KEY = booleanPreferencesKey("always_on_display")
 private val DYNAMIC_COLOR_SCHEME_KEY = booleanPreferencesKey("dynamic_color_scheme")
+private val CREATION_OF_NON_EMPTY_PLAYLISTS_KEY = booleanPreferencesKey("creation_of_non_empty_playlists")
 
 private fun <T> getFlow(context: Context, key: Preferences.Key<T>): Flow<T?> {
     return context.dataStore.data.map { preferences ->
@@ -187,5 +187,26 @@ suspend fun getDynamicColorSchemeEnabledBlocking(): Boolean {
         mainActivity,
         DYNAMIC_COLOR_SCHEME_KEY,
         true
+    )
+}
+
+private const val creationOfNonEmptyPlaylistsInitialValue = true
+
+fun saveCreationOfNonEmptyPlaylists(enabled: Boolean, context: Context) {
+    runBlocking {
+        saveValue(context, enabled, CREATION_OF_NON_EMPTY_PLAYLISTS_KEY)
+    }
+}
+
+@Composable
+fun getCreationOfNonEmptyPlaylists(): Boolean {
+    return getValue(mainActivity, CREATION_OF_NON_EMPTY_PLAYLISTS_KEY, creationOfNonEmptyPlaylistsInitialValue)
+}
+
+suspend fun getCreationOfNonEmptyPlaylistsBlocking(): Boolean {
+    return getValueBlocking(
+        mainActivity,
+        CREATION_OF_NON_EMPTY_PLAYLISTS_KEY,
+        creationOfNonEmptyPlaylistsInitialValue
     )
 }

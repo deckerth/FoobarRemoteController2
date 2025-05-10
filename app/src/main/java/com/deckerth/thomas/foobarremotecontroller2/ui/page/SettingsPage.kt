@@ -47,6 +47,7 @@ import com.deckerth.thomas.foobarremotecontroller2.R
 import com.deckerth.thomas.foobarremotecontroller2.enableVolumeControl
 import com.deckerth.thomas.foobarremotecontroller2.getAddTrackBehavior
 import com.deckerth.thomas.foobarremotecontroller2.getAlwaysOnDisplay
+import com.deckerth.thomas.foobarremotecontroller2.getCreationOfNonEmptyPlaylists
 import com.deckerth.thomas.foobarremotecontroller2.getDynamicColorSchemeEnabled
 import com.deckerth.thomas.foobarremotecontroller2.getFoobarVolumeControl
 import com.deckerth.thomas.foobarremotecontroller2.getIpAddress
@@ -55,6 +56,7 @@ import com.deckerth.thomas.foobarremotecontroller2.getViewMode
 import com.deckerth.thomas.foobarremotecontroller2.model.AddTracksBehaviors
 import com.deckerth.thomas.foobarremotecontroller2.saveAddTrackBehavior
 import com.deckerth.thomas.foobarremotecontroller2.saveAlwaysOnDisplay
+import com.deckerth.thomas.foobarremotecontroller2.saveCreationOfNonEmptyPlaylists
 import com.deckerth.thomas.foobarremotecontroller2.saveDynamicColorScheme
 import com.deckerth.thomas.foobarremotecontroller2.saveFoobarVolumeControl
 import com.deckerth.thomas.foobarremotecontroller2.savePauseDuringPhoneCalls
@@ -191,6 +193,20 @@ fun SettingsPage() {
                     getText = { v: AddTracksBehaviors -> v.text }
                 )
             }
+
+            PreferenceItem(
+                stringResource(R.string.settings_create_prefilled_playlists),
+                summary = if(getCreationOfNonEmptyPlaylists())
+                    stringResource(R.string.settings_create_empty_playlists_disabled_desc)
+                else
+                    stringResource(R.string.settings_create_empty_playlists_enabled_desc),
+                onClick = { enabled: Boolean ->
+                    saveCreationOfNonEmptyPlaylists(!enabled, mainActivity)
+                },
+                showToggle = true,
+                isChecked = getCreationOfNonEmptyPlaylists(),
+                isEnabled = true
+            )
 
             var isFoobarLinkOpen by remember { mutableStateOf(false) }
             Title(stringResource(R.string.foobar_link_title))

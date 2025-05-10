@@ -48,19 +48,23 @@ public class PlaylistAccess {
                 filenameWithExtension;
     }
 
-    public Playlist getPlaylist(PlaylistEntity playlistEntity, int startIndex) {
+    public Playlist getPlaylist(PlaylistEntity playlistEntity, int startIndex, boolean withPaths) {
         Response response;
         try {
-            response = vm.connector.getData("playlists/" + playlistEntity.getPlaylistId() +
-                    "/items/" + startIndex + "%3A" + 1000 + "?columns=%25label%25,%25catalog%25,%25composer%25,%25album%25,%25title%25,%25artist%25,%25samplerate%25,%25genre%25,%25discnumber%25,%25track%25,%25length%25,%25path%25");
+            if (withPaths)
+                response = vm.connector.getData("playlists/" + playlistEntity.getPlaylistId() +
+                        "/items/" + startIndex + "%3A" + 1000 + "?columns=%25label%25,%25catalog%25,%25composer%25,%25album%25,%25title%25,%25artist%25,%25samplerate%25,%25genre%25,%25discnumber%25,%25track%25,%25length%25,%25path%25");
+            else
+                response = vm.connector.getData("playlists/" + playlistEntity.getPlaylistId() +
+                        "/items/" + startIndex + "%3A" + 1000 + "?columns=%25label%25,%25catalog%25,%25composer%25,%25album%25,%25title%25,%25artist%25,%25samplerate%25,%25genre%25,%25discnumber%25,%25track%25,%25length%25,%24filename%28%25path%25%29%24");
         } catch (Exception e) {
             errorHandler.logError(ErrorType.NETWORK, ErrorCode.CONNECTION_ERROR, ErrorSource.PLAYLIST_ITEMS, e);
             return null;
         }
-        return parsePlaylist(response, playlistEntity, startIndex);
+        return parsePlaylist(response, playlistEntity, startIndex, withPaths);
     }
 
-    private Playlist parsePlaylist(Response input, PlaylistEntity playlistEntity, int startIndex) {
+    private Playlist parsePlaylist(Response input, PlaylistEntity playlistEntity, int startIndex, boolean withPaths) {
         Playlist playlist = new Playlist(playlistEntity);
         playlist.setIpAddress(input.getUsedIpAddress());
         try {
@@ -88,7 +92,7 @@ public class PlaylistAccess {
                                     "?",
                                     "01",
                                     "4:18"
-                                    "<path>"
+                                    "<path>" / "<filename>"
                                 ]
                             },
                             {
@@ -105,9 +109,13 @@ public class PlaylistAccess {
                 String discNumber = columnsArray.getString(8);
                 String track = columnsArray.getString(9);
                 String length = columnsArray.getString(10);
-                String path = columnsArray.getString(11);
-                String filename = getFilenameWithoutExtension(path);
-
+                String path = "";
+                String filename;
+                if (withPaths) {
+                    path = columnsArray.getString(11);
+                    filename = getFilenameWithoutExtension(path);
+                } else
+                    filename = columnsArray.getString(11);
                 String effectiveTitle = "";
                 if (!title.equals(filename)) effectiveTitle = title;
 
@@ -190,7 +198,7 @@ public class PlaylistAccess {
 //             ],
 //            "play": true
 //        }
-        String playValue = "false";
+        String playValue;
         String replaceValue = switch (addBehavior) {
             case ADD_BEHAVIOR_ADD -> {
                 playValue = "false";

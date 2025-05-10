@@ -8,6 +8,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.deckerth.thomas.foobarremotecontroller2.R
 import com.deckerth.thomas.foobarremotecontroller2.connector.PlayerObserver
+import com.deckerth.thomas.foobarremotecontroller2.getCreationOfNonEmptyPlaylistsBlocking
 import com.deckerth.thomas.foobarremotecontroller2.model.AddTracksBehaviors
 import com.deckerth.thomas.foobarremotecontroller2.model.Playlist
 import com.deckerth.thomas.foobarremotecontroller2.model.PlaylistEntity
@@ -83,7 +84,7 @@ class PlaylistsViewModel(private val vm: AppViewModel) : ViewModel() {
             val playlists = Playlists()
             for (list in playlistRegistry)
                 if (list.lifecycleState != PlaylistLifecycleState.Invalid)
-                    playlists.playlists.add(list.playlistEntity)
+                    playlists.addPlaylistEntity(list.playlistEntity)
             return playlists
         }
 
@@ -244,7 +245,7 @@ class PlaylistsViewModel(private val vm: AppViewModel) : ViewModel() {
                     // invariant: currentPlaylist is not null
                     val startIndex = currentPlaylist!!.titles.count()
                     val playlistPart = vm.playlistAccess
-                        .getPlaylist(currentPlaylist.playlistEntity, startIndex)
+                        .getPlaylist(currentPlaylist.playlistEntity, startIndex, getCreationOfNonEmptyPlaylistsBlocking())
                     // validity check
                     if (playlistPart != null && playlistPart.ipAddress == vm.ipAddress && currentPlaylist.titles.count() == startIndex) {
                         for (title in playlistPart.titles)

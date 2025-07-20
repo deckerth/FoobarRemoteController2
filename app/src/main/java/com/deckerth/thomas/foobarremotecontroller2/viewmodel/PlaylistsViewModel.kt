@@ -195,9 +195,15 @@ class PlaylistsViewModel(private val vm: AppViewModel) : ViewModel() {
             val playingList = getPlaylist(vm.player!!.playlistId)
             if (vm.player!!.getIndex() >= 0 && playingList.titles.count() > vm.player!!.getIndex()) {  // otherwise do not yet check
                 val playlistTitle = playingList.titles[vm.player!!.getIndex()]
-                if (playlistTitle.album != vm.player?.album || playlistTitle.title != vm.player?.title) {
+                if (playlistTitle.album != vm.player?.album) {
+                    //  Internet playlists have different titles in the playlist as
+                    //  they are sent to the player.
+                    //  E.g.: Title: BR-KLASSIK vs. von Richard Wagner
+                    //  So we omit the title check:
+                    //  || playlistTitle.title != vm.player?.title) {
+                    val message = "FOOB clearing changed playlist - Album: ${playlistTitle.album} vs. ${vm.player?.album} , Title: ${playlistTitle.title} vs. ${vm.player?.title}"
                     triggerPlaylistUpdate(playingList)
-                    println("FOOB clearing changed playlist")
+                    println(message)
                 }
             }
         }

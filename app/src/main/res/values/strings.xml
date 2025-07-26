@@ -164,4 +164,7 @@
     <string name="settings_create_empty_playlists_enabled_desc">New playlists are created empty</string>
     <string name="settings_create_empty_playlists_disabled_desc">You can populate new playlists by selecting tracks from the current playlist. (Requires extra memory for stroring the paths of all titles.)</string>
     <string name="settings_create_prefilled_playlists">Transfer selected titles to new playlists</string>
+    <string name="settings_output_device">Output device</string>
+    <string name="settings_output_devices_loading">Loading...</string>
+    <string name="settings_beefweb_plugin_outdated">Unknown - update Beefweb component in foobar</string>
 </resources>

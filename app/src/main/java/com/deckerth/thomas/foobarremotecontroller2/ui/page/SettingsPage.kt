@@ -40,7 +40,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.deckerth.thomas.foobarremotecontroller2.R
@@ -54,6 +53,8 @@ import com.deckerth.thomas.foobarremotecontroller2.getIpAddress
 import com.deckerth.thomas.foobarremotecontroller2.getPauseDuringPhoneCalls
 import com.deckerth.thomas.foobarremotecontroller2.getViewMode
 import com.deckerth.thomas.foobarremotecontroller2.model.AddTracksBehaviors
+import com.deckerth.thomas.foobarremotecontroller2.model.OutputDevice
+import com.deckerth.thomas.foobarremotecontroller2.model.OutputDevices
 import com.deckerth.thomas.foobarremotecontroller2.saveAddTrackBehavior
 import com.deckerth.thomas.foobarremotecontroller2.saveAlwaysOnDisplay
 import com.deckerth.thomas.foobarremotecontroller2.saveCreationOfNonEmptyPlaylists
@@ -65,9 +66,21 @@ import com.deckerth.thomas.foobarremotecontroller2.ui.components.LicenseText
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.Layouts
 import com.deckerth.thomas.foobarremotecontroller2.ui.mainActivity
 import com.deckerth.thomas.foobarremotecontroller2.ui.theme.seedColor
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
 
 @Composable
-fun SettingsPage() {
+fun SettingsPage(vm: AppViewModel) {
+
+    var outputDevices = remember { mutableStateOf<OutputDevices?>(null) }
+    val outputDevicesLoading = remember { mutableStateOf(false) }
+
+    if (!outputDevicesLoading.value && outputDevices.value == null) {
+        outputDevicesLoading.value = true
+        Thread {
+            outputDevices.value = vm.playerAccess.getOutputDevices()
+            outputDevicesLoading.value = false
+        }.start()
+    }
 
     val snackbarHostState = remember { SnackbarHostState() }
     Scaffold(
@@ -121,7 +134,8 @@ fun SettingsPage() {
 
             var isOpen by remember { mutableStateOf(false) }
             val viewMode = getViewMode()
-            PreferenceItem<Boolean>(stringResource(R.string.settings_view_mode),
+            PreferenceItem<Boolean>(
+                stringResource(R.string.settings_view_mode),
                 summary = viewMode.text,
                 showButton = viewMode == Layouts.LAYOUT_CUSTOM,
                 buttonText = stringResource(R.string.open_layout_editor),
@@ -170,10 +184,45 @@ fun SettingsPage() {
                 isEnabled = true
             )
 
+            var isOutputListOpen by remember { mutableStateOf(false) }
+            PreferenceItem<Boolean>(
+                stringResource(R.string.settings_output_device),
+                summary = if (outputDevices.value == null) {
+                    stringResource(R.string.settings_output_devices_loading)
+                } else if (outputDevices.value!!.valid) {
+                    outputDevices.value!!.getActiveDeviceName()
+                } else {
+                    stringResource(R.string.settings_beefweb_plugin_outdated)
+                },
+                showButton = false,
+                onClick = {
+                    if (!outputDevicesLoading.value && outputDevices.value != null &&
+                        outputDevices.value!!.valid && outputDevices.value!!.getDevices().size > 1
+                    )
+                        isOutputListOpen = true
+                })
+            if (isOutputListOpen) {
+                ListPreference(
+                    values = outputDevices.value!!.getDevices(),
+                    title = stringResource(R.string.settings_output_device),
+                    selectedItem = outputDevices.value!!.getActiveDevice(),
+                    onClick = { device ->
+                        isOutputListOpen = false
+                        if (device != null)
+                            Thread {
+                                vm.playerAccess.setOutputDevice(device)
+                                outputDevices.value!!.setActiveDevice(device)
+                            }.start()
+                    },
+                    getText = { v: OutputDevice -> v.name } as (OutputDevice?) -> String
+                )
+            }
+
             Title(stringResource(R.string.settings_browser))
             var isChooseAddOptionsOpen by remember { mutableStateOf(false) }
             val behavior = getAddTrackBehavior()
-            PreferenceItem<Boolean>(stringResource(R.string.settings_add_behavior),
+            PreferenceItem<Boolean>(
+                stringResource(R.string.settings_add_behavior),
                 summary = behavior.text,
                 showButton = false,
                 onClick = {
@@ -196,7 +245,7 @@ fun SettingsPage() {
 
             PreferenceItem(
                 stringResource(R.string.settings_create_prefilled_playlists),
-                summary = if(getCreationOfNonEmptyPlaylists())
+                summary = if (getCreationOfNonEmptyPlaylists())
                     stringResource(R.string.settings_create_empty_playlists_disabled_desc)
                 else
                     stringResource(R.string.settings_create_empty_playlists_enabled_desc),
@@ -214,7 +263,7 @@ fun SettingsPage() {
                 title = stringResource(
                     R.string.infos_text
                 ),
-                onClick = {isFoobarLinkOpen = true },
+                onClick = { isFoobarLinkOpen = true },
                 summary = ""
             )
             if (isFoobarLinkOpen) {
@@ -436,10 +485,3 @@ fun <T> ListPreference(
 }
 
 
-@Preview(
-    showBackground = true
-)
-@Composable
-fun SettingsPreview() {
-    SettingsPage()
-}

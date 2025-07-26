@@ -1,6 +1,8 @@
 package com.deckerth.thomas.foobarremotecontroller2.connector;
 
 import com.deckerth.thomas.foobarremotecontroller2.FoobarMediaServiceKt;
+import com.deckerth.thomas.foobarremotecontroller2.model.OutputDevice;
+import com.deckerth.thomas.foobarremotecontroller2.model.OutputDevices;
 import com.deckerth.thomas.foobarremotecontroller2.model.PlaybackMode;
 import com.deckerth.thomas.foobarremotecontroller2.model.PlaybackState;
 import com.deckerth.thomas.foobarremotecontroller2.model.Player;
@@ -55,9 +57,9 @@ public class PlayerAccess {
     }
 
     public void setPosition(Float position) {
-            String jsonString = "{\"position\":" + position + "}";
-            vm.connector.postData("player/", jsonString);
-            getPlayerState();
+        String jsonString = "{\"position\":" + position + "}";
+        vm.connector.postData("player/", jsonString);
+        getPlayerState();
     }
 
     private Player parsePlayerState(Response input) {
@@ -222,6 +224,75 @@ public class PlayerAccess {
             String jsonString = "{\"options\":[{\"id\": \"playbackOrder\", \"value\": " + mode.ordinal() + "}]}";
             vm.connector.postData("player/", jsonString);
             getPlayerState();
+        }).start();
+    }
+
+    public OutputDevices getOutputDevices() {
+        Response response;
+        try {
+            response = vm.connector.getData("outputs");
+        } catch (Exception e) {
+            vm.errorHandler.logError(ErrorType.NETWORK, ErrorCode.CONNECTION_ERROR, ErrorSource.PLAYER_STATE, e);
+            return null;
+        }
+        return parseOutputDevices(response);
+    }
+
+    private OutputDevices parseOutputDevices(Response response) {
+        // {
+        //  "outputs": {
+        //    "active": {
+        //      "typeId": "string",
+        //      "deviceId": "string"
+        //    },
+        //    "types": [
+        //      {
+        //        "id": "string",
+        //        "name": "string",
+        //        "devices": [
+        //          {
+        //            "id": "string",
+        //            "name": "string"
+        //          }
+        //        ]
+        //      }
+        //    ]
+        //  }
+        //}
+
+        OutputDevices deviceList = new OutputDevices();
+
+        try {
+            JSONObject contentObject = new JSONObject(response.getMessage());
+            JSONObject outputsObject = contentObject.getJSONObject("outputs");
+            JSONObject activeOutputObject = outputsObject.getJSONObject("active");
+            deviceList.setActiveDevice(new OutputDevice(activeOutputObject.getString("typeId"), activeOutputObject.getString("deviceId"), ""));
+            JSONArray types = outputsObject.getJSONArray("types");
+            for (int i = 0; i < types.length(); i++) {
+                JSONObject type = types.getJSONObject(i);
+                JSONArray devices = type.getJSONArray("devices");
+                for (int j = 0; j < devices.length(); j++) {
+                    JSONObject device = devices.getJSONObject(j);
+                    deviceList.addDevice(new OutputDevice(
+                            type.getString("id"), device.getString("id"), device.getString("name")));
+                }
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+            vm.errorHandler.logError(ErrorType.API, ErrorCode.BAD_RESPONSE, ErrorSource.PLAYER_STATE, e);
+            deviceList.invalidate();
+        }
+        return deviceList;
+    }
+
+    public void setOutputDevice(OutputDevice device) {
+        new Thread(() -> {
+            // {
+            //  "typeId": "string",
+            //  "deviceId": "string"
+            //}
+            String jsonString = "{\"typeId\": \"" + device.getTypeId() + "\", \"deviceId\": \"" + device.getDeviceId() + "\"}";
+            vm.connector.postData("outputs/active/", jsonString);
         }).start();
     }
 

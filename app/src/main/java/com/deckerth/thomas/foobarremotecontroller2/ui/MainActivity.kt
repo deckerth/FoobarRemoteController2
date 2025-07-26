@@ -465,7 +465,7 @@ class MainActivity : ComponentActivity() {
                 }
                 composable("Settings") {
                     appBarLabel = appLabel
-                    SettingsPage()
+                    SettingsPage(appViewModel)
                 }
                 composable("DeviceSelectionPage") {
                     appBarLabel = stringResource(R.string.title_device_selection)
@@ -680,7 +680,7 @@ class MainActivity : ComponentActivity() {
                 }
                 composable("Settings") {
                     appBarLabel = stringResource(R.string.title_settings)
-                    SettingsPage()
+                    SettingsPage(appViewModel)
                 }
                 composable("DeviceSelectionPage") {
                     appBarLabel = stringResource(R.string.title_device_selection)

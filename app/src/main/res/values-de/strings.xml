@@ -165,4 +165,7 @@
     <string name="settings_create_empty_playlists_enabled_desc">New playlists are created empty</string>
     <string name="settings_create_empty_playlists_disabled_desc">Neue Playlsists können durch Auswählen von Tracks aus der aktuellen Playlist befüllt werden. (Erfordert mehr Speicher für die Pfade aller Titel.)</string>
     <string name="settings_create_prefilled_playlists">Übertragen ausgewählter Titel in neue Playlists</string>
+    <string name="settings_output_device">Output device</string>
+    <string name="settings_output_devices_loading">Loading...</string>
+    <string name="settings_beefweb_plugin_outdated">Unknown - update Beefweb component in foobar</string>
 </resources>

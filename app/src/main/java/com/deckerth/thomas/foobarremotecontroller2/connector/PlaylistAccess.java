@@ -277,9 +277,8 @@ public class PlaylistAccess {
 
     public void addPlaylist(int position, String name, List<String> paths, AddTracksBehaviors addBehavior) {
         // http://localhost:8880/api/playlists/add?index=11&title=test
-        String encodedName;
-        // ...
 
+        String encodedName;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) { // TIRAMISU is API level 33
             encodedName = URLEncoder.encode(name, StandardCharsets.UTF_8);
         } else {

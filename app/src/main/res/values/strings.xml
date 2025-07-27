@@ -167,4 +167,8 @@
     <string name="settings_output_device">Output device</string>
     <string name="settings_output_devices_loading">Loading...</string>
     <string name="settings_beefweb_plugin_outdated">Unknown - update Beefweb component in foobar</string>
+    <string name="menu_item_copy_titles">Copy titles to another playlist</string>
+    <string name="titles_copied_to_playlist">%1$s titles copied</string>
+    <string name="title_copied_to_playlist">1 title copied</string>
+    <string name="checking_connection">Checking connection..</string>
 </resources>

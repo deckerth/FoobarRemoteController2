@@ -83,7 +83,7 @@ import com.deckerth.thomas.foobarremotecontroller2.getAlwaysOnDisplay
 import com.deckerth.thomas.foobarremotecontroller2.getIpAddressBlocking
 import com.deckerth.thomas.foobarremotecontroller2.model.checkIpAddressSyntax
 import com.deckerth.thomas.foobarremotecontroller2.ui.components.AddTitlesAppBar
-import com.deckerth.thomas.foobarremotecontroller2.ui.components.RemoveTitlesAppBar
+import com.deckerth.thomas.foobarremotecontroller2.ui.components.EditPlaylistAppBar
 import com.deckerth.thomas.foobarremotecontroller2.ui.page.BrowserMainPage
 import com.deckerth.thomas.foobarremotecontroller2.ui.page.LayoutEditorMainPage
 import com.deckerth.thomas.foobarremotecontroller2.ui.page.LayoutSelection
@@ -94,6 +94,7 @@ import com.deckerth.thomas.foobarremotecontroller2.ui.page.WelcomePage
 import com.deckerth.thomas.foobarremotecontroller2.ui.page.WizardPage
 import com.deckerth.thomas.foobarremotecontroller2.ui.theme.Foobar2000RemoteControllerTheme
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.PlaylistEditOperation
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -368,11 +369,25 @@ class MainActivity : ComponentActivity() {
                                             text = { Text(stringResource(R.string.menu_item_remove_titles)) },
                                             onClick = {
                                                 dropdownMenuExpanded = false
-                                                appViewModel.enableRemoveTitlesMode()
+                                                appViewModel.enablePlaylistEditMode(
+                                                    PlaylistEditOperation.REMOVE)
                                             },
                                             leadingIcon = {
                                                 Icon(
                                                     imageVector = Icons.Default.Delete,
+                                                    contentDescription = "Remove tracks"
+                                                )
+                                            }
+                                        )
+                                        DropdownMenuItem(
+                                            text = { Text(stringResource(R.string.menu_item_copy_titles)) },
+                                            onClick = {
+                                                dropdownMenuExpanded = false
+                                                appViewModel.enablePlaylistEditMode(PlaylistEditOperation.COPY)
+                                            },
+                                            leadingIcon = {
+                                                Icon(
+                                                    painter = painterResource(R.drawable.content_copy),
                                                     contentDescription = "Remove tracks"
                                                 )
                                             }
@@ -416,7 +431,7 @@ class MainActivity : ComponentActivity() {
                         )
                     )
                 }
-                RemoveTitlesAppBar(appViewModel)
+                EditPlaylistAppBar(appViewModel)
                 AddTitlesAppBar(appViewModel)
             },
             bottomBar = {
@@ -424,7 +439,7 @@ class MainActivity : ComponentActivity() {
                     NavigationBar {
                         items.forEachIndexed { index, item ->
                             NavigationBarItem(
-                                enabled = !appViewModel.removeTitlesMode && !appViewModel.addTitlesMode,
+                                enabled = !appViewModel.playlistEditMode && !appViewModel.addTitlesMode,
                                 selected = selectedItemIndex == index,
                                 onClick = {
                                     selectedItemIndex = index
@@ -496,7 +511,7 @@ class MainActivity : ComponentActivity() {
             LaunchedEffect(appViewModel.showTopAppBar) {
                 if (!appViewModel.showTopAppBar) {
                     delay(500)
-                    appViewModel.removeTitlesMode = true
+                    appViewModel.playlistEditMode = true
                 }
             }
         }
@@ -569,10 +584,18 @@ class MainActivity : ComponentActivity() {
                                         )
                                     }
                                     IconButton(onClick = {
-                                        appViewModel.enableRemoveTitlesMode()
+                                        appViewModel.enablePlaylistEditMode(PlaylistEditOperation.REMOVE)
                                     }) {
                                         Icon(
                                             imageVector = Icons.Default.Delete,
+                                            contentDescription = "Remove tracks"
+                                        )
+                                    }
+                                    IconButton(onClick = {
+                                        appViewModel.enablePlaylistEditMode(PlaylistEditOperation.COPY)
+                                    }) {
+                                        Icon(
+                                            painter = painterResource(R.drawable.content_copy),
                                             contentDescription = "Remove tracks"
                                         )
                                     }
@@ -646,7 +669,7 @@ class MainActivity : ComponentActivity() {
                         )
                     )
                 }
-                RemoveTitlesAppBar(appViewModel)
+                EditPlaylistAppBar(appViewModel)
                 AddTitlesAppBar(appViewModel)
             },
             modifier = Modifier.fillMaxSize()
@@ -710,7 +733,7 @@ class MainActivity : ComponentActivity() {
             LaunchedEffect(appViewModel.showTopAppBar) {
                 if (!appViewModel.showTopAppBar) {
                     delay(500)
-                    appViewModel.removeTitlesMode = true
+                    appViewModel.playlistEditMode = true
                 }
             }
         }

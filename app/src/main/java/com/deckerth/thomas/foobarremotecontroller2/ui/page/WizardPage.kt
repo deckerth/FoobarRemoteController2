@@ -499,7 +499,7 @@ fun CustomDevicePage(
             FilledTonalButton(
                 enabled = device.isValid,
                 onClick = {
-                    Toast.makeText(mainActivity, "Checking Connection", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(mainActivity, mainActivity.getString(R.string.checking_connection), Toast.LENGTH_SHORT).show()
                     // Launch a coroutine on the IO dispatcher for network operations
                     CoroutineScope(Dispatchers.IO).launch {
                         val success: Boolean = try {

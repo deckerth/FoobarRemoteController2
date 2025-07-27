@@ -161,11 +161,15 @@
     <string name="create_empty_playlist">Leere Playlist anlegen</string>
     <string name="choose_titles_from_current_playlist">Titel von der aktuellen Playlist hinzufügen</string>
     <string name="settings_browser">Playlists</string>
-    <string name="settings_create_empty_playlists">Create empty playlists</string>
+    <string name="settings_create_empty_playlists">Leere playlist erstellen</string>
     <string name="settings_create_empty_playlists_enabled_desc">New playlists are created empty</string>
     <string name="settings_create_empty_playlists_disabled_desc">Neue Playlsists können durch Auswählen von Tracks aus der aktuellen Playlist befüllt werden. (Erfordert mehr Speicher für die Pfade aller Titel.)</string>
     <string name="settings_create_prefilled_playlists">Übertragen ausgewählter Titel in neue Playlists</string>
-    <string name="settings_output_device">Output device</string>
-    <string name="settings_output_devices_loading">Loading...</string>
-    <string name="settings_beefweb_plugin_outdated">Unknown - update Beefweb component in foobar</string>
+    <string name="settings_output_device">Ausgabegerät</string>
+    <string name="settings_output_devices_loading">Wir geladen...</string>
+    <string name="settings_beefweb_plugin_outdated">Unbekannt - aktualisieren Sie die Beefweb Komponente in foobar</string>
+    <string name="menu_item_copy_titles">Titel in andere Playlist kopieren</string>
+    <string name="titles_copied_to_playlist">%1$s Titel kopiert</string>
+    <string name="title_copied_to_playlist">1 Titel kopiert</string>
+    <string name="checking_connection">Überprüfe die Verbindung..</string>
 </resources>

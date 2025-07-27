@@ -32,6 +32,10 @@ val viewModelInstance: AppViewModel get() {
     return instance!!
 }
 
+enum class PlaylistEditOperation {
+    REMOVE, COPY
+}
+
 class AppViewModel : ViewModel() {
 
     init {
@@ -61,7 +65,10 @@ class AppViewModel : ViewModel() {
     var selectedPlaylist by mutableStateOf("")
     var selectedPlaylistName by mutableStateOf("")
     var isSick by mutableStateOf(false)
-    var removeTitlesMode by mutableStateOf(false)
+    var playlistEditMode by mutableStateOf(false)
+    var playlistEditOperation by mutableStateOf(PlaylistEditOperation.REMOVE)
+    var displayToastOnPlaylistPage by mutableStateOf(false)
+    var toastOnPlaylistPageMessage by mutableStateOf("")
     var addTitlesMode by mutableStateOf(false)
     var showTopAppBar by mutableStateOf(true)
     var noOfSelectedTitles by mutableIntStateOf(0)
@@ -96,20 +103,21 @@ class AppViewModel : ViewModel() {
         noOfSelectedTitles--
     }
 
-    fun enableRemoveTitlesMode() {
-        if (removeTitlesMode) return
+    fun enablePlaylistEditMode(operation: PlaylistEditOperation) {
+        if (playlistEditMode) return
         showTopAppBar = false
         autoscrollSave = autoscroll
         autoscroll = false
-        //appViewModel.removeTitlesMode = true - Is done later in a LaunchedEffect to realize a delay
+        playlistEditOperation = operation
+        //appViewModel.playlistEditMode = true - Is done later in a LaunchedEffect to realize a delay
     }
 
-    fun disableRemoveTitlesMode(resetSelection: Boolean) {
-        if (!removeTitlesMode) return
-        removeTitlesMode = false
+    fun disablePlaylistEditMode(resetSelection: Boolean) {
+        if (!playlistEditMode) return
+        playlistEditMode = false
         showTopAppBar = true
         autoscroll = autoscrollSave
-        if (resetSelection) // not done when titles shall be removed
+        if (resetSelection) // not done when titles shall be removed / copied
             if (displayedPlaylist != null)
                 displayedPlaylist!!.resetSelectedTracks(this)
     }

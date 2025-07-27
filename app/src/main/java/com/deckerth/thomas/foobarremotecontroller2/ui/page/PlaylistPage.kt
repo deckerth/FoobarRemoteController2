@@ -78,9 +78,9 @@ fun PlaylistPage(vm: AppViewModel) {
     // The currently displayed playlists may have been changed in foobar so that is got invalidated
 
     if (vm.displayedPlaylist != null && vm.displayedPlaylist!!.lifecycleState != PlaylistLifecycleState.Valid) {
-        val displayToast = vm.removeTitlesMode || vm.playlistsViewModel.showFilter
+        val displayToast = vm.playlistEditMode || vm.playlistsViewModel.showFilter
 
-        if (vm.removeTitlesMode) vm.disableRemoveTitlesMode(true)
+        if (vm.playlistEditMode) vm.disablePlaylistEditMode(true)
         if (vm.addTitlesMode) vm.disableAddTitlesMode()
 
         if (vm.playlistsViewModel.showFilter) {
@@ -139,6 +139,14 @@ fun PlaylistPage(vm: AppViewModel) {
         },
         modifier = Modifier.fillMaxWidth(),
     )
+    if (vm.displayToastOnPlaylistPage) {
+        Toast.makeText(
+            mainActivity,
+            vm.toastOnPlaylistPageMessage,
+            Toast.LENGTH_SHORT
+        ).show()
+        vm.displayToastOnPlaylistPage = false
+    }
 }
 
 fun playlistInfoString(vm: AppViewModel): String {
@@ -192,7 +200,7 @@ fun AlbumCard(vm: AppViewModel, album: Album, layout: Layout?, previewMode: Bool
     }
 
     if (album.tracks.isNotEmpty() && !previewMode) modifier = modifier.clickable {
-        if (vm.removeTitlesMode || vm.addTitlesMode) album.toggleIsSelected()
+        if (vm.playlistEditMode || vm.addTitlesMode) album.toggleIsSelected()
         else {
             vm.playlistsViewModel.filterValue.clear()
             vm.playlistsViewModel.showFilter = false
@@ -211,7 +219,7 @@ fun AlbumCard(vm: AppViewModel, album: Album, layout: Layout?, previewMode: Bool
     ) {
         Column(modifier = modifier) {
             Row {
-                if (vm.removeTitlesMode || vm.addTitlesMode) TriStateCheckbox(
+                if (vm.playlistEditMode || vm.addTitlesMode) TriStateCheckbox(
                     modifier = Modifier.align(Alignment.CenterVertically),
                     state = album.isSelected,
                     onClick = {
@@ -309,7 +317,7 @@ fun TitleEntry(
         title.details.index == vm.player!!.getIndex() && title.details.playlistId == vm.player!!.playlistId
     var modifier = Modifier.clickable {
         if (!previewMode) {
-            if (vm.removeTitlesMode || vm.addTitlesMode) title.toggleIsSelected(vm)
+            if (vm.playlistEditMode || vm.addTitlesMode) title.toggleIsSelected(vm)
             else {
                 vm.playlistsViewModel.filterValue.clear()
                 vm.playlistsViewModel.showFilter = false
@@ -325,7 +333,7 @@ fun TitleEntry(
         var infoButtonClicked by remember { mutableStateOf(false) }
         HorizontalDivider()
         Row {
-            if (vm.removeTitlesMode || vm.addTitlesMode) Checkbox(
+            if (vm.playlistEditMode || vm.addTitlesMode) Checkbox(
                 modifier = Modifier.align(Alignment.CenterVertically),
                 checked = title.isSelected,
                 onCheckedChange = { title.setSelected(vm, it) })
@@ -501,7 +509,7 @@ fun PlaylistSwitcher(vm: AppViewModel, playlists: Playlists) {
             .padding(8.dp)
             .fillMaxWidth(),
         expanded = expanded,
-        onExpandedChange = { if (!vm.removeTitlesMode &&!vm.addTitlesMode) expanded = !expanded }) {
+        onExpandedChange = { if (!vm.playlistEditMode &&!vm.addTitlesMode) expanded = !expanded }) {
         OutlinedTextField(
             modifier = Modifier
                 .fillMaxWidth()
@@ -513,10 +521,10 @@ fun PlaylistSwitcher(vm: AppViewModel, playlists: Playlists) {
                 },
             label = { Text(text = stringResource(R.string.button_playlist_switcher)) },
             readOnly = true,
-            enabled = !vm.removeTitlesMode && !vm.addTitlesMode,
+            enabled = !vm.playlistEditMode && !vm.addTitlesMode,
             value = vm.selectedPlaylistName,
             trailingIcon = {
-                if (!vm.removeTitlesMode && !vm.addTitlesMode) ExposedDropdownMenuDefaults.TrailingIcon(
+                if (!vm.playlistEditMode && !vm.addTitlesMode) ExposedDropdownMenuDefaults.TrailingIcon(
                     expanded = expanded
                 )
             },

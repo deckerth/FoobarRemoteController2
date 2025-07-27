@@ -233,7 +233,9 @@ public class PlayerAccess {
             response = vm.connector.getData("outputs");
         } catch (Exception e) {
             vm.errorHandler.logError(ErrorType.NETWORK, ErrorCode.CONNECTION_ERROR, ErrorSource.PLAYER_STATE, e);
-            return null;
+            OutputDevices deviceList = new OutputDevices();
+            deviceList.invalidate();
+            return deviceList; // to indicate that the Beefweb component needs to be updated in foobar
         }
         return parseOutputDevices(response);
     }

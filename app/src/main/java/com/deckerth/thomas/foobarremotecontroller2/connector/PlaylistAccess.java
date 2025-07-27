@@ -13,6 +13,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -246,6 +247,30 @@ public class PlaylistAccess {
         vm.connector.postData("playlists/" + playlistId + "/items/remove", jsonString.toString());
     }
 
+    public void copyTitles(String fromPlaylistId, String toPlaylistId, int targetIndex, List<Integer> indexes) {
+
+        //        playlists/{sourceId}/{targetId}/items/copy
+        //
+        //        {
+        //            "items": [
+        //               1,
+        //               4
+        //             ]
+        //            "targetIndex": 1
+        //        }
+
+        StringBuilder jsonString = new StringBuilder("{\"items\":[ ");
+        int pos = 0;
+        for (Integer index : indexes) {
+            jsonString.append(index);
+            if (pos < indexes.size() - 1) // 0, 1 : indexes.size() = 2
+                jsonString.append(", ");
+            pos++;
+        }
+        jsonString.append(" ] }");
+        vm.connector.postData("playlists/" + fromPlaylistId + "/" + toPlaylistId + "/items/copy", jsonString.toString());
+    }
+
     public void addPlaylist(int position, String name) {
         addPlaylist(position, name, null, null);
     }
@@ -253,10 +278,14 @@ public class PlaylistAccess {
     public void addPlaylist(int position, String name, List<String> paths, AddTracksBehaviors addBehavior) {
         // http://localhost:8880/api/playlists/add?index=11&title=test
         String encodedName;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+        // ...
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) { // TIRAMISU is API level 33
             encodedName = URLEncoder.encode(name, StandardCharsets.UTF_8);
-        else
+        } else {
+            // Use the deprecated version for older APIs
             encodedName = URLEncoder.encode(name, StandardCharsets.UTF_8);
+        }
         vm.connector.postData("playlists/add?index=" + position + "&title=" + encodedName);
         if (paths != null)
             addPathsToPlaylist("" + position, paths, addBehavior);

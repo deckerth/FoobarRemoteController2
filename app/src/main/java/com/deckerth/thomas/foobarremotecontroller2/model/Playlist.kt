@@ -187,7 +187,8 @@ class Playlist(var playlistEntity: PlaylistEntity) {
     fun removeSelectedTracks(vm: AppViewModel) {
         if (vm.noOfSelectedTitles > 0) {
             val titlesToRemove = mutableListOf<Int>()
-            val albumList = if (vm.playlistsViewModel.filterValue.isActive) filteredAlbums else albums
+            val albumList =
+                if (vm.playlistsViewModel.filterValue.isActive) filteredAlbums else albums
             for (album in albumList)
                 for (title in album.tracks)
                     if (title.isSelected) {
@@ -203,12 +204,49 @@ class Playlist(var playlistEntity: PlaylistEntity) {
             }
         }
         vm.noOfSelectedTitles = 0
-        vm.disableRemoveTitlesMode(false)
+        vm.disablePlaylistEditMode(false)
+    }
+
+    fun copySelectedTitles(vm: AppViewModel, toPlaylist: PlaylistEntity) {
+        if (vm.noOfSelectedTitles > 0) {
+            val titlesToCopy = mutableListOf<Int>()
+            val albumList =
+                if (vm.playlistsViewModel.filterValue.isActive) filteredAlbums else albums
+            for (album in albumList)
+                for (title in album.tracks)
+                    if (title.isSelected) {
+                        titlesToCopy.add(title.details.index)
+                    }
+            resetSelectedTracks(vm)
+            CoroutineScope(Dispatchers.IO).launch {
+                if (vm.displayedPlaylist != null) {
+                    if (titlesToCopy.size == 1)
+                        vm.toastOnPlaylistPageMessage = mainActivity.getString(
+                            R.string.title_copied_to_playlist
+                        )
+                    else
+                        vm.toastOnPlaylistPageMessage = mainActivity.getString(
+                        R.string.titles_copied_to_playlist,
+                        titlesToCopy.size.toString()
+                    )
+
+                    vm.playlistAccess.copyTitles(
+                        vm.displayedPlaylist!!.playlistEntity.playlistId,
+                        toPlaylist.playlistId,
+                        vm.playlistsViewModel.getPlaylist(toPlaylist.playlistId).titles.size,
+                        titlesToCopy
+                    )
+                    vm.displayToastOnPlaylistPage = true
+                }
+            }
+        }
+        vm.disablePlaylistEditMode(false)
     }
 
     fun resetSelectedTracks(vm: AppViewModel) {
         if (vm.noOfSelectedTitles > 0) {
-            val albumList = if (vm.playlistsViewModel.filterValue.isActive) filteredAlbums else albums
+            val albumList =
+                if (vm.playlistsViewModel.filterValue.isActive) filteredAlbums else albums
             for (album in albumList)
                 album.setIsSelected(ToggleableState.Off)
         }

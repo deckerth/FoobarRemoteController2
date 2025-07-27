@@ -279,11 +279,17 @@ public class PlaylistAccess {
         // http://localhost:8880/api/playlists/add?index=11&title=test
 
         String encodedName;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) { // TIRAMISU is API level 33
-            encodedName = URLEncoder.encode(name, StandardCharsets.UTF_8);
-        } else {
-            // Use the deprecated version for older APIs
-            encodedName = URLEncoder.encode(name, StandardCharsets.UTF_8);
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) { // TIRAMISU is API level 33
+                encodedName = URLEncoder.encode(name, StandardCharsets.UTF_8);
+            } else {
+                // Use the deprecated version for older APIs
+                encodedName = URLEncoder.encode(name, StandardCharsets.UTF_8.name());
+            }
+        } catch (UnsupportedEncodingException e) {
+            // Handle the exception, though UTF-8 should always be supported
+            e.printStackTrace();
+            encodedName = name; // Fallback or throw an error
         }
         vm.connector.postData("playlists/add?index=" + position + "&title=" + encodedName);
         if (paths != null)

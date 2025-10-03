@@ -158,14 +158,14 @@
     <string name="playlist_titles_singular">1 Title</string>
     <string name="playlist_titles_plural">%1$s Titles</string>
     <string name="create_empty_playlist">Create empty playlist</string>
-    <string name="choose_titles_from_current_playlist">Add titles from current playlist</string>
+    <string name="choose_titles_from_current_playlist">Add selected titles from current playlist</string>
     <string name="settings_browser">Playlists</string>
     <string name="settings_create_empty_playlists">Create empty playlists</string>
     <string name="settings_create_empty_playlists_enabled_desc">New playlists are created empty</string>
     <string name="settings_create_empty_playlists_disabled_desc">You can populate new playlists by selecting tracks from the current playlist. (Requires extra memory for stroring the paths of all titles.)</string>
     <string name="settings_create_prefilled_playlists">Transfer selected titles to new playlists</string>
     <string name="settings_output_device">Output device</string>
-    <string name="settings_output_devices_loading">Loading...</string>
+    <string name="settings_output_devices_loading">Loading…</string>
     <string name="settings_beefweb_plugin_outdated">Unknown - update Beefweb component in foobar</string>
     <string name="menu_item_copy_titles">Copy titles to another playlist</string>
     <string name="titles_copied_to_playlist">%1$s titles copied</string>

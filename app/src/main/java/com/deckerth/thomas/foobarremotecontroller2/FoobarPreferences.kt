@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.byteArrayPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
@@ -23,6 +24,9 @@ import kotlinx.serialization.json.Json
 val Context.dataStore by preferencesDataStore(name = "settings")
 
 private val IP_ADDRESS_KEY = stringPreferencesKey("ip_address")
+private val USERNAME_KEY = stringPreferencesKey("username")
+private val PASSWORD_KEY = byteArrayPreferencesKey("password")
+private val IV_STRING_KEY = byteArrayPreferencesKey("iv_string")
 private val VIEW_MODE_KEY = intPreferencesKey("view_mode")
 private val CUSTOM_LAYOUT_KEY = stringPreferencesKey("custom_layout")
 private val FOOBAR_VOLUME_CONTROL_KEY = booleanPreferencesKey("foobar_volume_control")
@@ -30,7 +34,8 @@ private val PAUSE_DURING_PHONE_CALLS_KEY = booleanPreferencesKey("pause_during_p
 private val ADD_TRACK_BEHAVIOR_KEY = intPreferencesKey("add_track_behavior")
 private val ALWAYS_ON_DISPLAY_KEY = booleanPreferencesKey("always_on_display")
 private val DYNAMIC_COLOR_SCHEME_KEY = booleanPreferencesKey("dynamic_color_scheme")
-private val CREATION_OF_NON_EMPTY_PLAYLISTS_KEY = booleanPreferencesKey("creation_of_non_empty_playlists")
+private val CREATION_OF_NON_EMPTY_PLAYLISTS_KEY =
+    booleanPreferencesKey("creation_of_non_empty_playlists")
 
 private fun <T> getFlow(context: Context, key: Preferences.Key<T>): Flow<T?> {
     return context.dataStore.data.map { preferences ->
@@ -61,9 +66,9 @@ suspend fun <T> getValueBlocking(context: Context, key: Preferences.Key<T>, init
         .first() // Wait for the first emission from the Flow
 }
 
-fun saveIpAddress(ip: String, context: Context) {
+fun saveIpAddress(packedIPAddress: String, context: Context) {
     runBlocking {
-        saveValue(context, ip, IP_ADDRESS_KEY)
+        saveValue(context, packedIPAddress, IP_ADDRESS_KEY)
     }
 }
 
@@ -77,6 +82,38 @@ suspend fun getIpAddressBlocking(): String {
         mainActivity,
         IP_ADDRESS_KEY,
         ""
+    )
+}
+
+suspend fun getUsernameBlocking(): String {
+    return getValueBlocking(
+        mainActivity,
+        USERNAME_KEY,
+        ""
+    )
+}
+suspend fun getIvStringBlocking(): ByteArray {
+    return getValueBlocking(
+        mainActivity,
+        IV_STRING_KEY,
+        ByteArray(0)
+    )
+}
+
+fun saveCredentials(username: String, encryptedPassword: ByteArray, ivString: ByteArray, context: Context) {
+    runBlocking {
+        saveValue(context, username, USERNAME_KEY)
+        saveValue(context, encryptedPassword, PASSWORD_KEY)
+        saveValue(context, ivString, IV_STRING_KEY)
+    }
+}
+
+
+suspend fun getPasswordBlocking(): ByteArray {
+    return getValueBlocking(
+        mainActivity,
+        PASSWORD_KEY,
+        ByteArray(0)
     )
 }
 
@@ -120,7 +157,7 @@ fun getFoobarVolumeControl(): Boolean {
 suspend fun getFoobarVolumeControlBlocking(): Boolean {
     return try {
         getValueBlocking(mainActivity, FOOBAR_VOLUME_CONTROL_KEY, true)
-    } catch(e: UninitializedPropertyAccessException) {
+    } catch (e: UninitializedPropertyAccessException) {
         false // if the main activity is not active, do not allow volume control
     }
 }
@@ -150,7 +187,7 @@ fun getPauseDuringPhoneCalls(): Boolean {
 suspend fun getPauseDuringPhoneCallsBlocking(): Boolean {
     return try {
         getValueBlocking(mainActivity, PAUSE_DURING_PHONE_CALLS_KEY, true)
-    } catch(e: UninitializedPropertyAccessException) {
+    } catch (e: UninitializedPropertyAccessException) {
         false // if the main activity is not active, do not allow pausing
     }
 }
@@ -200,7 +237,11 @@ fun saveCreationOfNonEmptyPlaylists(enabled: Boolean, context: Context) {
 
 @Composable
 fun getCreationOfNonEmptyPlaylists(): Boolean {
-    return getValue(mainActivity, CREATION_OF_NON_EMPTY_PLAYLISTS_KEY, creationOfNonEmptyPlaylistsInitialValue)
+    return getValue(
+        mainActivity,
+        CREATION_OF_NON_EMPTY_PLAYLISTS_KEY,
+        creationOfNonEmptyPlaylistsInitialValue
+    )
 }
 
 suspend fun getCreationOfNonEmptyPlaylistsBlocking(): Boolean {

@@ -345,7 +345,7 @@ private fun isFoobarServer(ip: String, port: Int, timeout: Int): Boolean {
             requestMethod = "GET"
 
             connect()
-            return responseCode == 200
+            return responseCode == 200 || responseCode == 401
         }
     } catch (e: Exception) {
         return false

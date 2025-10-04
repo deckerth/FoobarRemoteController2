@@ -62,6 +62,31 @@ fun EditPlaylistAppBar(appViewModel: AppViewModel) {
             },
             actions = {
                 Row {
+                    IconButton(
+                        onClick = {
+                            appViewModel.displayedPlaylist!!.selectAllTracks(
+                                appViewModel
+                            )
+                        }
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.select_all),
+                            contentDescription = "Select all"
+                        )
+                    }
+                    IconButton(
+                        onClick = {
+                            appViewModel.displayedPlaylist!!.deselectAllTracks(
+                                appViewModel
+                            )
+                        },
+                        enabled = appViewModel.noOfSelectedTitles > 0
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.remove_selection),
+                            contentDescription = "Remove selection"
+                        )
+                    }
                     if (appViewModel.playlistEditOperation == PlaylistEditOperation.REMOVE)
                         IconButton(
                             onClick = {

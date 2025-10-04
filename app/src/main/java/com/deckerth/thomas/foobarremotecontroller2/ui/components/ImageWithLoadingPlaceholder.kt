@@ -23,17 +23,34 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.deckerth.thomas.foobarremotecontroller2.R
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
+import java.util.Base64
+
+fun basicAuthHeader(username: String, password: String): String {
+    val credentials = "$username:$password"
+    val base64Credentials = Base64.getEncoder().encodeToString(credentials.toByteArray())
+    return "Basic $base64Credentials"
+}
 
 @Composable
-fun ImageWithLoadingPlaceholder(imageUrl: String, modifier: Modifier = Modifier) {
+fun ImageWithLoadingPlaceholder(imageUrl: String, modifier: Modifier = Modifier, vm: AppViewModel) {
     var isLoading by remember { mutableStateOf(true) }
     Box {
+        val context = LocalContext.current
+
+        val imageRequest = ImageRequest.Builder(context)
+            .data(imageUrl)
+            .addHeader("Authorization", basicAuthHeader(vm.credentialsManager.getUser(), vm.credentialsManager.getPassword()))
+            .crossfade(true)
+            .build()
         AsyncImage(
             modifier = modifier,
-            model = imageUrl,
+            model = imageRequest,
             contentDescription = stringResource(R.string.desc_album_picture),
             //contentScale = ContentScale.Fit,
             onLoading = { isLoading = true },

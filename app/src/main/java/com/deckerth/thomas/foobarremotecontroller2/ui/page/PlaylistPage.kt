@@ -231,7 +231,7 @@ fun AlbumCard(vm: AppViewModel, album: Album, layout: Layout?, previewMode: Bool
                     modifier = Modifier.size(80.dp)
                 )
                 else ImageWithLoadingPlaceholder(
-                    imageUrl = album.originalTitle.artworkUrl, modifier = Modifier.size(80.dp)
+                    imageUrl = album.originalTitle.artworkUrl, modifier = Modifier.size(80.dp), vm
                 )
                 Column(
                     verticalArrangement = Arrangement.Center,

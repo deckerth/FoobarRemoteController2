@@ -59,7 +59,7 @@ class BrowserAccess(private val vm: AppViewModel) {
     private fun queryRoots(): String? {
         val response : Response?
         try {
-            response = vm.connector.getData("browser/roots")
+            response = vm.connector.getData("browser/roots", vm)
         } catch (e: Exception) {
             vm.errorHandler.logError(
                 ErrorType.NETWORK,
@@ -85,7 +85,7 @@ class BrowserAccess(private val vm: AppViewModel) {
     private fun queryDirectory(encodedPath: String): String? {
         val response: Response?
         try {
-            response = vm.connector.getData("browser/entries?path=$encodedPath")
+            response = vm.connector.getData("browser/entries?path=$encodedPath", vm)
         } catch (e: Exception) {
             vm.errorHandler.logError(
                 ErrorType.NETWORK,

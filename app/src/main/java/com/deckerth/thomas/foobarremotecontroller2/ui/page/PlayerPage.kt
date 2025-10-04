@@ -2,6 +2,7 @@
 
 package com.deckerth.thomas.foobarremotecontroller2.ui.page
 
+import android.annotation.SuppressLint
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -52,6 +53,7 @@ import com.deckerth.thomas.foobarremotecontroller2.model.PlaylistLifecycleState
 import com.deckerth.thomas.foobarremotecontroller2.ui.components.ArtWork
 import com.deckerth.thomas.foobarremotecontroller2.ui.components.LayoutComponent
 import com.deckerth.thomas.foobarremotecontroller2.ui.components.TitleDetails
+import com.deckerth.thomas.foobarremotecontroller2.ui.components.UserPasswordDialog
 import com.deckerth.thomas.foobarremotecontroller2.ui.isTablet
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.LayoutItems
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.layoutManager
@@ -61,6 +63,7 @@ import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+@SuppressLint("UnusedBoxWithConstraintsScope")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlayingPage(vm: AppViewModel) {
@@ -104,6 +107,8 @@ fun PlayingPage(vm: AppViewModel) {
                         modifier = Modifier
                             .align(Alignment.Center)
                     ) {
+                        if (vm.askForPassword)
+                            UserPasswordDialog(vm)
                         Icon(
                             painter = painterResource(R.drawable.signal_disconnected),
                             contentDescription = stringResource(R.string.desc_album_picture),
@@ -346,7 +351,7 @@ fun PlayerCard(
                     .fillMaxWidth()
                     .align(Alignment.Center))
             else
-                ArtWork(player, previewMode = previewMode)
+                ArtWork(player, previewMode = previewMode, vm)
         }
 
         // This Column contains the text fields and other controls.

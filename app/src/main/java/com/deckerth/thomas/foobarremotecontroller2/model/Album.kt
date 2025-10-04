@@ -20,9 +20,9 @@ data class SelectableTitle(val album: Album, val details: ITitle) {
         isSelected = value
         if (isSelected) {
             appViewModel.titleToRemoveWasSelected = true
-            appViewModel.increaseNoOfTitlesToRemove()
+            appViewModel.increaseNoOfSelectedTitles()
         } else {
-            appViewModel.decreaseNoOfTitlesToRemove()
+            appViewModel.decreaseNoOfSelectedTitles()
         }
         album.adjustIsSelected()
     }
@@ -45,9 +45,9 @@ data class Album(
     fun setIsSelected(value: ToggleableState) {
         isSelected = value
         if (value == ToggleableState.On)
-            for (title in _tracks) title.setSelected(viewModelInstance!!, true)
+            for (title in _tracks) title.setSelected(viewModelInstance, true)
         else if (value == ToggleableState.Off)
-            for (title in _tracks) title.setSelected(viewModelInstance!!, false)
+            for (title in _tracks) title.setSelected(viewModelInstance, false)
     }
 
     fun adjustIsSelected() {

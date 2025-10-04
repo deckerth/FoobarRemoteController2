@@ -172,4 +172,8 @@
     <string name="titles_copied_to_playlist">%1$s Titel kopiert</string>
     <string name="title_copied_to_playlist">1 Titel kopiert</string>
     <string name="checking_connection">Überprüfe die Verbindung..</string>
+    <string name="connect">Connect</string>
+    <string name="signInToAccessFoobar">Sign in to access Foobar</string>
+    <string name="user">User</string>
+    <string name="password">Password</string>
 </resources>

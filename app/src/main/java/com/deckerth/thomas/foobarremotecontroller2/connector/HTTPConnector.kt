@@ -8,10 +8,18 @@ import java.io.IOException
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
+import java.util.Base64
 
-data class Response(val usedIpAddress: String, var message: String = "")
+const val NO_CONNECTION = 400
+const val NOT_AUTHORIZED = 401
+const val CONNECTED = 200
 
-class HTTPConnector(private val vm: AppViewModel) {
+data class Response(
+    val usedIpAddress: String,
+    var message: String = ""
+)
+
+open class HTTPConnector() {
     fun serverAddress(ipAddress: String?): String {
         if (ipAddress != null) {
             return "http://${ipAddress}/api/"
@@ -19,17 +27,73 @@ class HTTPConnector(private val vm: AppViewModel) {
         return ""
     }
 
-    fun getData(endpoint: String): Response {
+    fun basicAuthHeader(username: String, password: String): String {
+        val credentials = "$username:$password"
+        val base64Credentials = Base64.getEncoder().encodeToString(credentials.toByteArray())
+        return "Basic $base64Credentials"
+    }
+
+    private fun setCredentials(urlConnection: HttpURLConnection, vm: AppViewModel) {
+        val user = vm.credentialsManager.getUser()
+        val password = vm.credentialsManager.getPassword()
+        if (user.isNotBlank()) {
+            val authHeader = basicAuthHeader(user, password)
+            urlConnection.setRequestProperty("Authorization", authHeader)
+        }
+    }
+
+//    fun getData(endpoint: String): Response {
+//        // Fetch data from the API in the background.
+//        val response = Response(vm.ipAddress!!)
+//        val url: URL
+//        try {
+//            url = URL(serverAddress(response.usedIpAddress) + endpoint)
+//            val client = OkHttpClient()
+//            val request = Request.Builder()
+//                .url(url)
+//                .header(
+//                    "Authorization",
+//                    basicAuthHeader(
+//                        vm.credentialsManager.getUser(),
+//                        vm.credentialsManager.getPassword()
+//                    )
+//                )
+//                .build()
+//            val responseFromAPI = client.newCall(request).execute()
+//            if (responseFromAPI.body == null)
+//                throw IOException("Response body is null")
+//            response.message = responseFromAPI.body!!.string()
+//            return response
+//        } catch (e: Exception) {
+//            e.printStackTrace()
+//            vm.errorHandler.logError(
+//                ErrorType.NETWORK,
+//                ErrorCode.CONNECTION_ERROR,
+//                ErrorSource.HTTP_CONNECTOR,
+//                e
+//            )
+//            throw e
+//        }
+//    }
+
+    fun getData(endpoint: String, vm: AppViewModel): Response {
         // Fetch data from the API in the background.
         val response = Response(vm.ipAddress!!)
         val result = StringBuilder()
+
+        var url: URL
+        var urlConnection: HttpURLConnection? = null
         try {
-            val url: URL
-            var urlConnection: HttpURLConnection? = null
-            try {
-                url = URL(serverAddress(response.usedIpAddress) + endpoint)
-                //open a URL connection
-                urlConnection = url.openConnection() as HttpURLConnection
+            url = URL(serverAddress(response.usedIpAddress) + endpoint)
+            //open a URL connection
+            urlConnection = url.openConnection() as HttpURLConnection
+            setCredentials(urlConnection, vm)
+
+            val connectionResponse = urlConnection.responseCode  // 401 -> Unauthorized, 200 -> OK
+            println("FOOB response (getData): $connectionResponse")
+            if (connectionResponse == NOT_AUTHORIZED) {
+                throw IOException("Unauthorized")
+            } else {
                 // Uncommenting the following can cause issues
                 println("FOOB $url ")
                 val inputStream = urlConnection.inputStream
@@ -44,7 +108,16 @@ class HTTPConnector(private val vm: AppViewModel) {
                 // return the data to onPostExecute method
                 response.message = result.toString()
                 return response
-            } catch (e: Exception) {
+            }
+        } catch (e: Exception) {
+            if (e.message != null && e.message.equals("Unauthorized"))
+                vm.errorHandler.logError(
+                    ErrorType.NETWORK,
+                    ErrorCode.AUTHORIZATION_ERROR,
+                    ErrorSource.HTTP_CONNECTOR,
+                    e
+                )
+            else {
                 e.printStackTrace()
                 vm.errorHandler.logError(
                     ErrorType.NETWORK,
@@ -52,36 +125,30 @@ class HTTPConnector(private val vm: AppViewModel) {
                     ErrorSource.HTTP_CONNECTOR,
                     e
                 )
-                throw e
-            } finally {
-                urlConnection?.disconnect()
             }
-        } catch (e: Exception) {
-            e.printStackTrace()
-            vm.errorHandler.logError(
-                ErrorType.NETWORK,
-                ErrorCode.CONNECTION_ERROR,
-                ErrorSource.HTTP_CONNECTOR,
-                e
-            )
             throw e
+        } finally {
+            urlConnection?.disconnect()
         }
     }
 
-    fun checkConnection(ip: String): Boolean {
-        if (!checkIpAddressSyntax(ip)) return false
+    fun checkConnection(ip: String, vm: AppViewModel): Int {
+        //vm.credentialsManager.setAuthenticator()
+        if (!checkIpAddressSyntax(ip)) return NO_CONNECTION
         try {
             val url = URL("http://$ip/api/playlists")
             println("FOOB \"http://$ip/api/playlists\"")
             //open a URL connection
             val urlConnection = url.openConnection() as HttpURLConnection
-            val response = urlConnection.responseCode
+            setCredentials(urlConnection, vm)
+            val response = urlConnection.responseCode  // 401 -> Unauthorized, 200 -> OK
             val message = urlConnection.responseMessage
+            urlConnection.disconnect()
             println("FOOB response: $response message:$message")
-            return response == 200 && message == "OK"
+            return response
         } catch (e: Exception) {
             e.printStackTrace()
-            return false
+            return NO_CONNECTION
         }
     }
 
@@ -115,19 +182,22 @@ class HTTPConnector(private val vm: AppViewModel) {
         }
     */
 
-    fun postData(endpoint: String) {
+    fun postData(endpoint: String, vm: AppViewModel) {
         val result = StringBuilder()
+        //vm.credentialsManager.setAuthenticator()
+        var url: URL
+        var urlConnection: HttpURLConnection? = null
         try {
-            val url: URL
-            var urlConnection: HttpURLConnection? = null
-            try {
-                url = URL(serverAddress(vm.ipAddress!!) + endpoint)
-                //open an URL connection
-                urlConnection = url.openConnection() as HttpURLConnection
-                urlConnection.requestMethod = "POST"
-                urlConnection.doOutput = true
-                urlConnection.setRequestProperty("Accept", "*/*")
-                urlConnection.connect()
+            url = URL(serverAddress(vm.ipAddress!!) + endpoint)
+            //open an URL connection
+            urlConnection = url.openConnection() as HttpURLConnection
+            setCredentials(urlConnection, vm)
+            urlConnection.requestMethod = "POST"
+            urlConnection.doOutput = true
+            urlConnection.setRequestProperty("Accept", "*/*")
+            val response = urlConnection.responseCode  // 401 -> Unauthorized, 200 -> OK
+            println("FOOB response (postData): $response")
+            if  (response in 200..299) { // // Check for a successful response range
                 val `in` = urlConnection.inputStream
                 val isw = InputStreamReader(`in`)
                 var data = isw.read()
@@ -135,30 +205,33 @@ class HTTPConnector(private val vm: AppViewModel) {
                     result.append(data.toChar())
                     data = isw.read()
                 }
-            } catch (e: Exception) {
-                e.printStackTrace()
-            } finally {
-                urlConnection?.disconnect()
             }
         } catch (e: Exception) {
             e.printStackTrace()
+        } finally {
+            urlConnection?.disconnect()
         }
     }
 
-    fun postData(endpoint: String, data: String) {
+    fun postData(endpoint: String, data: String, vm: AppViewModel) {
         val result = StringBuilder()
+        //vm.credentialsManager.setAuthenticator()
+        var url: URL
+        var urlConnection: HttpURLConnection? = null
         try {
-            val url: URL
-            var urlConnection: HttpURLConnection? = null
-            try {
-                url = URL(serverAddress(vm.ipAddress!!) + endpoint)
-                //open a URL connection
-                urlConnection = url.openConnection() as HttpURLConnection
-                urlConnection.requestMethod = "POST"
-                urlConnection.doOutput = true
-                //urlConnection.setRequestProperty("Accept", "*/*");
-                urlConnection.setRequestProperty("Content-Type", "application/json; charset=UTF-8")
-                urlConnection.connect()
+            url = URL(serverAddress(vm.ipAddress!!) + endpoint)
+            //open a URL connection
+            urlConnection = url.openConnection() as HttpURLConnection
+            setCredentials(urlConnection, vm)
+            urlConnection.requestMethod = "POST"
+            urlConnection.doOutput = true
+            urlConnection.setRequestProperty(
+                "Content-Type",
+                "application/json; charset=UTF-8"
+            )
+            val response = urlConnection.responseCode  // 401 -> Unauthorized, 200 -> OK
+            println("FOOB response (postData): $response")
+            if (response in 200..299) { // Check for a successful response range
                 urlConnection.outputStream.write(data.toByteArray())
                 try {  // try to read the response
                     val `in` = urlConnection.inputStream
@@ -171,29 +244,33 @@ class HTTPConnector(private val vm: AppViewModel) {
                 } catch (io: IOException) {
                     io.printStackTrace()
                 }
-            } catch (e: Exception) {
-                e.printStackTrace()
-            } finally {
-                urlConnection?.disconnect()
             }
         } catch (e: Exception) {
             e.printStackTrace()
+        } finally {
+            urlConnection?.disconnect()
         }
     }
 
-    fun getBitmapFromURL(src: String?): Bitmap? {
+    fun getBitmapFromURL(src: String?, vm: AppViewModel): Bitmap? {
+        var connection: HttpURLConnection? = null
         return if (!(src!!.contains("-1")))
             try {
+                //vm.credentialsManager.setAuthenticator()
                 println("FOOB getBitmapFromURL: $src")
                 val url = URL(src)
-                val connection = url.openConnection() as HttpURLConnection
-                connection.doInput = true
-                connection.connect()
-                val input = connection.inputStream
-                BitmapFactory.decodeStream(input)
+                connection = url.openConnection() as HttpURLConnection
+                setCredentials(connection, vm)
+                val response = connection.responseCode  // 401 -> Unauthorized, 200 -> OK
+                if (response in 200..299) {
+                    val input = connection.inputStream
+                    BitmapFactory.decodeStream(input)
+                } else null
             } catch (e: Exception) {
                 e.printStackTrace()
                 null
+            } finally {
+                connection?.disconnect()
             }
         else
             null

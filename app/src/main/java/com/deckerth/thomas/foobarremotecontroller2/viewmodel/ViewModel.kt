@@ -9,6 +9,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.deckerth.thomas.foobarremotecontroller2.connector.BrowserAccess
+import com.deckerth.thomas.foobarremotecontroller2.connector.CredentialsManager
 import com.deckerth.thomas.foobarremotecontroller2.connector.ErrorHandler
 import com.deckerth.thomas.foobarremotecontroller2.connector.HTTPConnector
 import com.deckerth.thomas.foobarremotecontroller2.connector.PlayerAccess
@@ -45,6 +46,8 @@ class AppViewModel : ViewModel() {
     var ipAddress: String? = null
     var valid = false
 
+    var askForPassword by mutableStateOf(false)
+
     lateinit var errorHandler: ErrorHandler
     lateinit var playerAccess: PlayerAccess
     lateinit var playlistAccess: PlaylistAccess
@@ -53,6 +56,7 @@ class AppViewModel : ViewModel() {
     lateinit var browserViewModel: BrowserViewModel
     lateinit var connector: HTTPConnector
     lateinit var foobVolumeControl: VolumeControl
+    lateinit var credentialsManager: CredentialsManager
 
     var autoscroll by mutableStateOf(true)
     var enforceAutoscroll by mutableStateOf(false)
@@ -76,7 +80,8 @@ class AppViewModel : ViewModel() {
     var createPlaylistRequest by mutableStateOf(false)
 
     fun initialize() {
-        connector = HTTPConnector(this)
+        credentialsManager = CredentialsManager()
+        connector = HTTPConnector()
         errorHandler = ErrorHandler(this)
         playerAccess = PlayerAccess(this)
         playlistAccess = PlaylistAccess(this)
@@ -95,11 +100,11 @@ class AppViewModel : ViewModel() {
         errorHandler.reset()
     }
 
-    fun increaseNoOfTitlesToRemove() {
+    fun increaseNoOfSelectedTitles() {
         noOfSelectedTitles++
     }
 
-    fun decreaseNoOfTitlesToRemove() {
+    fun decreaseNoOfSelectedTitles() {
         noOfSelectedTitles--
     }
 
@@ -164,7 +169,7 @@ class AppViewModel : ViewModel() {
             }
 
             if (player!!.getIndex() != -1) {
-                val bitmap = connector.getBitmapFromURL(player!!.artworkUrl)
+                val bitmap = connector.getBitmapFromURL(player!!.artworkUrl, this)
                 if (bitmap != null) {
                     // Update the color scheme with the new bitmap
                     updateColorScheme(bitmap)

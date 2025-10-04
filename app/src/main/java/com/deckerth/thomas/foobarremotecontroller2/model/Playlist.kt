@@ -184,6 +184,20 @@ class Playlist(var playlistEntity: PlaylistEntity) {
         return result
     }
 
+    fun selectAllTracks(vm: AppViewModel) {
+        val albumList =
+            if (vm.playlistsViewModel.filterValue.isActive) filteredAlbums else albums
+        for (album in albumList)
+            album.setIsSelected(ToggleableState.On)
+    }
+
+    fun deselectAllTracks(vm: AppViewModel) {
+        val albumList =
+            if (vm.playlistsViewModel.filterValue.isActive) filteredAlbums else albums
+        for (album in albumList)
+            album.setIsSelected(ToggleableState.Off)
+    }
+
     fun removeSelectedTracks(vm: AppViewModel) {
         if (vm.noOfSelectedTitles > 0) {
             val titlesToRemove = mutableListOf<Int>()

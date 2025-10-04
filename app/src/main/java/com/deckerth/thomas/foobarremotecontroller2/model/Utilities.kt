@@ -6,7 +6,8 @@ import android.net.NetworkCapabilities
 
 fun checkIpAddressSyntax(ipAddress: String): Boolean {
     val ipRegex = Regex("""^(\d{1,3}\.){3}\d{1,3}:\d{1,5}${'$'}""")
-    return ipRegex.matches(ipAddress)
+    val ok = ipRegex.matches(ipAddress)
+    return ok
 }
 
 fun checkPortSyntax(port: String): Boolean {

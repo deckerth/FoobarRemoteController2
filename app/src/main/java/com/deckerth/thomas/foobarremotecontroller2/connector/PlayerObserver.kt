@@ -32,6 +32,11 @@ class PlayerObserver(private val vm: AppViewModel, private val playlistAccess: P
                     } catch (e: Exception) {
                         e.printStackTrace()
                     }
+                else if (vm.errorHandler.authorizationErrorOccurred) {
+                    vm.askForPassword = true
+                    vm.player = null
+                }
+
             }, 0, 1, TimeUnit.SECONDS)
 
         } catch (e: Exception) {

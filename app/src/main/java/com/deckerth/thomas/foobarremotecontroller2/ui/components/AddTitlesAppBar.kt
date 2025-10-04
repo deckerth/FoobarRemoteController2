@@ -5,13 +5,13 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.deckerth.thomas.foobarremotecontroller2.R
 import com.deckerth.thomas.foobarremotecontroller2.getAddTrackBehavior
@@ -52,11 +52,47 @@ fun AddTitlesAppBar(appViewModel: AppViewModel) {
             },
             actions = {
                 Row {
-                    Button(onClick = {
-                        appViewModel.playlistsViewModel.addPlaylist(addBehavior)
-                    }) {
-                        Text(stringResource(R.string.button_create_playlist))
+                    IconButton(
+                        onClick = {
+                            appViewModel.displayedPlaylist!!.selectAllTracks(
+                                appViewModel
+                            )
+                        }
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.select_all),
+                            contentDescription = "Select all"
+                        )
                     }
+                    IconButton(
+                        onClick = {
+                            appViewModel.displayedPlaylist!!.deselectAllTracks(
+                                appViewModel
+                            )
+                        },
+                        enabled = appViewModel.noOfSelectedTitles > 0
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.remove_selection),
+                            contentDescription = "Remove selection"
+                        )
+                    }
+                    IconButton(
+                        onClick = {
+                            appViewModel.playlistsViewModel.addPlaylist(addBehavior)
+                        },
+                        enabled = appViewModel.noOfSelectedTitles > 0
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.format_list_bulleted_add),
+                            contentDescription = "New playlist"
+                        )
+                    }
+//                    Button(onClick = {
+//                        appViewModel.playlistsViewModel.addPlaylist(addBehavior)
+//                    }) {
+//                        Text(stringResource(R.string.button_create_playlist))
+//                    }
                 }
             }
         )

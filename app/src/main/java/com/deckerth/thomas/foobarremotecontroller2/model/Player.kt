@@ -42,7 +42,8 @@ data class Player(
     val artworkUrl: String,
     val playbackState: PlaybackState,
     val playbackMode: PlaybackMode,
-    val ipAddress: String
+    val ipAddress: String,
+    var invalidCredentials : Boolean = false
 ) {
 
     fun getPos(): Float {

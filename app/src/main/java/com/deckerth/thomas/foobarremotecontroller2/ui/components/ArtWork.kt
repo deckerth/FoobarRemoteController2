@@ -21,9 +21,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.deckerth.thomas.foobarremotecontroller2.R
 import com.deckerth.thomas.foobarremotecontroller2.model.Player
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
 
 @Composable
-fun ArtWork(player: Player, previewMode: Boolean = false) {
+fun ArtWork(player: Player, previewMode: Boolean = false, vm: AppViewModel) {
     val index = player.getIndex()
     if (index >= 0) {
         if (previewMode) {
@@ -40,7 +41,8 @@ fun ArtWork(player: Player, previewMode: Boolean = false) {
                 imageUrl = player.artworkUrl,
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(top = 16.dp, start = 16.dp, end = 16.dp)
+                    .padding(top = 16.dp, start = 16.dp, end = 16.dp),
+                vm
             )
     } else {
         Box(

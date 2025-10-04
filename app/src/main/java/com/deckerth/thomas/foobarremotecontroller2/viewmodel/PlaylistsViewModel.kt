@@ -7,6 +7,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.deckerth.thomas.foobarremotecontroller2.R
+import com.deckerth.thomas.foobarremotecontroller2.connector.CONNECTED
+import com.deckerth.thomas.foobarremotecontroller2.connector.NOT_AUTHORIZED
 import com.deckerth.thomas.foobarremotecontroller2.connector.PlayerObserver
 import com.deckerth.thomas.foobarremotecontroller2.getCreationOfNonEmptyPlaylistsBlocking
 import com.deckerth.thomas.foobarremotecontroller2.model.AddTracksBehaviors
@@ -101,7 +103,14 @@ class PlaylistsViewModel(private val vm: AppViewModel) : ViewModel() {
             if (vm.ipAddress != null) {
                 var count = 0
                 do {
-                    vm.valid = vm.connector.checkConnection(vm.ipAddress!!)
+                    val response = vm.connector.checkConnection(vm.ipAddress!!, vm)
+                    vm.valid = response == CONNECTED
+
+                    if (response == NOT_AUTHORIZED) {
+                        vm.askForPassword = true
+                        break
+                    }
+
                     count++
                     if (!vm.valid) {
                         Thread.sleep(500)
@@ -125,7 +134,7 @@ class PlaylistsViewModel(private val vm: AppViewModel) : ViewModel() {
         playerObserver.observer?.cancel(true)
         playlistRegistry.clear()
         vm.clearState()
-        playerObserver.startPlayerObserver()
+        startPlayerObserver()
     }
 
     fun getPlaylist(id: String): Playlist {
@@ -246,7 +255,7 @@ class PlaylistsViewModel(private val vm: AppViewModel) : ViewModel() {
                 do {
                     withContext(Dispatchers.Main) {
                         vm.loadingListProgress = currentPlaylist!!.titles.count()
-                            .toFloat() / currentPlaylist!!.playlistEntity.noOfTracks
+                            .toFloat() / currentPlaylist.playlistEntity.noOfTracks
                     }
                     // invariant: currentPlaylist is not null
                     val startIndex = currentPlaylist!!.titles.count()

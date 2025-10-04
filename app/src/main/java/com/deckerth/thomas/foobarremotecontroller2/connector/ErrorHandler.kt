@@ -18,6 +18,7 @@ enum class ErrorCode {
     NO_INTERNET_CONNECTION,
     BAD_RESPONSE,
     CONNECTION_ERROR,
+    AUTHORIZATION_ERROR,
     UNKNOWN_ERROR
 }
 
@@ -35,6 +36,7 @@ class ErrorHandler(private val vm: AppViewModel) {
     private var errorType: ErrorType = ErrorType.UNKNOWN
     private var errorCode: ErrorCode = ErrorCode.UNKNOWN_ERROR
     private var errorSource: ErrorSource = ErrorSource.PLAYER_STATE
+    var authorizationErrorOccurred = false
     private var healing = false
 
     fun logError(
@@ -50,6 +52,8 @@ class ErrorHandler(private val vm: AppViewModel) {
         if (firstOccurrence == null)
             firstOccurrence = Timestamp(System.currentTimeMillis())
 
+        if (errorCode == ErrorCode.AUTHORIZATION_ERROR)
+            authorizationErrorOccurred = true
         var message = ""
         if (error.message != null) message = error.message!!
 
@@ -76,6 +80,7 @@ class ErrorHandler(private val vm: AppViewModel) {
 
     fun reset() {
         healing = false
+        authorizationErrorOccurred = false
         firstOccurrence = null
     }
 

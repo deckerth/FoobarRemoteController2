@@ -81,6 +81,9 @@ import com.deckerth.thomas.foobarremotecontroller2.FoobarMediaService
 import com.deckerth.thomas.foobarremotecontroller2.R
 import com.deckerth.thomas.foobarremotecontroller2.getAlwaysOnDisplay
 import com.deckerth.thomas.foobarremotecontroller2.getIpAddressBlocking
+import com.deckerth.thomas.foobarremotecontroller2.getIvStringBlocking
+import com.deckerth.thomas.foobarremotecontroller2.getPasswordBlocking
+import com.deckerth.thomas.foobarremotecontroller2.getUsernameBlocking
 import com.deckerth.thomas.foobarremotecontroller2.model.checkIpAddressSyntax
 import com.deckerth.thomas.foobarremotecontroller2.ui.components.AddTitlesAppBar
 import com.deckerth.thomas.foobarremotecontroller2.ui.components.EditPlaylistAppBar
@@ -140,6 +143,10 @@ class MainActivity : ComponentActivity() {
             appViewModel.ipAddress = ipAddress
 
             LaunchedEffect(Unit) {
+                val user = getUsernameBlocking()
+                val encryptedPassword = getPasswordBlocking()
+                val iv = getIvStringBlocking()
+                appViewModel.credentialsManager.setCurrentUserPassword(user, encryptedPassword, iv)
                 ipAddress = getIpAddressBlocking() // executed exactly once
             }
 

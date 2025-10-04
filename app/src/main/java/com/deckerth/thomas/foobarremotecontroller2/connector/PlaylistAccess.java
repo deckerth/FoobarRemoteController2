@@ -54,10 +54,10 @@ public class PlaylistAccess {
         try {
             if (withPaths)
                 response = vm.connector.getData("playlists/" + playlistEntity.getPlaylistId() +
-                        "/items/" + startIndex + "%3A" + 1000 + "?columns=%25label%25,%25catalog%25,%25composer%25,%25album%25,%25title%25,%25artist%25,%25samplerate%25,%25genre%25,%25discnumber%25,%25track%25,%25length%25,%25path%25");
+                        "/items/" + startIndex + "%3A" + 1000 + "?columns=%25label%25,%25catalog%25,%25composer%25,%25album%25,%25title%25,%25artist%25,%25samplerate%25,%25genre%25,%25discnumber%25,%25track%25,%25length%25,%25path%25", vm);
             else
                 response = vm.connector.getData("playlists/" + playlistEntity.getPlaylistId() +
-                        "/items/" + startIndex + "%3A" + 1000 + "?columns=%25label%25,%25catalog%25,%25composer%25,%25album%25,%25title%25,%25artist%25,%25samplerate%25,%25genre%25,%25discnumber%25,%25track%25,%25length%25,%24filename%28%25path%25%29%24");
+                        "/items/" + startIndex + "%3A" + 1000 + "?columns=%25label%25,%25catalog%25,%25composer%25,%25album%25,%25title%25,%25artist%25,%25samplerate%25,%25genre%25,%25discnumber%25,%25track%25,%25length%25,%24filename%28%25path%25%29%24", vm);
         } catch (Exception e) {
             errorHandler.logError(ErrorType.NETWORK, ErrorCode.CONNECTION_ERROR, ErrorSource.PLAYLIST_ITEMS, e);
             return null;
@@ -150,7 +150,7 @@ public class PlaylistAccess {
     private Response queryPlaylists() {
         Response response;
         try {
-            response = vm.connector.getData("playlists");
+            response = vm.connector.getData("playlists", vm);
         } catch (Exception e) {
             errorHandler.logError(ErrorType.NETWORK, ErrorCode.CONNECTION_ERROR, ErrorSource.PLAYLIST_ITEMS, e);
             return null;
@@ -223,7 +223,7 @@ public class PlaylistAccess {
             pos++;
         }
         String jsonString = "{\"items\":[ " + pathString + "], \"play\":" + playValue + ", \"replace\":" + replaceValue + " }";
-        vm.connector.postData("playlists/" + playlistId + "/items/add/", jsonString);
+        vm.connector.postData("playlists/" + playlistId + "/items/add/", jsonString, vm);
     }
 
     public void removeTitles(String playlistId, List<Integer> indexes) {
@@ -244,7 +244,7 @@ public class PlaylistAccess {
             pos++;
         }
         jsonString.append(" ] }");
-        vm.connector.postData("playlists/" + playlistId + "/items/remove", jsonString.toString());
+        vm.connector.postData("playlists/" + playlistId + "/items/remove", jsonString.toString(), vm);
     }
 
     public void copyTitles(String fromPlaylistId, String toPlaylistId, int targetIndex, List<Integer> indexes) {
@@ -268,7 +268,7 @@ public class PlaylistAccess {
             pos++;
         }
         jsonString.append(" ] }");
-        vm.connector.postData("playlists/" + fromPlaylistId + "/" + toPlaylistId + "/items/copy", jsonString.toString());
+        vm.connector.postData("playlists/" + fromPlaylistId + "/" + toPlaylistId + "/items/copy", jsonString.toString(), vm);
     }
 
     public void addPlaylist(int position, String name) {
@@ -291,7 +291,7 @@ public class PlaylistAccess {
             e.printStackTrace();
             encodedName = name; // Fallback or throw an error
         }
-        vm.connector.postData("playlists/add?index=" + position + "&title=" + encodedName);
+        vm.connector.postData("playlists/add?index=" + position + "&title=" + encodedName, vm);
         if (paths != null)
             addPathsToPlaylist("" + position, paths, addBehavior);
     }

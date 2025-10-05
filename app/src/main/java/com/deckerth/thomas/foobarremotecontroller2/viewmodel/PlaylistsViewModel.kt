@@ -108,6 +108,7 @@ class PlaylistsViewModel(private val vm: AppViewModel) : ViewModel() {
 
                     if (response == NOT_AUTHORIZED) {
                         vm.askForPassword = true
+                        vm.player = null
                         break
                     }
 

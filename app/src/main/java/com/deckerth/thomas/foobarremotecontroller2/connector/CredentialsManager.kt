@@ -2,8 +2,12 @@ package com.deckerth.thomas.foobarremotecontroller2.connector
 
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
+import com.deckerth.thomas.foobarremotecontroller2.getFoobarConnectionsBlocking
 import com.deckerth.thomas.foobarremotecontroller2.saveCredentials
 import com.deckerth.thomas.foobarremotecontroller2.ui.mainActivity
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.security.KeyStore
 import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
@@ -16,6 +20,8 @@ class CredentialsManager() {
 
     private var user: String = ""
     private var password: String = ""
+
+    private var connectionManager : ConnectionManager? = null
 
     init {
         val keyStore = KeyStore.getInstance("AndroidKeyStore")
@@ -38,7 +44,13 @@ class CredentialsManager() {
             keyGenerator.init(keyGenParameterSpec)
             keyGenerator.generateKey()
         }
-        //setAuthenticator()
+        CoroutineScope(Dispatchers.IO).launch {
+            initConnectionManager()
+        }
+    }
+
+    private suspend fun initConnectionManager() {
+        connectionManager = getFoobarConnectionsBlocking()
     }
 
     private fun encrypt(password: String): Pair<ByteArray, ByteArray> {
@@ -70,20 +82,22 @@ class CredentialsManager() {
         return password
     }
 
-    fun setNewUserPassword(user: String, password: String) {
+    fun setNewUserPassword(ipAddress : String, user: String, password: String) {
         this.user = user
         this.password = password
         val (iv, encryptedPassword) = encrypt(password)
         saveCredentials(user, encryptedPassword, iv, mainActivity)
+        connectionManager?.addConnection(FoobarConnection(ipAddress, user, password, iv))
     }
 
-    fun setCurrentUserPassword(user: String, encryptedPassword: ByteArray, iv: ByteArray) {
+    fun setCurrentUserPassword(ipAddress : String, user: String, encryptedPassword: ByteArray, iv: ByteArray) {
         try {
             if (user.isNotBlank())
                 this.password = decrypt(iv, encryptedPassword)
             else
                 this.password = ""
             this.user = user
+            connectionManager?.addConnection(FoobarConnection(ipAddress, user, password, iv))
         }  catch (e: Exception) {
             // Decryption failed! The stored credentials are now invalid.
             // This can happen if the app was reinstalled, data was cleared,
@@ -95,4 +109,14 @@ class CredentialsManager() {
         }
     }
 
+    fun setIPAddress(ipAddress : String) {
+        val connection = connectionManager?.getConnection(ipAddress)
+        if (connection != null) {
+            this.user = connection.username
+            this.password = connection.password
+        } else {
+            this.user = ""
+            this.password = ""
+        }
+    }
 }

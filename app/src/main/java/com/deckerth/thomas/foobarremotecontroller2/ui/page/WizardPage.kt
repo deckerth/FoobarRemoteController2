@@ -151,6 +151,7 @@ fun WizardPage(
                     onFinished = { device: Device ->
                         saveIpAddress("${device.ipAddress}:8880", mainActivity)
                         vm?.ipAddress = "${device.ipAddress}:8880"
+                        vm?.credentialsManager?.setIPAddress(vm.ipAddress!!)
                         vm?.playlistsViewModel?.restartObserver()
                         onFinished()
                     }
@@ -228,14 +229,13 @@ fun WizardPage(
                 if (device.isValid) {
                     saveIpAddress(device.ipAddress, mainActivity)
                     vm?.ipAddress = device.ipAddress
+                    vm?.credentialsManager?.setIPAddress(device.ipAddress)
                     vm?.playlistsViewModel?.restartObserver()
                     onFinished()
                 }
             })
         }
     }
-
-
 }
 
 @Composable

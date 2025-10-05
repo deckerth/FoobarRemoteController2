@@ -32,7 +32,6 @@ private var passwordVisible by mutableStateOf(false)
 
 @Composable
 fun UserPasswordDialog(vm: AppViewModel, modifier: Modifier = Modifier) {
-    user = ""
     password = ""
     passwordVisible = false
     AlertDialog(
@@ -48,8 +47,8 @@ fun UserPasswordDialog(vm: AppViewModel, modifier: Modifier = Modifier) {
             TextButton(
                 onClick = {
                     vm.askForPassword = false
-                    if (user.isNotBlank()) {
-                        vm.credentialsManager.setNewUserPassword(user, password)
+                    if (user.isNotBlank() && vm.ipAddress != null) {
+                        vm.credentialsManager.setNewUserPassword(vm.ipAddress!!, user, password)
                         vm.playlistsViewModel.startPlayerObserver()
                     }
                 },
@@ -66,9 +65,19 @@ fun UserPasswordDialog(vm: AppViewModel, modifier: Modifier = Modifier) {
             )
         }, text = {
             Column {
+                if (vm.ipAddress != null)
+                    OutlinedTextField(
+                        value = vm.ipAddress!!,
+                        onValueChange = { },
+                        label = { Text(stringResource(R.string.field_ip_address)) },
+                        singleLine = true,
+                        enabled = false,
+                        modifier = modifier
+                            .padding(8.dp)
+                    )
                 OutlinedTextField(
                     value = user,
-                    onValueChange = { user = it },
+                    onValueChange = { user = it.trim() },
                     label = { Text(stringResource(R.string.user)) },
                     singleLine = true,
                     modifier = modifier
@@ -76,7 +85,7 @@ fun UserPasswordDialog(vm: AppViewModel, modifier: Modifier = Modifier) {
                 )
                 OutlinedTextField(
                     value = password,
-                    onValueChange = { password = it },
+                    onValueChange = { password = it.trim() },
                     label = { Text(stringResource(R.string.password)) },
                     singleLine = true,
                     // 1. Conditionally apply the visual transformation

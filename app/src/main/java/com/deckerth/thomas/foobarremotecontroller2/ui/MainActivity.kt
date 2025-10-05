@@ -146,8 +146,8 @@ class MainActivity : ComponentActivity() {
                 val user = getUsernameBlocking()
                 val encryptedPassword = getPasswordBlocking()
                 val iv = getIvStringBlocking()
-                appViewModel.credentialsManager.setCurrentUserPassword(user, encryptedPassword, iv)
                 ipAddress = getIpAddressBlocking() // executed exactly once
+                appViewModel.credentialsManager.setCurrentUserPassword(ipAddress, user, encryptedPassword, iv)
             }
 
             LaunchedEffect(ipAddress) { // executed exactly once

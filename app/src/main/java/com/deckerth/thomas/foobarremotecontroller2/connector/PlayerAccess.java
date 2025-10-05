@@ -61,7 +61,7 @@ public class PlayerAccess {
     public void setPosition(Float position) {
         String jsonString = "{\"position\":" + position + "}";
         vm.connector.postData("player/", jsonString, vm);
-        getPlayerState();
+        vm.updatePlayer();
     }
 
     private Player parsePlayerState(Response input) {
@@ -177,21 +177,21 @@ public class PlayerAccess {
     public void startPlayback() {
         new Thread(() -> {
             vm.connector.postData("player/play", vm);
-            getPlayerState();
+            vm.updatePlayer();
         }).start();
     }
 
     public void pausePlayback() {
         new Thread(() -> {
             vm.connector.postData("player/pause", vm);
-            getPlayerState();
+            vm.updatePlayer();
         }).start();
     }
 
     public void previousTrack() {
         new Thread(() -> {
             vm.connector.postData("player/previous", vm);
-            getPlayerState();
+            vm.updatePlayer();
         }).start();
     }
 
@@ -202,7 +202,7 @@ public class PlayerAccess {
     public void playTrack(String playlistId, Integer index) {
         new Thread(() -> {
             vm.connector.postData("player/play/" + playlistId + "/" + index.toString(), vm);
-            getPlayerState();
+            vm.updatePlayer();
         }).start();
     }
 
@@ -210,7 +210,7 @@ public class PlayerAccess {
         new Thread(() -> {
             String jsonString = "{\"volume\":" + value + "}";
             vm.connector.postData("player/", jsonString, vm);
-            getPlayerState();
+            vm.updatePlayer();
         }).start();
     }
 
@@ -218,7 +218,7 @@ public class PlayerAccess {
         new Thread(() -> {
             String jsonString = "{\"options\":[{\"id\": \"playbackOrder\", \"value\": " + mode.ordinal() + "}]}";
             vm.connector.postData("player/", jsonString, vm);
-            getPlayerState();
+            vm.updatePlayer();
         }).start();
     }
 

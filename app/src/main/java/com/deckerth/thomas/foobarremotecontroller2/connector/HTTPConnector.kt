@@ -229,10 +229,10 @@ open class HTTPConnector() {
                 "Content-Type",
                 "application/json; charset=UTF-8"
             )
+            urlConnection.outputStream.write(data.toByteArray())
             val response = urlConnection.responseCode  // 401 -> Unauthorized, 200 -> OK
             println("FOOB response (postData): $response")
             if (response in 200..299) { // Check for a successful response range
-                urlConnection.outputStream.write(data.toByteArray())
                 try {  // try to read the response
                     val `in` = urlConnection.inputStream
                     val isw = InputStreamReader(`in`)

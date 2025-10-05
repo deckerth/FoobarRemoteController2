@@ -5,6 +5,7 @@ import android.security.keystore.KeyProperties
 import com.deckerth.thomas.foobarremotecontroller2.getFoobarConnectionsBlocking
 import com.deckerth.thomas.foobarremotecontroller2.saveCredentials
 import com.deckerth.thomas.foobarremotecontroller2.ui.mainActivity
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -16,12 +17,7 @@ import javax.crypto.spec.GCMParameterSpec
 
 private const val KEY_ALIAS = "foobar_link_key_alias"
 
-class CredentialsManager() {
-
-    private var user: String = ""
-    private var password: String = ""
-
-    private var connectionManager : ConnectionManager? = null
+class CredentialsManager(val vm: AppViewModel) {
 
     init {
         val keyStore = KeyStore.getInstance("AndroidKeyStore")
@@ -50,7 +46,7 @@ class CredentialsManager() {
     }
 
     private suspend fun initConnectionManager() {
-        connectionManager = getFoobarConnectionsBlocking()
+        vm.connectionManager = getFoobarConnectionsBlocking()
     }
 
     private fun encrypt(password: String): Pair<ByteArray, ByteArray> {
@@ -72,51 +68,56 @@ class CredentialsManager() {
         cipher.init(Cipher.DECRYPT_MODE, secretKey, spec)
         val decryptedData = cipher.doFinal(encryptedData)
         return String(decryptedData)
-   }
+    }
 
     fun getUser(): String {
-        return user
+        return vm.user
     }
 
     fun getPassword(): String {
-        return password
+        return vm.password
     }
 
-    fun setNewUserPassword(ipAddress : String, user: String, password: String) {
-        this.user = user
-        this.password = password
+    fun setNewUserPassword(ipAddress: String, user: String, password: String) {
+        vm.user = user
+        vm.password = password
         val (iv, encryptedPassword) = encrypt(password)
         saveCredentials(user, encryptedPassword, iv, mainActivity)
-        connectionManager?.addConnection(FoobarConnection(ipAddress, user, password, iv))
+        vm.connectionManager?.addConnection(FoobarConnection(ipAddress, user, password, iv))
     }
 
-    fun setCurrentUserPassword(ipAddress : String, user: String, encryptedPassword: ByteArray, iv: ByteArray) {
+    fun setCurrentUserPassword(
+        ipAddress: String,
+        user: String,
+        encryptedPassword: ByteArray,
+        iv: ByteArray
+    ) {
         try {
             if (user.isNotBlank())
-                this.password = decrypt(iv, encryptedPassword)
+                vm.password = decrypt(iv, encryptedPassword)
             else
-                this.password = ""
-            this.user = user
-            connectionManager?.addConnection(FoobarConnection(ipAddress, user, password, iv))
-        }  catch (e: Exception) {
+                vm.password = ""
+            vm.user = user
+            vm.connectionManager?.addConnection(FoobarConnection(ipAddress, user, vm.password, iv))
+        } catch (e: Exception) {
             // Decryption failed! The stored credentials are now invalid.
             // This can happen if the app was reinstalled, data was cleared,
             // or the keystore key changed.
             // We must clear the credentials to prevent a login loop.
             e.printStackTrace() // Log the error for debugging
-            this.user = ""
-            this.password = ""
+            vm.user = ""
+            vm.password = ""
         }
     }
 
-    fun setIPAddress(ipAddress : String) {
-        val connection = connectionManager?.getConnection(ipAddress)
+    fun setIPAddress(ipAddress: String) {
+        val connection = vm.connectionManager?.getConnection(ipAddress)
         if (connection != null) {
-            this.user = connection.username
-            this.password = connection.password
+            vm.user = connection.username
+            vm.password = connection.password
         } else {
-            this.user = ""
-            this.password = ""
+            vm.user = ""
+            vm.password = ""
         }
     }
 }

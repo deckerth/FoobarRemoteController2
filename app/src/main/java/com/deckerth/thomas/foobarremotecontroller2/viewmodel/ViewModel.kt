@@ -9,6 +9,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.deckerth.thomas.foobarremotecontroller2.connector.BrowserAccess
+import com.deckerth.thomas.foobarremotecontroller2.connector.ConnectionManager
 import com.deckerth.thomas.foobarremotecontroller2.connector.CredentialsManager
 import com.deckerth.thomas.foobarremotecontroller2.connector.ErrorHandler
 import com.deckerth.thomas.foobarremotecontroller2.connector.HTTPConnector
@@ -44,6 +45,10 @@ class AppViewModel : ViewModel() {
     }
 
     var ipAddress: String? = null
+
+    var user: String by mutableStateOf("")
+    var password: String by mutableStateOf("")
+    var connectionManager: ConnectionManager? by mutableStateOf(null)
     var valid = false
 
     var askForPassword by mutableStateOf(false)
@@ -80,7 +85,7 @@ class AppViewModel : ViewModel() {
     var createPlaylistRequest by mutableStateOf(false)
 
     fun initialize() {
-        credentialsManager = CredentialsManager()
+        credentialsManager = CredentialsManager(this )
         connector = HTTPConnector()
         errorHandler = ErrorHandler(this)
         playerAccess = PlayerAccess(this)
@@ -150,7 +155,7 @@ class AppViewModel : ViewModel() {
 
     fun updatePlayer() {
         val newPlayer = playerAccess.getPlayerState()
-        if (newPlayer.ipAddress != ipAddress) return
+        if (newPlayer != null && newPlayer.ipAddress != ipAddress) return
         player = newPlayer
         val currentAlbumIndex = getCurrentAlbumIndex()
         if (autoscroll && player != null &&

@@ -172,6 +172,8 @@ class AppViewModel : ViewModel() {
                 PlaybackState.PLAYING -> PlaybackStateCompat.STATE_PLAYING
                 PlaybackState.PAUSED -> PlaybackStateCompat.STATE_PAUSED
             }
+            val durationSecs : Long = if (player!!.duration.isNotBlank()) (floor(player!!.duration.toDouble() * 1000)).toLong() else 0L
+            val positionSecs : Long = if (player!!.position.isNotBlank()) (floor(player!!.position.toDouble() * 1000)).toLong() else 0L
 
             if (player!!.getIndex() != -1) {
                 val bitmap = connector.getBitmapFromURL(player!!.artworkUrl, this)
@@ -188,8 +190,7 @@ class AppViewModel : ViewModel() {
                             bitmap
                         )
                         .putLong(
-                            MediaMetadataCompat.METADATA_KEY_DURATION,
-                            (floor(player!!.duration.toDouble() * 1000)).toLong()
+                            MediaMetadataCompat.METADATA_KEY_DURATION, durationSecs
                         )
                         .build()
                 )
@@ -197,7 +198,7 @@ class AppViewModel : ViewModel() {
                     PlaybackStateCompat.Builder()
                         .setState(
                             state,
-                            floor(player!!.position.toDouble() * 1000).toLong(),
+                            positionSecs,
                             1f
                         )
                         .setActions(
@@ -214,8 +215,7 @@ class AppViewModel : ViewModel() {
                         .putString(MediaMetadataCompat.METADATA_KEY_TITLE, player!!.title)
                         .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, player!!.artist)
                         .putLong(
-                            MediaMetadataCompat.METADATA_KEY_DURATION,
-                            (floor(player!!.duration.toDouble() * 1000)).toLong()
+                            MediaMetadataCompat.METADATA_KEY_DURATION,durationSecs
                         )
                         .build()
                 )
@@ -223,7 +223,7 @@ class AppViewModel : ViewModel() {
                     PlaybackStateCompat.Builder()
                         .setState(
                             state,
-                            floor(player!!.position.toDouble() * 1000).toLong(),
+                            positionSecs,
                             1f
                         )
                         .setActions(

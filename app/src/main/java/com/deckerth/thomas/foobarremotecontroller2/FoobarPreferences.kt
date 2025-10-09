@@ -38,6 +38,8 @@ private val DYNAMIC_COLOR_SCHEME_KEY = booleanPreferencesKey("dynamic_color_sche
 private val CREATION_OF_NON_EMPTY_PLAYLISTS_KEY =
     booleanPreferencesKey("creation_of_non_empty_playlists")
 private val CONNECTIONS_KEY = stringPreferencesKey("connections")
+private val RELEASE_KEY = stringPreferencesKey("release")
+
 private fun <T> getFlow(context: Context, key: Preferences.Key<T>): Flow<T?> {
     return context.dataStore.data.map { preferences ->
         preferences[key]
@@ -253,13 +255,6 @@ suspend fun getCreationOfNonEmptyPlaylistsBlocking(): Boolean {
     )
 }
 
-@Composable
-fun getFoobarConnections(): ConnectionManager {
-    val connectionsString = getValue(mainActivity.baseContext, CONNECTIONS_KEY, "")
-    return if (connectionsString.isEmpty()) return ConnectionManager()
-    else Json.decodeFromString(connectionsString)
-}
-
 suspend fun getFoobarConnectionsBlocking(): ConnectionManager {
     val connectionsString = getValueBlocking(mainActivity.baseContext, CONNECTIONS_KEY, "")
     return if (connectionsString.isEmpty()) return ConnectionManager()
@@ -270,5 +265,15 @@ fun saveFoobarConnections(context: Context, connections: ConnectionManager) {
     val connectionsString = Json.encodeToString(connections)
     runBlocking {
         saveValue(context, connectionsString, CONNECTIONS_KEY)
+    }
+}
+
+suspend fun getReleaseNotesDisplayedForReleaseBlocking(): String {
+    return getValueBlocking(mainActivity.baseContext, RELEASE_KEY, "")
+}
+
+fun saveReleaseNotesDisplayedForRelease(context: Context, release:String) {
+    runBlocking {
+        saveValue(context, release, RELEASE_KEY)
     }
 }

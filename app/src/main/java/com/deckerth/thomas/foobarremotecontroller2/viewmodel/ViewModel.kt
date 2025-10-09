@@ -84,6 +84,9 @@ class AppViewModel : ViewModel() {
     var titleToRemoveWasSelected by mutableStateOf(false)
     var createPlaylistRequest by mutableStateOf(false)
 
+    // Release Notes
+    var showReleaseNotes by mutableStateOf(false)
+    var releaseNotesDisplayedForRelease by mutableStateOf("")
     fun initialize() {
         credentialsManager = CredentialsManager(this )
         connector = HTTPConnector()

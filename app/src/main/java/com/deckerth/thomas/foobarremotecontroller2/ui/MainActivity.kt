@@ -83,6 +83,7 @@ import com.deckerth.thomas.foobarremotecontroller2.getAlwaysOnDisplay
 import com.deckerth.thomas.foobarremotecontroller2.getIpAddressBlocking
 import com.deckerth.thomas.foobarremotecontroller2.getIvStringBlocking
 import com.deckerth.thomas.foobarremotecontroller2.getPasswordBlocking
+import com.deckerth.thomas.foobarremotecontroller2.getReleaseNotesDisplayedForReleaseBlocking
 import com.deckerth.thomas.foobarremotecontroller2.getUsernameBlocking
 import com.deckerth.thomas.foobarremotecontroller2.model.checkIpAddressSyntax
 import com.deckerth.thomas.foobarremotecontroller2.ui.components.AddTitlesAppBar
@@ -146,6 +147,7 @@ class MainActivity : ComponentActivity() {
                 val user = getUsernameBlocking()
                 val encryptedPassword = getPasswordBlocking()
                 val iv = getIvStringBlocking()
+                appViewModel.releaseNotesDisplayedForRelease = getReleaseNotesDisplayedForReleaseBlocking()
                 ipAddress = getIpAddressBlocking() // executed exactly once
                 appViewModel.credentialsManager.setCurrentUserPassword(ipAddress, user, encryptedPassword, iv)
             }

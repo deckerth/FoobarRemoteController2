@@ -176,4 +176,11 @@
     <string name="signInToAccessFoobar">Anmeldung</string>
     <string name="user">Nutzername</string>
     <string name="password">Passwort</string>
+    <string name="release_notes_title">Neuigkeiten</string>
+    <string name="release_notes_1_header">Beefweb Berechtigungsprüfung</string>
+    <string name="release_notes_1_text">Sie können das Beefweb plugin so konfigurieren, dass Zugangsdaten eingegeben werden müssen. Sobald Foobar Link erkennt, dass Zugangsdaten benötigt werden, wird der Nutzer aufgefordert, einen Benutzernamen und ein Passwort einzugeben. Foobar Link speichert die Zugangsdaten für jede IP-Adresse, unter der ein Foobar-Server läuft.</string>
+    <string name="release_notes_2_header">Editieren von Playlists</string>
+    <string name="release_notes_2_text">Wenn Sie eine neue Playlist aus der aktuellen erstellen oder ausgewählte Titel in eine andere Playlist kopieren, können Sie nun einfach alle Titel auswählen oder abwählen.</string>
+    <string name="release_notes_remark">Sie können sich die Informationen über die Neuigkeiten später in den Einstellungen ansehen.</string>
+    <string name="release_notes_verion">Version: %1$s</string>
 </resources>

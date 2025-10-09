@@ -52,6 +52,7 @@ import com.deckerth.thomas.foobarremotecontroller2.model.Player
 import com.deckerth.thomas.foobarremotecontroller2.model.PlaylistLifecycleState
 import com.deckerth.thomas.foobarremotecontroller2.ui.components.ArtWork
 import com.deckerth.thomas.foobarremotecontroller2.ui.components.LayoutComponent
+import com.deckerth.thomas.foobarremotecontroller2.ui.components.ReleaseNotes
 import com.deckerth.thomas.foobarremotecontroller2.ui.components.TitleDetails
 import com.deckerth.thomas.foobarremotecontroller2.ui.components.UserPasswordDialog
 import com.deckerth.thomas.foobarremotecontroller2.ui.isTablet
@@ -101,13 +102,14 @@ fun PlayingPage(vm: AppViewModel) {
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState(), enabled = true)
             ) {
+                ReleaseNotes(vm)
                 if (vm.player == null) {
                     showLoading = !vm.isSick
                     Column(
                         modifier = Modifier
                             .align(Alignment.Center)
                     ) {
-                        if (vm.askForPassword)
+                        if (vm.askForPassword && !vm.showReleaseNotes)
                             UserPasswordDialog(vm)
                         Icon(
                             painter = painterResource(R.drawable.signal_disconnected),

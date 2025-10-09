@@ -63,6 +63,7 @@ import com.deckerth.thomas.foobarremotecontroller2.saveFoobarVolumeControl
 import com.deckerth.thomas.foobarremotecontroller2.savePauseDuringPhoneCalls
 import com.deckerth.thomas.foobarremotecontroller2.saveViewMode
 import com.deckerth.thomas.foobarremotecontroller2.ui.components.LicenseText
+import com.deckerth.thomas.foobarremotecontroller2.ui.components.ReleaseNotes
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.Layouts
 import com.deckerth.thomas.foobarremotecontroller2.ui.mainActivity
 import com.deckerth.thomas.foobarremotecontroller2.ui.theme.seedColor
@@ -71,7 +72,7 @@ import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
 @Composable
 fun SettingsPage(vm: AppViewModel) {
 
-    var outputDevices = remember { mutableStateOf<OutputDevices?>(null) }
+    val outputDevices = remember { mutableStateOf<OutputDevices?>(null) }
     val outputDevicesLoading = remember { mutableStateOf(false) }
 
     if (!outputDevicesLoading.value && outputDevices.value == null) {
@@ -281,6 +282,14 @@ fun SettingsPage(vm: AppViewModel) {
                     text = { LicenseText() }
                 )
             }
+            PreferenceItem<Boolean>(
+                title = stringResource(
+                    R.string.release_notes_title
+                ),
+                onClick = { vm.showReleaseNotes = true },
+                summary = ""
+            )
+            ReleaseNotes(vm)
         }
     }
 }

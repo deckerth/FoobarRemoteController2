@@ -13,7 +13,7 @@ android {
         applicationId = "com.deckerth.thomas.foobarremotecontroller2"
         minSdk = 31
         targetSdk = 35
-        versionCode = 23
+        versionCode = 25
         versionName = "2510"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"

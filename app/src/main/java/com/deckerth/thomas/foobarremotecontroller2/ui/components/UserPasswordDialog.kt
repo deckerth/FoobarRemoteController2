@@ -23,6 +23,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.deckerth.thomas.foobarremotecontroller2.R
+import com.deckerth.thomas.foobarremotecontroller2.ui.mainActivity
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
 
 private var user by mutableStateOf("")
@@ -38,7 +39,11 @@ fun UserPasswordDialog(vm: AppViewModel, modifier: Modifier = Modifier) {
         onDismissRequest = {
             vm.askForPassword = false
         }, dismissButton = {
-            TextButton(onClick = { vm.askForPassword = false }) {
+            TextButton(onClick = {
+                vm.askForPassword = false
+                vm.ipAddress = ""
+                mainActivity.navigateTo("DeviceSelectionPage")
+            }) {
                 Text(
                     stringResource(R.string.cancel), style = MaterialTheme.typography.bodyMedium
                 )

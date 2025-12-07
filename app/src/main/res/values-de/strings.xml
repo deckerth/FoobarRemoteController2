@@ -159,7 +159,7 @@
     <string name="playlist_titles_singular">1 Titel</string>
     <string name="playlist_titles_plural">%1$s Titel</string>
     <string name="create_empty_playlist">Leere Playlist anlegen</string>
-    <string name="choose_titles_from_current_playlist">Augewählte Titel von der aktuellen Playlist hinzufügen</string>
+    <string name="choose_titles_from_current_playlist">Ausgewählte Titel von der aktuellen Playlist hinzufügen</string>
     <string name="settings_browser">Playlists</string>
     <string name="settings_create_empty_playlists">Leere playlist erstellen</string>
     <string name="settings_create_empty_playlists_enabled_desc">Neue Playlists werden leer angelegt</string>

@@ -3,7 +3,6 @@ package com.deckerth.thomas.foobarremotecontroller2.ui.components
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.material.icons.Icons
@@ -111,30 +110,7 @@ fun PlaylistNameDialog(
                 Row(
                     Modifier
                         .fillMaxWidth()
-                        .height(56.dp)
-                        .selectable(
-                            selected = (createEmptyPlaylist),
-                            onClick = { createEmptyPlaylist = !createEmptyPlaylist },
-                            role = Role.RadioButton
-                        )
-                        .padding(horizontal = 16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    RadioButton(
-                        selected = (createEmptyPlaylist),
-                        onClick = null // null recommended for accessibility with screen readers
-                    )
-                    Text(
-                        text = stringResource(R.string.create_empty_playlist),
-                        style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier.padding(start = 16.dp)
-                    )
-                }
-
-                Row(
-                    Modifier
-                        .fillMaxWidth()
-                        .height(56.dp)
+                        .padding(top = 16.dp)
                         .selectable(
                             selected = (!createEmptyPlaylist),
                             onClick = { createEmptyPlaylist = !createEmptyPlaylist },
@@ -159,11 +135,34 @@ fun PlaylistNameDialog(
                         modifier = Modifier.padding(start = 16.dp)
                     )
                 }
+
+                Row(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(top = 24.dp)
+                        .selectable(
+                            selected = (createEmptyPlaylist),
+                            onClick = { createEmptyPlaylist = !createEmptyPlaylist },
+                            role = Role.RadioButton
+                        )
+                        .padding(horizontal = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    RadioButton(
+                        selected = (createEmptyPlaylist),
+                        onClick = null // null recommended for accessibility with screen readers
+                    )
+                    Text(
+                        text = stringResource(R.string.create_empty_playlist),
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.padding(start = 16.dp)
+                    )
+                }
+
             }
         }
     }, modifier = modifier
         .padding(16.dp)
-        .fillMaxWidth()
     )
 }
 

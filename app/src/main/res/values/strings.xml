@@ -182,4 +182,6 @@
     <string name="release_notes_2_text">When creating a new playlist from the current one or copying selected tracks to another playlist, you can now quickly select or deselect all titles with ease.</string>
     <string name="release_notes_remark">You can review the release notes later in the app settings.</string>
     <string name="release_notes_verion">Version: %1$s</string>
+    <string name="menu_item_top_of_playlist">Go to top</string>
+    <string name="menu_item_bottom_of_playlist">Go to bottom</string>
 </resources>

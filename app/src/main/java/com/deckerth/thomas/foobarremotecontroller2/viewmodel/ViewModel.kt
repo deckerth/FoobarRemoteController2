@@ -67,6 +67,8 @@ class AppViewModel : ViewModel() {
     var enforceAutoscroll by mutableStateOf(false)
     private var autoscrollSave by mutableStateOf(true)
     var autoScrollIndex by mutableIntStateOf(0)
+    var scrollToTop by mutableStateOf(false)
+    var scrollToBottom by mutableStateOf(false)
     var displayedPlaylist by mutableStateOf<Playlist?>(null)
     var loadingList by mutableStateOf(false)
     var loadingListProgress by mutableFloatStateOf(0f)

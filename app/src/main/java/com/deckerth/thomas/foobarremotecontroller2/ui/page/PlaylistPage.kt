@@ -133,7 +133,7 @@ fun PlaylistPage(vm: AppViewModel) {
             } else vm.addTitlesMode = true
         })
 
-    if (!mainActivity.isTablet() && ( vm.loadingList || vm.displayedPlaylist == null) ) LinearProgressIndicator(
+    if (!mainActivity.isTablet() && (vm.loadingList || vm.displayedPlaylist == null)) LinearProgressIndicator(
         progress = {
             vm.loadingListProgress
         },
@@ -447,7 +447,6 @@ fun Playlist(vm: AppViewModel, playlist: Playlist) {
         val currentAlbumIndex = vm.getCurrentAlbumIndex()
         val playlistState =
             rememberLazyListState(initialFirstVisibleItemIndex = if (!vm.loadingList && vm.autoscroll && currentAlbumIndex != -1) currentAlbumIndex else 0)
-        var animating by remember { mutableStateOf(false) }
 
         Text(
             modifier = Modifier.padding(start = 8.dp),
@@ -481,14 +480,28 @@ fun Playlist(vm: AppViewModel, playlist: Playlist) {
 
         LaunchedEffect(vm.autoScrollIndex, vm.enforceAutoscroll) {
             if (vm.autoscroll && vm.autoScrollIndex != -1) {
-                animating = true
                 if (vm.enforceAutoscroll) {
                     vm.enforceAutoscroll = false
                     playlistState.scrollToItem(if (vm.autoScrollIndex > 0) vm.autoScrollIndex - 1 else 1)
                 }
 
                 playlistState.scrollToItem(vm.autoScrollIndex)
-                animating = false
+            }
+        }
+        LaunchedEffect(vm.scrollToTop) {
+            if (vm.scrollToTop) {
+                vm.scrollToTop = false
+                playlistState.scrollToItem(0)
+            }
+        }
+        LaunchedEffect(vm.scrollToBottom) {
+            if (vm.scrollToBottom) {
+                vm.scrollToBottom = false
+                if (playlist.albums.isNotEmpty())
+                    if (vm.playlistsViewModel.filterValue.isActive)
+                        playlistState.scrollToItem(playlist.filteredAlbums.size - 1)
+                    else
+                        playlistState.scrollToItem(playlist.albums.size - 1)
             }
         }
     }
@@ -509,7 +522,9 @@ fun PlaylistSwitcher(vm: AppViewModel, playlists: Playlists) {
             .padding(8.dp)
             .fillMaxWidth(),
         expanded = expanded,
-        onExpandedChange = { if (!vm.playlistEditMode &&!vm.addTitlesMode) expanded = !expanded }) {
+        onExpandedChange = {
+            if (!vm.playlistEditMode && !vm.addTitlesMode) expanded = !expanded
+        }) {
         OutlinedTextField(
             modifier = Modifier
                 .fillMaxWidth()

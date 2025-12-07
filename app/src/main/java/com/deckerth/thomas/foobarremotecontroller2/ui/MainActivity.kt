@@ -32,6 +32,8 @@ import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.automirrored.outlined.List
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Refresh
@@ -362,6 +364,34 @@ class MainActivity : ComponentActivity() {
                                     DropdownMenu(
                                         expanded = dropdownMenuExpanded,
                                         onDismissRequest = { dropdownMenuExpanded = false }) {
+                                        DropdownMenuItem(
+                                            text = { Text(stringResource(R.string.menu_item_top_of_playlist)) },
+                                            onClick = {
+                                                dropdownMenuExpanded = false
+                                                appViewModel.autoscroll = false
+                                                appViewModel.scrollToTop = true
+                                            },
+                                            leadingIcon = {
+                                                Icon(
+                                                    imageVector = Icons.Default.KeyboardArrowUp,
+                                                    contentDescription = "Top of playlist"
+                                                )
+                                            }
+                                        )
+                                        DropdownMenuItem(
+                                            text = { Text(stringResource(R.string.menu_item_bottom_of_playlist)) },
+                                            onClick = {
+                                                dropdownMenuExpanded = false
+                                                appViewModel.autoscroll = false
+                                                appViewModel.scrollToBottom = true
+                                            },
+                                            leadingIcon = {
+                                                Icon(
+                                                    imageVector = Icons.Default.KeyboardArrowDown,
+                                                    contentDescription = "Top of playlist"
+                                                )
+                                            }
+                                        )
                                         DropdownMenuItem(
                                             text = { Text(stringResource(R.string.menu_item_add_titles)) },
                                             onClick = {

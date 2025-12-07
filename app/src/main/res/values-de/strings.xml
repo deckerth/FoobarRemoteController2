@@ -183,4 +183,6 @@
     <string name="release_notes_2_text">Wenn Sie eine neue Playlist aus der aktuellen erstellen oder ausgewählte Titel in eine andere Playlist kopieren, können Sie nun einfach alle Titel auswählen oder abwählen.</string>
     <string name="release_notes_remark">Sie können sich die Informationen über die Neuigkeiten später in den Einstellungen ansehen.</string>
     <string name="release_notes_verion">Version: %1$s</string>
+    <string name="menu_item_top_of_playlist">Zum Anfang springen</string>
+    <string name="menu_item_bottom_of_playlist">Zum Ende springen</string>
 </resources>

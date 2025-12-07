@@ -13,8 +13,8 @@ android {
         applicationId = "com.deckerth.thomas.foobarremotecontroller2"
         minSdk = 31
         targetSdk = 35
-        versionCode = 25
-        versionName = "2510"
+        versionCode = 26
+        versionName = "2512"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {

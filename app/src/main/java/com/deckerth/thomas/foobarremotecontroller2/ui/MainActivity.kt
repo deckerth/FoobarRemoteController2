@@ -393,6 +393,34 @@ class MainActivity : ComponentActivity() {
                                             }
                                         )
                                         DropdownMenuItem(
+                                            text = { Text(stringResource(R.string.filter_titles)) },
+                                            onClick = {
+                                                dropdownMenuExpanded =
+                                                    false; appViewModel.playlistsViewModel.showFilter =
+                                                true
+                                            },
+                                            leadingIcon = {
+                                                Icon(
+                                                    painter = painterResource(R.drawable.filter_alt),
+                                                    contentDescription = "Filter"
+                                                )
+                                            }
+                                        )
+                                        DropdownMenuItem(
+                                            text = { Text(stringResource(R.string.add_to_playback_queue)) },
+                                            onClick = {
+                                                dropdownMenuExpanded = false
+                                                appViewModel.enablePlaylistEditMode(
+                                                    PlaylistEditOperation.ADD_TO_PLAYBACK_QUEUE)
+                                            },
+                                            leadingIcon = {
+                                                Icon(
+                                                    painter = painterResource(R.drawable.play),
+                                                    contentDescription = "Add titles to playback queue"
+                                                )
+                                            }
+                                        )
+                                        DropdownMenuItem(
                                             text = { Text(stringResource(R.string.menu_item_add_titles)) },
                                             onClick = {
                                                 dropdownMenuExpanded = false; navigateTo("Browser")
@@ -428,20 +456,6 @@ class MainActivity : ComponentActivity() {
                                                 Icon(
                                                     painter = painterResource(R.drawable.content_copy),
                                                     contentDescription = "Remove tracks"
-                                                )
-                                            }
-                                        )
-                                        DropdownMenuItem(
-                                            text = { Text(stringResource(R.string.filter_titles)) },
-                                            onClick = {
-                                                dropdownMenuExpanded =
-                                                    false; appViewModel.playlistsViewModel.showFilter =
-                                                true
-                                            },
-                                            leadingIcon = {
-                                                Icon(
-                                                    painter = painterResource(R.drawable.filter_alt),
-                                                    contentDescription = "Filter"
                                                 )
                                             }
                                         )
@@ -636,7 +650,25 @@ class MainActivity : ComponentActivity() {
                                         )
 
                                     }
-
+                                    if (appViewModel.playlistsViewModel.filterValue.isActive)
+                                        IconButton(onClick = {
+                                            appViewModel.playlistsViewModel.showFilter = false
+                                            appViewModel.playlistsViewModel.filterValue.clear()
+                                        }) {
+                                            Icon(
+                                                painter = painterResource(R.drawable.filter_alt_off),
+                                                contentDescription = "Filter off"
+                                            )
+                                        }
+                                    else
+                                        IconButton(onClick = {
+                                            appViewModel.playlistsViewModel.showFilter = true
+                                        }) {
+                                            Icon(
+                                                painter = painterResource(R.drawable.filter_alt),
+                                                contentDescription = "Filter"
+                                            )
+                                        }
                                     IconButton(onClick = {
                                         navigateTo("Browser")
                                     }) {
@@ -661,25 +693,6 @@ class MainActivity : ComponentActivity() {
                                             contentDescription = "Remove tracks"
                                         )
                                     }
-                                    if (appViewModel.playlistsViewModel.filterValue.isActive)
-                                        IconButton(onClick = {
-                                            appViewModel.playlistsViewModel.showFilter = false
-                                            appViewModel.playlistsViewModel.filterValue.clear()
-                                        }) {
-                                            Icon(
-                                                painter = painterResource(R.drawable.filter_alt_off),
-                                                contentDescription = "Filter off"
-                                            )
-                                        }
-                                    else
-                                        IconButton(onClick = {
-                                            appViewModel.playlistsViewModel.showFilter = true
-                                        }) {
-                                            Icon(
-                                                painter = painterResource(R.drawable.filter_alt),
-                                                contentDescription = "Filter"
-                                            )
-                                        }
                                     IconButton(onClick = {
                                         appViewModel.createPlaylistRequest = true
                                     }) {

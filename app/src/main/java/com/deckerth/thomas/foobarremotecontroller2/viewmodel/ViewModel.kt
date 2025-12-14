@@ -35,7 +35,7 @@ val viewModelInstance: AppViewModel get() {
 }
 
 enum class PlaylistEditOperation {
-    REMOVE, COPY
+    REMOVE, COPY, ADD_TO_PLAYBACK_QUEUE
 }
 
 class AppViewModel : ViewModel() {

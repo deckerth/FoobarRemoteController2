@@ -181,12 +181,15 @@
 <!--    <string name="release_notes_1_text">Sie können das Beefweb plugin so konfigurieren, dass Zugangsdaten eingegeben werden müssen. Sobald Foobar Link erkennt, dass Zugangsdaten benötigt werden, wird der Nutzer aufgefordert, einen Benutzernamen und ein Passwort einzugeben. Foobar Link speichert die Zugangsdaten für jede IP-Adresse, unter der ein Foobar-Server läuft.</string>-->
 <!--    <string name="release_notes_2_header">Editieren von Playlists</string>-->
 <!--    <string name="release_notes_2_text">Wenn Sie eine neue Playlist aus der aktuellen erstellen oder ausgewählte Titel in eine andere Playlist kopieren, können Sie nun einfach alle Titel auswählen oder abwählen.</string>-->
-    <string name="release_notes_1_header">Navigation in der Playlist</string>
-    <string name="release_notes_1_text">Sie können direkt zum Anfang oder zum Ende der Playlist springen</string>
-    <string name="release_notes_2_header">Second</string>
-    <string name="release_notes_2_text">Second Feature</string>
+    <string name="release_notes_1_header">Playback Queue</string>
+    <string name="release_notes_1_text">Selektieren Sie Titel aus einer Playlist und fügen Sie sie anschließend der Playback Queue hinzu.</string>
+    <string name="release_notes_2_header">Navigation in der Playlist</string>
+    <string name="release_notes_2_text">Über das Playlist Menü können Sie zum Anfang oder zum Ende der Playlist springen.</string>
     <string name="release_notes_remark">Sie können sich die Informationen über die Neuigkeiten später in den Einstellungen ansehen.</string>
-    <string name="release_notes_verion">Version: %1$s</string>
+    <string name="release_notes_version">Version: %1$s</string>
     <string name="menu_item_top_of_playlist">Zum Anfang springen</string>
     <string name="menu_item_bottom_of_playlist">Zum Ende springen</string>
+    <string name="add_to_playback_queue">Add titles to playback queue</string>
+    <string name="title_added_to_playback_queue">1 title added to playback queue</string>
+    <string name="titles_added_to_playback_queue">%1$s titles added to playback queue</string>
 </resources>

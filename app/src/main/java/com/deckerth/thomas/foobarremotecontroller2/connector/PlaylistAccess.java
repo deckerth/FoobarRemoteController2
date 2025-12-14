@@ -271,6 +271,17 @@ public class PlaylistAccess {
         vm.connector.postData("playlists/" + fromPlaylistId + "/" + toPlaylistId + "/items/copy", jsonString.toString(), vm);
     }
 
+    public void addTitleToPlaybackQueue(String fromPlaylistId, int index) {
+
+        //        playqueue/add
+        //        {
+        //            "plref": "p1"
+        //            "index": 1
+        //        }
+
+        vm.connector.postData("playqueue/add", "{ \"plref\": \"" + fromPlaylistId + "\", \"itemIndex\":" + index + "}", vm);
+    }
+
     public void addPlaylist(int position, String name) {
         addPlaylist(position, name, null, null);
     }

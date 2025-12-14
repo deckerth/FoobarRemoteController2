@@ -87,8 +87,8 @@ fun EditPlaylistAppBar(appViewModel: AppViewModel) {
                             contentDescription = "Remove selection"
                         )
                     }
-                    if (appViewModel.playlistEditOperation == PlaylistEditOperation.REMOVE)
-                        IconButton(
+                    when (appViewModel.playlistEditOperation) {
+                        PlaylistEditOperation.REMOVE -> IconButton(
                             onClick = {
                                 appViewModel.displayedPlaylist!!.removeSelectedTracks(
                                     appViewModel
@@ -101,32 +101,48 @@ fun EditPlaylistAppBar(appViewModel: AppViewModel) {
                                 contentDescription = "Delete"
                             )
                         }
-                    else {
-                        // Copy titles to another playlist
-                        IconButton(
+
+                        PlaylistEditOperation.COPY -> {
+                            IconButton(
+                                onClick = {
+                                    playlistSelectorExpanded = true
+                                },
+                                enabled = appViewModel.noOfSelectedTitles > 0
+                            ) {
+                                Icon(
+                                    painter = painterResource(R.drawable.content_copy),
+                                    contentDescription = "Copy"
+                                )
+                            }
+
+                            PlaylistSelector(
+                                appViewModel,
+                                playlistSelectorExpanded,
+                                onClick = {
+                                    playlistSelectorExpanded = false
+                                    if (it != null) {
+                                        appViewModel.displayedPlaylist!!.copySelectedTitles(
+                                            appViewModel,
+                                            it
+                                        )
+                                    }
+                                }
+                            )
+                        }
+
+                        PlaylistEditOperation.ADD_TO_PLAYBACK_QUEUE -> IconButton(
                             onClick = {
-                                playlistSelectorExpanded = true
+                                appViewModel.displayedPlaylist!!.addSelectedTitlesToPlaybackQueue(
+                                    appViewModel
+                                )
                             },
                             enabled = appViewModel.noOfSelectedTitles > 0
                         ) {
                             Icon(
-                                painter = painterResource(R.drawable.content_copy),
-                                contentDescription = "Copy"
+                                painter = painterResource(R.drawable.play),
+                                contentDescription = "Add titles to playback queue"
                             )
                         }
-                        PlaylistSelector(
-                            appViewModel,
-                            playlistSelectorExpanded,
-                            onClick = {
-                                playlistSelectorExpanded = false
-                                if (it != null) {
-                                    appViewModel.displayedPlaylist!!.copySelectedTitles(
-                                        appViewModel,
-                                        it
-                                    )
-                                }
-                            }
-                        )
                     }
                 }
             }

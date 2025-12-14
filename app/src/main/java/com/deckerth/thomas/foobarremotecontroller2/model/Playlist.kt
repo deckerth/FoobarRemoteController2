@@ -223,14 +223,7 @@ class Playlist(var playlistEntity: PlaylistEntity) {
 
     fun copySelectedTitles(vm: AppViewModel, toPlaylist: PlaylistEntity) {
         if (vm.noOfSelectedTitles > 0) {
-            val titlesToCopy = mutableListOf<Int>()
-            val albumList =
-                if (vm.playlistsViewModel.filterValue.isActive) filteredAlbums else albums
-            for (album in albumList)
-                for (title in album.tracks)
-                    if (title.isSelected) {
-                        titlesToCopy.add(title.details.index)
-                    }
+            val titlesToCopy = getSelectedTitles(vm)
             resetSelectedTracks(vm)
             CoroutineScope(Dispatchers.IO).launch {
                 if (vm.displayedPlaylist != null) {
@@ -240,9 +233,9 @@ class Playlist(var playlistEntity: PlaylistEntity) {
                         )
                     else
                         vm.toastOnPlaylistPageMessage = mainActivity.getString(
-                        R.string.titles_copied_to_playlist,
-                        titlesToCopy.size.toString()
-                    )
+                            R.string.titles_copied_to_playlist,
+                            titlesToCopy.size.toString()
+                        )
 
                     vm.playlistAccess.copyTitles(
                         vm.displayedPlaylist!!.playlistEntity.playlistId,
@@ -255,6 +248,47 @@ class Playlist(var playlistEntity: PlaylistEntity) {
             }
         }
         vm.disablePlaylistEditMode(false)
+    }
+
+    private fun getSelectedTitles(vm: AppViewModel): MutableList<Int> {
+        val titlesToCopy = mutableListOf<Int>()
+        val albumList =
+            if (vm.playlistsViewModel.filterValue.isActive) filteredAlbums else albums
+        for (album in albumList)
+            for (title in album.tracks)
+                if (title.isSelected) {
+                    titlesToCopy.add(title.details.index)
+                }
+        return titlesToCopy
+    }
+
+    fun addSelectedTitlesToPlaybackQueue(vm: AppViewModel) {
+        if (vm.noOfSelectedTitles > 0) {
+            val titlesToAdd = getSelectedTitles(vm)
+            resetSelectedTracks(vm)
+            CoroutineScope(Dispatchers.IO).launch {
+                if (vm.displayedPlaylist != null) {
+                    if (titlesToAdd.size == 1)
+                        vm.toastOnPlaylistPageMessage = mainActivity.getString(
+                            R.string.title_added_to_playback_queue
+                        )
+                    else
+                        vm.toastOnPlaylistPageMessage = mainActivity.getString(
+                            R.string.titles_added_to_playback_queue,
+                            titlesToAdd.size.toString()
+                        )
+
+                    for (title in titlesToAdd) {
+                        vm.playlistAccess.addTitleToPlaybackQueue(
+                            vm.displayedPlaylist!!.playlistEntity.playlistId,
+                            title
+                        )
+                    }
+                    vm.displayToastOnPlaylistPage = true
+                }
+            }
+            vm.disablePlaylistEditMode(false)
+        }
     }
 
     fun resetSelectedTracks(vm: AppViewModel) {

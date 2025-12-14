@@ -125,6 +125,12 @@ public class PlayerAccess {
                 String title = columns.getString(4);
                 String filename = columns.getString(11);
                 String effectiveTitle = "";
+                String index = activeItemObject.getString("index");
+                String imageURL;
+                if (!index.isEmpty() && !index.equals("-1"))
+                    imageURL = vm.connector.serverAddress(input.getUsedIpAddress()) + "artwork/" + activeItemObject.getString("playlistId") + "/" + activeItemObject.getString("index");
+                else
+                    imageURL = vm.connector.serverAddress(input.getUsedIpAddress()) + "artwork/current";
                 if (!title.equals(filename)) effectiveTitle = title;
                 return new Player(
                         columns.getString(0),
@@ -142,7 +148,7 @@ public class PlayerAccess {
                         activeItemObject.getString("index"),
                         activeItemObject.getString("duration"),
                         activeItemObject.getString("position"),
-                        vm.connector.serverAddress(input.getUsedIpAddress()) + "artwork/" + activeItemObject.getString("playlistId") + "/" + activeItemObject.getString("index"),
+                        imageURL,
                         playbackState,
                         PlaybackMode.getEntries().get(playerObject.getInt("playbackMode")),
                         input.getUsedIpAddress(), false);

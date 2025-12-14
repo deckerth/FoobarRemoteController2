@@ -614,6 +614,29 @@ class MainActivity : ComponentActivity() {
                                                 .size(24.dp)
                                         )
                                     }
+
+                                    IconButton(onClick = {
+                                        appViewModel.autoscroll = false
+                                        appViewModel.scrollToTop = true
+                                    }) {
+                                        Icon(
+                                            imageVector = Icons.Default.KeyboardArrowUp,
+                                            contentDescription = "Top of playlist"
+                                        )
+
+                                    }
+
+                                    IconButton(onClick = {
+                                        appViewModel.autoscroll = false
+                                        appViewModel.scrollToBottom = true
+                                    }) {
+                                        Icon(
+                                            imageVector = Icons.Default.KeyboardArrowDown,
+                                            contentDescription = "Bottom of playlist"
+                                        )
+
+                                    }
+
                                     IconButton(onClick = {
                                         navigateTo("Browser")
                                     }) {

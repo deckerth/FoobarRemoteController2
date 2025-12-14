@@ -12,6 +12,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
@@ -22,14 +23,8 @@ import com.deckerth.thomas.foobarremotecontroller2.ui.theme.Foobar2000RemoteCont
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
 
 @Composable
-fun ReleaseNotesText(
-    appVersion: String?,
-    withSettingsNote: Boolean,
-    modifier: Modifier = Modifier
-) {
-    InitStyles()
-
-    val annotatedString = buildAnnotatedString {
+private fun getReleaseNotes(appVersion: String?, withSettingsNote: Boolean) : AnnotatedString {
+    return buildAnnotatedString {
         withStyle(headingStyle) {
             append(stringResource(R.string.release_notes_title) + "\n")
         }
@@ -43,17 +38,29 @@ fun ReleaseNotesText(
         withStyle(textStyle) {
             append(stringResource(R.string.release_notes_1_text) + "\n\n")
         }
-        withStyle(titleStyle) {
-            append(stringResource(R.string.release_notes_2_header) + "\n\n")
-        }
-        withStyle(textStyle) {
-            append(stringResource(R.string.release_notes_2_text) + "\n\n\n")
-        }
+//        withStyle(titleStyle) {
+//            append(stringResource(R.string.release_notes_2_header) + "\n\n")
+//        }
+//        withStyle(textStyle) {
+//            append(stringResource(R.string.release_notes_2_text) + "\n\n\n")
+//        }
         if (withSettingsNote)
             withStyle(smallTextStyle) {
                 append(stringResource(R.string.release_notes_remark) + "\n")
             }
     }
+}
+
+@Composable
+fun ReleaseNotesText(
+    appVersion: String?,
+    withSettingsNote: Boolean,
+    modifier: Modifier = Modifier
+) {
+    InitStyles()
+
+    val annotatedString = getReleaseNotes(appVersion, withSettingsNote)
+
     Text(
         text = annotatedString,
         modifier = modifier

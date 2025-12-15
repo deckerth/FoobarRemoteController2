@@ -262,6 +262,41 @@ class Playlist(var playlistEntity: PlaylistEntity) {
         return titlesToCopy
     }
 
+    fun addTitleToPlaybackQueue(vm: AppViewModel, playlistId: String, titleIndex: Int) {
+        CoroutineScope(Dispatchers.IO).launch {
+            vm.toastOnPlaylistPageMessage = mainActivity.getString(
+                R.string.title_added_to_playback_queue
+            )
+
+            vm.playlistAccess.addTitleToPlaybackQueue(
+                playlistId,
+                titleIndex
+            )
+        }
+        vm.displayToastOnPlaylistPage = true
+    }
+
+    fun addAlbumToPlaybackQueue(vm: AppViewModel, album: Album) {
+        CoroutineScope(Dispatchers.IO).launch {
+            if (album.tracks.size == 1)
+                vm.toastOnPlaylistPageMessage = mainActivity.getString(
+                    R.string.title_added_to_playback_queue
+                )
+            else
+                vm.toastOnPlaylistPageMessage = mainActivity.getString(
+                    R.string.titles_added_to_playback_queue,
+                    album.tracks.size.toString()
+                )
+
+            for (title in album.tracks)
+                vm.playlistAccess.addTitleToPlaybackQueue(
+                    title.details.playlistId,
+                    title.details.index
+                )
+        }
+        vm.displayToastOnPlaylistPage = true
+    }
+
     fun addSelectedTitlesToPlaybackQueue(vm: AppViewModel) {
         if (vm.noOfSelectedTitles > 0) {
             val titlesToAdd = getSelectedTitles(vm)

@@ -16,6 +16,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -55,6 +57,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.deckerth.thomas.foobarremotecontroller2.R
 import com.deckerth.thomas.foobarremotecontroller2.model.Album
+import com.deckerth.thomas.foobarremotecontroller2.model.ITitle
 import com.deckerth.thomas.foobarremotecontroller2.model.Playlist
 import com.deckerth.thomas.foobarremotecontroller2.model.PlaylistEntity
 import com.deckerth.thomas.foobarremotecontroller2.model.PlaylistLifecycleState
@@ -146,6 +149,71 @@ fun PlaylistPage(vm: AppViewModel) {
             Toast.LENGTH_SHORT
         ).show()
         vm.displayToastOnPlaylistPage = false
+    }
+}
+
+@Composable
+fun TitleDropdownMenu(vm: AppViewModel, title: ITitle? = null, album: Album? = null) {
+    var dropdownMenuExpanded by remember { mutableStateOf(false) }
+    var showTitleDetails by remember { mutableStateOf(false) }
+    if (vm.displayedPlaylist == null) return
+    Box {
+        IconButton(
+            onClick = { dropdownMenuExpanded = true }) {
+            Icon(
+                imageVector = Icons.Default.MoreVert,
+                contentDescription = "More",
+                modifier = Modifier.size(16.dp)
+            )
+        }
+        DropdownMenu(
+            expanded = dropdownMenuExpanded,
+            onDismissRequest = { dropdownMenuExpanded = false }) {
+
+            if (title != null || album != null)
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.menu_item_add_to_playback_queue)) },
+                    onClick = {
+                        if (title != null)
+                            vm.displayedPlaylist!!.addTitleToPlaybackQueue(
+                                vm,
+                                vm.displayedPlaylist!!.playlistEntity.playlistId,
+                                title.index
+                            )
+                        else if (album != null)
+                            vm.displayedPlaylist!!.addAlbumToPlaybackQueue(vm, album)
+                        dropdownMenuExpanded = false
+                    },
+                    leadingIcon = {
+                        Icon(
+                            painter = painterResource(R.drawable.play),
+                            contentDescription = "Add to playback queue"
+                        )
+                    }
+                )
+            if (title != null) {
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.menu_item_show_title_details)) },
+                    onClick = {
+                        dropdownMenuExpanded = false
+                        showTitleDetails = true
+                    },
+                    leadingIcon = {
+                        Icon(
+                            painter = painterResource(R.drawable.info_i),
+                            contentDescription = stringResource(R.string.button_details),
+                            modifier = Modifier.size(16.dp)
+                        )
+                    }
+                )
+
+                if (showTitleDetails)
+                    TitleDetails(
+                        title = title,
+                        onDismiss = { showTitleDetails = false },
+                    )
+            }
+        }
     }
 }
 
@@ -244,22 +312,7 @@ fun AlbumCard(vm: AppViewModel, album: Album, layout: Layout?, previewMode: Bool
                         LayoutComponent(album, item)
                     }
                 }
-                if (albumRepresentsTitle) {
-                    var infoButtonClicked by remember { mutableStateOf(false) }
-                    IconButton(
-                        modifier = Modifier.align(Alignment.CenterVertically),
-                        onClick = { infoButtonClicked = true }) {
-                        Icon(
-                            painter = painterResource(R.drawable.info_i),
-                            contentDescription = stringResource(R.string.button_details),
-                            modifier = Modifier.size(16.dp)
-                        )
-                    }
-                    if (infoButtonClicked) TitleDetails(
-                        title = album.tracks[0].details,
-                        onDismiss = { infoButtonClicked = false },
-                    )
-                }
+                TitleDropdownMenu(vm, album = album)
             }
             if (album.tracks.size > 1) {
                 HorizontalDivider()
@@ -337,29 +390,19 @@ fun TitleEntry(
                 modifier = Modifier.align(Alignment.CenterVertically),
                 checked = title.isSelected,
                 onCheckedChange = { title.setSelected(vm, it) })
-            Box {
-                Column(
-                    modifier = Modifier.padding(16.dp)
-                ) {
-                    val layout = layoutManager.getLayout()
-                    for (item in layout.titleLayout.items) {
-                        LayoutComponent(album, title.details, layout.albumLayoutHasArtist, item)
-                    }
+
+            Column(
+                modifier = Modifier
+                    .padding(16.dp)
+                    .weight(1f)
+            ) {
+                val layout = layoutManager.getLayout()
+                for (item in layout.titleLayout.items) {
+                    LayoutComponent(album, title.details, layout.albumLayoutHasArtist, item)
                 }
-                IconButton(
-                    modifier = Modifier.align(Alignment.CenterEnd),
-                    onClick = { infoButtonClicked = true }) {
-                    Icon(
-                        painter = painterResource(R.drawable.info_i),
-                        contentDescription = stringResource(R.string.button_details),
-                        modifier = Modifier.size(16.dp)
-                    )
-                }
-                if (infoButtonClicked) TitleDetails(
-                    title = title.details,
-                    onDismiss = { infoButtonClicked = false },
-                )
             }
+
+            TitleDropdownMenu(vm, title.details)
         }
     }
 }

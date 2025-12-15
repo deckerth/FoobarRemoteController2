@@ -192,4 +192,6 @@
     <string name="add_to_playback_queue">Add titles to playback queue</string>
     <string name="title_added_to_playback_queue">1 title added to playback queue</string>
     <string name="titles_added_to_playback_queue">%1$s titles added to playback queue</string>
+    <string name="menu_item_add_to_playback_queue">Add to playback queue</string>
+    <string name="menu_item_show_title_details">Details</string>
 </resources>

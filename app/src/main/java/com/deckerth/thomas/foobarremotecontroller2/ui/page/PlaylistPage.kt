@@ -383,7 +383,6 @@ fun TitleEntry(
     Column(
         modifier = modifier
     ) {
-        var infoButtonClicked by remember { mutableStateOf(false) }
         HorizontalDivider()
         Row {
             if (vm.playlistEditMode || vm.addTitlesMode) Checkbox(

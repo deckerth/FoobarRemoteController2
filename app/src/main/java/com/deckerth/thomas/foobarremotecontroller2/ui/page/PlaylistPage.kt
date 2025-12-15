@@ -206,15 +206,14 @@ fun TitleDropdownMenu(vm: AppViewModel, title: ITitle? = null, album: Album? = n
                         )
                     }
                 )
-
-                if (showTitleDetails)
-                    TitleDetails(
-                        title = title,
-                        onDismiss = { showTitleDetails = false },
-                    )
             }
         }
     }
+    if (showTitleDetails && title != null)
+        TitleDetails(
+            title = title,
+            onDismiss = { showTitleDetails = false },
+        )
 }
 
 fun playlistInfoString(vm: AppViewModel): String {

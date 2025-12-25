@@ -670,6 +670,15 @@ class MainActivity : ComponentActivity() {
                                             )
                                         }
                                     IconButton(onClick = {
+                                        appViewModel.enablePlaylistEditMode(
+                                            PlaylistEditOperation.ADD_TO_PLAYBACK_QUEUE)
+                                    }) {
+                                        Icon(
+                                            painter = painterResource(R.drawable.play),
+                                            contentDescription = "Add titles to playback queue"
+                                        )
+                                    }
+                                    IconButton(onClick = {
                                         navigateTo("Browser")
                                     }) {
                                         Icon(

@@ -297,6 +297,74 @@ class Playlist(var playlistEntity: PlaylistEntity) {
         vm.displayToastOnPlaylistPage = true
     }
 
+    fun addTitleToPlaylist(
+        vm: AppViewModel,
+        title: ITitle,
+        toPlaylistId: String,
+        addBehavior: AddTracksBehaviors
+    ) {
+        CoroutineScope(Dispatchers.IO).launch {
+            vm.toastOnPlaylistPageMessage = mainActivity.getString(
+                R.string.title_copied_to_playlist
+            )
+            vm.playlistAccess.addPathsToPlaylist(
+                toPlaylistId,
+                title.path,
+                addBehavior
+            )
+        }
+        vm.displayToastOnPlaylistPage = true
+    }
+
+    fun addAlbumToPlaylist(
+        vm: AppViewModel,
+        album: Album,
+        toPlaylistId: String,
+        addBehavior: AddTracksBehaviors
+    ) {
+        CoroutineScope(Dispatchers.IO).launch {
+            if (album.tracks.size == 1)
+                vm.toastOnPlaylistPageMessage = mainActivity.getString(
+                    R.string.title_copied_to_playlist
+                )
+            else
+                vm.toastOnPlaylistPageMessage = mainActivity.getString(
+                    R.string.titles_copied_to_playlist,
+                    album.tracks.size.toString()
+                )
+            val paths: MutableList<String> = ArrayList<String>()
+            for (title in album.tracks)
+                paths.add(title.details.path)
+            vm.playlistAccess.addPathsToPlaylist(
+                toPlaylistId,
+                paths,
+                addBehavior
+            )
+        }
+        vm.displayToastOnPlaylistPage = true
+    }
+
+    fun removeTitleFromPlaylist(vm: AppViewModel, title: ITitle) {
+        CoroutineScope(Dispatchers.IO).launch {
+            if (vm.displayedPlaylist != null)
+                vm.playlistAccess.removeTitles(
+                    playlistEntity.playlistId,
+                    listOf(title.index)
+                )
+        }
+    }
+
+    fun removeAlbumFromPlaylist(
+        vm: AppViewModel,
+        album: Album ) {
+        CoroutineScope(Dispatchers.IO).launch {
+            val indexes: MutableList<Int> = ArrayList<Int>()
+            for (title in album.tracks)
+                indexes.add(title.details.index)
+            vm.playlistAccess.removeTitles(playlistEntity.playlistId, indexes)
+        }
+    }
+
     fun addSelectedTitlesToPlaybackQueue(vm: AppViewModel) {
         if (vm.noOfSelectedTitles > 0) {
             val titlesToAdd = getSelectedTitles(vm)

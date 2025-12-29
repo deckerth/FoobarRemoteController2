@@ -17,6 +17,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenu
@@ -56,6 +58,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.deckerth.thomas.foobarremotecontroller2.R
+import com.deckerth.thomas.foobarremotecontroller2.getAddTrackBehavior
 import com.deckerth.thomas.foobarremotecontroller2.model.Album
 import com.deckerth.thomas.foobarremotecontroller2.model.ITitle
 import com.deckerth.thomas.foobarremotecontroller2.model.Playlist
@@ -67,6 +70,7 @@ import com.deckerth.thomas.foobarremotecontroller2.model.Title
 import com.deckerth.thomas.foobarremotecontroller2.ui.components.ImageWithLoadingPlaceholder
 import com.deckerth.thomas.foobarremotecontroller2.ui.components.LayoutComponent
 import com.deckerth.thomas.foobarremotecontroller2.ui.components.PlaylistNameDialog
+import com.deckerth.thomas.foobarremotecontroller2.ui.components.PlaylistSelector
 import com.deckerth.thomas.foobarremotecontroller2.ui.components.TitleDetails
 import com.deckerth.thomas.foobarremotecontroller2.ui.components.TitleSearchBarDialog
 import com.deckerth.thomas.foobarremotecontroller2.ui.isTablet
@@ -156,6 +160,10 @@ fun PlaylistPage(vm: AppViewModel) {
 fun TitleDropdownMenu(vm: AppViewModel, title: ITitle? = null, album: Album? = null) {
     var dropdownMenuExpanded by remember { mutableStateOf(false) }
     var showTitleDetails by remember { mutableStateOf(false) }
+    var playlistSelectorExpanded by remember { mutableStateOf(false) }
+
+    val addBehavior = getAddTrackBehavior()
+
     if (vm.displayedPlaylist == null) return
     Box {
         IconButton(
@@ -191,7 +199,36 @@ fun TitleDropdownMenu(vm: AppViewModel, title: ITitle? = null, album: Album? = n
                         )
                     }
                 )
-            if (title != null) {
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.menu_item_add_to_playlist)) },
+                onClick = {
+                    playlistSelectorExpanded = true
+                    dropdownMenuExpanded = false
+                },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = "Add music"
+                    )
+                }
+            )
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.menu_item_remove_from_playlist)) },
+                onClick = {
+                    if (title != null)
+                        vm.displayedPlaylist!!.removeTitleFromPlaylist(vm, title)
+                    else if (album != null)
+                        vm.displayedPlaylist!!.removeAlbumFromPlaylist(vm, album)
+                    dropdownMenuExpanded = false
+                },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = "Delete titles from playlist"
+                    )
+                }
+            )
+            if (title != null || (album != null && album.tracks.size == 1))  {
                 DropdownMenuItem(
                     text = { Text(stringResource(R.string.menu_item_show_title_details)) },
                     onClick = {
@@ -209,11 +246,37 @@ fun TitleDropdownMenu(vm: AppViewModel, title: ITitle? = null, album: Album? = n
             }
         }
     }
-    if (showTitleDetails && title != null)
+
+    PlaylistSelector(
+        vm,
+        playlistSelectorExpanded,
+        onClick = {
+            playlistSelectorExpanded = false
+            if (it != null) {
+                if (title != null)
+                    vm.displayedPlaylist!!.addTitleToPlaylist(
+                        vm,
+                        title,
+                        it.playlistId,
+                        addBehavior
+                    )
+                else if (album != null)
+                    vm.displayedPlaylist!!.addAlbumToPlaylist(vm, album, it.playlistId, addBehavior)
+            }
+        }
+    )
+
+    if (showTitleDetails)
+        if (title != null)
         TitleDetails(
             title = title,
             onDismiss = { showTitleDetails = false },
         )
+    else if (album != null && album.tracks.size == 1)
+            TitleDetails(
+                title = album.tracks[0].details,
+                onDismiss = { showTitleDetails = false },
+            )
 }
 
 fun playlistInfoString(vm: AppViewModel): String {

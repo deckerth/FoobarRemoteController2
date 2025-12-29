@@ -639,7 +639,6 @@ class MainActivity : ComponentActivity() {
                                         )
 
                                     }
-
                                     IconButton(onClick = {
                                         appViewModel.autoscroll = false
                                         appViewModel.scrollToBottom = true

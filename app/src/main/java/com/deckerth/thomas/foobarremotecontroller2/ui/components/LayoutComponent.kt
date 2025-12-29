@@ -56,6 +56,7 @@ fun LayoutComponent(vm: AppViewModel, player: Player, layoutItem: LayoutItem) {
 
         LayoutItems.TITLE -> TextComponent(text = player.title, item = layoutItem)
         LayoutItems.ALBUM -> TextComponent(text = player.album, item = layoutItem)
+        LayoutItems.ARTIST_TITLE -> TextComponent(text = player.artist + " - " + player.title, item = layoutItem)
         LayoutItems.ARTIST -> TextComponent(text = player.artist, item = layoutItem)
         LayoutItems.SAMPLE_RATE -> TextComponent(text = player.sampleRate+ " Hz", item = layoutItem)
         LayoutItems.GENRE -> TextComponent(text = player.genre, item = layoutItem)
@@ -81,6 +82,8 @@ fun LayoutComponent(album: Album, layoutItem: LayoutItem) {
 
         LayoutItems.ALBUM -> TextComponent(text = album.originalTitle.album, item = layoutItem)
         LayoutItems.ARTIST -> TextComponent(text = album.originalTitle.artist, item = layoutItem)
+        LayoutItems.ARTIST_TITLE -> TextComponent(text = album.originalTitle.artist + " - " + album.originalTitle.title, item = layoutItem)
+
         LayoutItems.COMPOSER ->
             if (album.originalTitle.composer != "" && album.originalTitle.composer != "?") {
                 TextComponent(text = album.originalTitle.composer, item = layoutItem)
@@ -103,6 +106,7 @@ fun LayoutComponent(album: Album, title: ITitle, checkArtist: Boolean, layoutIte
         LayoutItems.ALBUM -> TextComponent(text = title.album, item = layoutItem)
         LayoutItems.TITLE -> TextComponent(text = title.title, item = layoutItem)
         LayoutItems.ARTIST -> TextComponent(text = title.artist, item = layoutItem)
+        LayoutItems.ARTIST_TITLE -> TextComponent(text = title.artist + " - " + title.title, item = layoutItem)
         LayoutItems.SMART_ARTIST ->
             if (!checkArtist || !title.artist.equals(album.originalTitle.artist))
                 TextComponent(text = title.artist, item = layoutItem)

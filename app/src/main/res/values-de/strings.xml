@@ -194,8 +194,9 @@
     <string name="titles_added_to_playback_queue">%1$s Titel wurden der Playback Queue hinzugefügt</string>
     <string name="menu_item_add_to_playback_queue">Zur Playback Queue hinzufügen</string>
     <string name="menu_item_show_title_details">Details</string>
-    <string name="menu_item_add_to_playlist">Add to playlist...</string>
+    <string name="menu_item_add_to_playlist">Add to playlist…</string>
     <string name="menu_item_remove_from_playlist">Remove from playlist</string>
     <string name="release_notes_3_header">Navigation in der Playlist</string>
     <string name="release_notes_3_text">Über das Playlist Menü können Sie zum Anfang oder zum Ende der Playlist springen.</string>
+    <string name="layout_item_artist_title">Artist - Title</string>
 </resources>

@@ -29,6 +29,8 @@ enum class LayoutItems(
     ALBUM(mainActivity.baseContext.getString(R.string.layout_item_album)),
     TITLE(mainActivity.baseContext.getString(R.string.layout_item_title), onAlbum = false),
     ARTIST(mainActivity.baseContext.getString(R.string.layout_item_artist)),
+    ARTIST_TITLE(mainActivity.baseContext.getString(R.string.layout_item_artist_title)),
+
     GENRE(mainActivity.baseContext.getString(R.string.layout_item_genre)),
     SMART_ARTIST(
         mainActivity.baseContext.getString(R.string.layout_item_smart_artist),

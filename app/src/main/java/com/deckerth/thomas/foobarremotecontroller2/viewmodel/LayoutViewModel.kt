@@ -54,7 +54,8 @@ class LayoutViewModel(private val vm: AppViewModel) : ViewModel() {
                 else
                     continue
             }
-            description.items.add(field.layoutItem!!)
+            if (!field.isEndMarker)
+                description.items.add(field.layoutItem!!)
         }
         layoutManager.setCustomLayoutDescription(vm.selectedView, description)
     }
@@ -80,6 +81,8 @@ class LayoutViewModel(private val vm: AppViewModel) : ViewModel() {
             fields.add(LayoutField(i, item))
             i++
         }
+        fields.add(LayoutField(i, null, "", isSectionTitle = false, isEndMarker = true))
+        i++
         fields.add(LayoutField(i, null, mainActivity.getString(R.string.available_fields), true))
         i++
         for (item in unusedItems) {

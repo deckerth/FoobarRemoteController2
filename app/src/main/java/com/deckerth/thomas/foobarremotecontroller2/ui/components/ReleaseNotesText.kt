@@ -84,6 +84,9 @@ private fun dismiss(vm: AppViewModel, appVersion: String?) {
 
 @Composable
 fun ReleaseNotes(vm: AppViewModel) {
+
+    val releaseNotesValidity = "2512.2"
+
     var appVersion by remember {
         mutableStateOf(
             mainActivity.packageManager.getPackageInfo(
@@ -95,7 +98,7 @@ fun ReleaseNotes(vm: AppViewModel) {
 
     var withSettingsNote by remember { mutableStateOf(false) }
 
-    if (!vm.showReleaseNotes && appVersion != null && vm.releaseNotesDisplayedForRelease != appVersion) {
+    if (!vm.showReleaseNotes && appVersion != null && vm.releaseNotesDisplayedForRelease < releaseNotesValidity) {
         vm.showReleaseNotes = true
         withSettingsNote =
             true // This note is displayed only if the Release Notes are displayed the first time automatically

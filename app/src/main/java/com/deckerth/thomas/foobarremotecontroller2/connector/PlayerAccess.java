@@ -45,17 +45,35 @@ public class PlayerAccess {
 //    }
 
     public Player getPlayerState() {
-        Response response;
-        try {
-            //response = vm.connector.getData("player?columns=%25label%25,%25catalog%25,%25composer%25,%25album%25,%25title%25,%25artist%25,%25discnumber%25,%25track%25,%25playback_time%25");
-            response = vm.connector.getData("player?columns=%25label%25,%25catalog%25,%25composer%25,%25album%25,%25title%25,%25artist%25,%25samplerate%25,%25genre%25,%25discnumber%25,%25track%25,%25playback_time%25,%24filename%28%25path%25%29%24", vm);
-        } catch (Exception e) {
-            vm.errorHandler.logError(ErrorType.NETWORK, ErrorCode.CONNECTION_ERROR, ErrorSource.PLAYER_STATE, e);
-//            if (e.getMessage() != null && e.getMessage().equals("Unauthorized"))
-//                vm.setAskForPassword(true);
-            return null;
+        if (lastKnownPlayerState == null) return null;
+
+        Player currentPlayer = lastKnownPlayerState.clonePlayer();
+
+        // update position
+        if (!currentPlayer.getDuration().isBlank()) {
+            float duration = Float.parseFloat(currentPlayer.getDuration());
+            float position = Float.parseFloat(currentPlayer.getPosition());
+            long now = System.currentTimeMillis();
+            long elapsed = now - lastKnownPlayerState.getTimestamp();
+            float newPosition = position + elapsed / 1000f;
+            if (newPosition > duration) newPosition = duration;
+            currentPlayer.setPosition(Float.toString(newPosition));
         }
-        return parsePlayerState(response);
+
+        return currentPlayer;
+
+
+//        Response response;
+//        try {
+//            //response = vm.connector.getData("player?columns=%25label%25,%25catalog%25,%25composer%25,%25album%25,%25title%25,%25artist%25,%25discnumber%25,%25track%25,%25playback_time%25");
+//            response = vm.connector.getData("player?columns=%25label%25,%25catalog%25,%25composer%25,%25album%25,%25title%25,%25artist%25,%25samplerate%25,%25genre%25,%25discnumber%25,%25track%25,%25playback_time%25,%24filename%28%25path%25%29%24", vm);
+//        } catch (Exception e) {
+//            vm.errorHandler.logError(ErrorType.NETWORK, ErrorCode.CONNECTION_ERROR, ErrorSource.PLAYER_STATE, e);
+////            if (e.getMessage() != null && e.getMessage().equals("Unauthorized"))
+////                vm.setAskForPassword(true);
+//            return null;
+//        }
+//        return parsePlayerState(response);
     }
 
     public void setPosition(Float position) {
@@ -64,9 +82,14 @@ public class PlayerAccess {
         vm.updatePlayer();
     }
 
-    private Player parsePlayerState(Response input) {
+    private Player lastKnownPlayerState;
+
+    public void setPlayerState(Player playerState) {
+        lastKnownPlayerState = playerState;
+    }
+
+    public Player parsePlayerState(String usedIpAddress, JSONObject contentObject) {
         try {
-            JSONObject contentObject = new JSONObject(input.getMessage());
             JSONObject playerObject = contentObject.getJSONObject("player");
             JSONObject activeItemObject = playerObject.getJSONObject("activeItem");
             JSONObject volumeObject = playerObject.getJSONObject("volume");
@@ -128,9 +151,9 @@ public class PlayerAccess {
                 String index = activeItemObject.getString("index");
                 String imageURL;
                 if (!index.isEmpty() && !index.equals("-1"))
-                    imageURL = vm.connector.serverAddress(input.getUsedIpAddress()) + "artwork/" + activeItemObject.getString("playlistId") + "/" + activeItemObject.getString("index");
+                    imageURL = vm.connector.serverAddress(usedIpAddress) + "artwork/" + activeItemObject.getString("playlistId") + "/" + activeItemObject.getString("index");
                 else
-                    imageURL = vm.connector.serverAddress(input.getUsedIpAddress()) + "artwork/current";
+                    imageURL = vm.connector.serverAddress(usedIpAddress) + "artwork/current";
                 if (!title.equals(filename)) effectiveTitle = title;
                 return new Player(
                         columns.getString(0),
@@ -151,7 +174,7 @@ public class PlayerAccess {
                         imageURL,
                         playbackState,
                         PlaybackMode.getEntries().get(playerObject.getInt("playbackMode")),
-                        input.getUsedIpAddress(), false);
+                        usedIpAddress, false);
             } else
                 return new Player(
                         "",
@@ -172,7 +195,18 @@ public class PlayerAccess {
                         "",
                         playbackState,
                         PlaybackMode.getEntries().get(playerObject.getInt("playbackMode")),
-                        input.getUsedIpAddress(), false);
+                        usedIpAddress, false);
+        } catch (JSONException e) {
+            e.printStackTrace();
+            vm.errorHandler.logError(ErrorType.API, ErrorCode.BAD_RESPONSE, ErrorSource.PLAYER_STATE, e);
+            return null;
+        }
+    }
+
+    private Player parsePlayerState(Response input) {
+        try {
+            JSONObject contentObject = new JSONObject(input.getMessage());
+            return parsePlayerState(input.getUsedIpAddress(), contentObject);
         } catch (JSONException e) {
             e.printStackTrace();
             vm.errorHandler.logError(ErrorType.API, ErrorCode.BAD_RESPONSE, ErrorSource.PLAYER_STATE, e);

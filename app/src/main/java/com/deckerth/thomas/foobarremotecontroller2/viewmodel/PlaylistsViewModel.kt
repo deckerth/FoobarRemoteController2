@@ -10,6 +10,7 @@ import com.deckerth.thomas.foobarremotecontroller2.R
 import com.deckerth.thomas.foobarremotecontroller2.connector.CONNECTED
 import com.deckerth.thomas.foobarremotecontroller2.connector.NOT_AUTHORIZED
 import com.deckerth.thomas.foobarremotecontroller2.connector.PlayerObserver
+import com.deckerth.thomas.foobarremotecontroller2.connector.startQueryAccess
 import com.deckerth.thomas.foobarremotecontroller2.getCreationOfNonEmptyPlaylistsBlocking
 import com.deckerth.thomas.foobarremotecontroller2.model.AddTracksBehaviors
 import com.deckerth.thomas.foobarremotecontroller2.model.Playlist
@@ -127,6 +128,8 @@ class PlaylistsViewModel(private val vm: AppViewModel) : ViewModel() {
                 if (vm.valid) {
                     playerObserver.startPlayerObserver()
                 }
+
+                val queryAccess = startQueryAccess(vm)
             }
         }.start()
     }

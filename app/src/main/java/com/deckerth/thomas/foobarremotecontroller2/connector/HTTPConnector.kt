@@ -33,7 +33,7 @@ open class HTTPConnector() {
         return "Basic $base64Credentials"
     }
 
-    private fun setCredentials(urlConnection: HttpURLConnection, vm: AppViewModel) {
+    fun setCredentials(urlConnection: HttpURLConnection, vm: AppViewModel) {
         val user = vm.credentialsManager.getUser()
         val password = vm.credentialsManager.getPassword()
         if (user.isNotBlank()) {

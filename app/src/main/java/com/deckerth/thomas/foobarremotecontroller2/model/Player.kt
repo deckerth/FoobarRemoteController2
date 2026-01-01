@@ -43,8 +43,9 @@ data class Player(
     val playbackState: PlaybackState,
     val playbackMode: PlaybackMode,
     val ipAddress: String,
-    var invalidCredentials : Boolean = false
+    var invalidCredentials: Boolean = false
 ) {
+    val timestamp: Long = System.currentTimeMillis()
 
     fun getPos(): Float {
         try {
@@ -56,7 +57,7 @@ data class Player(
         }
     }
 
-    fun setPos(vm: AppViewModel, relativePos : Float) {
+    fun setPos(vm: AppViewModel, relativePos: Float) {
         if (!vm.errorHandler.sick() && duration.isNotBlank())
             CoroutineScope(Dispatchers.IO).launch {
                 val absolutePosition = relativePos * duration.toFloat()
@@ -85,5 +86,30 @@ data class Player(
         } catch (ex: NumberFormatException) {
             return -1
         }
+    }
+
+    fun clonePlayer(): Player {
+        return Player(
+            label,
+            catalog,
+            composer,
+            album,
+            title,
+            artist,
+            sampleRate,
+            genre,
+            discNumber,
+            track,
+            playbackTime,
+            playlistId,
+            index,
+            duration,
+            position,
+            artworkUrl,
+            playbackState,
+            playbackMode,
+            ipAddress,
+            invalidCredentials
+        )
     }
 }

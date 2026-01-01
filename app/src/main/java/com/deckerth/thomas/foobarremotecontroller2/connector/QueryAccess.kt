@@ -38,13 +38,13 @@ class QueryAccess(val vm: AppViewModel) {
 
         try {
             url = URL(vm.connector.serverAddress(usedIpAddress) + endpoint)
-            //open a URL connection
+            //open an URL connection
             urlConnection = url.openConnection() as HttpURLConnection
             vm.connector.setCredentials(urlConnection, vm)
 
             val connectionResponse =
                 urlConnection.responseCode  // 401 -> Unauthorized, 200 -> OK
-            println("FOOB response (getData): $connectionResponse")
+            println("FOOB response (queryAPI): $connectionResponse")
             if (connectionResponse == NOT_AUTHORIZED) {
                 throw IOException("Unauthorized")
             } else {

@@ -20,8 +20,8 @@ class PlaylistAccess(private val vm: AppViewModel) {
         get() {
             val response =
                 queryPlaylists()
-            if (response == null) return null
-            else return parsePlaylists(response)
+            return if (response == null) null
+            else parsePlaylists(response)
         }
 
     private fun getFilenameWithoutExtension(fullPath: String): String {
@@ -43,13 +43,13 @@ class PlaylistAccess(private val vm: AppViewModel) {
     ): Playlist? {
         val response: Response?
         try {
-            if (withPaths) response = vm.connector.getData(
-                "playlists/" + playlistEntity.getPlaylistId() +
+            response = if (withPaths) vm.connector.getData(
+                "playlists/" + playlistEntity.playlistId +
                         "/items/" + startIndex + "%3A" + 1000 + "?columns=%25label%25,%25catalog%25,%25composer%25,%25album%25,%25title%25,%25artist%25,%25samplerate%25,%25genre%25,%25discnumber%25,%25track%25,%25length%25,%25path%25",
                 vm
             )
-            else response = vm.connector.getData(
-                "playlists/" + playlistEntity.getPlaylistId() +
+            else vm.connector.getData(
+                "playlists/" + playlistEntity.playlistId +
                         "/items/" + startIndex + "%3A" + 1000 + "?columns=%25label%25,%25catalog%25,%25composer%25,%25album%25,%25title%25,%25artist%25,%25samplerate%25,%25genre%25,%25discnumber%25,%25track%25,%25length%25,%24filename%28%25path%25%29%24",
                 vm
             )
@@ -126,7 +126,7 @@ class PlaylistAccess(private val vm: AppViewModel) {
 
                 playlist.addTitle(
                     Title(
-                        playlistEntity.getPlaylistId(),
+                        playlistEntity.playlistId,
                         i + startIndex,
                         label,
                         catalog,
@@ -139,7 +139,7 @@ class PlaylistAccess(private val vm: AppViewModel) {
                         discNumber,
                         track,
                         length, "", "",
-                        vm.connector.serverAddress(input.usedIpAddress) + "artwork/" + playlistEntity.getPlaylistId() + "/" + (i + startIndex),
+                        vm.connector.serverAddress(input.usedIpAddress) + "artwork/" + playlistEntity.playlistId + "/" + (i + startIndex),
                         path
                     )
                 )
@@ -207,7 +207,7 @@ class PlaylistAccess(private val vm: AppViewModel) {
     }
 
     fun addPathsToPlaylist(playlistId: String?, path: String?, addBehavior: AddTracksBehaviors) {
-        val paths: MutableList<String> = ArrayList<String>()
+        val paths: MutableList<String> = ArrayList()
         paths.add(path!!)
         addPathsToPlaylist(playlistId, paths, addBehavior)
     }
@@ -223,20 +223,17 @@ class PlaylistAccess(private val vm: AppViewModel) {
 //             ],
 //            "play": true
 //        }
-        val playValue: String?
-        val replaceValue = when (addBehavior) {
+        //val playValue: String?
+        val playValue = when (addBehavior) {
             AddTracksBehaviors.ADD_BEHAVIOR_ADD -> {
-                playValue = "false"
                 "false"
             }
 
             AddTracksBehaviors.ADD_BEHAVIOR_ADD_PLAY -> {
-                playValue = "true"
                 "false"
             }
 
             AddTracksBehaviors.ADD_BEHAVIOR_REPLACE_PLAY -> {
-                playValue = "true"
                 "true"
             }
         }
@@ -249,8 +246,8 @@ class PlaylistAccess(private val vm: AppViewModel) {
             pos++
         }
         val jsonString =
-            "{\"items\":[ " + pathString + "], \"play\":" + playValue + ", \"replace\":" + replaceValue + " }"
-        vm.connector.postData("playlists/" + playlistId + "/items/add/", jsonString, vm)
+            "{\"items\":[ $pathString], \"play\":$playValue, \"replace\":$playValue }"
+        vm.connector.postData("playlists/$playlistId/items/add/", jsonString, vm)
     }
 
     fun removeTitles(playlistId: String, indexes: List<Int>) {
@@ -271,9 +268,9 @@ class PlaylistAccess(private val vm: AppViewModel) {
         }
         jsonString.append(" ] }")
         vm.connector.postData(
-            "playlists/" + playlistId + "/items/remove",
-            jsonString.toString(),
-            vm
+            endpoint = "playlists/$playlistId/items/remove",
+            data = jsonString.toString(),
+            vm = vm
         )
     }
 
@@ -303,7 +300,7 @@ class PlaylistAccess(private val vm: AppViewModel) {
         }
         jsonString.append(" ] }")
         vm.connector.postData(
-            "playlists/" + fromPlaylistId + "/" + toPlaylistId + "/items/copy",
+            "playlists/$fromPlaylistId/$toPlaylistId/items/copy",
             jsonString.toString(),
             vm
         )
@@ -318,7 +315,7 @@ class PlaylistAccess(private val vm: AppViewModel) {
 
         vm.connector.postData(
             "playqueue/add",
-            "{ \"plref\": \"" + fromPlaylistId + "\", \"itemIndex\":" + index + "}",
+            "{ \"plref\": \"$fromPlaylistId\", \"itemIndex\":$index}",
             vm
         )
     }
@@ -334,18 +331,18 @@ class PlaylistAccess(private val vm: AppViewModel) {
 
         var encodedName: String?
         try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) { // TIRAMISU is API level 33
-                encodedName = URLEncoder.encode(name, StandardCharsets.UTF_8)
+            encodedName = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) { // TIRAMISU is API level 33
+                URLEncoder.encode(name, StandardCharsets.UTF_8)
             } else {
                 // Use the deprecated version for older APIs
-                encodedName = URLEncoder.encode(name, StandardCharsets.UTF_8.name())
+                URLEncoder.encode(name, StandardCharsets.UTF_8.name())
             }
         } catch (e: UnsupportedEncodingException) {
             // Handle the exception, though UTF-8 should always be supported
             e.printStackTrace()
             encodedName = name // Fallback or throw an error
         }
-        vm.connector.postData("playlists/add?index=" + position + "&title=" + encodedName, vm)
+        vm.connector.postData("playlists/add?index=$position&title=$encodedName", vm)
         if (paths != null && addBehavior != null) addPathsToPlaylist("" + position, paths, addBehavior)
     }
 }

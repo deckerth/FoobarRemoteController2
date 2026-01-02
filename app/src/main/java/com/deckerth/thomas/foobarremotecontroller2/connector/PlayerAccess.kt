@@ -52,7 +52,7 @@ class PlayerAccess(private val vm: AppViewModel) {
         }
 
     fun setPosition(position: Float?) {
-        val jsonString = "{\"position\":" + position + "}"
+        val jsonString = "{\"position\":$position}"
         vm.connector.postData("player/", jsonString, vm)
         vm.updatePlayer()
     }
@@ -107,12 +107,12 @@ class PlayerAccess(private val vm: AppViewModel) {
             if (Duration.between(lastChanged, Instant.now()).toMillis() > 500) {
                 println("FOOB Volume set")
                 val volumeControl = vm.foobVolumeControl
-                volumeControl.setMuted(volumeObject.getBoolean("isMuted"))
-                volumeControl.setMin(volumeObject.getInt("min"))
-                volumeControl.setMax(volumeObject.getInt("max"))
-                volumeControl.setType(volumeObject.getString("type"))
-                volumeControl.setValue(volumeObject.getInt("value"))
-                volumeProvider.setCurrentVolume(volumeControl.getCurrentValuePercent())
+                volumeControl.muted = volumeObject.getBoolean("isMuted")
+                volumeControl.min = volumeObject.getInt("min")
+                volumeControl.max = volumeObject.getInt("max")
+                volumeControl.type = volumeObject.getString("type")
+                volumeControl.value = volumeObject.getInt("value")
+                volumeProvider.setCurrentVolume(volumeControl.currentValuePercent)
             }
 
             if (columns.length() > 0) {
@@ -120,12 +120,10 @@ class PlayerAccess(private val vm: AppViewModel) {
                 val filename = columns.getString(11)
                 var effectiveTitle = ""
                 val index = activeItemObject.getString("index")
-                val imageURL: String?
-                if (!index.isEmpty() && index != "-1") imageURL =
-                    vm.connector.serverAddress(usedIpAddress) + "artwork/" + activeItemObject.getString(
-                        "playlistId"
-                    ) + "/" + activeItemObject.getString("index")
-                else imageURL = vm.connector.serverAddress(usedIpAddress) + "artwork/current"
+                val imageURL = if (!index.isEmpty() && index != "-1") vm.connector.serverAddress(usedIpAddress) + "artwork/" + activeItemObject.getString(
+                    "playlistId"
+                ) + "/" + activeItemObject.getString("index")
+                else vm.connector.serverAddress(usedIpAddress) + "artwork/current"
                 if (title != filename) effectiveTitle = title
                 return Player(
                     columns.getString(0),
@@ -208,14 +206,14 @@ class PlayerAccess(private val vm: AppViewModel) {
 
     fun playTrack(playlistId: String?, index: Int) {
         Thread {
-            vm.connector.postData("player/play/" + playlistId + "/" + index.toString(), vm)
+            vm.connector.postData("player/play/$playlistId/$index", vm)
             vm.updatePlayer()
         }.start()
     }
 
     fun setVolume(value: Int?) {
         Thread {
-            val jsonString = "{\"volume\":" + value + "}"
+            val jsonString = "{\"volume\":$value}"
             vm.connector.postData("player/", jsonString, vm)
             vm.updatePlayer()
         }.start()

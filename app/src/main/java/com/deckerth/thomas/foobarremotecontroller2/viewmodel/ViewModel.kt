@@ -159,7 +159,7 @@ class AppViewModel : ViewModel() {
     var player by mutableStateOf<Player?>(null)
 
     fun updatePlayer() {
-        val newPlayer = playerAccess.getPlayerState()
+        val newPlayer = playerAccess.playerState
         if (newPlayer != null && newPlayer.ipAddress != ipAddress) return
         player = newPlayer
         val currentAlbumIndex = getCurrentAlbumIndex()

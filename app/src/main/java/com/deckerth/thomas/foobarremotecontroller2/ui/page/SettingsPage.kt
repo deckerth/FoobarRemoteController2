@@ -78,7 +78,7 @@ fun SettingsPage(vm: AppViewModel) {
     if (!outputDevicesLoading.value && outputDevices.value == null) {
         outputDevicesLoading.value = true
         Thread {
-            outputDevices.value = vm.playerAccess.getOutputDevices()
+            outputDevices.value = vm.playerAccess.outputDevices
             outputDevicesLoading.value = false
         }.start()
     }
@@ -203,6 +203,7 @@ fun SettingsPage(vm: AppViewModel) {
                         isOutputListOpen = true
                 })
             if (isOutputListOpen) {
+                @Suppress("UNCHECKED_CAST")
                 ListPreference(
                     values = outputDevices.value!!.getDevices(),
                     title = stringResource(R.string.settings_output_device),

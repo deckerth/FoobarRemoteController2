@@ -1,82 +1,88 @@
-package com.deckerth.thomas.foobarremotecontroller2.connector;
+package com.deckerth.thomas.foobarremotecontroller2.connector
 
-import android.os.Build;
+import android.os.Build
+import com.deckerth.thomas.foobarremotecontroller2.model.AddTracksBehaviors
+import com.deckerth.thomas.foobarremotecontroller2.model.Playlist
+import com.deckerth.thomas.foobarremotecontroller2.model.PlaylistEntity
+import com.deckerth.thomas.foobarremotecontroller2.model.Playlists
+import com.deckerth.thomas.foobarremotecontroller2.model.Title
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
+import org.json.JSONException
+import org.json.JSONObject
+import java.io.UnsupportedEncodingException
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 
-import com.deckerth.thomas.foobarremotecontroller2.model.AddTracksBehaviors;
-import com.deckerth.thomas.foobarremotecontroller2.model.Playlist;
-import com.deckerth.thomas.foobarremotecontroller2.model.PlaylistEntity;
-import com.deckerth.thomas.foobarremotecontroller2.model.Playlists;
-import com.deckerth.thomas.foobarremotecontroller2.model.Title;
-import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel;
+class PlaylistAccess(private val vm: AppViewModel) {
+    private val errorHandler: ErrorHandler = vm.errorHandler
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-
-public class PlaylistAccess {
-
-    private final ErrorHandler errorHandler;
-    private final AppViewModel vm;
-
-    public PlaylistAccess(AppViewModel vm) {
-        this.vm = vm;
-        this.errorHandler = vm.getErrorHandler();
-    }
-
-    public Playlists getPlaylists() {
-        Response response = queryPlaylists();
-        if (response == null)
-            return null;
-        else
-            return parsePlaylists(response);
-    }
-
-    private String getFilenameWithoutExtension(String fullPath) {
-        int lastSeparatorIndex = fullPath.lastIndexOf('\\');
-        String filenameWithExtension = (lastSeparatorIndex != -1) ?
-                fullPath.substring(lastSeparatorIndex + 1) :
-                fullPath;
-
-        int lastDotIndex = filenameWithExtension.lastIndexOf('.');
-        return (lastDotIndex != -1) ?
-                filenameWithExtension.substring(0, lastDotIndex) :
-                filenameWithExtension;
-    }
-
-    public Playlist getPlaylist(PlaylistEntity playlistEntity, int startIndex, boolean withPaths) {
-        Response response;
-        try {
-            if (withPaths)
-                response = vm.connector.getData("playlists/" + playlistEntity.getPlaylistId() +
-                        "/items/" + startIndex + "%3A" + 1000 + "?columns=%25label%25,%25catalog%25,%25composer%25,%25album%25,%25title%25,%25artist%25,%25samplerate%25,%25genre%25,%25discnumber%25,%25track%25,%25length%25,%25path%25", vm);
-            else
-                response = vm.connector.getData("playlists/" + playlistEntity.getPlaylistId() +
-                        "/items/" + startIndex + "%3A" + 1000 + "?columns=%25label%25,%25catalog%25,%25composer%25,%25album%25,%25title%25,%25artist%25,%25samplerate%25,%25genre%25,%25discnumber%25,%25track%25,%25length%25,%24filename%28%25path%25%29%24", vm);
-        } catch (Exception e) {
-            errorHandler.logError(ErrorType.NETWORK, ErrorCode.CONNECTION_ERROR, ErrorSource.PLAYLIST_ITEMS, e);
-            return null;
+    val playlists: Playlists?
+        get() {
+            val response =
+                queryPlaylists()
+            if (response == null) return null
+            else return parsePlaylists(response)
         }
-        return parsePlaylist(response, playlistEntity, startIndex, withPaths);
+
+    private fun getFilenameWithoutExtension(fullPath: String): String {
+        val lastSeparatorIndex = fullPath.lastIndexOf('\\')
+        val filenameWithExtension =
+            if (lastSeparatorIndex != -1) fullPath.substring(lastSeparatorIndex + 1) else fullPath
+
+        val lastDotIndex = filenameWithExtension.lastIndexOf('.')
+        return if (lastDotIndex != -1) filenameWithExtension.substring(
+            0,
+            lastDotIndex
+        ) else filenameWithExtension
     }
 
-    private Playlist parsePlaylist(Response input, PlaylistEntity playlistEntity, int startIndex, boolean withPaths) {
-        Playlist playlist = new Playlist(playlistEntity);
-        playlist.setIpAddress(input.getUsedIpAddress());
+    fun getPlaylist(
+        playlistEntity: PlaylistEntity,
+        startIndex: Int,
+        withPaths: Boolean
+    ): Playlist? {
+        val response: Response?
         try {
-            JSONObject contentObject = new JSONObject(input.getMessage());
-            JSONObject playlistItemsObject = contentObject.getJSONObject("playlistItems");
-            JSONArray itemsArray = playlistItemsObject.getJSONArray("items");
+            if (withPaths) response = vm.connector.getData(
+                "playlists/" + playlistEntity.getPlaylistId() +
+                        "/items/" + startIndex + "%3A" + 1000 + "?columns=%25label%25,%25catalog%25,%25composer%25,%25album%25,%25title%25,%25artist%25,%25samplerate%25,%25genre%25,%25discnumber%25,%25track%25,%25length%25,%25path%25",
+                vm
+            )
+            else response = vm.connector.getData(
+                "playlists/" + playlistEntity.getPlaylistId() +
+                        "/items/" + startIndex + "%3A" + 1000 + "?columns=%25label%25,%25catalog%25,%25composer%25,%25album%25,%25title%25,%25artist%25,%25samplerate%25,%25genre%25,%25discnumber%25,%25track%25,%25length%25,%24filename%28%25path%25%29%24",
+                vm
+            )
+        } catch (e: Exception) {
+            errorHandler.logError(
+                ErrorType.NETWORK,
+                ErrorCode.CONNECTION_ERROR,
+                ErrorSource.PLAYLIST_ITEMS,
+                e
+            )
+            return null
+        }
+        return parsePlaylist(response, playlistEntity, startIndex, withPaths)
+    }
 
-            for (int i = 0; i < itemsArray.length(); i++) {
-                JSONObject itemObject = itemsArray.getJSONObject(i);
-                JSONArray columnsArray = itemObject.getJSONArray("columns");
-                      /*
+    private fun parsePlaylist(
+        input: Response,
+        playlistEntity: PlaylistEntity,
+        startIndex: Int,
+        withPaths: Boolean
+    ): Playlist? {
+        val playlist = Playlist(playlistEntity)
+        playlist.ipAddress = input.usedIpAddress
+        try {
+            val contentObject = JSONObject(input.message)
+            val playlistItemsObject = contentObject.getJSONObject("playlistItems")
+            val itemsArray = playlistItemsObject.getJSONArray("items")
+
+            for (i in 0..<itemsArray.length()) {
+                val itemObject = itemsArray.getJSONObject(i)
+                val columnsArray = itemObject.getJSONArray("columns")
+
+                /*
                       {
                       "playlistItems": {
                         "items": [
@@ -98,136 +104,156 @@ public class PlaylistAccess {
                             },
                             {
                 */
-
-                String label = columnsArray.getString(0);
-                String catalog = columnsArray.getString(1);
-                String composer = columnsArray.getString(2);
-                String album = columnsArray.getString(3);
-                String title = columnsArray.getString(4);
-                String artist = columnsArray.getString(5);
-                String samplerRate = columnsArray.getString(6);
-                String genre = columnsArray.getString(7);
-                String discNumber = columnsArray.getString(8);
-                String track = columnsArray.getString(9);
-                String length = columnsArray.getString(10);
-                String path = "";
-                String filename;
+                val label = columnsArray.getString(0)
+                val catalog = columnsArray.getString(1)
+                val composer = columnsArray.getString(2)
+                val album = columnsArray.getString(3)
+                val title = columnsArray.getString(4)
+                val artist = columnsArray.getString(5)
+                val samplerRate = columnsArray.getString(6)
+                val genre = columnsArray.getString(7)
+                val discNumber = columnsArray.getString(8)
+                val track = columnsArray.getString(9)
+                val length = columnsArray.getString(10)
+                var path = ""
+                val filename: String?
                 if (withPaths) {
-                    path = columnsArray.getString(11);
-                    filename = getFilenameWithoutExtension(path);
-                } else
-                    filename = columnsArray.getString(11);
-                String effectiveTitle = "";
-                if (!title.equals(filename)) effectiveTitle = title;
+                    path = columnsArray.getString(11)
+                    filename = getFilenameWithoutExtension(path)
+                } else filename = columnsArray.getString(11)
+                var effectiveTitle = ""
+                if (title != filename) effectiveTitle = title
 
                 playlist.addTitle(
-                        new Title(
-                                playlistEntity.getPlaylistId(),
-                                i + startIndex,
-                                label,
-                                catalog,
-                                composer,
-                                album,
-                                effectiveTitle,
-                                artist,
-                                samplerRate,
-                                genre,
-                                discNumber,
-                                track,
-                                length, "", "",
-                                vm.connector.serverAddress(input.getUsedIpAddress()) + "artwork/" + playlistEntity.getPlaylistId() + "/" + (i + startIndex),
-                                path));
+                    Title(
+                        playlistEntity.getPlaylistId(),
+                        i + startIndex,
+                        label,
+                        catalog,
+                        composer,
+                        album,
+                        effectiveTitle,
+                        artist,
+                        samplerRate,
+                        genre,
+                        discNumber,
+                        track,
+                        length, "", "",
+                        vm.connector.serverAddress(input.usedIpAddress) + "artwork/" + playlistEntity.getPlaylistId() + "/" + (i + startIndex),
+                        path
+                    )
+                )
             }
-        } catch (JSONException e) {
-            errorHandler.logError(ErrorType.API, ErrorCode.BAD_RESPONSE, ErrorSource.PLAYLIST_ITEMS, e);
+        } catch (e: JSONException) {
+            errorHandler.logError(
+                ErrorType.API,
+                ErrorCode.BAD_RESPONSE,
+                ErrorSource.PLAYLIST_ITEMS,
+                e
+            )
             //e.printStackTrace();
-            return null;
+            return null
         }
 
-        return playlist;
+        return playlist
     }
 
-    private Response queryPlaylists() {
-        Response response;
+    private fun queryPlaylists(): Response? {
+        val response: Response?
         try {
-            response = vm.connector.getData("playlists", vm);
-        } catch (Exception e) {
-            errorHandler.logError(ErrorType.NETWORK, ErrorCode.CONNECTION_ERROR, ErrorSource.PLAYLIST_ITEMS, e);
-            return null;
+            response = vm.connector.getData("playlists", vm)
+        } catch (e: Exception) {
+            errorHandler.logError(
+                ErrorType.NETWORK,
+                ErrorCode.CONNECTION_ERROR,
+                ErrorSource.PLAYLIST_ITEMS,
+                e
+            )
+            return null
         }
-        return response;
+        return response
     }
 
-    private Playlists parsePlaylists(Response input) {
-        Playlists result = new Playlists();
-        result.ipAddress = input.getUsedIpAddress();
+    private fun parsePlaylists(input: Response): Playlists? {
+        val result = Playlists()
+        result.ipAddress = input.usedIpAddress
         try {
-            JSONObject playlistsObject = new JSONObject(input.getMessage());
-            JSONArray playlistArray = playlistsObject.getJSONArray("playlists");
-            for (int i = 0; i < playlistArray.length(); i++) {
-                JSONObject playlistObject = playlistArray.getJSONObject(i);
-      /*                "id": "p1",
+            val playlistsObject = JSONObject(input.message)
+            val playlistArray = playlistsObject.getJSONArray("playlists")
+            for (i in 0..<playlistArray.length()) {
+                val playlistObject = playlistArray.getJSONObject(i)
+
+                /*                "id": "p1",
                         "index": 0,
                         "isCurrent": false,
                         "itemCount": 12,
                         "title": "Default Playlist",
                         "totalTime": 0 */
-
-                result.addPlaylistEntity(new PlaylistEntity(playlistObject.getString("id"),
+                result.addPlaylistEntity(
+                    PlaylistEntity(
+                        playlistObject.getString("id"),
                         playlistObject.getString("title"),
                         playlistObject.getBoolean("isCurrent"),
-                        playlistObject.getInt("itemCount")));
+                        playlistObject.getInt("itemCount")
+                    )
+                )
             }
-        } catch (JSONException e) {
-            errorHandler.logError(ErrorType.API, ErrorCode.BAD_RESPONSE, ErrorSource.PLAYLISTS, e);
+        } catch (e: JSONException) {
+            errorHandler.logError(ErrorType.API, ErrorCode.BAD_RESPONSE, ErrorSource.PLAYLISTS, e)
             //e.printStackTrace();
-            return null;
+            return null
         }
-        return result;
+        return result
     }
 
-    public void addPathsToPlaylist(String playlistId, String path, AddTracksBehaviors addBehavior) {
-        List<String> paths = new ArrayList<>();
-        paths.add(path);
-        addPathsToPlaylist(playlistId, paths, addBehavior);
+    fun addPathsToPlaylist(playlistId: String?, path: String?, addBehavior: AddTracksBehaviors) {
+        val paths: MutableList<String> = ArrayList<String>()
+        paths.add(path!!)
+        addPathsToPlaylist(playlistId, paths, addBehavior)
     }
 
-    public void addPathsToPlaylist(String playlistId, List<String> paths, AddTracksBehaviors addBehavior) {
+    fun addPathsToPlaylist(
+        playlistId: String?,
+        paths: List<String>,
+        addBehavior: AddTracksBehaviors
+    ) {
 //        {
 //            "items": [
 //            "T:\\Music\\Alpha\\Alpha 634"
 //             ],
 //            "play": true
 //        }
-        String playValue;
-        String replaceValue = switch (addBehavior) {
-            case ADD_BEHAVIOR_ADD -> {
-                playValue = "false";
-                yield "false";
+        val playValue: String?
+        val replaceValue = when (addBehavior) {
+            AddTracksBehaviors.ADD_BEHAVIOR_ADD -> {
+                playValue = "false"
+                "false"
             }
-            case ADD_BEHAVIOR_ADD_PLAY -> {
-                playValue = "true";
-                yield "false";
+
+            AddTracksBehaviors.ADD_BEHAVIOR_ADD_PLAY -> {
+                playValue = "true"
+                "false"
             }
-            case ADD_BEHAVIOR_REPLACE_PLAY -> {
-                playValue = "true";
-                yield "true";
+
+            AddTracksBehaviors.ADD_BEHAVIOR_REPLACE_PLAY -> {
+                playValue = "true"
+                "true"
             }
-        };
-        int pos = 0;
-        StringBuilder pathString = new StringBuilder();
-        for (String path : paths) {
-            pathString.append("\"").append(path.replace("\\", "\\\\")).append("\"");
-            if (pos < paths.size() - 1) // 0, 1 : indexes.size() = 2
-                pathString.append(", ");
-            pos++;
         }
-        String jsonString = "{\"items\":[ " + pathString + "], \"play\":" + playValue + ", \"replace\":" + replaceValue + " }";
-        vm.connector.postData("playlists/" + playlistId + "/items/add/", jsonString, vm);
+        var pos = 0
+        val pathString = StringBuilder()
+        for (path in paths) {
+            pathString.append("\"").append(path.replace("\\", "\\\\")).append("\"")
+            if (pos < paths.size - 1)  // 0, 1 : indexes.size() = 2
+                pathString.append(", ")
+            pos++
+        }
+        val jsonString =
+            "{\"items\":[ " + pathString + "], \"play\":" + playValue + ", \"replace\":" + replaceValue + " }"
+        vm.connector.postData("playlists/" + playlistId + "/items/add/", jsonString, vm)
     }
 
-    public void removeTitles(String playlistId, List<Integer> indexes) {
-
+    fun removeTitles(playlistId: String, indexes: List<Int>) {
         //        {
         //            "items": [
         //               1,
@@ -235,20 +261,28 @@ public class PlaylistAccess {
         //             ]
         //        }
 
-        StringBuilder jsonString = new StringBuilder("{\"items\":[ ");
-        int pos = 0;
-        for (Integer index : indexes) {
-            jsonString.append(index);
-            if (pos < indexes.size() - 1) // 0, 1 : indexes.size() = 2
-                jsonString.append(", ");
-            pos++;
+        val jsonString = StringBuilder("{\"items\":[ ")
+        var pos = 0
+        for (index in indexes) {
+            jsonString.append(index)
+            if (pos < indexes.size - 1)  // 0, 1 : indexes.size() = 2
+                jsonString.append(", ")
+            pos++
         }
-        jsonString.append(" ] }");
-        vm.connector.postData("playlists/" + playlistId + "/items/remove", jsonString.toString(), vm);
+        jsonString.append(" ] }")
+        vm.connector.postData(
+            "playlists/" + playlistId + "/items/remove",
+            jsonString.toString(),
+            vm
+        )
     }
 
-    public void copyTitles(String fromPlaylistId, String toPlaylistId, int targetIndex, List<Integer> indexes) {
-
+    fun copyTitles(
+        fromPlaylistId: String,
+        toPlaylistId: String,
+        targetIndex: Int,
+        indexes: MutableList<Int>
+    ) {
         //        playlists/{sourceId}/{targetId}/items/copy
         //
         //        {
@@ -259,51 +293,59 @@ public class PlaylistAccess {
         //            "targetIndex": 1
         //        }
 
-        StringBuilder jsonString = new StringBuilder("{\"items\":[ ");
-        int pos = 0;
-        for (Integer index : indexes) {
-            jsonString.append(index);
-            if (pos < indexes.size() - 1) // 0, 1 : indexes.size() = 2
-                jsonString.append(", ");
-            pos++;
+        val jsonString = StringBuilder("{\"items\":[ ")
+        var pos = 0
+        for (index in indexes) {
+            jsonString.append(index)
+            if (pos < indexes.size - 1)  // 0, 1 : indexes.size() = 2
+                jsonString.append(", ")
+            pos++
         }
-        jsonString.append(" ] }");
-        vm.connector.postData("playlists/" + fromPlaylistId + "/" + toPlaylistId + "/items/copy", jsonString.toString(), vm);
+        jsonString.append(" ] }")
+        vm.connector.postData(
+            "playlists/" + fromPlaylistId + "/" + toPlaylistId + "/items/copy",
+            jsonString.toString(),
+            vm
+        )
     }
 
-    public void addTitleToPlaybackQueue(String fromPlaylistId, int index) {
-
+    fun addTitleToPlaybackQueue(fromPlaylistId: String?, index: Int) {
         //        playqueue/add
         //        {
         //            "plref": "p1"
         //            "index": 1
         //        }
 
-        vm.connector.postData("playqueue/add", "{ \"plref\": \"" + fromPlaylistId + "\", \"itemIndex\":" + index + "}", vm);
+        vm.connector.postData(
+            "playqueue/add",
+            "{ \"plref\": \"" + fromPlaylistId + "\", \"itemIndex\":" + index + "}",
+            vm
+        )
     }
 
-    public void addPlaylist(int position, String name) {
-        addPlaylist(position, name, null, null);
-    }
-
-    public void addPlaylist(int position, String name, List<String> paths, AddTracksBehaviors addBehavior) {
+    @JvmOverloads
+    fun addPlaylist(
+        position: Int,
+        name: String?,
+        paths: List<String>? = null,
+        addBehavior: AddTracksBehaviors? = null // either both parameters are null or both are set
+    ) {
         // http://localhost:8880/api/playlists/add?index=11&title=test
 
-        String encodedName;
+        var encodedName: String?
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) { // TIRAMISU is API level 33
-                encodedName = URLEncoder.encode(name, StandardCharsets.UTF_8);
+                encodedName = URLEncoder.encode(name, StandardCharsets.UTF_8)
             } else {
                 // Use the deprecated version for older APIs
-                encodedName = URLEncoder.encode(name, StandardCharsets.UTF_8.name());
+                encodedName = URLEncoder.encode(name, StandardCharsets.UTF_8.name())
             }
-        } catch (UnsupportedEncodingException e) {
+        } catch (e: UnsupportedEncodingException) {
             // Handle the exception, though UTF-8 should always be supported
-            e.printStackTrace();
-            encodedName = name; // Fallback or throw an error
+            e.printStackTrace()
+            encodedName = name // Fallback or throw an error
         }
-        vm.connector.postData("playlists/add?index=" + position + "&title=" + encodedName, vm);
-        if (paths != null)
-            addPathsToPlaylist("" + position, paths, addBehavior);
+        vm.connector.postData("playlists/add?index=" + position + "&title=" + encodedName, vm)
+        if (paths != null && addBehavior != null) addPathsToPlaylist("" + position, paths, addBehavior)
     }
 }

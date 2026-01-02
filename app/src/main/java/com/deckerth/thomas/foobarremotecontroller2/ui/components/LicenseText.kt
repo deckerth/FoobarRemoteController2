@@ -24,8 +24,8 @@ fun LicenseText(modifier: Modifier = Modifier) {
 
     var appVersion by remember {
         mutableStateOf(
-            mainActivity.packageManager.getPackageInfo(
-                mainActivity.packageName,
+            mainActivity!!.packageManager.getPackageInfo(
+                mainActivity!!.packageName,
                 0
             ).versionName
         )

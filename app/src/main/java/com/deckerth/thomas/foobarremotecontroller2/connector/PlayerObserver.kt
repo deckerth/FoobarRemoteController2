@@ -6,7 +6,11 @@ import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledFuture
 import java.util.concurrent.TimeUnit
 
-class PlayerObserver(private val vm: AppViewModel, private val playlistAccess: PlaylistAccess, private val playlistsViewModel: PlaylistsViewModel) {
+class PlayerObserver(
+    private val vm: AppViewModel,
+    private val playlistAccess: PlaylistAccess,
+    private val playlistsViewModel: PlaylistsViewModel
+) {
 
     var observer: ScheduledFuture<*>? = null
 
@@ -20,15 +24,8 @@ class PlayerObserver(private val vm: AppViewModel, private val playlistAccess: P
                 if (!vm.errorHandler.sick())
                     try {
                         vm.updatePlayer()
-                        val playlists = playlistAccess.playlists
-                        if (vm.player != null && playlists != null)
-                            if (vm.autoscroll && vm.player!!.playlistId.isNotEmpty() && vm.player!!.playlistId != vm.selectedPlaylist)
-                                playlistsViewModel.setSelectedPlaylist(vm.player!!.playlistId)
-                            else if (vm.selectedPlaylist.isEmpty() && playlists.currentPlaylist != null)
-                                playlistsViewModel.setSelectedPlaylist(playlists.currentPlaylist.playlistId)
-
-                        if (playlists != null && playlists.ipAddress == vm.ipAddress)
-                            playlistsViewModel.setPlaylists(playlists)
+                        if (vm.playlistAccess.playlists != null)
+                            vm.playlistsViewModel.setPlaylists(vm.playlistAccess.playlists!!) // for delayed playlist update
                     } catch (e: Exception) {
                         e.printStackTrace()
                     }

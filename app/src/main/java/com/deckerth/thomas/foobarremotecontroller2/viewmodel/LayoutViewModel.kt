@@ -73,7 +73,7 @@ class LayoutViewModel(private val vm: AppViewModel) : ViewModel() {
         val unusedItems = allItems.filter { item -> !layoutItems.any { it.item == item } }
         val fields = mutableListOf<LayoutField>()
 
-        fields.add(LayoutField(0, null, vm.selectedView.text, true))
+        fields.add(LayoutField(0, null, vm.selectedView.getText(vm.selectedView), true))
         var i = 1
         for (item in layoutItems) {
             if (item.item == LayoutItems.ARTWORK)
@@ -83,7 +83,7 @@ class LayoutViewModel(private val vm: AppViewModel) : ViewModel() {
         }
         fields.add(LayoutField(i, null, "", isSectionTitle = false, isEndMarker = true))
         i++
-        fields.add(LayoutField(i, null, mainActivity.getString(R.string.available_fields), true))
+        fields.add(LayoutField(i, null, mainActivity!!.getString(R.string.available_fields), true))
         i++
         for (item in unusedItems) {
             fields.add(

@@ -97,7 +97,7 @@ fun SettingsPage(vm: AppViewModel) {
                 stringResource(R.string.field_ip_address),
                 summary = getIpAddress(),
                 onClick = {
-                    mainActivity.navigateTo("DeviceSelectionPage")
+                    mainActivity!!.navigateTo("DeviceSelectionPage")
                 })
 
             Title(stringResource(R.string.settings_appearance))
@@ -107,11 +107,11 @@ fun SettingsPage(vm: AppViewModel) {
                 summary = "",
                 onClick = { enabled: Boolean ->
                     val intendedSettingActive = !enabled
-                    saveAlwaysOnDisplay(intendedSettingActive, mainActivity)
+                    saveAlwaysOnDisplay(intendedSettingActive, mainActivity!!)
                     if (intendedSettingActive)
-                        mainActivity.keepScreenOn()
+                        mainActivity!!.keepScreenOn()
                     else
-                        mainActivity.disableScreenOn()
+                        mainActivity!!.disableScreenOn()
 
                 },
                 showToggle = true,
@@ -124,7 +124,7 @@ fun SettingsPage(vm: AppViewModel) {
                 summary = stringResource(R.string.settings_dynamic_color_scheme_desc),
                 onClick = { enabled: Boolean ->
                     val intendedSettingActive = !enabled
-                    saveDynamicColorScheme(intendedSettingActive, mainActivity)
+                    saveDynamicColorScheme(intendedSettingActive, mainActivity!!)
                     if (!intendedSettingActive)
                         seedColor = Color.Black
                 },
@@ -140,7 +140,7 @@ fun SettingsPage(vm: AppViewModel) {
                 summary = viewMode.text,
                 showButton = viewMode == Layouts.LAYOUT_CUSTOM,
                 buttonText = stringResource(R.string.open_layout_editor),
-                onButtonClick = { mainActivity.navigateTo("Layout selection") },
+                onButtonClick = { mainActivity!!.navigateTo("Layout selection") },
                 onClick = {
                     isOpen = true
                 })
@@ -151,7 +151,7 @@ fun SettingsPage(vm: AppViewModel) {
                     selectedItem = getViewMode(),
                     onClick = { mode: Layouts? ->
                         if (mode != null) {
-                            saveViewMode(viewMode, mode, mainActivity)
+                            saveViewMode(viewMode, mode, mainActivity!!)
                         }
                         isOpen = false
                     },
@@ -165,11 +165,11 @@ fun SettingsPage(vm: AppViewModel) {
                 summary = "",
                 onClick = { enabled: Boolean ->
                     val intendedSettingActive = !enabled
-                    saveFoobarVolumeControl(intendedSettingActive, mainActivity)
+                    saveFoobarVolumeControl(intendedSettingActive, mainActivity!!)
                     if (intendedSettingActive)
                         enableVolumeControl()
                     else
-                        mainActivity.restartService()
+                        mainActivity!!.restartService()
                 },
                 showToggle = true,
                 isChecked = getFoobarVolumeControl(),
@@ -179,7 +179,7 @@ fun SettingsPage(vm: AppViewModel) {
             PreferenceItem(
                 stringResource(R.string.settings_pause_during_phone_call),
                 summary = "",
-                onClick = { enabled: Boolean -> savePauseDuringPhoneCalls(!enabled, mainActivity) },
+                onClick = { enabled: Boolean -> savePauseDuringPhoneCalls(!enabled, mainActivity!!) },
                 showToggle = true,
                 isChecked = getPauseDuringPhoneCalls(),
                 isEnabled = true
@@ -225,7 +225,7 @@ fun SettingsPage(vm: AppViewModel) {
             val behavior = getAddTrackBehavior()
             PreferenceItem<Boolean>(
                 stringResource(R.string.settings_add_behavior),
-                summary = behavior.text,
+                summary = behavior.get_text(behavior),
                 showButton = false,
                 onClick = {
                     isChooseAddOptionsOpen = true
@@ -237,11 +237,11 @@ fun SettingsPage(vm: AppViewModel) {
                     selectedItem = getAddTrackBehavior(),
                     onClick = { chosen: AddTracksBehaviors? ->
                         if (chosen != null) {
-                            saveAddTrackBehavior(chosen, mainActivity)
+                            saveAddTrackBehavior(chosen, mainActivity!!)
                         }
                         isChooseAddOptionsOpen = false
                     },
-                    getText = { v: AddTracksBehaviors -> v.text }
+                    getText = { v: AddTracksBehaviors -> v.get_text(v) }
                 )
             }
 
@@ -252,7 +252,7 @@ fun SettingsPage(vm: AppViewModel) {
                 else
                     stringResource(R.string.settings_create_empty_playlists_enabled_desc),
                 onClick = { enabled: Boolean ->
-                    saveCreationOfNonEmptyPlaylists(!enabled, mainActivity)
+                    saveCreationOfNonEmptyPlaylists(!enabled, mainActivity!!)
                 },
                 showToggle = true,
                 isChecked = getCreationOfNonEmptyPlaylists(),

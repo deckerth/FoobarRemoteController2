@@ -106,7 +106,7 @@ fun WizardPage(
         composable("Introduction") {
             if (state.navController != null)
                 println("FOOB navstack: ${state.navController!!.graph.nodes.size()}")
-            mainActivity.appBarLabel = stringResource(R.string.welcome_heading)
+            mainActivity!!.appBarLabel = stringResource(R.string.welcome_heading)
             Box(
                 modifier = Modifier.fillMaxSize()
             ) {
@@ -139,7 +139,7 @@ fun WizardPage(
         composable("Search Device") {
             if (state.navController != null)
                 println("FOOB navstack: ${state.navController!!.graph.nodes.size()}")
-            mainActivity.appBarLabel = stringResource(R.string.search_device_heading)
+            mainActivity!!.appBarLabel = stringResource(R.string.search_device_heading)
             Box(
                 modifier = Modifier.fillMaxSize()
             ) {
@@ -149,7 +149,7 @@ fun WizardPage(
                         hasSearched = true
                     },
                     onFinished = { device: Device ->
-                        saveIpAddress("${device.ipAddress}:8880", mainActivity)
+                        saveIpAddress("${device.ipAddress}:8880", mainActivity!!)
                         vm?.ipAddress = "${device.ipAddress}:8880"
                         vm?.credentialsManager?.setIPAddress(vm.ipAddress!!)
                         vm?.playlistsViewModel?.restartObserver()
@@ -189,7 +189,7 @@ fun WizardPage(
         composable("No Device Found") {
             if (state.navController != null)
                 println("FOOB navstack: ${state.navController!!.graph.nodes.size()}")
-            mainActivity.appBarLabel = stringResource(R.string.device_not_found_heading)
+            mainActivity!!.appBarLabel = stringResource(R.string.device_not_found_heading)
             Box(
                 modifier = Modifier.fillMaxSize()
             ) {
@@ -224,10 +224,10 @@ fun WizardPage(
         composable("Manual Device") {
             if (state.navController != null)
                 println("FOOB navstack: ${state.navController!!.graph.nodes.size()}")
-            mainActivity.appBarLabel = stringResource(R.string.manual_device_heading)
+            mainActivity!!.appBarLabel = stringResource(R.string.manual_device_heading)
             CustomDevicePage(onFinished = { device: Device ->
                 if (device.isValid) {
-                    saveIpAddress(device.ipAddress, mainActivity)
+                    saveIpAddress(device.ipAddress, mainActivity!!)
                     vm?.ipAddress = device.ipAddress
                     vm?.credentialsManager?.setIPAddress(device.ipAddress)
                     vm?.playlistsViewModel?.restartObserver()
@@ -363,7 +363,7 @@ private fun getHostName(ip: String): String? {
 
 @Composable
 fun DeviceList(devices: List<Device>, onClick: (device: Device) -> Unit = {}) {
-    if (isWlanConnected(mainActivity))
+    if (isWlanConnected(mainActivity!!))
         LazyColumn {
             items(devices) { device ->
                 DeviceEntry(device, onClick)
@@ -499,7 +499,7 @@ fun CustomDevicePage(
             FilledTonalButton(
                 enabled = device.isValid,
                 onClick = {
-                    Toast.makeText(mainActivity, mainActivity.getString(R.string.checking_connection), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(mainActivity, mainActivity!!.getString(R.string.checking_connection), Toast.LENGTH_SHORT).show()
                     // Launch a coroutine on the IO dispatcher for network operations
                     CoroutineScope(Dispatchers.IO).launch {
                         val success: Boolean = try {
@@ -512,14 +512,14 @@ fun CustomDevicePage(
                         withContext(Dispatchers.Main) {
                             if (success) {
                                 Toast.makeText(
-                                    mainActivity,
-                                    mainActivity.getString(R.string.connection_successful),
+                                    mainActivity!!,
+                                    mainActivity!!.getString(R.string.connection_successful),
                                     Toast.LENGTH_SHORT
                                 ).show()
                             } else {
                                 Toast.makeText(
-                                    mainActivity,
-                                    mainActivity.getString(R.string.connection_failed),
+                                    mainActivity!!,
+                                    mainActivity!!.getString(R.string.connection_failed),
                                     Toast.LENGTH_SHORT
                                 ).show()
                             }

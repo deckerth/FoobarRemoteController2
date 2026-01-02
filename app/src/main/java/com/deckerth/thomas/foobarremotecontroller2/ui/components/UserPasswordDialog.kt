@@ -42,7 +42,7 @@ fun UserPasswordDialog(vm: AppViewModel, modifier: Modifier = Modifier) {
             TextButton(onClick = {
                 vm.askForPassword = false
                 vm.ipAddress = ""
-                mainActivity.navigateTo("DeviceSelectionPage")
+                mainActivity!!.navigateTo("DeviceSelectionPage")
             }) {
                 Text(
                     stringResource(R.string.cancel), style = MaterialTheme.typography.bodyMedium

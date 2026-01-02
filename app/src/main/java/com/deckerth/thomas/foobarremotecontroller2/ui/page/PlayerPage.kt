@@ -144,7 +144,7 @@ fun PlayingPage(vm: AppViewModel) {
             }
         }
     }
-    if (!mainActivity.isTablet() && showLoading)
+    if (!mainActivity!!.isTablet() && showLoading)
         LinearProgressIndicator(
             progress = { vm.loadingListProgress },
             modifier = Modifier.fillMaxWidth(),
@@ -329,9 +329,10 @@ fun PlayerCard(
     boxSize: IntSize
 ) {
     // In phone mode: Trigger loading of the current playlist if it is not already loaded.
-    if (!mainActivity.isTablet())
+    if (!mainActivity!!.isTablet())
         if(vm.displayedPlaylist != null && vm.displayedPlaylist!!.lifecycleState == PlaylistLifecycleState.RequiresUpdate) {
             vm.displayedPlaylist!!.lifecycleState = PlaylistLifecycleState.Valid
+            vm.displayedPlaylist!!.clear()
             vm.displayedPlaylist = null
         }
 

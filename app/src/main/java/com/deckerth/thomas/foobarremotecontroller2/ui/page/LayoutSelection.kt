@@ -22,19 +22,19 @@ fun LayoutSelection(appViewModel: AppViewModel) {
         PreferenceItem<Boolean>(title = stringResource(R.string.choose_player_layout), summary = "",
             onClick = {
                 appViewModel.selectedView = ViewsWithLayout.PLAYER
-                mainActivity.navigateTo("Layout editor")
+                mainActivity!!.navigateTo("Layout editor")
             })
 
         Title(stringResource(R.string.layout_playlist))
         PreferenceItem<Boolean>(title = stringResource(R.string.choose_album_layout), summary = "",
             onClick = {
                 appViewModel.selectedView = ViewsWithLayout.ALBUM
-                mainActivity.navigateTo("Layout editor")
+                mainActivity!!.navigateTo("Layout editor")
             })
         PreferenceItem<Boolean>(title = stringResource(R.string.choose_title_layout), summary = "",
             onClick = {
                 appViewModel.selectedView = ViewsWithLayout.TITLE
-                mainActivity.navigateTo("Layout editor")
+                mainActivity!!.navigateTo("Layout editor")
             })
 
     }

@@ -40,7 +40,7 @@ class ConnectionManager {
 
     fun addConnection(connection: FoobarConnection) {
         connections[connection.ipAddress] = connection
-        saveFoobarConnections(mainActivity, this)
+        saveFoobarConnections(mainActivity!!, this)
     }
 
     fun getConnection(ipAddress: String): FoobarConnection? {

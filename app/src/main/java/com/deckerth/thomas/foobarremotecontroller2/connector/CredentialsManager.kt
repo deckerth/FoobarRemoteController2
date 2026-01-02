@@ -19,7 +19,7 @@ private const val KEY_ALIAS = "foobar_link_key_alias"
 
 class CredentialsManager(val vm: AppViewModel) {
 
-    init {
+    fun initialize() {
         val keyStore = KeyStore.getInstance("AndroidKeyStore")
         keyStore.load(null)
 
@@ -82,7 +82,7 @@ class CredentialsManager(val vm: AppViewModel) {
         vm.user = user
         vm.password = password
         val (iv, encryptedPassword) = encrypt(password)
-        saveCredentials(user, encryptedPassword, iv, mainActivity)
+        saveCredentials(user, encryptedPassword, iv, mainActivity!!)
         vm.connectionManager?.addConnection(FoobarConnection(ipAddress, user, password, iv))
     }
 

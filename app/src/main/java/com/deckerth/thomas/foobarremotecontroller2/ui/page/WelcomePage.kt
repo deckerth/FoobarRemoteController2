@@ -28,7 +28,7 @@ fun WelcomePage(vm : AppViewModel? = null) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(text = mainActivity.appBarLabel) },
+                title = { Text(text = mainActivity!!.appBarLabel) },
                 modifier = Modifier.fillMaxWidth(),
                 //colors = TopAppBarDefaults.topAppBarColors(
                 //    containerColor = TopAppBarDefaults.topAppBarColors().scrolledContainerColor
@@ -39,10 +39,10 @@ fun WelcomePage(vm : AppViewModel? = null) {
     ) { innerPadding ->
         WizardPage(vm = vm, Modifier.padding(innerPadding),
             onCancel = {
-                mainActivity.finish()
+                mainActivity!!.finish()
             },
             onFinished = {
-                mainActivity.recreate()
+                mainActivity!!.recreate()
             })
     }
 }

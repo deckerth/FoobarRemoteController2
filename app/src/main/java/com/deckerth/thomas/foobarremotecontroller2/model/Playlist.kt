@@ -43,7 +43,7 @@ class Playlist(var playlistEntity: PlaylistEntity) {
     fun getGenres(addAllGenresText: Boolean = false): List<String> {
         val result = mutableListOf<String>()
         if (addAllGenresText)
-            result.add(mainActivity.getString(R.string.all_genres))
+            result.add(mainActivity!!.getString(R.string.all_genres))
         genres.sort()
         result.addAll(genres)
         return result
@@ -228,11 +228,11 @@ class Playlist(var playlistEntity: PlaylistEntity) {
             CoroutineScope(Dispatchers.IO).launch {
                 if (vm.displayedPlaylist != null) {
                     if (titlesToCopy.size == 1)
-                        vm.toastOnPlaylistPageMessage = mainActivity.getString(
+                        vm.toastOnPlaylistPageMessage = mainActivity!!.getString(
                             R.string.title_copied_to_playlist
                         )
                     else
-                        vm.toastOnPlaylistPageMessage = mainActivity.getString(
+                        vm.toastOnPlaylistPageMessage = mainActivity!!.getString(
                             R.string.titles_copied_to_playlist,
                             titlesToCopy.size.toString()
                         )
@@ -264,7 +264,7 @@ class Playlist(var playlistEntity: PlaylistEntity) {
 
     fun addTitleToPlaybackQueue(vm: AppViewModel, playlistId: String, titleIndex: Int) {
         CoroutineScope(Dispatchers.IO).launch {
-            vm.toastOnPlaylistPageMessage = mainActivity.getString(
+            vm.toastOnPlaylistPageMessage = mainActivity!!.getString(
                 R.string.title_added_to_playback_queue
             )
 
@@ -279,11 +279,11 @@ class Playlist(var playlistEntity: PlaylistEntity) {
     fun addAlbumToPlaybackQueue(vm: AppViewModel, album: Album) {
         CoroutineScope(Dispatchers.IO).launch {
             if (album.tracks.size == 1)
-                vm.toastOnPlaylistPageMessage = mainActivity.getString(
+                vm.toastOnPlaylistPageMessage = mainActivity!!.getString(
                     R.string.title_added_to_playback_queue
                 )
             else
-                vm.toastOnPlaylistPageMessage = mainActivity.getString(
+                vm.toastOnPlaylistPageMessage = mainActivity!!.getString(
                     R.string.titles_added_to_playback_queue,
                     album.tracks.size.toString()
                 )
@@ -304,7 +304,7 @@ class Playlist(var playlistEntity: PlaylistEntity) {
         addBehavior: AddTracksBehaviors
     ) {
         CoroutineScope(Dispatchers.IO).launch {
-            vm.toastOnPlaylistPageMessage = mainActivity.getString(
+            vm.toastOnPlaylistPageMessage = mainActivity!!.getString(
                 R.string.title_copied_to_playlist
             )
             vm.playlistAccess.addPathsToPlaylist(
@@ -324,11 +324,11 @@ class Playlist(var playlistEntity: PlaylistEntity) {
     ) {
         CoroutineScope(Dispatchers.IO).launch {
             if (album.tracks.size == 1)
-                vm.toastOnPlaylistPageMessage = mainActivity.getString(
+                vm.toastOnPlaylistPageMessage = mainActivity!!.getString(
                     R.string.title_copied_to_playlist
                 )
             else
-                vm.toastOnPlaylistPageMessage = mainActivity.getString(
+                vm.toastOnPlaylistPageMessage = mainActivity!!.getString(
                     R.string.titles_copied_to_playlist,
                     album.tracks.size.toString()
                 )
@@ -372,11 +372,11 @@ class Playlist(var playlistEntity: PlaylistEntity) {
             CoroutineScope(Dispatchers.IO).launch {
                 if (vm.displayedPlaylist != null) {
                     if (titlesToAdd.size == 1)
-                        vm.toastOnPlaylistPageMessage = mainActivity.getString(
+                        vm.toastOnPlaylistPageMessage = mainActivity!!.getString(
                             R.string.title_added_to_playback_queue
                         )
                     else
-                        vm.toastOnPlaylistPageMessage = mainActivity.getString(
+                        vm.toastOnPlaylistPageMessage = mainActivity!!.getString(
                             R.string.titles_added_to_playback_queue,
                             titlesToAdd.size.toString()
                         )

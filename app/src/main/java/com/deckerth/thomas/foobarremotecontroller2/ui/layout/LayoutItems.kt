@@ -22,33 +22,33 @@ enum class LayoutItems(
     val onAlbum: Boolean = true,
     val onTitle: Boolean = true
 ) {
-    LABEL(mainActivity.baseContext.getString(R.string.layout_item_label)),
-    CATALOG(mainActivity.baseContext.getString(R.string.layout_item_medium)),
-    LABEL_CATALOG(mainActivity.baseContext.getString(R.string.layout_item_label_catalog)),
-    COMPOSER(mainActivity.baseContext.getString(R.string.layout_item_composer)),
-    ALBUM(mainActivity.baseContext.getString(R.string.layout_item_album)),
-    TITLE(mainActivity.baseContext.getString(R.string.layout_item_title), onAlbum = false),
-    ARTIST(mainActivity.baseContext.getString(R.string.layout_item_artist)),
-    ARTIST_TITLE(mainActivity.baseContext.getString(R.string.layout_item_artist_title)),
+    LABEL(mainActivity!!.baseContext.getString(R.string.layout_item_label)),
+    CATALOG(mainActivity!!.baseContext.getString(R.string.layout_item_medium)),
+    LABEL_CATALOG(mainActivity!!.baseContext.getString(R.string.layout_item_label_catalog)),
+    COMPOSER(mainActivity!!.baseContext.getString(R.string.layout_item_composer)),
+    ALBUM(mainActivity!!.baseContext.getString(R.string.layout_item_album)),
+    TITLE(mainActivity!!.baseContext.getString(R.string.layout_item_title), onAlbum = false),
+    ARTIST(mainActivity!!.baseContext.getString(R.string.layout_item_artist)),
+    ARTIST_TITLE(mainActivity!!.baseContext.getString(R.string.layout_item_artist_title)),
 
-    GENRE(mainActivity.baseContext.getString(R.string.layout_item_genre)),
+    GENRE(mainActivity!!.baseContext.getString(R.string.layout_item_genre)),
     SMART_ARTIST(
-        mainActivity.baseContext.getString(R.string.layout_item_smart_artist),
+        mainActivity!!.baseContext.getString(R.string.layout_item_smart_artist),
         onAlbum = false,
         onPlayer = false
     ),
     PROGRESS(
-        mainActivity.baseContext.getString(R.string.layout_item_progress_bar),
+        mainActivity!!.baseContext.getString(R.string.layout_item_progress_bar),
         onTitle = false,
         onAlbum = false
     ),
     ARTWORK(
-        mainActivity.baseContext.getString(R.string.layout_item_cover),
+        mainActivity!!.baseContext.getString(R.string.layout_item_cover),
         onTitle = false,
         onAlbum = false,
         onPlayer = false
     ),
-    SAMPLE_RATE(mainActivity.baseContext.getString(R.string.layout_item_samplerate)),
+    SAMPLE_RATE(mainActivity!!.baseContext.getString(R.string.layout_item_samplerate)),
     UNDEFINED("UNDEFINED", onTitle = false, onAlbum = false, onPlayer = false);
 }
 

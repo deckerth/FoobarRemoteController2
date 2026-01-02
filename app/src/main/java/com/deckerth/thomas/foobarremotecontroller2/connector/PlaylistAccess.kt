@@ -16,13 +16,41 @@ import java.nio.charset.StandardCharsets
 class PlaylistAccess(private val vm: AppViewModel) {
     private val errorHandler: ErrorHandler = vm.errorHandler
 
-    val playlists: Playlists?
-        get() {
-            val response =
-                queryPlaylists()
-            return if (response == null) null
-            else parsePlaylists(response)
+    var playlists: Playlists? = null  // is set by QueryAccess
+        set(value) {
+            if (value != null && value.ipAddress == vm.ipAddress) {
+                if (vm.player != null)
+                    if (vm.autoscroll && vm.player!!.playlistId.isNotEmpty() && vm.player!!.playlistId != vm.selectedPlaylist)
+                        vm.playlistsViewModel.setSelectedPlaylist(vm.player!!.playlistId)
+                    else if (vm.selectedPlaylist.isEmpty() && value.currentPlaylist != null)
+                        vm.playlistsViewModel.setSelectedPlaylist(value.currentPlaylist.playlistId)
+
+                vm.playlistsViewModel.setPlaylists(value)
+                field = value
+            }
         }
+
+    fun fetchPlaylists()  {
+        val response = queryPlaylists()
+        playlists = if (response == null) null
+        else  parsePlaylists(response)
+    }
+
+    private fun queryPlaylists(): Response? {
+        val response: Response?
+        try {
+            response = vm.connector.getData("playlists", vm)
+        } catch (e: Exception) {
+            errorHandler.logError(
+                ErrorType.NETWORK,
+                ErrorCode.CONNECTION_ERROR,
+                ErrorSource.PLAYLIST_ITEMS,
+                e
+            )
+            return null
+        }
+        return response
+    }
 
     private fun getFilenameWithoutExtension(fullPath: String): String {
         val lastSeparatorIndex = fullPath.lastIndexOf('\\')
@@ -158,27 +186,14 @@ class PlaylistAccess(private val vm: AppViewModel) {
         return playlist
     }
 
-    private fun queryPlaylists(): Response? {
-        val response: Response?
-        try {
-            response = vm.connector.getData("playlists", vm)
-        } catch (e: Exception) {
-            errorHandler.logError(
-                ErrorType.NETWORK,
-                ErrorCode.CONNECTION_ERROR,
-                ErrorSource.PLAYLIST_ITEMS,
-                e
-            )
-            return null
-        }
-        return response
+    private fun parsePlaylists(input: Response): Playlists? {
+        return parsePlaylists(input.usedIpAddress, JSONObject(input.message))
     }
 
-    private fun parsePlaylists(input: Response): Playlists? {
+    fun parsePlaylists(usedIpAddress: String, playlistsObject : JSONObject): Playlists? {
         val result = Playlists()
-        result.ipAddress = input.usedIpAddress
+        result.ipAddress = usedIpAddress
         try {
-            val playlistsObject = JSONObject(input.message)
             val playlistArray = playlistsObject.getJSONArray("playlists")
             for (i in 0..<playlistArray.length()) {
                 val playlistObject = playlistArray.getJSONObject(i)

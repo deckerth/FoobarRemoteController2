@@ -43,7 +43,7 @@ fun TitleDetails(title: ITitle, onDismiss: () -> Unit) {
         confirmButton = { },
         title = {
             Text(
-                text = mainActivity.baseContext.getString(R.string.button_details),
+                text = mainActivity!!.baseContext.getString(R.string.button_details),
                 style = MaterialTheme.typography.headlineSmall
             )
         },

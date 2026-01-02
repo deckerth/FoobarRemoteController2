@@ -33,19 +33,6 @@ class PlayerAccess(private val vm: AppViewModel) {
             }
 
             return currentPlayer
-
-
-            //        Response response;
-//        try {
-//            //response = vm.connector.getData("player?columns=%25label%25,%25catalog%25,%25composer%25,%25album%25,%25title%25,%25artist%25,%25discnumber%25,%25track%25,%25playback_time%25");
-//            response = vm.connector.getData("player?columns=%25label%25,%25catalog%25,%25composer%25,%25album%25,%25title%25,%25artist%25,%25samplerate%25,%25genre%25,%25discnumber%25,%25track%25,%25playback_time%25,%24filename%28%25path%25%29%24", vm);
-//        } catch (Exception e) {
-//            vm.errorHandler.logError(ErrorType.NETWORK, ErrorCode.CONNECTION_ERROR, ErrorSource.PLAYER_STATE, e);
-//                  /*      if (e.getMessage() != null && e.getMessage().equals("Unauthorized"))
-//                           vm.setAskForPassword(true); */
-//            return null;
-//        }
-//        return parsePlayerState(response);
         }
         set(playerState) {
             lastKnownPlayerState = playerState

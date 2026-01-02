@@ -4,7 +4,6 @@ import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.Service
-import android.content.Context
 import android.content.Intent
 import android.media.AudioAttributes
 import android.media.AudioAttributes.CONTENT_TYPE_MUSIC
@@ -17,7 +16,6 @@ import android.support.v4.media.session.PlaybackStateCompat
 import androidx.core.app.NotificationCompat
 import androidx.media.VolumeProviderCompat
 import androidx.media.app.NotificationCompat.MediaStyle
-import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.viewModelInstance
 import kotlinx.coroutines.runBlocking
 import java.time.Instant
@@ -36,7 +34,6 @@ fun enableVolumeControl() {
 
 class FoobarMediaService : Service() {
     private lateinit var audioManager: AudioManager
-    private val vm: AppViewModel = viewModelInstance
 
     private val audioFocusRequest: AudioFocusRequest = AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
         .setOnAudioFocusChangeListener { focusChange ->
@@ -48,12 +45,12 @@ class FoobarMediaService : Service() {
             if (pause)
                 when (focusChange) {
                     AudioManager.AUDIOFOCUS_LOSS_TRANSIENT -> {
-                        vm.playerAccess.pausePlayback()
+                        viewModelInstance?.playerAccess?.pausePlayback()
                         // Handle audio focus loss (e.g., stop playback)
                     }
 
                     AudioManager.AUDIOFOCUS_GAIN -> {
-                        vm.playerAccess.startPlayback()
+                        viewModelInstance?.playerAccess?.startPlayback()
                         // Handle audio focus gain (e.g., resume playback)
                     }
                 }
@@ -78,7 +75,7 @@ class FoobarMediaService : Service() {
         foobarMediaService = this
 
         // Initialize AudioManager and MediaSessionCompat
-        audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        audioManager = getSystemService(AUDIO_SERVICE) as AudioManager
 
         // Initialize the MediaSession
         mediaSession = MediaSessionCompat(this, "FoobarMediaService").apply {
@@ -98,24 +95,24 @@ class FoobarMediaService : Service() {
             setCallback(object : MediaSessionCompat.Callback() {
                 override fun onPlay() {
                     // Handle play action
-                    vm.playerAccess.startPlayback()
+                    viewModelInstance?.playerAccess?.startPlayback()
                     //updateNotification(true)
                 }
 
                 override fun onPause() {
                     // Handle pause action
-                    vm.playerAccess.pausePlayback()
+                    viewModelInstance?.playerAccess?.pausePlayback()
                     //updateNotification(false)
                 }
 
                 override fun onSkipToNext() {
                     // Handle skip to next action
-                    vm.playerAccess.nextTrack()
+                    viewModelInstance?.playerAccess?.nextTrack()
                 }
 
                 override fun onSkipToPrevious() {
                     // Handle skip to previous action
-                    vm.playerAccess.previousTrack()
+                    viewModelInstance?.playerAccess?.previousTrack()
                 }
             })
 
@@ -124,20 +121,20 @@ class FoobarMediaService : Service() {
             volumeProvider = object : VolumeProviderCompat(
                 VOLUME_CONTROL_ABSOLUTE,
                 100, // Max volume
-                vm.foobVolumeControl.currentValuePercent
+                viewModelInstance?.foobVolumeControl!!.currentValuePercent
             ) {
                 override fun onSetVolumeTo(volume: Int) {
                     lastChanged = Instant.now()
                     currentVolume = volume
-                    vm.foobVolumeControl.value = vm.foobVolumeControl.getDecibelValue(currentVolume)
-                    vm.playerAccess.setVolume(vm.foobVolumeControl.value)
+                    viewModelInstance?.foobVolumeControl!!.value = viewModelInstance?.foobVolumeControl!!.getDecibelValue(currentVolume)
+                    viewModelInstance?.playerAccess!!.setVolume(viewModelInstance?.foobVolumeControl!!.value)
                 }
 
                 override fun onAdjustVolume(direction: Int) {
                     lastChanged = Instant.now()
                     currentVolume += direction
-                    vm.foobVolumeControl.value = vm.foobVolumeControl.getDecibelValue(currentVolume)
-                    vm.playerAccess.setVolume(vm.foobVolumeControl.value)
+                    viewModelInstance?.foobVolumeControl!!.value = viewModelInstance?.foobVolumeControl!!.getDecibelValue(currentVolume)
+                    viewModelInstance?.playerAccess!!.setVolume(viewModelInstance?.foobVolumeControl!!.value)
                 }
             }
 

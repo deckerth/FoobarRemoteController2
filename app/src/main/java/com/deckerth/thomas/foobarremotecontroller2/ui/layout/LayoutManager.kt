@@ -112,7 +112,7 @@ class LayoutManager {
                     Layouts.LAYOUT_CLASSIC -> createClassicLayout()
                     Layouts.LAYOUT_CUSTOM -> createModernLayout()  // should not happen
                 }
-                saveCustomLayout(mainActivity.baseContext, customLayout!!)
+                saveCustomLayout(mainActivity!!.baseContext, customLayout!!)
             }
         }
     }
@@ -133,7 +133,7 @@ class LayoutManager {
             ViewsWithLayout.TITLE -> customLayout!!.titleLayout = layout
             else -> {}
         }
-        saveCustomLayout(mainActivity.baseContext, customLayout!!)
+        saveCustomLayout(mainActivity!!.baseContext, customLayout!!)
     }
 }
 

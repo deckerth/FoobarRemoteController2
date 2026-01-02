@@ -113,7 +113,7 @@ data class BottomNavigationItem(
     val unselectedIcon: ImageVector,
 )
 
-lateinit var mainActivity: MainActivity
+var mainActivity: MainActivity? = null
 
 class MainActivity : ComponentActivity() {
 
@@ -149,9 +149,15 @@ class MainActivity : ComponentActivity() {
                 val user = getUsernameBlocking()
                 val encryptedPassword = getPasswordBlocking()
                 val iv = getIvStringBlocking()
-                appViewModel.releaseNotesDisplayedForRelease = getReleaseNotesDisplayedForReleaseBlocking()
+                appViewModel.releaseNotesDisplayedForRelease =
+                    getReleaseNotesDisplayedForReleaseBlocking()
                 ipAddress = getIpAddressBlocking() // executed exactly once
-                appViewModel.credentialsManager.setCurrentUserPassword(ipAddress, user, encryptedPassword, iv)
+                appViewModel.credentialsManager.setCurrentUserPassword(
+                    ipAddress,
+                    user,
+                    encryptedPassword,
+                    iv
+                )
             }
 
             LaunchedEffect(ipAddress) { // executed exactly once
@@ -201,9 +207,11 @@ class MainActivity : ComponentActivity() {
     }
 
     fun restartService() {
-        val intent = Intent(this, FoobarMediaService::class.java)
-        mainActivity.stopService(intent)
-        startForegroundService(intent)
+        if (mainActivity != null) {
+            val intent = Intent(this, FoobarMediaService::class.java)
+            mainActivity!!.stopService(intent)
+            startForegroundService(intent)
+        }
     }
 
     @OptIn(ExperimentalMaterial3Api::class)
@@ -212,10 +220,11 @@ class MainActivity : ComponentActivity() {
         Foobar2000RemoteControllerTheme {
             Scaffold(
                 topBar = {
-                    TopAppBar(
-                        title = { Text(text = mainActivity.appBarLabel) },
-                        modifier = Modifier.fillMaxWidth(),
-                    )
+                    if (mainActivity != null)
+                        TopAppBar(
+                            title = { Text(text = mainActivity!!.appBarLabel) },
+                            modifier = Modifier.fillMaxWidth(),
+                        )
                 },
             ) { innerPadding ->
                 Box(modifier = Modifier.padding(innerPadding)) { }
@@ -290,7 +299,8 @@ class MainActivity : ComponentActivity() {
                                         checked = appViewModel.autoscroll,
                                         onCheckedChange = {
                                             appViewModel.autoscroll = !appViewModel.autoscroll
-                                            appViewModel.playlistsViewModel.filterValue.isActive = false
+                                            appViewModel.playlistsViewModel.filterValue.isActive =
+                                                false
 
                                             if (appViewModel.autoscroll)
                                                 CoroutineScope(Dispatchers.Main).launch {
@@ -411,7 +421,8 @@ class MainActivity : ComponentActivity() {
                                             onClick = {
                                                 dropdownMenuExpanded = false
                                                 appViewModel.enablePlaylistEditMode(
-                                                    PlaylistEditOperation.ADD_TO_PLAYBACK_QUEUE)
+                                                    PlaylistEditOperation.ADD_TO_PLAYBACK_QUEUE
+                                                )
                                             },
                                             leadingIcon = {
                                                 Icon(
@@ -437,7 +448,8 @@ class MainActivity : ComponentActivity() {
                                             onClick = {
                                                 dropdownMenuExpanded = false
                                                 appViewModel.enablePlaylistEditMode(
-                                                    PlaylistEditOperation.REMOVE)
+                                                    PlaylistEditOperation.REMOVE
+                                                )
                                             },
                                             leadingIcon = {
                                                 Icon(
@@ -450,7 +462,9 @@ class MainActivity : ComponentActivity() {
                                             text = { Text(stringResource(R.string.menu_item_copy_titles)) },
                                             onClick = {
                                                 dropdownMenuExpanded = false
-                                                appViewModel.enablePlaylistEditMode(PlaylistEditOperation.COPY)
+                                                appViewModel.enablePlaylistEditMode(
+                                                    PlaylistEditOperation.COPY
+                                                )
                                             },
                                             leadingIcon = {
                                                 Icon(
@@ -670,7 +684,8 @@ class MainActivity : ComponentActivity() {
                                         }
                                     IconButton(onClick = {
                                         appViewModel.enablePlaylistEditMode(
-                                            PlaylistEditOperation.ADD_TO_PLAYBACK_QUEUE)
+                                            PlaylistEditOperation.ADD_TO_PLAYBACK_QUEUE
+                                        )
                                     }) {
                                         Icon(
                                             painter = painterResource(R.drawable.play),
@@ -764,25 +779,26 @@ class MainActivity : ComponentActivity() {
             ) {
                 composable("Now Playing And Playlist") {
                     appBarLabel = appLabel
-                    Column { // Row for the two pages with shared progress indicator
-                        if (mainActivity.isTablet() && appViewModel.loadingList)
-                            LinearProgressIndicator(
-                                progress = { appViewModel.loadingListProgress },
-                                modifier = Modifier.fillMaxWidth(),
-                            )
-                        Row {
-                            Box(
-                                modifier = Modifier.weight(1f)
-                            ) {
-                                PlaylistPage(appViewModel)
-                            }
-                            Box(
-                                modifier = Modifier.weight(1f)
-                            ) {
-                                PlayingPage(appViewModel)
+                    if (mainActivity != null)
+                        Column { // Row for the two pages with shared progress indicator
+                            if (mainActivity!!.isTablet() && appViewModel.loadingList)
+                                LinearProgressIndicator(
+                                    progress = { appViewModel.loadingListProgress },
+                                    modifier = Modifier.fillMaxWidth(),
+                                )
+                            Row {
+                                Box(
+                                    modifier = Modifier.weight(1f)
+                                ) {
+                                    PlaylistPage(appViewModel)
+                                }
+                                Box(
+                                    modifier = Modifier.weight(1f)
+                                ) {
+                                    PlayingPage(appViewModel)
+                                }
                             }
                         }
-                    }
                 }
                 composable("Settings") {
                     appBarLabel = stringResource(R.string.title_settings)

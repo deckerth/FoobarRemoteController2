@@ -17,19 +17,19 @@ data class LayoutItem(
     fun verbose(): String {
         when (item) {
             LayoutItems.ARTWORK ->
-                return mainActivity.baseContext.getString(R.string.size_property) + " ${itemSize.text}"
+                return mainActivity!!.baseContext.getString(R.string.size_property) + " ${itemSize.text}"
 
             LayoutItems.PROGRESS ->
                 return ""
 
             else -> {
                 val italic =
-                    if (italic) ", " + mainActivity.baseContext.getString(R.string.font_italic) else ""
+                    if (italic) ", " + mainActivity!!.baseContext.getString(R.string.font_italic) else ""
                 val bold =
-                    if (bold) ", " + mainActivity.baseContext.getString(R.string.font_bold) else ""
+                    if (bold) ", " + mainActivity!!.baseContext.getString(R.string.font_bold) else ""
                 val alignment =
                     if (alignment != TextAlignment.LEFT) ", " + alignment.text else ""
-                return mainActivity.baseContext.getString(R.string.font_properties) + ": ${itemSize.text}" + italic + bold + alignment
+                return mainActivity!!.baseContext.getString(R.string.font_properties) + ": ${itemSize.text}" + italic + bold + alignment
             }
         }
     }

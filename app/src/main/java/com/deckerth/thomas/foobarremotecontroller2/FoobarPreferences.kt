@@ -77,33 +77,41 @@ fun saveIpAddress(packedIPAddress: String, context: Context) {
 
 @Composable
 fun getIpAddress(): String {
-    return getValue(mainActivity, IP_ADDRESS_KEY, "")
+    return if (mainActivity == null) ""
+    else getValue(mainActivity!!, IP_ADDRESS_KEY, "")
 }
 
 suspend fun getIpAddressBlocking(): String {
-    return getValueBlocking(
-        mainActivity,
-        IP_ADDRESS_KEY,
-        ""
-    )
+    return if (mainActivity == null) "" else
+        getValueBlocking(
+            mainActivity!!,
+            IP_ADDRESS_KEY,
+            ""
+        )
 }
 
 suspend fun getUsernameBlocking(): String {
-    return getValueBlocking(
-        mainActivity,
+    return if (mainActivity == null) "" else getValueBlocking(
+        mainActivity!!,
         USERNAME_KEY,
         ""
     )
 }
+
 suspend fun getIvStringBlocking(): ByteArray {
-    return getValueBlocking(
-        mainActivity,
+    return if (mainActivity == null) ByteArray(0) else getValueBlocking(
+        mainActivity!!,
         IV_STRING_KEY,
         ByteArray(0)
     )
 }
 
-fun saveCredentials(username: String, encryptedPassword: ByteArray, ivString: ByteArray, context: Context) {
+fun saveCredentials(
+    username: String,
+    encryptedPassword: ByteArray,
+    ivString: ByteArray,
+    context: Context
+) {
     runBlocking {
         saveValue(context, username, USERNAME_KEY)
         saveValue(context, encryptedPassword, PASSWORD_KEY)
@@ -113,8 +121,8 @@ fun saveCredentials(username: String, encryptedPassword: ByteArray, ivString: By
 
 
 suspend fun getPasswordBlocking(): ByteArray {
-    return getValueBlocking(
-        mainActivity,
+    return if (mainActivity == null) ByteArray(0) else getValueBlocking(
+        mainActivity!!,
         PASSWORD_KEY,
         ByteArray(0)
     )
@@ -129,12 +137,17 @@ fun saveViewMode(previousMode: Layouts, mode: Layouts, context: Context) {
 
 @Composable
 fun getViewMode(): Layouts {
-    return Layouts.entries[getValue(mainActivity, VIEW_MODE_KEY, Layouts.LAYOUT_MODERN.ordinal)]
+    return if (mainActivity == null) Layouts.LAYOUT_MODERN else Layouts.entries[getValue(
+        mainActivity!!,
+        VIEW_MODE_KEY,
+        Layouts.LAYOUT_MODERN.ordinal
+    )]
 }
 
 @Composable
 fun getCustomLayout(): Layout? {
-    val layoutString = getValue(mainActivity.baseContext, CUSTOM_LAYOUT_KEY, "")
+    if (mainActivity == null) return null
+    val layoutString = getValue(mainActivity!!.baseContext, CUSTOM_LAYOUT_KEY, "")
     return if (layoutString.isEmpty()) null
     else Json.decodeFromString(layoutString)
 }
@@ -154,14 +167,15 @@ fun saveFoobarVolumeControl(enabled: Boolean, context: Context) {
 
 @Composable
 fun getFoobarVolumeControl(): Boolean {
-    return getValue(mainActivity, FOOBAR_VOLUME_CONTROL_KEY, true)
+    return if (mainActivity == null) true
+    else getValue(mainActivity!!, FOOBAR_VOLUME_CONTROL_KEY, true)
 }
 
 suspend fun getFoobarVolumeControlBlocking(): Boolean {
-    return try {
-        getValueBlocking(mainActivity, FOOBAR_VOLUME_CONTROL_KEY, true)
-    } catch (e: UninitializedPropertyAccessException) {
-        false // if the main activity is not active, do not allow volume control
+    return if (mainActivity == null) false
+    else {
+        getValueBlocking(mainActivity!!, FOOBAR_VOLUME_CONTROL_KEY, true)
+        getValueBlocking(mainActivity!!, FOOBAR_VOLUME_CONTROL_KEY, true)
     }
 }
 
@@ -179,20 +193,19 @@ fun saveAlwaysOnDisplay(enabled: Boolean, context: Context) {
 
 @Composable
 fun getAlwaysOnDisplay(): Boolean {
-    return getValue(mainActivity, ALWAYS_ON_DISPLAY_KEY, false)
+    return if (mainActivity == null) false
+    else getValue(mainActivity!!, ALWAYS_ON_DISPLAY_KEY, false)
 }
 
 @Composable
 fun getPauseDuringPhoneCalls(): Boolean {
-    return getValue(mainActivity, PAUSE_DURING_PHONE_CALLS_KEY, true)
+    return if (mainActivity == null) true
+    else getValue(mainActivity!!, PAUSE_DURING_PHONE_CALLS_KEY, true)
 }
 
 suspend fun getPauseDuringPhoneCallsBlocking(): Boolean {
-    return try {
-        getValueBlocking(mainActivity, PAUSE_DURING_PHONE_CALLS_KEY, true)
-    } catch (e: UninitializedPropertyAccessException) {
-        false // if the main activity is not active, do not allow pausing
-    }
+    return if (mainActivity == null) false else
+        getValueBlocking(mainActivity!!, PAUSE_DURING_PHONE_CALLS_KEY, true)
 }
 
 fun saveAddTrackBehavior(behavior: AddTracksBehaviors, context: Context) {
@@ -203,8 +216,9 @@ fun saveAddTrackBehavior(behavior: AddTracksBehaviors, context: Context) {
 
 @Composable
 fun getAddTrackBehavior(): AddTracksBehaviors {
-    return AddTracksBehaviors.entries[getValue(
-        mainActivity,
+    return if (mainActivity == null) AddTracksBehaviors.ADD_BEHAVIOR_ADD_PLAY
+    else AddTracksBehaviors.entries[getValue(
+        mainActivity!!,
         ADD_TRACK_BEHAVIOR_KEY,
         AddTracksBehaviors.ADD_BEHAVIOR_ADD_PLAY.ordinal
     )]
@@ -219,12 +233,14 @@ fun saveDynamicColorScheme(enabled: Boolean, context: Context) {
 
 @Composable
 fun getDynamicColorSchemeEnabled(): Boolean {
-    return getValue(mainActivity, DYNAMIC_COLOR_SCHEME_KEY, true)
+    return if (mainActivity == null) true
+    else getValue(mainActivity!!, DYNAMIC_COLOR_SCHEME_KEY, true)
 }
 
 suspend fun getDynamicColorSchemeEnabledBlocking(): Boolean {
-    return getValueBlocking(
-        mainActivity,
+    return if (mainActivity == null) true
+    else getValueBlocking(
+        mainActivity!!,
         DYNAMIC_COLOR_SCHEME_KEY,
         true
     )
@@ -240,23 +256,27 @@ fun saveCreationOfNonEmptyPlaylists(enabled: Boolean, context: Context) {
 
 @Composable
 fun getCreationOfNonEmptyPlaylists(): Boolean {
-    return getValue(
-        mainActivity,
+    return if (mainActivity == null) creationOfNonEmptyPlaylistsInitialValue
+    else getValue(
+        mainActivity!!,
         CREATION_OF_NON_EMPTY_PLAYLISTS_KEY,
         creationOfNonEmptyPlaylistsInitialValue
     )
 }
 
 suspend fun getCreationOfNonEmptyPlaylistsBlocking(): Boolean {
-    return getValueBlocking(
-        mainActivity,
+    return if (mainActivity == null) creationOfNonEmptyPlaylistsInitialValue
+    else getValueBlocking(
+        mainActivity!!,
         CREATION_OF_NON_EMPTY_PLAYLISTS_KEY,
         creationOfNonEmptyPlaylistsInitialValue
     )
 }
 
 suspend fun getFoobarConnectionsBlocking(): ConnectionManager {
-    val connectionsString = getValueBlocking(mainActivity.baseContext, CONNECTIONS_KEY, "")
+    if (mainActivity == null)
+        return ConnectionManager()
+    val connectionsString = getValueBlocking(mainActivity!!.baseContext, CONNECTIONS_KEY, "")
     return if (connectionsString.isEmpty()) return ConnectionManager()
     else Json.decodeFromString(connectionsString)
 }
@@ -269,10 +289,11 @@ fun saveFoobarConnections(context: Context, connections: ConnectionManager) {
 }
 
 suspend fun getReleaseNotesDisplayedForReleaseBlocking(): String {
-    return getValueBlocking(mainActivity.baseContext, RELEASE_KEY, "")
+    return if (mainActivity == null) ""
+    else getValueBlocking(mainActivity!!.baseContext, RELEASE_KEY, "")
 }
 
-fun saveReleaseNotesDisplayedForRelease(context: Context, release:String) {
+fun saveReleaseNotesDisplayedForRelease(context: Context, release: String) {
     runBlocking {
         saveValue(context, release, RELEASE_KEY)
     }

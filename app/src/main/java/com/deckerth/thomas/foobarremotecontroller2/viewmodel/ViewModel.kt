@@ -15,6 +15,7 @@ import com.deckerth.thomas.foobarremotecontroller2.connector.ErrorHandler
 import com.deckerth.thomas.foobarremotecontroller2.connector.HTTPConnector
 import com.deckerth.thomas.foobarremotecontroller2.connector.PlayerAccess
 import com.deckerth.thomas.foobarremotecontroller2.connector.PlaylistAccess
+import com.deckerth.thomas.foobarremotecontroller2.connector.QueryAccess
 import com.deckerth.thomas.foobarremotecontroller2.foobarMediaService
 import com.deckerth.thomas.foobarremotecontroller2.mediaSession
 import com.deckerth.thomas.foobarremotecontroller2.model.PlaybackState
@@ -26,7 +27,7 @@ import com.deckerth.thomas.foobarremotecontroller2.ui.theme.updateColorScheme
 import kotlin.math.floor
 
 private var instance: AppViewModel? = null
-val viewModelInstance: AppViewModel get() {
+val viewModelInstance: AppViewModel? get() {
     if (instance == null) {
         instance = AppViewModel()
         instance!!.initialize()
@@ -58,6 +59,9 @@ class AppViewModel : ViewModel() {
     lateinit var playlistAccess: PlaylistAccess
     lateinit var browserAccess: BrowserAccess
     lateinit var playlistsViewModel: PlaylistsViewModel
+
+    var queryAccess: QueryAccess? = null
+
     lateinit var browserViewModel: BrowserViewModel
     lateinit var connector: HTTPConnector
     lateinit var foobVolumeControl: VolumeControl
@@ -91,6 +95,7 @@ class AppViewModel : ViewModel() {
     var releaseNotesDisplayedForRelease by mutableStateOf("")
     fun initialize() {
         credentialsManager = CredentialsManager(this )
+        credentialsManager.initialize()
         connector = HTTPConnector()
         errorHandler = ErrorHandler(this)
         playerAccess = PlayerAccess(this)
@@ -103,6 +108,7 @@ class AppViewModel : ViewModel() {
 
     fun clearState() {
         displayedPlaylist = null
+        queryAccess?.setPlaylist("")
         selectedPlaylist = ""
         selectedPlaylistName = ""
         selectedView = ViewsWithLayout.PLAYER

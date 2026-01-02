@@ -95,6 +95,7 @@ fun PlaylistPage(vm: AppViewModel) {
             vm.playlistsViewModel.filterValue.clear()
         }
 
+        println("FOOBPLAYLISTPAGE Clearing playlist: ${vm.displayedPlaylist!!.playlistEntity.playlistId}")
         vm.displayedPlaylist!!.clear()
         if (vm.displayedPlaylist!!.lifecycleState == PlaylistLifecycleState.RequiresUpdate) vm.displayedPlaylist!!.lifecycleState =
             PlaylistLifecycleState.Valid // for delayed update to avoid crashes during layout update
@@ -140,7 +141,7 @@ fun PlaylistPage(vm: AppViewModel) {
             } else vm.addTitlesMode = true
         })
 
-    if (!mainActivity.isTablet() && (vm.loadingList || vm.displayedPlaylist == null)) LinearProgressIndicator(
+    if (!mainActivity!!.isTablet() && (vm.loadingList || vm.displayedPlaylist == null)) LinearProgressIndicator(
         progress = {
             vm.loadingListProgress
         },
@@ -285,17 +286,17 @@ fun playlistInfoString(vm: AppViewModel): String {
     } else 0
     return if (vm.playlistsViewModel.filterValue.isActive)
         if (count == 1)
-            mainActivity.getString(
+            mainActivity!!.getString(
                 R.string.playlist_titles_singular
-            ) + mainActivity.getString(R.string.playlist_filtered_indicator)
+            ) + mainActivity!!.getString(R.string.playlist_filtered_indicator)
         else
-            mainActivity.getString(
+            mainActivity!!.getString(
                 R.string.playlist_titles_plural, count.toString()
-            ) + mainActivity.getString(R.string.playlist_filtered_indicator)
+            ) + mainActivity!!.getString(R.string.playlist_filtered_indicator)
     else
-        if (count == 1) mainActivity.getString(R.string.playlist_titles_singular)
+        if (count == 1) mainActivity!!.getString(R.string.playlist_titles_singular)
         else
-            mainActivity.getString(R.string.playlist_titles_plural, count.toString())
+            mainActivity!!.getString(R.string.playlist_titles_plural, count.toString())
 }
 
 @Composable

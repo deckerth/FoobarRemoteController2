@@ -78,7 +78,7 @@ private fun dismiss(vm: AppViewModel, appVersion: String?) {
     vm.showReleaseNotes = false
     if (appVersion != null && vm.releaseNotesDisplayedForRelease != appVersion) {
         vm.releaseNotesDisplayedForRelease = appVersion
-        saveReleaseNotesDisplayedForRelease(mainActivity, appVersion)
+        saveReleaseNotesDisplayedForRelease(mainActivity!!, appVersion)
     }
 }
 
@@ -89,8 +89,8 @@ fun ReleaseNotes(vm: AppViewModel) {
 
     var appVersion by remember {
         mutableStateOf(
-            mainActivity.packageManager.getPackageInfo(
-                mainActivity.packageName,
+            mainActivity!!.packageManager.getPackageInfo(
+                mainActivity!!.packageName,
                 0
             ).versionName
         )

@@ -247,7 +247,7 @@ class MainActivity : ComponentActivity() {
         val navController = rememberNavController()
         _navController = navController
         appLabel = stringResource(R.string.app_name)
-        var dropdownMenuExpanded by remember { mutableStateOf(false) }
+
         val items = listOf(
             BottomNavigationItem(
                 title = stringResource(R.string.tab_playlist),
@@ -295,53 +295,8 @@ class MainActivity : ComponentActivity() {
                         actions = {
                             when (getCurrentRoute(navController)) {
                                 "Playlist" -> Row {
-                                    FilledIconToggleButton(
-                                        checked = appViewModel.autoscroll,
-                                        onCheckedChange = {
-                                            appViewModel.autoscroll = !appViewModel.autoscroll
-                                            appViewModel.playlistsViewModel.filterValue.isActive =
-                                                false
-
-                                            if (appViewModel.autoscroll)
-                                                CoroutineScope(Dispatchers.Main).launch {
-                                                    // Change the selected playlist if required
-                                                    if (appViewModel.player != null && appViewModel.displayedPlaylist != null &&
-                                                        appViewModel.player!!.playlistId != "" &&
-                                                        appViewModel.player!!.playlistId != appViewModel.displayedPlaylist?.playlistEntity!!.playlistId
-                                                    ) {
-                                                        appViewModel.playlistsViewModel.setSelectedPlaylist(
-                                                            appViewModel.player!!.playlistId
-                                                        )
-                                                    }
-
-                                                    val currentAlbumIndex =
-                                                        appViewModel.getCurrentAlbumIndex()
-                                                    if (currentAlbumIndex != -1) {
-                                                        appViewModel.autoScrollIndex =
-                                                            currentAlbumIndex
-                                                        appViewModel.enforceAutoscroll =
-                                                            true // first scrolls to index 0
-                                                    }
-                                                }
-                                        })
-                                    {
-                                        Icon(
-                                            painter = painterResource(R.drawable.jump_to_element),
-                                            contentDescription = stringResource(R.string.desc_jump_to_title),
-                                            modifier = Modifier
-                                                .size(24.dp)
-                                        )
-                                    }
-                                    if (appViewModel.playlistsViewModel.filterValue.isActive)
-                                        IconButton(onClick = {
-                                            appViewModel.playlistsViewModel.showFilter = false
-                                            appViewModel.playlistsViewModel.filterValue.clear()
-                                        }) {
-                                            Icon(
-                                                painter = painterResource(R.drawable.filter_alt_off),
-                                                contentDescription = "Filter off"
-                                            )
-                                        }
+                                    ToggleAutoscrollButton()
+                                    DisableFilterButton()
                                     IconButton(onClick = {
                                         appViewModel.playlistsViewModel.updateList()
                                     }) {
@@ -350,144 +305,7 @@ class MainActivity : ComponentActivity() {
                                             contentDescription = "Refresh"
                                         )
                                     }
-                                    IconToggleButton(
-                                        checked = dropdownMenuExpanded,
-                                        onCheckedChange = {
-                                            dropdownMenuExpanded = !dropdownMenuExpanded
-                                        },
-                                        colors = IconToggleButtonColors(
-                                            checkedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-                                            checkedContentColor = IconButtonDefaults.iconButtonColors().contentColor,
-                                            containerColor = IconButtonDefaults.iconButtonColors().containerColor,
-                                            contentColor = IconButtonDefaults.iconButtonColors().contentColor,
-                                            disabledContainerColor = IconButtonDefaults.iconButtonColors().disabledContainerColor,
-                                            disabledContentColor = IconButtonDefaults.iconButtonColors().disabledContentColor,
-                                        )
-                                    )
-                                    {
-                                        Icon(
-                                            imageVector = Icons.Default.MoreVert,
-                                            contentDescription = "More"
-                                        )
-
-                                    }
-                                    DropdownMenu(
-                                        expanded = dropdownMenuExpanded,
-                                        onDismissRequest = { dropdownMenuExpanded = false }) {
-                                        DropdownMenuItem(
-                                            text = { Text(stringResource(R.string.menu_item_top_of_playlist)) },
-                                            onClick = {
-                                                dropdownMenuExpanded = false
-                                                appViewModel.autoscroll = false
-                                                appViewModel.scrollToTop = true
-                                            },
-                                            leadingIcon = {
-                                                Icon(
-                                                    imageVector = Icons.Default.KeyboardArrowUp,
-                                                    contentDescription = "Top of playlist"
-                                                )
-                                            }
-                                        )
-                                        DropdownMenuItem(
-                                            text = { Text(stringResource(R.string.menu_item_bottom_of_playlist)) },
-                                            onClick = {
-                                                dropdownMenuExpanded = false
-                                                appViewModel.autoscroll = false
-                                                appViewModel.scrollToBottom = true
-                                            },
-                                            leadingIcon = {
-                                                Icon(
-                                                    imageVector = Icons.Default.KeyboardArrowDown,
-                                                    contentDescription = "Top of playlist"
-                                                )
-                                            }
-                                        )
-                                        DropdownMenuItem(
-                                            text = { Text(stringResource(R.string.filter_titles)) },
-                                            onClick = {
-                                                dropdownMenuExpanded =
-                                                    false; appViewModel.playlistsViewModel.showFilter =
-                                                true
-                                            },
-                                            leadingIcon = {
-                                                Icon(
-                                                    painter = painterResource(R.drawable.filter_alt),
-                                                    contentDescription = "Filter"
-                                                )
-                                            }
-                                        )
-                                        DropdownMenuItem(
-                                            text = { Text(stringResource(R.string.add_to_playback_queue)) },
-                                            onClick = {
-                                                dropdownMenuExpanded = false
-                                                appViewModel.enablePlaylistEditMode(
-                                                    PlaylistEditOperation.ADD_TO_PLAYBACK_QUEUE
-                                                )
-                                            },
-                                            leadingIcon = {
-                                                Icon(
-                                                    painter = painterResource(R.drawable.play),
-                                                    contentDescription = "Add titles to playback queue"
-                                                )
-                                            }
-                                        )
-                                        DropdownMenuItem(
-                                            text = { Text(stringResource(R.string.menu_item_add_titles)) },
-                                            onClick = {
-                                                dropdownMenuExpanded = false; navigateTo("Browser")
-                                            },
-                                            leadingIcon = {
-                                                Icon(
-                                                    imageVector = Icons.Default.Add,
-                                                    contentDescription = "Add music"
-                                                )
-                                            }
-                                        )
-                                        DropdownMenuItem(
-                                            text = { Text(stringResource(R.string.menu_item_remove_titles)) },
-                                            onClick = {
-                                                dropdownMenuExpanded = false
-                                                appViewModel.enablePlaylistEditMode(
-                                                    PlaylistEditOperation.REMOVE
-                                                )
-                                            },
-                                            leadingIcon = {
-                                                Icon(
-                                                    imageVector = Icons.Default.Delete,
-                                                    contentDescription = "Remove tracks"
-                                                )
-                                            }
-                                        )
-                                        DropdownMenuItem(
-                                            text = { Text(stringResource(R.string.menu_item_copy_titles)) },
-                                            onClick = {
-                                                dropdownMenuExpanded = false
-                                                appViewModel.enablePlaylistEditMode(
-                                                    PlaylistEditOperation.COPY
-                                                )
-                                            },
-                                            leadingIcon = {
-                                                Icon(
-                                                    painter = painterResource(R.drawable.content_copy),
-                                                    contentDescription = "Remove tracks"
-                                                )
-                                            }
-                                        )
-                                        DropdownMenuItem(
-                                            text = { Text(stringResource(R.string.create_playlist)) },
-                                            onClick = {
-                                                dropdownMenuExpanded =
-                                                    false; appViewModel.createPlaylistRequest =
-                                                true
-                                            },
-                                            leadingIcon = {
-                                                Icon(
-                                                    painter = painterResource(R.drawable.format_list_bulleted_add),
-                                                    contentDescription = "New playlist"
-                                                )
-                                            }
-                                        )
-                                    }
+                                    PlaylistMenu()
                                 }
 
                                 "Now Playing" -> {}
@@ -585,11 +403,52 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
+    private fun ToggleAutoscrollButton(modifier: Modifier = Modifier) {
+        FilledIconToggleButton(
+            modifier = modifier,
+            checked = appViewModel.autoscroll,
+            onCheckedChange = {
+                appViewModel.autoscroll = !appViewModel.autoscroll
+                appViewModel.playlistsViewModel.filterValue.isActive =
+                    false
+
+                if (appViewModel.autoscroll)
+                    CoroutineScope(Dispatchers.Main).launch {
+                        // Change the selected playlist if required
+                        if (appViewModel.player != null && appViewModel.displayedPlaylist != null &&
+                            appViewModel.player!!.playlistId != "" &&
+                            appViewModel.player!!.playlistId != appViewModel.displayedPlaylist?.playlistEntity!!.playlistId
+                        ) {
+                            appViewModel.playlistsViewModel.setSelectedPlaylist(
+                                appViewModel.player!!.playlistId
+                            )
+                        }
+
+                        val currentAlbumIndex =
+                            appViewModel.getCurrentAlbumIndex()
+                        if (currentAlbumIndex != -1) {
+                            appViewModel.autoScrollIndex =
+                                currentAlbumIndex
+                            appViewModel.enforceAutoscroll =
+                                true // first scrolls to index 0
+                        }
+                    }
+            })
+        {
+            Icon(
+                painter = painterResource(R.drawable.jump_to_element),
+                contentDescription = stringResource(R.string.desc_jump_to_title),
+                modifier = Modifier
+                    .size(24.dp)
+            )
+        }
+    }
+
+    @Composable
     fun FoobarTabletLayout() {
         val navController = rememberNavController()
         _navController = navController
         appLabel = stringResource(R.string.app_name)
-        var dropdownMenuExpanded by remember { mutableStateOf(false) }
 
         Scaffold(
             topBar = {
@@ -608,189 +467,9 @@ class MainActivity : ComponentActivity() {
                                     text = appBarLabel
                                 )
                                 if (getCurrentRoute(navController) == "Now Playing And Playlist") {
-                                    FilledIconToggleButton(
-                                        modifier = Modifier.padding(start = 10.dp),
-                                        checked = appViewModel.autoscroll,
-                                        onCheckedChange = {
-                                            appViewModel.autoscroll = !appViewModel.autoscroll
-
-                                            if (appViewModel.autoscroll)
-                                                CoroutineScope(Dispatchers.Main).launch {
-                                                    // Change the selected playlist if required
-                                                    if (appViewModel.player != null && appViewModel.displayedPlaylist != null &&
-                                                        appViewModel.player!!.playlistId != "" &&
-                                                        appViewModel.player!!.playlistId != appViewModel.displayedPlaylist?.playlistEntity!!.playlistId
-                                                    ) {
-                                                        appViewModel.playlistsViewModel.setSelectedPlaylist(
-                                                            appViewModel.player!!.playlistId
-                                                        )
-                                                    }
-
-                                                    val currentAlbumIndex =
-                                                        appViewModel.getCurrentAlbumIndex()
-                                                    if (currentAlbumIndex != -1) {
-                                                        appViewModel.autoScrollIndex =
-                                                            currentAlbumIndex
-                                                        appViewModel.enforceAutoscroll =
-                                                            true // first scrolls to index 0
-                                                    }
-                                                }
-                                        })
-                                    {
-                                        Icon(
-                                            painter = painterResource(R.drawable.jump_to_element),
-                                            contentDescription = stringResource(R.string.desc_jump_to_title),
-                                            modifier = Modifier
-                                                .size(24.dp)
-                                        )
-                                    }
-                                    if (appViewModel.playlistsViewModel.filterValue.isActive)
-                                        IconButton(onClick = {
-                                            appViewModel.playlistsViewModel.showFilter = false
-                                            appViewModel.playlistsViewModel.filterValue.clear()
-                                        }) {
-                                            Icon(
-                                                painter = painterResource(R.drawable.filter_alt_off),
-                                                contentDescription = "Filter off"
-                                            )
-                                        }
-                                    IconToggleButton(
-                                        checked = dropdownMenuExpanded,
-                                        onCheckedChange = {
-                                            dropdownMenuExpanded = !dropdownMenuExpanded
-                                        },
-                                        colors = IconToggleButtonColors(
-                                            checkedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-                                            checkedContentColor = IconButtonDefaults.iconButtonColors().contentColor,
-                                            containerColor = IconButtonDefaults.iconButtonColors().containerColor,
-                                            contentColor = IconButtonDefaults.iconButtonColors().contentColor,
-                                            disabledContainerColor = IconButtonDefaults.iconButtonColors().disabledContainerColor,
-                                            disabledContentColor = IconButtonDefaults.iconButtonColors().disabledContentColor,
-                                        )
-                                    )
-                                    {
-                                        Icon(
-                                            imageVector = Icons.Default.MoreVert,
-                                            contentDescription = "More"
-                                        )
-                                    }
-                                    DropdownMenu(
-                                        expanded = dropdownMenuExpanded,
-                                        onDismissRequest = { dropdownMenuExpanded = false }) {
-                                        DropdownMenuItem(
-                                            text = { Text(stringResource(R.string.menu_item_top_of_playlist)) },
-                                            onClick = {
-                                                dropdownMenuExpanded = false
-                                                appViewModel.autoscroll = false
-                                                appViewModel.scrollToTop = true
-                                            },
-                                            leadingIcon = {
-                                                Icon(
-                                                    imageVector = Icons.Default.KeyboardArrowUp,
-                                                    contentDescription = "Top of playlist"
-                                                )
-                                            }
-                                        )
-                                        DropdownMenuItem(
-                                            text = { Text(stringResource(R.string.menu_item_bottom_of_playlist)) },
-                                            onClick = {
-                                                dropdownMenuExpanded = false
-                                                appViewModel.autoscroll = false
-                                                appViewModel.scrollToBottom = true
-                                            },
-                                            leadingIcon = {
-                                                Icon(
-                                                    imageVector = Icons.Default.KeyboardArrowDown,
-                                                    contentDescription = "Top of playlist"
-                                                )
-                                            }
-                                        )
-                                        DropdownMenuItem(
-                                            text = { Text(stringResource(R.string.filter_titles)) },
-                                            onClick = {
-                                                dropdownMenuExpanded =
-                                                    false; appViewModel.playlistsViewModel.showFilter =
-                                                true
-                                            },
-                                            leadingIcon = {
-                                                Icon(
-                                                    painter = painterResource(R.drawable.filter_alt),
-                                                    contentDescription = "Filter"
-                                                )
-                                            }
-                                        )
-                                        DropdownMenuItem(
-                                            text = { Text(stringResource(R.string.add_to_playback_queue)) },
-                                            onClick = {
-                                                dropdownMenuExpanded = false
-                                                appViewModel.enablePlaylistEditMode(
-                                                    PlaylistEditOperation.ADD_TO_PLAYBACK_QUEUE
-                                                )
-                                            },
-                                            leadingIcon = {
-                                                Icon(
-                                                    painter = painterResource(R.drawable.play),
-                                                    contentDescription = "Add titles to playback queue"
-                                                )
-                                            }
-                                        )
-                                        DropdownMenuItem(
-                                            text = { Text(stringResource(R.string.menu_item_add_titles)) },
-                                            onClick = {
-                                                dropdownMenuExpanded = false; navigateTo("Browser")
-                                            },
-                                            leadingIcon = {
-                                                Icon(
-                                                    imageVector = Icons.Default.Add,
-                                                    contentDescription = "Add music"
-                                                )
-                                            }
-                                        )
-                                        DropdownMenuItem(
-                                            text = { Text(stringResource(R.string.menu_item_remove_titles)) },
-                                            onClick = {
-                                                dropdownMenuExpanded = false
-                                                appViewModel.enablePlaylistEditMode(
-                                                    PlaylistEditOperation.REMOVE
-                                                )
-                                            },
-                                            leadingIcon = {
-                                                Icon(
-                                                    imageVector = Icons.Default.Delete,
-                                                    contentDescription = "Remove tracks"
-                                                )
-                                            }
-                                        )
-                                        DropdownMenuItem(
-                                            text = { Text(stringResource(R.string.menu_item_copy_titles)) },
-                                            onClick = {
-                                                dropdownMenuExpanded = false
-                                                appViewModel.enablePlaylistEditMode(
-                                                    PlaylistEditOperation.COPY
-                                                )
-                                            },
-                                            leadingIcon = {
-                                                Icon(
-                                                    painter = painterResource(R.drawable.content_copy),
-                                                    contentDescription = "Remove tracks"
-                                                )
-                                            }
-                                        )
-                                        DropdownMenuItem(
-                                            text = { Text(stringResource(R.string.create_playlist)) },
-                                            onClick = {
-                                                dropdownMenuExpanded =
-                                                    false; appViewModel.createPlaylistRequest =
-                                                true
-                                            },
-                                            leadingIcon = {
-                                                Icon(
-                                                    painter = painterResource(R.drawable.format_list_bulleted_add),
-                                                    contentDescription = "New playlist"
-                                                )
-                                            }
-                                        )
-                                    }
+                                    ToggleAutoscrollButton(Modifier.padding(start = 10.dp))
+                                    DisableFilterButton()
+                                    PlaylistMenu()
                                 }
                             }
                         },
@@ -902,6 +581,162 @@ class MainActivity : ComponentActivity() {
                     appViewModel.playlistEditMode = true
                 }
             }
+        }
+    }
+
+    @Composable
+    private fun DisableFilterButton() {
+        if (appViewModel.playlistsViewModel.filterValue.isActive)
+            IconButton(onClick = {
+                appViewModel.playlistsViewModel.showFilter = false
+                appViewModel.playlistsViewModel.filterValue.clear()
+            }) {
+                Icon(
+                    painter = painterResource(R.drawable.filter_alt_off),
+                    contentDescription = "Filter off"
+                )
+            }
+    }
+
+    @Composable
+    private fun PlaylistMenu() {
+        var dropdownMenuExpanded by remember { mutableStateOf(false) }
+        IconToggleButton(
+            checked = dropdownMenuExpanded,
+            onCheckedChange = {
+                dropdownMenuExpanded = !dropdownMenuExpanded
+            },
+            colors = IconToggleButtonColors(
+                checkedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                checkedContentColor = IconButtonDefaults.iconButtonColors().contentColor,
+                containerColor = IconButtonDefaults.iconButtonColors().containerColor,
+                contentColor = IconButtonDefaults.iconButtonColors().contentColor,
+                disabledContainerColor = IconButtonDefaults.iconButtonColors().disabledContainerColor,
+                disabledContentColor = IconButtonDefaults.iconButtonColors().disabledContentColor,
+            )
+        )
+        {
+            Icon(
+                imageVector = Icons.Default.MoreVert,
+                contentDescription = "More"
+            )
+        }
+        DropdownMenu(
+            expanded = dropdownMenuExpanded,
+            onDismissRequest = { dropdownMenuExpanded = false }) {
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.menu_item_top_of_playlist)) },
+                onClick = {
+                    dropdownMenuExpanded = false
+                    appViewModel.autoscroll = false
+                    appViewModel.scrollToTop = true
+                },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.KeyboardArrowUp,
+                        contentDescription = "Top of playlist"
+                    )
+                }
+            )
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.menu_item_bottom_of_playlist)) },
+                onClick = {
+                    dropdownMenuExpanded = false
+                    appViewModel.autoscroll = false
+                    appViewModel.scrollToBottom = true
+                },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.KeyboardArrowDown,
+                        contentDescription = "Top of playlist"
+                    )
+                }
+            )
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.filter_titles)) },
+                onClick = {
+                    dropdownMenuExpanded =
+                        false; appViewModel.playlistsViewModel.showFilter =
+                    true
+                },
+                leadingIcon = {
+                    Icon(
+                        painter = painterResource(R.drawable.filter_alt),
+                        contentDescription = "Filter"
+                    )
+                }
+            )
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.add_to_playback_queue)) },
+                onClick = {
+                    dropdownMenuExpanded = false
+                    appViewModel.enablePlaylistEditMode(
+                        PlaylistEditOperation.ADD_TO_PLAYBACK_QUEUE
+                    )
+                },
+                leadingIcon = {
+                    Icon(
+                        painter = painterResource(R.drawable.play),
+                        contentDescription = "Add titles to playback queue"
+                    )
+                }
+            )
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.menu_item_add_titles)) },
+                onClick = {
+                    dropdownMenuExpanded = false; navigateTo("Browser")
+                },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = "Add music"
+                    )
+                }
+            )
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.menu_item_remove_titles)) },
+                onClick = {
+                    dropdownMenuExpanded = false
+                    appViewModel.enablePlaylistEditMode(
+                        PlaylistEditOperation.REMOVE
+                    )
+                },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = "Remove tracks"
+                    )
+                }
+            )
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.menu_item_copy_titles)) },
+                onClick = {
+                    dropdownMenuExpanded = false
+                    appViewModel.enablePlaylistEditMode(
+                        PlaylistEditOperation.COPY
+                    )
+                },
+                leadingIcon = {
+                    Icon(
+                        painter = painterResource(R.drawable.content_copy),
+                        contentDescription = "Remove tracks"
+                    )
+                }
+            )
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.create_playlist)) },
+                onClick = {
+                    dropdownMenuExpanded =
+                        false; appViewModel.createPlaylistRequest =
+                    true
+                },
+                leadingIcon = {
+                    Icon(
+                        painter = painterResource(R.drawable.format_list_bulleted_add),
+                        contentDescription = "New playlist"
+                    )
+                }
+            )
         }
     }
 

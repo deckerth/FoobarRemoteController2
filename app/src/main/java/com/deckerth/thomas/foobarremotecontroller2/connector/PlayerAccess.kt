@@ -12,6 +12,8 @@ import org.json.JSONException
 import org.json.JSONObject
 import java.time.Duration
 import java.time.Instant
+import java.util.Locale
+import kotlin.math.roundToInt
 
 class PlayerAccess(private val vm: AppViewModel) {
     var playerState: Player?
@@ -22,20 +24,46 @@ class PlayerAccess(private val vm: AppViewModel) {
             val currentPlayer = lastKnownPlayerState!!.clonePlayer()
 
             // update position
-            if (!currentPlayer.duration.isBlank()) {
+            if (!currentPlayer.duration.isBlank() && currentPlayer.playbackState == PlaybackState.PLAYING) {
                 val duration = currentPlayer.duration.toFloat()
                 val position = currentPlayer.position.toFloat()
+
                 val now = System.currentTimeMillis()
-                val elapsed = now - lastKnownPlayerState!!.timestamp
-                var newPosition = position + elapsed / 1000f
+                val elapsedSeconds = (now - lastKnownPlayerState!!.timestamp) / 1000f
+                var newPosition = position + elapsedSeconds
                 if (newPosition > duration) newPosition = duration
                 currentPlayer.position = newPosition.toString()
-            }
 
+                val timeParts = currentPlayer.playbackTime.split(":")
+                if (timeParts.size == 2) {
+                    try {
+                        // Convert parts to numbers and calculate total seconds
+                        val minutes = timeParts[0].toLong()
+                        val seconds = timeParts[1].toLong()
+                        val currentTotalSeconds = (minutes * 60) + seconds
+
+                        var newTotalSeconds = currentTotalSeconds + elapsedSeconds
+                        if (newTotalSeconds > duration) newTotalSeconds = duration
+
+                        val newPlaybackTimeSeconds = newTotalSeconds.roundToInt()
+
+                        // Format the new total seconds back into a "minutes:seconds" string
+                        val newMinutes = newPlaybackTimeSeconds / 60
+                        val newSeconds = newPlaybackTimeSeconds % 60
+                        currentPlayer.playbackTime =
+                            String.format(Locale.getDefault(), "%d:%02d", newMinutes, newSeconds)
+
+                    } catch (e: NumberFormatException) {
+                        // Handle cases where the string is not in the expected format
+                        // For now, we'll just leave the original time
+                    }
+                }
+            }
             return currentPlayer
         }
         set(playerState) {
             lastKnownPlayerState = playerState
+            vm.updatePlayer()
         }
 
     fun setPosition(position: Float?) {

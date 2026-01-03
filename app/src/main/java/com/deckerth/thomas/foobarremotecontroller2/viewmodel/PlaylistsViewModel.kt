@@ -194,13 +194,13 @@ class PlaylistsViewModel(private val vm: AppViewModel) : ViewModel() {
 
         // process removed playlists
         for (currentList in playlistRegistry) {
-            if (!newPlaylists.playlists.any { it.playlistId == currentList.playlistEntity.playlistId }) {
+            if (currentList.lifecycleState != PlaylistLifecycleState.Invalid &&
+                !newPlaylists.playlists.any { it.playlistId == currentList.playlistEntity.playlistId }) {
                 currentList.playlistEntity.noOfTracks = 0
                 currentList.lifecycleState = PlaylistLifecycleState.Invalid
                 if (vm.selectedPlaylist == currentList.playlistEntity.playlistId) {
                     vm.selectedPlaylist = ""
                     vm.selectedPlaylistName = ""
-                    // vm.displayedPlaylist = null
                 }
                 println("FOOBUPDATE invalidating removed playlist ${currentList.playlistEntity.playlistId}")
             }
@@ -223,7 +223,6 @@ class PlaylistsViewModel(private val vm: AppViewModel) : ViewModel() {
                 }
             }
         }
-
         updatePlaylists()
     }
 

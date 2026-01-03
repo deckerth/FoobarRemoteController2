@@ -17,7 +17,6 @@ import kotlin.math.roundToInt
 
 class PlayerAccess(private val vm: AppViewModel) {
     var playerState: Player?
-        //    public void startPlayerObserver() {
         get() {
             if (lastKnownPlayerState == null) return null
 
@@ -69,7 +68,6 @@ class PlayerAccess(private val vm: AppViewModel) {
     fun setPosition(position: Float?) {
         val jsonString = "{\"position\":$position}"
         vm.connector.postData("player/", jsonString, vm)
-        vm.updatePlayer()
     }
 
     private var lastKnownPlayerState: Player? = null
@@ -197,21 +195,18 @@ class PlayerAccess(private val vm: AppViewModel) {
     fun startPlayback() {
         Thread {
             vm.connector.postData("player/play", vm)
-            vm.updatePlayer()
         }.start()
     }
 
     fun pausePlayback() {
         Thread {
             vm.connector.postData("player/pause", vm)
-            vm.updatePlayer()
         }.start()
     }
 
     fun previousTrack() {
         Thread {
             vm.connector.postData("player/previous", vm)
-            vm.updatePlayer()
         }.start()
     }
 
@@ -222,7 +217,6 @@ class PlayerAccess(private val vm: AppViewModel) {
     fun playTrack(playlistId: String?, index: Int) {
         Thread {
             vm.connector.postData("player/play/$playlistId/$index", vm)
-            vm.updatePlayer()
         }.start()
     }
 
@@ -230,7 +224,6 @@ class PlayerAccess(private val vm: AppViewModel) {
         Thread {
             val jsonString = "{\"volume\":$value}"
             vm.connector.postData("player/", jsonString, vm)
-            vm.updatePlayer()
         }.start()
     }
 
@@ -240,7 +233,6 @@ class PlayerAccess(private val vm: AppViewModel) {
             val jsonString =
                 "{\"options\":[{\"id\": \"playbackOrder\", \"value\": " + mode.ordinal + "}]}"
             vm.connector.postData("player/", jsonString, vm)
-            vm.updatePlayer()
         }.start()
     }
 

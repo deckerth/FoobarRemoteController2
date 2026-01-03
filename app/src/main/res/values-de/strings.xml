@@ -48,7 +48,7 @@
     <string name="choose_title_layout">Titellayout</string>
     <string name="choose_player_layout">Player Layout</string>
     <string name="desc_jump_to_title">Zu aktuellem Titel springen</string>
-    <string name="info_no_connection">Keine Verbindung möglich</string>
+    <string name="info_no_connection">Verbindung wird hergestellt…</string>
     <string name="info_removed">Von der Playlist entfernt</string>
     <string name="available_fields">Verfügbare Felder</string>
     <string name="title_large">Großer Titel</string>
@@ -171,7 +171,7 @@
     <string name="menu_item_copy_titles">Titel in andere Playlist kopieren</string>
     <string name="titles_copied_to_playlist">%1$s Titel kopiert</string>
     <string name="title_copied_to_playlist">1 Titel kopiert</string>
-    <string name="checking_connection">Überprüfe die Verbindung..</string>
+    <string name="checking_connection">Überprüfe die Verbindung…</string>
     <string name="connect">Verbinden</string>
     <string name="signInToAccessFoobar">Anmeldung</string>
     <string name="user">Nutzername</string>

@@ -75,7 +75,7 @@ class PlaylistsViewModel(private val vm: AppViewModel) : ViewModel() {
     var filterValue by mutableStateOf(TitleFilter())
     var nameOfNewPlaylist by mutableStateOf("")
 
-    private val playerObserver = PlayerObserver(vm, vm.playlistAccess, this)
+    private val playerObserver = PlayerObserver(vm)
 
     /**
      *   @return all known playlists that are not invalid

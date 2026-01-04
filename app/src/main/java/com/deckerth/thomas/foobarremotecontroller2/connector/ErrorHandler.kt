@@ -67,10 +67,15 @@ class ErrorHandler(private val vm: AppViewModel) {
             healing = true
             CoroutineScope(Dispatchers.IO).launch {
                 try {
-                    println("FOOB Healing")
-                    delay(10000L)
-                    withContext(Dispatchers.Main) { reset() }
-                    println("FOOB Healing finished")
+                    while (true) {
+                        println("FOOB Healing")
+                        delay(10000L)
+                        if (!vm.askForPassword) {
+                            withContext(Dispatchers.Main) { reset() }
+                            println("FOOB Healing finished")
+                            break
+                        }
+                    }
                 } catch (_: Exception) {
                 }
             }

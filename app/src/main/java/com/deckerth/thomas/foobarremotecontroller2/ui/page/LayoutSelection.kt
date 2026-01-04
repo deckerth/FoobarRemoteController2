@@ -45,5 +45,5 @@ fun LayoutSelection(appViewModel: AppViewModel) {
 )
 @Composable
 fun LayoutSelectionPreview() {
-    LayoutSelection(AppViewModel())
+    LayoutSelection(AppViewModel("Preview"))
 }

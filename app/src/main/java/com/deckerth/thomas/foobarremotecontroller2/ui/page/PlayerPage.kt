@@ -159,10 +159,10 @@ fun onRefresh(vm: AppViewModel) {
 fun PlayerButtons(
     vm: AppViewModel,
     player: Player,
+    modifier: Modifier = Modifier,
     onPreviousTrack: () -> Unit = { vm.playerAccess.previousTrack() },
     onNextTrack: () -> Unit = { vm.playerAccess.nextTrack() },
-    previewMode: Boolean = false,
-    modifier: Modifier = Modifier
+    previewMode: Boolean = false
 ) {
     Spacer(modifier = Modifier.height(10.dp))
     Row(
@@ -372,10 +372,10 @@ fun PlayerCard(
                     PlayerButtons(
                         vm,
                         player,
+                        modifier = Modifier.padding(bottom = 24.dp),
                         onPreviousTrack,
                         onNextTrack,
-                        previewMode,
-                        modifier = Modifier.padding(bottom = 24.dp)
+                        previewMode
                     )
                 else
                     PlayerButtons(vm, player, modifier = Modifier.padding(bottom = 24.dp))
@@ -416,7 +416,7 @@ fun PlayerCardPreview() {
     Foobar2000RemoteControllerTheme {
         Surface {
             PlayerCard(
-                vm = AppViewModel(),
+                vm = AppViewModel("Preview"),
                 player = Player(
                     "label",
                     "xyz",

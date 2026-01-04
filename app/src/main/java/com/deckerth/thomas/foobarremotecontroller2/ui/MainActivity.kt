@@ -130,7 +130,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         mainActivity = this
 
-        appViewModel = AppViewModel()
+        appViewModel = AppViewModel("MainActivity")
         appViewModel.initialize()
 
         //start FoobarMediaSessionService

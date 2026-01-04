@@ -506,7 +506,7 @@ fun AlbumCardPreview() {
     //fields.items.add(LayoutItem(LayoutItems.COMPOSER, ItemSize.BODY_SMALL))
 
     //val layout = Layout(playerLayout = fields, albumLayout = fields, titleLayout = fields)
-    AlbumCard(AppViewModel(), album, null)
+    AlbumCard(AppViewModel("Preview"), album, null)
 }
 
 @Preview(showBackground = true)
@@ -541,7 +541,7 @@ fun AlbumCardPreview2() {
     //fields.items.add(LayoutItem(LayoutItems.COMPOSER, ItemSize.BODY_SMALL))
 
     //val layout = Layout(playerLayout = fields, albumLayout = fields, titleLayout = fields)
-    AlbumCard(AppViewModel(), album, null)
+    AlbumCard(AppViewModel("Preview"), album, null)
 }
 
 @Composable
@@ -713,7 +713,7 @@ fun PlaylistSwitcherPreview() {
             "p4", "name4", false, 10
         )
     )
-    PlaylistSwitcher(AppViewModel(), playlists = playlists)
+    PlaylistSwitcher(AppViewModel("Preview"), playlists = playlists)
 }
 
 
@@ -774,7 +774,7 @@ fun PlaylistPreview() {
 //        }
         Column {
             PlaylistSwitcherPreview()
-            Playlist(AppViewModel(), playlist)
+            Playlist(AppViewModel("Preview"), playlist)
         }
     }
 }

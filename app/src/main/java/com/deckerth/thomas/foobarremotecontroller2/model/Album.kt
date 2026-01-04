@@ -6,7 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.state.ToggleableState
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.TitleFilter
-import com.deckerth.thomas.foobarremotecontroller2.viewmodel.viewModelInstance
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.appViewModel
 
 data class SelectableTitle(val album: Album, val details: ITitle) {
     var isSelected by mutableStateOf(false)
@@ -45,9 +45,9 @@ data class Album(
     fun setIsSelected(value: ToggleableState) {
         isSelected = value
         if (value == ToggleableState.On)
-            for (title in _tracks) title.setSelected(viewModelInstance!!, true)
+            for (title in _tracks) title.setSelected(appViewModel!!, true)
         else if (value == ToggleableState.Off)
-            for (title in _tracks) title.setSelected(viewModelInstance!!, false)
+            for (title in _tracks) title.setSelected(appViewModel!!, false)
     }
 
     fun adjustIsSelected() {

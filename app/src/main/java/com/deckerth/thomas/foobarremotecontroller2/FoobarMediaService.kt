@@ -16,7 +16,8 @@ import android.support.v4.media.session.PlaybackStateCompat
 import androidx.core.app.NotificationCompat
 import androidx.media.VolumeProviderCompat
 import androidx.media.app.NotificationCompat.MediaStyle
-import com.deckerth.thomas.foobarremotecontroller2.viewmodel.viewModelInstance
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.appViewModel
 import kotlinx.coroutines.runBlocking
 import java.time.Instant
 
@@ -27,42 +28,44 @@ var lastChanged: Instant = Instant.now()
 
 
 fun enableVolumeControl() {
-    if(mediaSession != null) {
-         mediaSession!!.setPlaybackToRemote(volumeProvider)
+    if (mediaSession != null) {
+        mediaSession!!.setPlaybackToRemote(volumeProvider)
     }
 }
 
 class FoobarMediaService : Service() {
     private lateinit var audioManager: AudioManager
+    private lateinit var viewModelInstance: AppViewModel
 
-    private val audioFocusRequest: AudioFocusRequest = AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
-        .setOnAudioFocusChangeListener { focusChange ->
-            var pause: Boolean
-            runBlocking {
-                pause = getPauseDuringPhoneCallsBlocking()
+    private val audioFocusRequest: AudioFocusRequest =
+        AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
+            .setOnAudioFocusChangeListener { focusChange ->
+                var pause: Boolean
+                runBlocking {
+                    pause = getPauseDuringPhoneCallsBlocking()
+                }
+
+                if (pause)
+                    when (focusChange) {
+                        AudioManager.AUDIOFOCUS_LOSS_TRANSIENT -> {
+                            viewModelInstance.playerAccess.pausePlayback()
+                            // Handle audio focus loss (e.g., stop playback)
+                        }
+
+                        AudioManager.AUDIOFOCUS_GAIN -> {
+                            viewModelInstance.playerAccess.startPlayback()
+                            // Handle audio focus gain (e.g., resume playback)
+                        }
+                    }
             }
 
-            if (pause)
-                when (focusChange) {
-                    AudioManager.AUDIOFOCUS_LOSS_TRANSIENT -> {
-                        viewModelInstance?.playerAccess?.pausePlayback()
-                        // Handle audio focus loss (e.g., stop playback)
-                    }
-
-                    AudioManager.AUDIOFOCUS_GAIN -> {
-                        viewModelInstance?.playerAccess?.startPlayback()
-                        // Handle audio focus gain (e.g., resume playback)
-                    }
-                }
-        }
-
-        .setAudioAttributes(
-            AudioAttributes.Builder()
-                .setUsage(USAGE_MEDIA)
-                .setContentType(CONTENT_TYPE_MUSIC)
-                .build()
-        )
-        .build()
+            .setAudioAttributes(
+                AudioAttributes.Builder()
+                    .setUsage(USAGE_MEDIA)
+                    .setContentType(CONTENT_TYPE_MUSIC)
+                    .build()
+            )
+            .build()
 
     companion object {
         const val CHANNEL_ID = "MediaServiceChannel"
@@ -73,6 +76,12 @@ class FoobarMediaService : Service() {
         super.onCreate()
 
         foobarMediaService = this
+
+        if (appViewModel == null) {
+            viewModelInstance = AppViewModel("FoobarMediaService")
+            viewModelInstance.initialize()
+        } else
+            viewModelInstance = appViewModel!!
 
         // Initialize AudioManager and MediaSessionCompat
         audioManager = getSystemService(AUDIO_SERVICE) as AudioManager
@@ -95,24 +104,24 @@ class FoobarMediaService : Service() {
             setCallback(object : MediaSessionCompat.Callback() {
                 override fun onPlay() {
                     // Handle play action
-                    viewModelInstance?.playerAccess?.startPlayback()
+                    viewModelInstance.playerAccess.startPlayback()
                     //updateNotification(true)
                 }
 
                 override fun onPause() {
                     // Handle pause action
-                    viewModelInstance?.playerAccess?.pausePlayback()
+                    viewModelInstance.playerAccess.pausePlayback()
                     //updateNotification(false)
                 }
 
                 override fun onSkipToNext() {
                     // Handle skip to next action
-                    viewModelInstance?.playerAccess?.nextTrack()
+                    viewModelInstance.playerAccess.nextTrack()
                 }
 
                 override fun onSkipToPrevious() {
                     // Handle skip to previous action
-                    viewModelInstance?.playerAccess?.previousTrack()
+                    viewModelInstance.playerAccess.previousTrack()
                 }
             })
 
@@ -121,20 +130,22 @@ class FoobarMediaService : Service() {
             volumeProvider = object : VolumeProviderCompat(
                 VOLUME_CONTROL_ABSOLUTE,
                 100, // Max volume
-                viewModelInstance?.foobVolumeControl!!.currentValuePercent
+                viewModelInstance.foobVolumeControl.currentValuePercent
             ) {
                 override fun onSetVolumeTo(volume: Int) {
                     lastChanged = Instant.now()
                     currentVolume = volume
-                    viewModelInstance?.foobVolumeControl!!.value = viewModelInstance?.foobVolumeControl!!.getDecibelValue(currentVolume)
-                    viewModelInstance?.playerAccess!!.setVolume(viewModelInstance?.foobVolumeControl!!.value)
+                    viewModelInstance.foobVolumeControl.value =
+                        viewModelInstance.foobVolumeControl.getDecibelValue(currentVolume)
+                    viewModelInstance.playerAccess.setVolume(viewModelInstance.foobVolumeControl.value)
                 }
 
                 override fun onAdjustVolume(direction: Int) {
                     lastChanged = Instant.now()
                     currentVolume += direction
-                    viewModelInstance?.foobVolumeControl!!.value = viewModelInstance?.foobVolumeControl!!.getDecibelValue(currentVolume)
-                    viewModelInstance?.playerAccess!!.setVolume(viewModelInstance?.foobVolumeControl!!.value)
+                    viewModelInstance.foobVolumeControl.value =
+                        viewModelInstance.foobVolumeControl.getDecibelValue(currentVolume)
+                    viewModelInstance.playerAccess.setVolume(viewModelInstance.foobVolumeControl.value)
                 }
             }
 

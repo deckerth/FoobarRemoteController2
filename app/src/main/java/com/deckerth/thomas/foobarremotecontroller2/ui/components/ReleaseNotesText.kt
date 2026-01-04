@@ -38,18 +38,18 @@ private fun getReleaseNotes(appVersion: String?, withSettingsNote: Boolean) : An
         withStyle(textStyle) {
             append(stringResource(R.string.release_notes_1_text) + "\n\n")
         }
-        withStyle(titleStyle) {
-            append(stringResource(R.string.release_notes_2_header) + "\n\n")
-        }
-        withStyle(textStyle) {
-            append(stringResource(R.string.release_notes_2_text) + "\n\n\n")
-        }
-        withStyle(titleStyle) {
-            append(stringResource(R.string.release_notes_3_header) + "\n\n")
-        }
-        withStyle(textStyle) {
-            append(stringResource(R.string.release_notes_3_text) + "\n\n\n")
-        }
+//        withStyle(titleStyle) {
+//            append(stringResource(R.string.release_notes_2_header) + "\n\n")
+//        }
+//        withStyle(textStyle) {
+//            append(stringResource(R.string.release_notes_2_text) + "\n\n\n")
+//        }
+//        withStyle(titleStyle) {
+//            append(stringResource(R.string.release_notes_3_header) + "\n\n")
+//        }
+//        withStyle(textStyle) {
+//            append(stringResource(R.string.release_notes_3_text) + "\n\n\n")
+//        }
         if (withSettingsNote)
             withStyle(smallTextStyle) {
                 append(stringResource(R.string.release_notes_remark) + "\n")
@@ -85,7 +85,7 @@ private fun dismiss(vm: AppViewModel, appVersion: String?) {
 @Composable
 fun ReleaseNotes(vm: AppViewModel) {
 
-    val releaseNotesValidity = "2512.2"
+    val releaseNotesValidity = "2601"
 
     var appVersion by remember {
         mutableStateOf(

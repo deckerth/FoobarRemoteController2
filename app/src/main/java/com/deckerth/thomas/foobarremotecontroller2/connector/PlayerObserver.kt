@@ -1,16 +1,11 @@
 package com.deckerth.thomas.foobarremotecontroller2.connector
 
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
-import com.deckerth.thomas.foobarremotecontroller2.viewmodel.PlaylistsViewModel
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledFuture
 import java.util.concurrent.TimeUnit
 
-class PlayerObserver(
-    private val vm: AppViewModel,
-    private val playlistAccess: PlaylistAccess,
-    private val playlistsViewModel: PlaylistsViewModel
-) {
+class PlayerObserver(private val vm: AppViewModel) {
 
     var observer: ScheduledFuture<*>? = null
 
@@ -34,7 +29,7 @@ class PlayerObserver(
                     vm.player = null
                 }
 
-            }, 0, 1, TimeUnit.SECONDS)
+            }, 0, 800, TimeUnit.MILLISECONDS)
 
         } catch (e: Exception) {
             e.printStackTrace()

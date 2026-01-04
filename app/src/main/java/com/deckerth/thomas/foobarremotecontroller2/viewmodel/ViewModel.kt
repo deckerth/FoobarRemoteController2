@@ -26,23 +26,17 @@ import com.deckerth.thomas.foobarremotecontroller2.ui.layout.ViewsWithLayout
 import com.deckerth.thomas.foobarremotecontroller2.ui.theme.updateColorScheme
 import kotlin.math.floor
 
-private var instance: AppViewModel? = null
-val viewModelInstance: AppViewModel? get() {
-    if (instance == null) {
-        instance = AppViewModel()
-        instance!!.initialize()
-    }
-    return instance!!
-}
+var appViewModel: AppViewModel? = null
 
 enum class PlaylistEditOperation {
     REMOVE, COPY, ADD_TO_PLAYBACK_QUEUE
 }
 
-class AppViewModel : ViewModel() {
+class AppViewModel(val owner : String) : ViewModel() {
 
     init {
-        instance = this
+        appViewModel = this
+        println("FOOBQUERY($owner) View model created")
     }
 
     var ipAddress: String? = null

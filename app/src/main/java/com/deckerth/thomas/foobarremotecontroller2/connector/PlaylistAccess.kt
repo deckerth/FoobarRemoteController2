@@ -19,11 +19,11 @@ class PlaylistAccess(private val vm: AppViewModel) {
     var playlists: Playlists? = null  // is set by QueryAccess
         set(value) {
             if (value != null && value.ipAddress == vm.ipAddress) {
-                if (vm.player != null)
-                    if (vm.autoscroll && vm.player!!.playlistId.isNotEmpty() && vm.player!!.playlistId != vm.selectedPlaylist)
-                        vm.playlistsViewModel.setSelectedPlaylist(vm.player!!.playlistId)
-                    else if (vm.selectedPlaylist.isEmpty() && value.currentPlaylist != null)
-                        vm.playlistsViewModel.setSelectedPlaylist(value.currentPlaylist.playlistId)
+//                if (vm.player != null)
+//                    if (vm.autoscroll && vm.player!!.playlistId.isNotEmpty() && vm.player!!.playlistId != vm.selectedPlaylist)
+//                        vm.playlistsViewModel.setSelectedPlaylist(vm.player!!.playlistId)
+//                    else if (vm.selectedPlaylist.isEmpty() && value.currentPlaylist != null)
+//                        vm.playlistsViewModel.setSelectedPlaylist(value.currentPlaylist.playlistId)
 
                 vm.playlistsViewModel.setPlaylists(value)
                 field = value

@@ -20,10 +20,13 @@ class QueryAccess(val vm: AppViewModel) {
     private var restart = false
     private var playlistId = ""
     private var isListening = false
+    private var isReading = false
 
     val currentProcessId = Process.myPid()
     val currentInstanceNumber = instanceCounter++
 
+    private var urlConnection: HttpURLConnection? = null
+    private var reader: BufferedReader? = null
     fun addListener(listener: (AppViewModel, String, String, JSONObject) -> Unit) {
         listeners.add(listener)
     }
@@ -44,14 +47,17 @@ class QueryAccess(val vm: AppViewModel) {
             println("FOOBQUERY(${vm.owner}) Started. Process ID: $currentProcessId, Instance: $currentInstanceNumber")
 
             var url: URL
-            var urlConnection: HttpURLConnection? = null
-            var reader: BufferedReader? = null
+            var usedIpAddress = ""
 
             try {
                 while (!endListening) {
                     restart = false
 
-                    val usedIpAddress = vm.ipAddress
+                    if (vm.ipAddress == null) break
+                    if (vm.ipAddress!! != usedIpAddress)
+                        playlistId = ""
+                    usedIpAddress = vm.ipAddress!!
+
                     var endpoint =
                         "query/updates?player=true&" +
                                 "trcolumns=" +
@@ -65,20 +71,30 @@ class QueryAccess(val vm: AppViewModel) {
                     url = URL(vm.connector.serverAddress(usedIpAddress) + endpoint)
                     //open an URL connection
                     urlConnection = url.openConnection() as HttpURLConnection
-                    vm.connector.setCredentials(urlConnection, vm)
+                    vm.connector.setCredentials(urlConnection!!, vm)
 
                     val connectionResponse =
-                        urlConnection.responseCode  // 401 -> Unauthorized, 200 -> OK
+                        urlConnection!!.responseCode  // 401 -> Unauthorized, 200 -> OK
                     println("FOOBQUERY(${vm.owner}) response: $connectionResponse")
                     if (connectionResponse == NOT_AUTHORIZED) {
                         throw IOException("Unauthorized")
                     } else if (connectionResponse == NO_CONNECTION)
                         throw IOException("No connection")
                     else if (connectionResponse in 200..299) {
-                        reader = BufferedReader(InputStreamReader(urlConnection.inputStream))
+                        reader = BufferedReader(InputStreamReader(urlConnection!!.inputStream))
 
                         while (!endListening && !restart) {
-                            val line = reader.readLine() ?: break
+                            var line = ""
+                            try {
+                                isReading = true
+                                line = reader!!.readLine() ?: break
+                                isReading = false
+                            } catch (e: Exception) {
+                                break
+                            }
+
+                            if (usedIpAddress != vm.ipAddress) restart = true
+
                             if (!endListening && !restart && line.startsWith("data: ")) {
                                 val data = line.removePrefix("data: ")
                                 if (data != "{}") {
@@ -86,7 +102,7 @@ class QueryAccess(val vm: AppViewModel) {
                                     listeners.forEach { t ->
                                         t(
                                             vm,
-                                            usedIpAddress!!,
+                                            usedIpAddress,
                                             playlistId,
                                             json
                                         )
@@ -94,6 +110,7 @@ class QueryAccess(val vm: AppViewModel) {
                                 }
                             }
                         }
+                        isReading = false
                         if (!endListening && !restart) {
                             println("FOOBQUERY(${vm.owner}) listener ended irregularly, restarting...")
                         } else if (restart) {
@@ -135,10 +152,16 @@ class QueryAccess(val vm: AppViewModel) {
     }
 
     fun startOrRestart() {
-        if (isListening)
+        if (isListening) {
+            val isBlocked = isReading
             restart = true
-        else
+            if (isBlocked)
+                urlConnection?.disconnect()  // terminate reader
+        } else {
+            isListening = true
             start()
+        }
+
     }
 }
 
@@ -152,8 +175,11 @@ fun startQueryAccess(vm: AppViewModel) {
                 setPlaylist(vm.displayedPlaylist!!.playlistEntity.playlistId)
             start()
         }
-    else
+    else {
+        vm.queryAccess!!.setPlaylist("")
         vm.queryAccess!!.startOrRestart()
+    }
+
 }
 
 fun analyzePlayer(

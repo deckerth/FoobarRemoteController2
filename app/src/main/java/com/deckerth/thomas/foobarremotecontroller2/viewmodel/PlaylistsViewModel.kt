@@ -86,7 +86,9 @@ class PlaylistsViewModel(private val vm: AppViewModel) : ViewModel() {
         get() {
             val playlists = Playlists()
             for (list in playlistRegistry)
-                if (list.lifecycleState != PlaylistLifecycleState.Invalid)
+                if (list.ipAddress == vm.ipAddress &&
+                    list.lifecycleState != PlaylistLifecycleState.Invalid
+                )
                     playlists.addPlaylistEntity(list.playlistEntity)
             return playlists
         }
@@ -105,7 +107,7 @@ class PlaylistsViewModel(private val vm: AppViewModel) : ViewModel() {
                 var count = 0
                 do {
                     val response = vm.connector.checkConnection(vm.ipAddress!!, vm)
-                    vm.valid = response == CONNECTED
+                    vm.ipAddressIsValid = response == CONNECTED
 
                     if (response == NOT_AUTHORIZED) {
                         vm.askForPassword = true
@@ -114,20 +116,20 @@ class PlaylistsViewModel(private val vm: AppViewModel) : ViewModel() {
                     }
 
                     count++
-                    if (!vm.valid) {
+                    if (!vm.ipAddressIsValid) {
                         Thread.sleep(500)
                     }
                     if (count > 20) {
                         break
                     }
-                } while (!vm.valid)
+                } while (!vm.ipAddressIsValid)
 
-                println("FOOBUPDATE ${vm.ipAddress} valid:${vm.valid}")
+                println("FOOBUPDATE ${vm.ipAddress} valid:${vm.ipAddressIsValid}")
 
                 playerObserver.observer?.cancel(true)
-                if (vm.valid) {
-                    playerObserver.startPlayerObserver()
+                if (vm.ipAddressIsValid) {
                     startQueryAccess(vm)
+                    playerObserver.startPlayerObserver()
                 }
             }
         }.start()
@@ -138,14 +140,13 @@ class PlaylistsViewModel(private val vm: AppViewModel) : ViewModel() {
         playlistRegistry.clear()
         vm.clearState()
         startPlayerObserver()
-        startQueryAccess(vm)
     }
 
     fun getPlaylist(id: String): Playlist {
         var list =
             if (playlistRegistry.isEmpty()) null else playlistRegistry.firstOrNull { it.playlistEntity.playlistId == id }
         if (list == null) {
-            list = Playlist(PlaylistEntity(id, "", false, 0))
+            list = Playlist(PlaylistEntity(id, "", false, 0)).apply { ipAddress = vm.ipAddress!! }
             playlistRegistry.add(list)
         }
         return list
@@ -162,40 +163,44 @@ class PlaylistsViewModel(private val vm: AppViewModel) : ViewModel() {
         // Clear changed playlists so that they are loaded from scratch
         for (newEntity in newPlaylists.playlists) {
             val currentEntry = getPlaylist(newEntity.playlistId)
-            if (newEntity.noOfTracks != currentEntry.playlistEntity.noOfTracks) {
-                if (vm.displayedPlaylist == null || vm.displayedPlaylist!!.playlistEntity.playlistId != newEntity.playlistId) {
-                    currentEntry.clear()
-                    println("FOOBUPDATE cleared for update: ${currentEntry.playlistEntity.playlistId}")
-                } else {
-                    // Do not clear the playlist if it is currently displayed.
-                    // It is set to invalid, and will later be loaded again when recompose begins.
-                    currentEntry.lifecycleState = PlaylistLifecycleState.RequiresUpdate
-                    println("FOOBUPDATE set RequiresUpdate: ${currentEntry.playlistEntity.playlistId}")
+            if (currentEntry.ipAddress == newPlaylists.ipAddress) {
+                if (newEntity.noOfTracks != currentEntry.playlistEntity.noOfTracks) {
+                    if (vm.displayedPlaylist == null || vm.displayedPlaylist!!.playlistEntity.playlistId != newEntity.playlistId) {
+                        currentEntry.clear()
+                        println("FOOBUPDATE cleared for update: ${currentEntry.playlistEntity.playlistId}")
+                    } else {
+                        // Do not clear the playlist if it is currently displayed.
+                        // It is set to invalid, and will later be loaded again when recompose begins.
+                        currentEntry.lifecycleState = PlaylistLifecycleState.RequiresUpdate
+                        println("FOOBUPDATE set RequiresUpdate: ${currentEntry.playlistEntity.playlistId}")
+                    }
                 }
-            }
-            // Update the current entry with the new data
-            currentEntry.playlistEntity.apply {
-                name = newEntity.name
-                isCurrent = newEntity.isCurrent
-                noOfTracks = newEntity.noOfTracks
-                if (vm.selectedPlaylist == currentEntry.playlistEntity.playlistId)
-                    vm.selectedPlaylistName = newEntity.name
-            }
+                // Update the current entry with the new data
+                currentEntry.playlistEntity.apply {
+                    name = newEntity.name
+                    isCurrent = newEntity.isCurrent
+                    noOfTracks = newEntity.noOfTracks
+                    if (vm.selectedPlaylist == currentEntry.playlistEntity.playlistId)
+                        vm.selectedPlaylistName = newEntity.name
+                }
 
-            if (vm.selectedPlaylist == "" && newEntity.playlistId == playingPlaylistId) {
-                // select first playlist setSelectedPlaylist(entity.playlistId)
-                vm.selectedPlaylist = newEntity.playlistId
-                vm.selectedPlaylistName = newEntity.name
-                vm.displayedPlaylist = getPlaylist(newEntity.playlistId) //.clone()
-                vm.queryAccess?.setPlaylist(newEntity.playlistId)
-                println("FOOBUPDATE setSelectedPlaylist: ${newEntity.playlistId}")
+                if (vm.selectedPlaylist == "" && newEntity.playlistId == playingPlaylistId) {
+                    // select first playlist setSelectedPlaylist(entity.playlistId)
+                    vm.selectedPlaylist = newEntity.playlistId
+                    vm.selectedPlaylistName = newEntity.name
+                    vm.displayedPlaylist = getPlaylist(newEntity.playlistId) //.clone()
+                    vm.queryAccess?.setPlaylist(newEntity.playlistId)
+                    println("FOOBUPDATE setSelectedPlaylist: ${newEntity.playlistId}")
+                }
             }
         }
 
         // process removed playlists
         for (currentList in playlistRegistry) {
             if (currentList.lifecycleState != PlaylistLifecycleState.Invalid &&
-                !newPlaylists.playlists.any { it.playlistId == currentList.playlistEntity.playlistId }) {
+                currentList.ipAddress == newPlaylists.ipAddress &&
+                !newPlaylists.playlists.any { it.playlistId == currentList.playlistEntity.playlistId }
+            ) {
                 currentList.playlistEntity.noOfTracks = 0
                 currentList.lifecycleState = PlaylistLifecycleState.Invalid
                 if (vm.selectedPlaylist == currentList.playlistEntity.playlistId) {
@@ -207,7 +212,7 @@ class PlaylistsViewModel(private val vm: AppViewModel) : ViewModel() {
         }
 
         // check if playing playlist is still current
-        if (vm.player != null && vm.player!!.playlistId.isNotEmpty()) {
+        if (vm.player != null && vm.player!!.playlistId.isNotEmpty() && vm.player!!.ipAddress == vm.ipAddress) {
             val playingList = getPlaylist(vm.player!!.playlistId)
             if (vm.player!!.getIndex() >= 0 && playingList.titles.count() > vm.player!!.getIndex()) {  // otherwise do not yet check
                 val playlistTitle = playingList.titles[vm.player!!.getIndex()]
@@ -217,12 +222,36 @@ class PlaylistsViewModel(private val vm: AppViewModel) : ViewModel() {
                     //  E.g.: Title: BR-KLASSIK vs. von Richard Wagner
                     //  So we omit the title check:
                     //  || playlistTitle.title != vm.player?.title) {
-                    val message = "FOOBUPDATE clearing changed playlist - Album: ${playlistTitle.album} vs. ${vm.player?.album} , Title: ${playlistTitle.title} vs. ${vm.player?.title}"
+                    val message =
+                        "FOOBUPDATE clearing changed playlist - Album: ${playlistTitle.album} vs. ${vm.player?.album} , Title: ${playlistTitle.title} vs. ${vm.player?.title}"
                     triggerPlaylistUpdate(playingList)
                     println(message)
                 }
             }
         }
+
+        // Follow autoscroll
+        if (vm.player != null && vm.player!!.ipAddress == vm.ipAddress &&
+            vm.autoscroll &&
+            vm.player!!.playlistId.isNotEmpty() && vm.player!!.playlistId != vm.selectedPlaylist  ) {
+            vm.selectedPlaylist = vm.player!!.playlistId
+            vm.displayedPlaylist = getPlaylist(vm.player!!.playlistId)
+            vm.selectedPlaylistName = vm.displayedPlaylist!!.playlistEntity.name
+            vm.queryAccess?.setPlaylist(vm.player!!.playlistId)
+        }
+
+        // If there is still no selected playlist, select the playlist that is selected in foobar
+        if (vm.selectedPlaylist.isEmpty()) {
+            val currentPlaylist = playlists.currentPlaylist
+            if (currentPlaylist != null) {
+                vm.selectedPlaylist = currentPlaylist.playlistId
+                vm.selectedPlaylistName = currentPlaylist.name
+                vm.displayedPlaylist = getPlaylist(currentPlaylist.playlistId)
+                vm.queryAccess?.setPlaylist(currentPlaylist.playlistId)
+                println("FOOBUPDATE setSelectedPlaylist: ${currentPlaylist.playlistId}")
+            }
+        }
+
         updatePlaylists()
     }
 
@@ -256,13 +285,14 @@ class PlaylistsViewModel(private val vm: AppViewModel) : ViewModel() {
 
     private fun updatePlaylist(playlist: Playlist) {
         vm.loadingList = true
-        println("FOOBUPDATE Playlist to be updated: ${playlist.playlistEntity.playlistId}")
+        println("FOOBUPDATE Playlist to be updated: ${playlist.playlistEntity.playlistId}(${playlist.ipAddress})")
 
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 var currentPlaylist: Playlist? = playlist
                 println("FOOBUPDATE starting updatePlaylist: ${currentPlaylist!!.playlistEntity.playlistId}, titles: ${currentPlaylist.titles.count()}")
                 do {
+                    if (playlist.ipAddress.isNotBlank() && playlist.ipAddress != vm.ipAddress) break
                     withContext(Dispatchers.Main) {
                         vm.loadingListProgress = currentPlaylist!!.titles.count()
                             .toFloat() / currentPlaylist.playlistEntity.noOfTracks
@@ -270,7 +300,11 @@ class PlaylistsViewModel(private val vm: AppViewModel) : ViewModel() {
                     // invariant: currentPlaylist is not null
                     val startIndex = currentPlaylist!!.titles.count()
                     val playlistPart = vm.playlistAccess
-                        .getPlaylist(currentPlaylist.playlistEntity, startIndex, getCreationOfNonEmptyPlaylistsBlocking())
+                        .getPlaylist(
+                            currentPlaylist.playlistEntity,
+                            startIndex,
+                            getCreationOfNonEmptyPlaylistsBlocking()
+                        )
                     // validity check
                     if (playlistPart != null && playlistPart.ipAddress == vm.ipAddress && currentPlaylist.titles.count() == startIndex) {
                         for (title in playlistPart.titles)
@@ -347,13 +381,15 @@ class PlaylistsViewModel(private val vm: AppViewModel) : ViewModel() {
                         vm.disableAddTitlesMode()
                         vm.playlistAccess.addPlaylist(
                             noOfValidPlaylists(),
-                            nameOfNewPlaylist )
+                            nameOfNewPlaylist
+                        )
                     }
 
                 } else
                     vm.playlistAccess.addPlaylist(
                         noOfValidPlaylists(),
-                        nameOfNewPlaylist)
+                        nameOfNewPlaylist
+                    )
 
                 withContext(Dispatchers.Main) {
                     Toast.makeText(

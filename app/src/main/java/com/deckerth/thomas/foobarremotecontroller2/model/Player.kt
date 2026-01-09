@@ -51,7 +51,10 @@ data class Player(
         try {
             val duration = this.duration.toFloat()
             val position = this.position.toFloat()
-            return position / duration * 1f
+            return if (duration == 0f)
+                0f
+            else
+                position / duration * 1f
         } catch (ex: NumberFormatException) {
             return 0f
         }

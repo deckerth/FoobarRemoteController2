@@ -32,7 +32,7 @@ enum class PlaylistEditOperation {
     REMOVE, COPY, ADD_TO_PLAYBACK_QUEUE
 }
 
-class AppViewModel(val owner : String) : ViewModel() {
+class AppViewModel(val owner: String) : ViewModel() {
 
     init {
         appViewModel = this
@@ -44,7 +44,7 @@ class AppViewModel(val owner : String) : ViewModel() {
     var user: String by mutableStateOf("")
     var password: String by mutableStateOf("")
     var connectionManager: ConnectionManager? by mutableStateOf(null)
-    var valid = false
+    var ipAddressIsValid = false
 
     var askForPassword by mutableStateOf(false)
 
@@ -88,7 +88,7 @@ class AppViewModel(val owner : String) : ViewModel() {
     var showReleaseNotes by mutableStateOf(false)
     var releaseNotesDisplayedForRelease by mutableStateOf("")
     fun initialize() {
-        credentialsManager = CredentialsManager(this )
+        credentialsManager = CredentialsManager(this)
         credentialsManager.initialize()
         connector = HTTPConnector()
         errorHandler = ErrorHandler(this)
@@ -160,8 +160,10 @@ class AppViewModel(val owner : String) : ViewModel() {
 
     fun updatePlayer() {
         val newPlayer = playerAccess.playerState
-        if (newPlayer != null && newPlayer.ipAddress != ipAddress) return
-        player = newPlayer
+        player = if (newPlayer != null && newPlayer.ipAddress != ipAddress)
+            null
+        else
+            newPlayer
         val currentAlbumIndex = getCurrentAlbumIndex()
         if (autoscroll && player != null &&
             displayedPlaylist != null &&
@@ -177,8 +179,10 @@ class AppViewModel(val owner : String) : ViewModel() {
                 PlaybackState.PLAYING -> PlaybackStateCompat.STATE_PLAYING
                 PlaybackState.PAUSED -> PlaybackStateCompat.STATE_PAUSED
             }
-            val durationSecs : Long = if (player!!.duration.isNotBlank()) (floor(player!!.duration.toDouble() * 1000)).toLong() else 0L
-            val positionSecs : Long = if (player!!.position.isNotBlank()) (floor(player!!.position.toDouble() * 1000)).toLong() else 0L
+            val durationSecs: Long =
+                if (player!!.duration.isNotBlank()) (floor(player!!.duration.toDouble() * 1000)).toLong() else 0L
+            val positionSecs: Long =
+                if (player!!.position.isNotBlank()) (floor(player!!.position.toDouble() * 1000)).toLong() else 0L
 
             if (player!!.getIndex() != -1) {
                 val bitmap = connector.getBitmapFromURL(player!!.artworkUrl, this)
@@ -220,7 +224,7 @@ class AppViewModel(val owner : String) : ViewModel() {
                         .putString(MediaMetadataCompat.METADATA_KEY_TITLE, player!!.title)
                         .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, player!!.artist)
                         .putLong(
-                            MediaMetadataCompat.METADATA_KEY_DURATION,durationSecs
+                            MediaMetadataCompat.METADATA_KEY_DURATION, durationSecs
                         )
                         .build()
                 )

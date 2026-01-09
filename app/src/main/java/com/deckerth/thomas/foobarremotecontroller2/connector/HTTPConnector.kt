@@ -42,40 +42,6 @@ open class HTTPConnector() {
         }
     }
 
-//    fun getData(endpoint: String): Response {
-//        // Fetch data from the API in the background.
-//        val response = Response(vm.ipAddress!!)
-//        val url: URL
-//        try {
-//            url = URL(serverAddress(response.usedIpAddress) + endpoint)
-//            val client = OkHttpClient()
-//            val request = Request.Builder()
-//                .url(url)
-//                .header(
-//                    "Authorization",
-//                    basicAuthHeader(
-//                        vm.credentialsManager.getUser(),
-//                        vm.credentialsManager.getPassword()
-//                    )
-//                )
-//                .build()
-//            val responseFromAPI = client.newCall(request).execute()
-//            if (responseFromAPI.body == null)
-//                throw IOException("Response body is null")
-//            response.message = responseFromAPI.body!!.string()
-//            return response
-//        } catch (e: Exception) {
-//            e.printStackTrace()
-//            vm.errorHandler.logError(
-//                ErrorType.NETWORK,
-//                ErrorCode.CONNECTION_ERROR,
-//                ErrorSource.HTTP_CONNECTOR,
-//                e
-//            )
-//            throw e
-//        }
-//    }
-
     fun getData(endpoint: String, vm: AppViewModel): Response {
         // Fetch data from the API in the background.
         val response = Response(vm.ipAddress!!)
@@ -96,6 +62,7 @@ open class HTTPConnector() {
             } else {
                 // Uncommenting the following can cause issues
                 println("FOOB $url ")
+
                 val inputStream = urlConnection.inputStream
                 val isw = InputStreamReader(inputStream)
                 var data = isw.read()
@@ -137,7 +104,7 @@ open class HTTPConnector() {
         if (!checkIpAddressSyntax(ip)) return NO_CONNECTION
         try {
             val url = URL("http://$ip/api/playlists")
-            println("FOOB \"http://$ip/api/playlists\"")
+            println("FOOB checkConnection \"http://$ip/api/playlists\"")
             //open a URL connection
             val urlConnection = url.openConnection() as HttpURLConnection
             setCredentials(urlConnection, vm)

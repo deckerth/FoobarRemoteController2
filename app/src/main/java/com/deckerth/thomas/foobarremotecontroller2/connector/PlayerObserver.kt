@@ -19,8 +19,18 @@ class PlayerObserver(private val vm: AppViewModel) {
                 if (!vm.errorHandler.sick())
                     try {
                         vm.updatePlayer()
+
+                        // Delayed playlist update:
+                        // A typical scenario:
+                        // PlaylistAccess gets new playlists, and it turns out that the currently
+                        // displayed playlist needs to be updated. A direct update may terminate the
+                        // app if Compose is just rendering the current playlist.
+                        // In this case, the list is only marked that it requires an update.
+                        // When Compose starts to render the playlist the next time, this is detected,
+                        // and instead of rendering the list, displayedPlaylist is cleared, and can therefore
+                        // now be updated. This call in the player loop triggers this update
                         if (vm.playlistAccess.playlists != null)
-                            vm.playlistsViewModel.setPlaylists(vm.playlistAccess.playlists!!) // for delayed playlist update
+                            vm.playlistsViewModel.setPlaylists(vm.playlistAccess.playlists!!)
                     } catch (e: Exception) {
                         e.printStackTrace()
                     }

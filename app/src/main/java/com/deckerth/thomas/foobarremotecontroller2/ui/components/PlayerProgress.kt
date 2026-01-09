@@ -85,10 +85,15 @@ fun PlayerProgress(vm: AppViewModel, player: Player) {
             modifier = Modifier
                 .fillMaxWidth(),
             track = { sliderState ->
-
-                // Calculate fraction of the slider that is active
-                val fraction =
-                    (sliderState.value - sliderState.valueRange.start) / (sliderState.valueRange.endInclusive - sliderState.valueRange.start)
+                var fraction = 0f
+                try {
+                    // Calculate fraction of the slider that is active
+                    fraction =
+                        (sliderState.value - sliderState.valueRange.start) / (sliderState.valueRange.endInclusive - sliderState.valueRange.start)
+                } catch (e: ArithmeticException) {
+                }
+                if (fraction.isNaN())
+                    fraction = 0f
 
                 Box(Modifier.fillMaxWidth()) {
                     Box(

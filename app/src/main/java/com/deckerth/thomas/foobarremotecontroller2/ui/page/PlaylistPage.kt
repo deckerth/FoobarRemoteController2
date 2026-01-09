@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -369,7 +368,6 @@ fun AlbumCard(vm: AppViewModel, album: Album, layout: Layout?, previewMode: Bool
                     modifier = Modifier
                         .weight(1f)
                         .padding(horizontal = 16.dp)
-                        .height(80.dp)
                 ) {
                     if (layout != null) for (item in layout.albumLayout.items) {
                         LayoutComponent(album, item)

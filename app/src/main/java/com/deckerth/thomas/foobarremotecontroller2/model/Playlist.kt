@@ -160,7 +160,10 @@ class Playlist(var playlistEntity: PlaylistEntity) {
             currentAlbum.addTitle(title)
         } else {
             var currentAlbum = albums[albums.count() - 1]
-            if (title.album == currentAlbum.originalTitle.album) {
+            if (title.album == currentAlbum.originalTitle.album &&
+                (title.title != currentAlbum.originalTitle.title ||
+                        title.artist == currentAlbum.originalTitle.artist)
+            ) {
                 currentAlbum.addTitle(title)
             } else {
                 currentAlbum = Album(title)
@@ -356,7 +359,8 @@ class Playlist(var playlistEntity: PlaylistEntity) {
 
     fun removeAlbumFromPlaylist(
         vm: AppViewModel,
-        album: Album ) {
+        album: Album
+    ) {
         CoroutineScope(Dispatchers.IO).launch {
             val indexes: MutableList<Int> = ArrayList<Int>()
             for (title in album.tracks)

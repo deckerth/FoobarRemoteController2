@@ -111,7 +111,7 @@ class PlaylistsViewModel(private val vm: AppViewModel) : ViewModel() {
 
                     if (response == NOT_AUTHORIZED) {
                         vm.askForPassword = true
-                        vm.player = null
+                        vm.playerViewModel.valid = false
                         break
                     }
 
@@ -156,8 +156,8 @@ class PlaylistsViewModel(private val vm: AppViewModel) : ViewModel() {
         // update registry
         var playingPlaylistId = ""
 
-        if (vm.player != null)
-            playingPlaylistId = vm.player!!.playlistId
+        if (vm.playerViewModel.valid)
+            playingPlaylistId = vm.playerViewModel.playlistId
 
         // Check if any playlist has now a different number of tracks than before
         // Clear changed playlists so that they are loaded from scratch
@@ -212,18 +212,18 @@ class PlaylistsViewModel(private val vm: AppViewModel) : ViewModel() {
         }
 
         // check if playing playlist is still current
-        if (vm.player != null && vm.player!!.playlistId.isNotEmpty() && vm.player!!.ipAddress == vm.ipAddress) {
-            val playingList = getPlaylist(vm.player!!.playlistId)
-            if (vm.player!!.getIndex() >= 0 && playingList.titles.count() > vm.player!!.getIndex()) {  // otherwise do not yet check
-                val playlistTitle = playingList.titles[vm.player!!.getIndex()]
-                if (playlistTitle.album != vm.player?.album) {
+        if (vm.playerViewModel.valid && vm.playerViewModel.playlistId.isNotEmpty() && vm.playerViewModel.ipAddress == vm.ipAddress) {
+            val playingList = getPlaylist(vm.playerViewModel.playlistId)
+            if (vm.playerViewModel.getIndex() >= 0 && playingList.titles.count() > vm.playerViewModel.getIndex()) {  // otherwise do not yet check
+                val playlistTitle = playingList.titles[vm.playerViewModel.getIndex()]
+                if (playlistTitle.album != vm.playerViewModel.album) {
                     //  Internet playlists have different titles in the playlist as
                     //  they are sent to the player.
                     //  E.g.: Title: BR-KLASSIK vs. von Richard Wagner
                     //  So we omit the title check:
                     //  || playlistTitle.title != vm.player?.title) {
                     val message =
-                        "FOOBUPDATE clearing changed playlist - Album: ${playlistTitle.album} vs. ${vm.player?.album} , Title: ${playlistTitle.title} vs. ${vm.player?.title}"
+                        "FOOBUPDATE clearing changed playlist - Album: ${playlistTitle.album} vs. ${vm.playerViewModel.album} , Title: ${playlistTitle.title} vs. ${vm.playerViewModel.title}"
                     triggerPlaylistUpdate(playingList)
                     println(message)
                 }
@@ -231,13 +231,13 @@ class PlaylistsViewModel(private val vm: AppViewModel) : ViewModel() {
         }
 
         // Follow autoscroll
-        if (vm.player != null && vm.player!!.ipAddress == vm.ipAddress &&
+        if (vm.playerViewModel.valid && vm.playerViewModel.ipAddress == vm.ipAddress &&
             vm.autoscroll &&
-            vm.player!!.playlistId.isNotEmpty() && vm.player!!.playlistId != vm.selectedPlaylist  ) {
-            vm.selectedPlaylist = vm.player!!.playlistId
-            vm.displayedPlaylist = getPlaylist(vm.player!!.playlistId)
+            vm.playerViewModel.playlistId.isNotEmpty() && vm.playerViewModel.playlistId != vm.selectedPlaylist  ) {
+            vm.selectedPlaylist = vm.playerViewModel.playlistId
+            vm.displayedPlaylist = getPlaylist(vm.playerViewModel.playlistId)
             vm.selectedPlaylistName = vm.displayedPlaylist!!.playlistEntity.name
-            vm.queryAccess?.setPlaylist(vm.player!!.playlistId)
+            vm.queryAccess?.setPlaylist(vm.playerViewModel.playlistId)
         }
 
         // If there is still no selected playlist, select the playlist that is selected in foobar
@@ -263,9 +263,9 @@ class PlaylistsViewModel(private val vm: AppViewModel) : ViewModel() {
                 return selected
         }
         // check player
-        if (vm.player != null && vm.player!!.playlistId.isNotBlank()) {
-            if (vm.player!!.playlistId != vm.selectedPlaylist) {
-                val played = getPlaylist(vm.player!!.playlistId)
+        if (vm.playerViewModel.valid && vm.playerViewModel.playlistId.isNotBlank()) {
+            if (vm.playerViewModel.playlistId != vm.selectedPlaylist) {
+                val played = getPlaylist(vm.playerViewModel.playlistId)
                 if (played.lifecycleState == PlaylistLifecycleState.Valid && played.titles.count() < played.playlistEntity.noOfTracks)
                     return played
             }

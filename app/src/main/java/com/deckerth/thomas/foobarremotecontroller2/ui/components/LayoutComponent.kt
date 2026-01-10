@@ -10,12 +10,12 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import com.deckerth.thomas.foobarremotecontroller2.model.Album
 import com.deckerth.thomas.foobarremotecontroller2.model.ITitle
-import com.deckerth.thomas.foobarremotecontroller2.model.Player
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.ItemSize
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.LayoutItem
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.LayoutItems
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.TextAlignment
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.PlayerViewModel
 
 @Composable
 fun getTextStyle(itemSize: ItemSize): TextStyle {
@@ -45,25 +45,25 @@ fun TextComponent(text: String, item: LayoutItem) {
 }
 
 @Composable
-fun LayoutComponent(vm: AppViewModel, player: Player, layoutItem: LayoutItem) {
+fun LayoutComponent(vm: AppViewModel, playerViewModel: PlayerViewModel, layoutItem: LayoutItem) {
     when (layoutItem.item) {
-        LayoutItems.LABEL -> TextComponent(text = player.label, item = layoutItem)
-        LayoutItems.CATALOG -> TextComponent(text = player.catalog, item = layoutItem)
+        LayoutItems.LABEL -> TextComponent(text = playerViewModel.label, item = layoutItem)
+        LayoutItems.CATALOG -> TextComponent(text = playerViewModel.catalog, item = layoutItem)
         LayoutItems.LABEL_CATALOG -> TextComponent(
-            text = player.label + " " + player.catalog,
+            text = playerViewModel.label + " " + playerViewModel.catalog,
             item = layoutItem
         )
 
-        LayoutItems.TITLE -> TextComponent(text = player.title, item = layoutItem)
-        LayoutItems.ALBUM -> TextComponent(text = player.album, item = layoutItem)
-        LayoutItems.ARTIST_TITLE -> TextComponent(text = player.artist + " - " + player.title, item = layoutItem)
-        LayoutItems.ARTIST -> TextComponent(text = player.artist, item = layoutItem)
-        LayoutItems.SAMPLE_RATE -> TextComponent(text = player.sampleRate+ " Hz", item = layoutItem)
-        LayoutItems.GENRE -> TextComponent(text = player.genre, item = layoutItem)
-        LayoutItems.PROGRESS -> PlayerProgress(vm, player)
+        LayoutItems.TITLE -> TextComponent(text = playerViewModel.title, item = layoutItem)
+        LayoutItems.ALBUM -> TextComponent(text = playerViewModel.album, item = layoutItem)
+        LayoutItems.ARTIST_TITLE -> TextComponent(text = playerViewModel.artist + " - " + playerViewModel.title, item = layoutItem)
+        LayoutItems.ARTIST -> TextComponent(text = playerViewModel.artist, item = layoutItem)
+        LayoutItems.SAMPLE_RATE -> TextComponent(text = playerViewModel.sampleRate+ " Hz", item = layoutItem)
+        LayoutItems.GENRE -> TextComponent(text = playerViewModel.genre, item = layoutItem)
+        LayoutItems.PROGRESS -> PlayerProgress(vm, playerViewModel)
         LayoutItems.COMPOSER ->
-            if (player.composer != "" && player.composer != "?") {
-                TextComponent(text = player.composer, item = layoutItem)
+            if (playerViewModel.composer != "" && playerViewModel.composer != "?") {
+                TextComponent(text = playerViewModel.composer, item = layoutItem)
             }
 
         else -> Text("UNKNOWN ITEM")

@@ -3,76 +3,23 @@ package com.deckerth.thomas.foobarremotecontroller2.connector
 import com.deckerth.thomas.foobarremotecontroller2.lastChanged
 import com.deckerth.thomas.foobarremotecontroller2.model.OutputDevice
 import com.deckerth.thomas.foobarremotecontroller2.model.OutputDevices
-import com.deckerth.thomas.foobarremotecontroller2.model.PlaybackMode
-import com.deckerth.thomas.foobarremotecontroller2.model.PlaybackState
-import com.deckerth.thomas.foobarremotecontroller2.model.Player
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.PlaybackMode
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.PlaybackState
 import com.deckerth.thomas.foobarremotecontroller2.volumeProvider
 import org.json.JSONException
 import org.json.JSONObject
 import java.time.Duration
 import java.time.Instant
-import java.util.Locale
-import kotlin.math.roundToInt
 
 class PlayerAccess(private val vm: AppViewModel) {
-    var playerState: Player?
-        get() {
-            if (lastKnownPlayerState == null) return null
-
-            val currentPlayer = lastKnownPlayerState!!.clonePlayer()
-
-            // update position
-            if (!currentPlayer.duration.isBlank() && currentPlayer.playbackState == PlaybackState.PLAYING) {
-                val duration = currentPlayer.duration.toFloat()
-                val position = currentPlayer.position.toFloat()
-
-                val now = System.currentTimeMillis()
-                val elapsedSeconds = (now - lastKnownPlayerState!!.timestamp) / 1000f
-                var newPosition = position + elapsedSeconds
-                if (newPosition > duration) newPosition = duration
-                currentPlayer.position = newPosition.toString()
-
-                val timeParts = currentPlayer.playbackTime.split(":")
-                if (timeParts.size == 2) {
-                    try {
-                        // Convert parts to numbers and calculate total seconds
-                        val minutes = timeParts[0].toLong()
-                        val seconds = timeParts[1].toLong()
-                        val currentTotalSeconds = (minutes * 60) + seconds
-
-                        var newTotalSeconds = currentTotalSeconds + elapsedSeconds
-                        if (newTotalSeconds > duration) newTotalSeconds = duration
-
-                        val newPlaybackTimeSeconds = newTotalSeconds.roundToInt()
-
-                        // Format the new total seconds back into a "minutes:seconds" string
-                        val newMinutes = newPlaybackTimeSeconds / 60
-                        val newSeconds = newPlaybackTimeSeconds % 60
-                        currentPlayer.playbackTime =
-                            String.format(Locale.getDefault(), "%d:%02d", newMinutes, newSeconds)
-
-                    } catch (e: NumberFormatException) {
-                        // Handle cases where the string is not in the expected format
-                        // For now, we'll just leave the original time
-                    }
-                }
-            }
-            return currentPlayer
-        }
-        set(playerState) {
-            lastKnownPlayerState = playerState
-            vm.updatePlayer()
-        }
 
     fun setPosition(position: Float?) {
         val jsonString = "{\"position\":$position}"
         vm.connector.postData("player/", jsonString, vm)
     }
 
-    private var lastKnownPlayerState: Player? = null
-
-    fun parsePlayerState(usedIpAddress: String, contentObject: JSONObject): Player? {
+    fun parsePlayerState(usedIpAddress: String, contentObject: JSONObject) {
         try {
             val playerObject = contentObject.getJSONObject("player")
             val activeItemObject = playerObject.getJSONObject("activeItem")
@@ -138,7 +85,7 @@ class PlayerAccess(private val vm: AppViewModel) {
                 ) + "/" + activeItemObject.getString("index")
                 else vm.connector.serverAddress(usedIpAddress) + "artwork/current"
                 if (title != filename) effectiveTitle = title
-                return Player(
+                vm.playerViewModel.update(
                     columns.getString(0),
                     columns.getString(1),
                     columns.getString(2),
@@ -159,27 +106,9 @@ class PlayerAccess(private val vm: AppViewModel) {
                     PlaybackMode.entries[playerObject.getInt("playbackMode")],
                     usedIpAddress, false
                 )
-            } else return Player(
-                "",
-                "",
-                "",
-                "",
-                "",
-                "",
-                "",
-                "",
-                "",
-                "",
-                "",
-                "",
-                "",
-                "",
-                "",
-                "",
-                playbackState,
-                PlaybackMode.entries[playerObject.getInt("playbackMode")],
-                usedIpAddress, false
-            )
+            } else {
+                vm.playerViewModel.valid = false
+            }
         } catch (e: JSONException) {
             e.printStackTrace()
             vm.errorHandler.logError(
@@ -188,7 +117,7 @@ class PlayerAccess(private val vm: AppViewModel) {
                 ErrorSource.PLAYER_STATE,
                 e
             )
-            return null
+            vm.playerViewModel.valid = false
         }
     }
 

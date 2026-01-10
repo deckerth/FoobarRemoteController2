@@ -84,7 +84,7 @@ class QueryAccess(val vm: AppViewModel) {
                         reader = BufferedReader(InputStreamReader(urlConnection!!.inputStream))
 
                         while (!endListening && !restart) {
-                            var line = ""
+                            var line: String
                             try {
                                 isReading = true
                                 line = reader!!.readLine() ?: break
@@ -198,7 +198,7 @@ fun analyzePlayer(
     println("FOOBQUERY(${vm.owner})  Current Title: ${columns.optString(0)}")
     println("FOOBQUERY(${vm.owner})    Duration: ${activeItem.optInt("duration")}")
     println("FOOBQUERY(${vm.owner})    Position: ${activeItem.optInt("position")}")
-    vm.playerAccess.playerState = vm.playerAccess.parsePlayerState(usedIpAddress, json)
+    vm.playerAccess.parsePlayerState(usedIpAddress, json)
 }
 
 fun analyzePlaylists(

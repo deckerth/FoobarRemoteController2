@@ -415,12 +415,12 @@ class MainActivity : ComponentActivity() {
                 if (appViewModel.autoscroll)
                     CoroutineScope(Dispatchers.Main).launch {
                         // Change the selected playlist if required
-                        if (appViewModel.player != null && appViewModel.displayedPlaylist != null &&
-                            appViewModel.player!!.playlistId != "" &&
-                            appViewModel.player!!.playlistId != appViewModel.displayedPlaylist?.playlistEntity!!.playlistId
+                        if (appViewModel.playerViewModel.valid && appViewModel.displayedPlaylist != null &&
+                            appViewModel.playerViewModel.playlistId != "" &&
+                            appViewModel.playerViewModel.playlistId != appViewModel.displayedPlaylist?.playlistEntity!!.playlistId
                         ) {
                             appViewModel.playlistsViewModel.setSelectedPlaylist(
-                                appViewModel.player!!.playlistId
+                                appViewModel.playerViewModel.playlistId
                             )
                         }
 

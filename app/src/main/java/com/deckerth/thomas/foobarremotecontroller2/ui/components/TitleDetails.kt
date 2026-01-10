@@ -72,10 +72,10 @@ fun TitleDetails(title: ITitle, onDismiss: () -> Unit) {
 
 @Composable
 fun TitleDetails(vm: AppViewModel, onDismiss: () -> Unit) {
-    if (vm.player == null) return
-    if (vm.player!!.playlistId.isEmpty() || vm.player!!.index.isEmpty()) return
-    val playlist = vm.playlistsViewModel.getPlaylist(vm.player!!.playlistId)
-    val title = playlist.getTitle(vm.player!!.index.toInt())
+    if (!vm.playerViewModel.valid) return
+    if (vm.playerViewModel.playlistId.isEmpty() || vm.playerViewModel.index.isEmpty()) return
+    val playlist = vm.playlistsViewModel.getPlaylist(vm.playerViewModel.playlistId)
+    val title = playlist.getTitle(vm.playerViewModel.index.toInt())
     if (title != null) {
         TitleDetails(title, onDismiss)
     }

@@ -1,5 +1,6 @@
 package com.deckerth.thomas.foobarremotecontroller2.ui.page
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
@@ -14,17 +15,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.deckerth.thomas.foobarremotecontroller2.R
-import com.deckerth.thomas.foobarremotecontroller2.model.PlaybackMode
-import com.deckerth.thomas.foobarremotecontroller2.model.PlaybackState
-import com.deckerth.thomas.foobarremotecontroller2.model.Player
 import com.deckerth.thomas.foobarremotecontroller2.model.Playlist
 import com.deckerth.thomas.foobarremotecontroller2.model.PlaylistEntity
 import com.deckerth.thomas.foobarremotecontroller2.model.Title
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.ViewsWithLayout
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.layoutManager
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.PlaybackMode
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.PlaybackState
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.PlayerViewModel
 
-val previewPlayerClassic = Player(
+val previewPlayerClassic = PlayerViewModel().apply { update(
     "Decca",
     "421 670-2",
     "Puccini, Giacomo",
@@ -43,10 +44,10 @@ val previewPlayerClassic = Player(
     R.drawable.cover_tosca.toString(),
     PlaybackState.PLAYING,
     PlaybackMode.DEFAULT,
-    ""
-)
+    "",
+    false) }
 
-val previewPlayerPop = Player(
+val previewPlayerPop = PlayerViewModel().apply { update(
     "Polydor",
     "517 007-2",
     "Björn Ulvaeus",
@@ -65,8 +66,10 @@ val previewPlayerPop = Player(
     R.drawable.cover_abba.toString(),
     PlaybackState.PLAYING,
     PlaybackMode.DEFAULT,
-    ""
-)
+    "",
+    false) }
+
+val previewPlayer = PlayerViewModel()
 
 val previewPlaylist = Playlist(PlaylistEntity("p4", "Preview", true, 2))
 
@@ -117,6 +120,7 @@ private fun setupPreviewPlaylist() {
 
 var currentPlayer by mutableStateOf(previewPlayerPop)
 
+@SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable
 fun LayoutPreviewPage(appViewModel: AppViewModel) {
     var maxBoxHeight by remember { mutableStateOf(0.dp) }
@@ -152,7 +156,7 @@ fun PlaylistPreview(vm: AppViewModel, playlist: Playlist) {
     LazyColumn(state = playlistState) {
         try {
             items(playlist.albums) { album ->
-                AlbumCard(vm, album, layoutManager.getLayout(), true)
+                AlbumCard(vm, currentPlayer, album, layoutManager.getLayout(), true)
             }
         } catch (e: Exception) {
             e.printStackTrace()

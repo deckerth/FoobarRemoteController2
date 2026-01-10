@@ -18,8 +18,6 @@ import com.deckerth.thomas.foobarremotecontroller2.connector.PlaylistAccess
 import com.deckerth.thomas.foobarremotecontroller2.connector.QueryAccess
 import com.deckerth.thomas.foobarremotecontroller2.foobarMediaService
 import com.deckerth.thomas.foobarremotecontroller2.mediaSession
-import com.deckerth.thomas.foobarremotecontroller2.model.PlaybackState
-import com.deckerth.thomas.foobarremotecontroller2.model.Player
 import com.deckerth.thomas.foobarremotecontroller2.model.Playlist
 import com.deckerth.thomas.foobarremotecontroller2.model.VolumeControl
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.ViewsWithLayout
@@ -53,6 +51,7 @@ class AppViewModel(val owner: String) : ViewModel() {
     lateinit var playlistAccess: PlaylistAccess
     lateinit var browserAccess: BrowserAccess
     lateinit var playlistsViewModel: PlaylistsViewModel
+    val playerViewModel = PlayerViewModel()
 
     var queryAccess: QueryAccess? = null
 
@@ -147,25 +146,23 @@ class AppViewModel(val owner: String) : ViewModel() {
     }
 
     fun getCurrentAlbumIndex(): Int {
-        if (player == null || player!!.getIndex() == -1 || displayedPlaylist == null || displayedPlaylist!!.albums.isEmpty())
+        if (playerViewModel.valid || playerViewModel.getIndex() == -1 || displayedPlaylist == null || displayedPlaylist!!.albums.isEmpty())
             return -1
         for ((index, album) in displayedPlaylist!!.albums.withIndex()) {
-            if (album.hasIndex(player!!.getIndex()))
+            if (album.hasIndex(playerViewModel.getIndex()))
                 return index
         }
         return -1
     }
 
-    var player by mutableStateOf<Player?>(null)
-
     fun updatePlayer() {
-        val newPlayer = playerAccess.playerState
-        player = if (newPlayer != null && newPlayer.ipAddress != ipAddress)
-            null
-        else
-            newPlayer
+        if (!playerViewModel.valid || playerViewModel.ipAddress != ipAddress)
+            return
+
+        playerViewModel.updatePlayer()  // update timestamps
+
         val currentAlbumIndex = getCurrentAlbumIndex()
-        if (autoscroll && player != null &&
+        if (autoscroll && playerViewModel.valid &&
             displayedPlaylist != null &&
             displayedPlaylist!!.albums.isNotEmpty() &&
             currentAlbumIndex != autoScrollIndex &&
@@ -173,27 +170,27 @@ class AppViewModel(val owner: String) : ViewModel() {
         ) {
             autoScrollIndex = currentAlbumIndex
         }
-        if (mediaSession != null && player != null) {
-            val state = when (player!!.playbackState) {
+        if (mediaSession != null && playerViewModel.valid) {
+            val state = when (playerViewModel.playbackState) {
                 PlaybackState.STOPPED -> PlaybackStateCompat.STATE_STOPPED
                 PlaybackState.PLAYING -> PlaybackStateCompat.STATE_PLAYING
                 PlaybackState.PAUSED -> PlaybackStateCompat.STATE_PAUSED
             }
             val durationSecs: Long =
-                if (player!!.duration.isNotBlank()) (floor(player!!.duration.toDouble() * 1000)).toLong() else 0L
+                if (playerViewModel.duration.isNotBlank()) (floor(playerViewModel.duration.toDouble() * 1000)).toLong() else 0L
             val positionSecs: Long =
-                if (player!!.position.isNotBlank()) (floor(player!!.position.toDouble() * 1000)).toLong() else 0L
+                if (playerViewModel.position.isNotBlank()) (floor(playerViewModel.position.toDouble() * 1000)).toLong() else 0L
 
-            if (player!!.getIndex() != -1) {
-                val bitmap = connector.getBitmapFromURL(player!!.artworkUrl, this)
+            if (playerViewModel.getIndex() != -1) {
+                val bitmap = connector.getBitmapFromURL(playerViewModel.artworkUrl, this)
                 if (bitmap != null) {
                     // Update the color scheme with the new bitmap
                     updateColorScheme(bitmap)
                 }
                 mediaSession!!.setMetadata(
                     MediaMetadataCompat.Builder()
-                        .putString(MediaMetadataCompat.METADATA_KEY_TITLE, player!!.title)
-                        .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, player!!.artist)
+                        .putString(MediaMetadataCompat.METADATA_KEY_TITLE, playerViewModel.title)
+                        .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, playerViewModel.artist)
                         .putBitmap(
                             MediaMetadataCompat.METADATA_KEY_ALBUM_ART,
                             bitmap
@@ -218,11 +215,11 @@ class AppViewModel(val owner: String) : ViewModel() {
                         )
                         .build()
                 )
-            } else if (player!!.playbackState != PlaybackState.STOPPED) {// no longer in playlist -> no image
+            } else if (playerViewModel.playbackState != PlaybackState.STOPPED) {// no longer in playlist -> no image
                 mediaSession!!.setMetadata(
                     MediaMetadataCompat.Builder()
-                        .putString(MediaMetadataCompat.METADATA_KEY_TITLE, player!!.title)
-                        .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, player!!.artist)
+                        .putString(MediaMetadataCompat.METADATA_KEY_TITLE, playerViewModel.title)
+                        .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, playerViewModel.artist)
                         .putLong(
                             MediaMetadataCompat.METADATA_KEY_DURATION, durationSecs
                         )
@@ -246,7 +243,7 @@ class AppViewModel(val owner: String) : ViewModel() {
             } else
                 mediaSession!!.setMetadata(null)
 
-            println("FOOB updatePlayer: ${player!!.position}")
+            println("FOOB updatePlayer: ${playerViewModel.position}")
 
             foobarMediaService?.updateNotification()
         }

@@ -13,11 +13,11 @@ import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.deckerth.thomas.foobarremotecontroller2.R
-import com.deckerth.thomas.foobarremotecontroller2.model.Player
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.PlayerViewModel
 
 @Composable
-fun ArtWork(player: Player, previewMode: Boolean = false, vm: AppViewModel) {
+fun ArtWork(player: PlayerViewModel, previewMode: Boolean = false, vm: AppViewModel) {
     val index = player.getIndex()
     if (index >= 0) {
         if (previewMode) {

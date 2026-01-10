@@ -46,9 +46,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.deckerth.thomas.foobarremotecontroller2.R
-import com.deckerth.thomas.foobarremotecontroller2.model.PlaybackMode
-import com.deckerth.thomas.foobarremotecontroller2.model.PlaybackState
-import com.deckerth.thomas.foobarremotecontroller2.model.Player
 import com.deckerth.thomas.foobarremotecontroller2.model.PlaylistLifecycleState
 import com.deckerth.thomas.foobarremotecontroller2.ui.components.ArtWork
 import com.deckerth.thomas.foobarremotecontroller2.ui.components.LayoutComponent
@@ -61,6 +58,9 @@ import com.deckerth.thomas.foobarremotecontroller2.ui.layout.layoutManager
 import com.deckerth.thomas.foobarremotecontroller2.ui.mainActivity
 import com.deckerth.thomas.foobarremotecontroller2.ui.theme.Foobar2000RemoteControllerTheme
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.PlaybackMode
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.PlaybackState
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.PlayerViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -103,7 +103,7 @@ fun PlayingPage(vm: AppViewModel) {
                     .verticalScroll(rememberScrollState(), enabled = true)
             ) {
                 ReleaseNotes(vm)
-                if (vm.player == null) {
+                if (!vm.playerViewModel.valid) {
                     showLoading = !vm.isSick
                     Column(
                         modifier = Modifier
@@ -138,7 +138,7 @@ fun PlayingPage(vm: AppViewModel) {
                 } else
                     PlayerCard(
                         vm,
-                        player = vm.player!!,
+                        playerViewModel = vm.playerViewModel,
                         boxSize = IntSize(maxBoxWidth.value.toInt(), maxBoxHeight.value.toInt())
                     )
             }
@@ -158,7 +158,6 @@ fun onRefresh(vm: AppViewModel) {
 @Composable
 fun PlayerButtons(
     vm: AppViewModel,
-    player: Player,
     modifier: Modifier = Modifier,
     onPreviousTrack: () -> Unit = { vm.playerAccess.previousTrack() },
     onNextTrack: () -> Unit = { vm.playerAccess.nextTrack() },
@@ -174,7 +173,7 @@ fun PlayerButtons(
         IconButton(
             onClick = {
                 if (!previewMode)
-                    when (player.playbackMode) {
+                    when (vm.playerViewModel.playbackMode) {
                         PlaybackMode.REPEAT_TRACK -> vm.playerAccess
                             .setPlaybackMode(PlaybackMode.DEFAULT)
 
@@ -189,7 +188,7 @@ fun PlayerButtons(
                 .size(40.dp)
         ) {
             Icon(
-                painter = when (player.playbackMode) {
+                painter = when (vm.playerViewModel.playbackMode) {
                     PlaybackMode.REPEAT_TRACK -> painterResource(R.drawable.repeat_one_on)
                     PlaybackMode.REPEAT_PLAYLIST -> painterResource(R.drawable.repeat_on)
                     else -> painterResource(R.drawable.repeat)
@@ -203,7 +202,7 @@ fun PlayerButtons(
         Spacer(modifier = Modifier.width(space))
         IconButton(
             onClick = onPreviousTrack,
-            enabled = player.playbackState != PlaybackState.STOPPED,
+            enabled = vm.playerViewModel.playbackState != PlaybackState.STOPPED,
             modifier = Modifier
                 .size(60.dp)
         ) {
@@ -219,7 +218,7 @@ fun PlayerButtons(
         FilledIconButton(
             onClick = {
                 if (!previewMode)
-                    if (player.playbackState == PlaybackState.PLAYING)
+                    if (vm.playerViewModel.playbackState == PlaybackState.PLAYING)
                         vm.playerAccess.pausePlayback()
                     else
                         vm.playerAccess.startPlayback()
@@ -227,7 +226,7 @@ fun PlayerButtons(
             modifier = Modifier
                 .size(60.dp)
         ) {
-            if (player.playbackState == PlaybackState.PAUSED || player.playbackState == PlaybackState.STOPPED) {
+            if (vm.playerViewModel.playbackState == PlaybackState.PAUSED || vm.playerViewModel.playbackState == PlaybackState.STOPPED) {
                 Icon(
                     painter = painterResource(R.drawable.play),
                     contentDescription = stringResource(R.string.desc_play),
@@ -249,7 +248,7 @@ fun PlayerButtons(
         Spacer(modifier = Modifier.width(space))
         IconButton(
             onClick = onNextTrack,
-            enabled = player.playbackState != PlaybackState.STOPPED,
+            enabled = vm.playerViewModel.playbackState != PlaybackState.STOPPED,
             modifier = Modifier
                 .size(60.dp)
         ) {
@@ -265,7 +264,7 @@ fun PlayerButtons(
         IconButton(
             onClick = {
                 if (!previewMode)
-                    when (player.playbackMode) {
+                    when (vm.playerViewModel.playbackMode) {
                         PlaybackMode.SHUFFLE_TRACKS -> vm.playerAccess
                             .setPlaybackMode(PlaybackMode.DEFAULT)
 
@@ -283,7 +282,7 @@ fun PlayerButtons(
                 .size(40.dp)
         ) {
             Icon(
-                painter = when (player.playbackMode) {
+                painter = when (vm.playerViewModel.playbackMode) {
                     PlaybackMode.SHUFFLE_TRACKS -> painterResource(R.drawable.shuffle_on)
                     PlaybackMode.SHUFFLE_ALBUMS -> painterResource(R.drawable.shuffle_on)
                     PlaybackMode.SHUFFLE_FOLDERS -> painterResource(R.drawable.shuffle_on)
@@ -322,7 +321,7 @@ fun PlayerStopped(modifier: Modifier = Modifier) {
 @Composable
 fun PlayerCard(
     vm: AppViewModel,
-    player: Player,
+    playerViewModel: PlayerViewModel,  // for preview purposes a fake view model is used
     previewMode: Boolean = false,
     onPreviousTrack: (() -> Unit)? = null,
     onNextTrack: (() -> Unit)? = null,
@@ -349,36 +348,35 @@ fun PlayerCard(
                 // Makes the Box occupy the full width of the screen.
                 .fillMaxWidth()
         ) {
-            if (player.playbackState == PlaybackState.STOPPED)
+            if (playerViewModel.playbackState == PlaybackState.STOPPED)
                 PlayerStopped(modifier = Modifier
                     .fillMaxWidth()
                     .align(Alignment.Center))
             else
-                ArtWork(player, previewMode = previewMode, vm)
+                ArtWork(playerViewModel, previewMode = previewMode, vm)
         }
 
         // This Column contains the text fields and other controls.
         Box {
             Column(modifier = Modifier.padding(16.dp)) {
-                if (player.playbackState != PlaybackState.STOPPED) {
+                if (playerViewModel.playbackState != PlaybackState.STOPPED) {
                     val layout = layoutManager.getLayout()
 
                     for (item in layout.playerLayout.items) {
                         if (item.item != LayoutItems.ARTWORK)
-                            LayoutComponent(vm, player, item)
+                            LayoutComponent(vm, playerViewModel,item)
                     }
                 }
                 if (onPreviousTrack != null && onNextTrack != null)
                     PlayerButtons(
                         vm,
-                        player,
                         modifier = Modifier.padding(bottom = 24.dp),
                         onPreviousTrack,
                         onNextTrack,
                         previewMode
                     )
                 else
-                    PlayerButtons(vm, player, modifier = Modifier.padding(bottom = 24.dp))
+                    PlayerButtons(vm, modifier = Modifier.padding(bottom = 24.dp))
             }
             var infoButtonClicked by remember { mutableStateOf(false) }
             IconButton(
@@ -417,27 +415,7 @@ fun PlayerCardPreview() {
         Surface {
             PlayerCard(
                 vm = AppViewModel("Preview"),
-                player = Player(
-                    "label",
-                    "xyz",
-                    "",
-                    "Album",
-                    "Title",
-                    "Artist",
-                    "44100",
-                    "Pop",
-                    "0",
-                    "02",
-                    "0:28",
-                    "",
-                    "",
-                    "955.8266666666667",
-                    "28.9795",
-                    "",
-                    PlaybackState.PLAYING,
-                    PlaybackMode.DEFAULT,
-                    ""
-                ),
+                playerViewModel = PlayerViewModel(),
                 boxSize = IntSize(200, 200)
             )
         }

@@ -78,6 +78,7 @@ import com.deckerth.thomas.foobarremotecontroller2.ui.layout.layoutManager
 import com.deckerth.thomas.foobarremotecontroller2.ui.mainActivity
 import com.deckerth.thomas.foobarremotecontroller2.ui.theme.Foobar2000RemoteControllerTheme
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.PlayerViewModel
 
 @Composable
 fun PlaylistPage(vm: AppViewModel) {
@@ -299,7 +300,7 @@ fun playlistInfoString(vm: AppViewModel): String {
 }
 
 @Composable
-fun AlbumCard(vm: AppViewModel, album: Album, layout: Layout?, previewMode: Boolean = false) {
+fun AlbumCard(vm: AppViewModel, playerViewModel: PlayerViewModel, album: Album, layout: Layout?, previewMode: Boolean = false) {
 
     /*
     in automatic mode (initial state):
@@ -308,10 +309,10 @@ fun AlbumCard(vm: AppViewModel, album: Album, layout: Layout?, previewMode: Bool
     automatic mode is re-entered otherwise
     */
 
-    if (!previewMode && vm.player != null) {
+    if (!previewMode && playerViewModel.valid) {
         val currentlyPlaying =
-            album.originalTitle.playlistId == vm.player!!.playlistId && album.hasIndex(
-                vm.player!!.getIndex()
+            album.originalTitle.playlistId == playerViewModel.playlistId && album.hasIndex(
+                playerViewModel.getIndex()
             )
         if (album.isAutomaticSelection) album.isExpanded = currentlyPlaying
         else album.isAutomaticSelection = album.isExpanded == currentlyPlaying
@@ -322,8 +323,8 @@ fun AlbumCard(vm: AppViewModel, album: Album, layout: Layout?, previewMode: Bool
     var modifier: Modifier = Modifier
     if (albumRepresentsTitle) {
         var titleSelected = false
-        if (vm.player != null) titleSelected =
-            album.tracks[0].details.index == vm.player!!.getIndex() && album.tracks[0].details.playlistId == vm.player!!.playlistId
+        if (playerViewModel.valid) titleSelected =
+            album.tracks[0].details.index == playerViewModel.getIndex() && album.tracks[0].details.playlistId == playerViewModel.playlistId
 
         if (titleSelected) modifier =
             modifier.background(MaterialTheme.colorScheme.primaryContainer)
@@ -406,14 +407,14 @@ fun AlbumCard(vm: AppViewModel, album: Album, layout: Layout?, previewMode: Bool
                     Column {
                         album.tracks.forEach { title ->
                             TitleEntry(
-                                vm = vm, album = album, title = title, previewMode = previewMode
+                                vm = vm, playerViewModel = playerViewModel, album = album, title = title, previewMode = previewMode
                             )
                         }
                     }
                 }
             } else if (!albumRepresentsTitle) {
                 TitleEntry(
-                    vm = vm, album = album, title = album.tracks[0], previewMode = previewMode
+                    vm = vm, playerViewModel = playerViewModel, album = album, title = album.tracks[0], previewMode = previewMode
                 )
             }
         }
@@ -423,12 +424,12 @@ fun AlbumCard(vm: AppViewModel, album: Album, layout: Layout?, previewMode: Bool
 
 @Composable
 fun TitleEntry(
-    vm: AppViewModel, album: Album, title: SelectableTitle, previewMode: Boolean = false
+    vm: AppViewModel, playerViewModel: PlayerViewModel, album: Album, title: SelectableTitle, previewMode: Boolean = false
 ) {
     var titleSelected = false
     if (previewMode) titleSelected = title.details.index == 0
-    else if (vm.player != null) titleSelected =
-        title.details.index == vm.player!!.getIndex() && title.details.playlistId == vm.player!!.playlistId
+    else if (playerViewModel.valid) titleSelected =
+        title.details.index == playerViewModel.getIndex() && title.details.playlistId == playerViewModel.playlistId
     var modifier = Modifier.clickable {
         if (!previewMode) {
             if (vm.playlistEditMode || vm.addTitlesMode) title.toggleIsSelected(vm)
@@ -504,7 +505,7 @@ fun AlbumCardPreview() {
     //fields.items.add(LayoutItem(LayoutItems.COMPOSER, ItemSize.BODY_SMALL))
 
     //val layout = Layout(playerLayout = fields, albumLayout = fields, titleLayout = fields)
-    AlbumCard(AppViewModel("Preview"), album, null)
+    AlbumCard(AppViewModel("Preview"), PlayerViewModel(), album, null)
 }
 
 @Preview(showBackground = true)
@@ -539,7 +540,7 @@ fun AlbumCardPreview2() {
     //fields.items.add(LayoutItem(LayoutItems.COMPOSER, ItemSize.BODY_SMALL))
 
     //val layout = Layout(playerLayout = fields, albumLayout = fields, titleLayout = fields)
-    AlbumCard(AppViewModel("Preview"), album, null)
+    AlbumCard(AppViewModel("Preview"), PlayerViewModel(), album, null)
 }
 
 @Composable
@@ -565,6 +566,7 @@ fun Playlist(vm: AppViewModel, playlist: Playlist) {
                     items(playlist.filteredAlbums) { album ->
                         if (album.matches(vm.playlistsViewModel.filterValue)) AlbumCard(
                             vm,
+                            vm.playerViewModel,
                             album,
                             layoutManager.getLayout()
                         )
@@ -574,7 +576,7 @@ fun Playlist(vm: AppViewModel, playlist: Playlist) {
                 }
             } else if (playlist.albums.isNotEmpty()) try {
                 items(playlist.albums) { album ->
-                    AlbumCard(vm, album, layoutManager.getLayout())
+                    AlbumCard(vm, vm.playerViewModel, album, layoutManager.getLayout())
                 }
             } catch (e: Exception) {
                 e.printStackTrace()

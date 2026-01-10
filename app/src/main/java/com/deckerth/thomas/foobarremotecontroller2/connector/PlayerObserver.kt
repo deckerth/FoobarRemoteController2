@@ -36,7 +36,7 @@ class PlayerObserver(private val vm: AppViewModel) {
                     }
                 else if (vm.errorHandler.authorizationErrorOccurred) {
                     vm.askForPassword = true
-                    vm.player = null
+                    vm.playerViewModel.valid = false
                 }
 
             }, 0, 800, TimeUnit.MILLISECONDS)

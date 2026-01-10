@@ -31,12 +31,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.deckerth.thomas.foobarremotecontroller2.R
-import com.deckerth.thomas.foobarremotecontroller2.model.Player
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.PlayerViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PlayerProgress(vm: AppViewModel, player: Player) {
+fun PlayerProgress(vm: AppViewModel, playerViewModel: PlayerViewModel) {
     val interactionSource = remember { MutableInteractionSource() }
     var sliderValue by remember { mutableFloatStateOf(0f) }
     var isDragging by remember { mutableStateOf(false) }
@@ -56,7 +56,7 @@ fun PlayerProgress(vm: AppViewModel, player: Player) {
         }
     }
 
-    if (!isDragging) sliderValue = player.getPos()
+    if (!isDragging) sliderValue = playerViewModel.getPos()
 
     Spacer(modifier = Modifier.height(8.dp))
 
@@ -65,14 +65,14 @@ fun PlayerProgress(vm: AppViewModel, player: Player) {
             Text(
                 modifier = Modifier
                     .fillMaxWidth(),
-                text = player.playbackTime,
+                text = playerViewModel.playbackTime,
                 style = MaterialTheme.typography.labelSmall
             )
             Text(
                 textAlign = TextAlign.Right,
                 modifier = Modifier
                     .fillMaxWidth(),
-                text = player.getNiceDuration(),
+                text = playerViewModel.getNiceDuration(),
                 style = MaterialTheme.typography.labelSmall
             )
         }
@@ -80,7 +80,7 @@ fun PlayerProgress(vm: AppViewModel, player: Player) {
         Slider(
             value = sliderValue,
             onValueChange = { newPosition -> sliderValue = newPosition },
-            onValueChangeFinished = { player.setPos(vm, sliderValue) },
+            onValueChangeFinished = { playerViewModel.setPos(vm, sliderValue) },
             interactionSource = interactionSource,
             modifier = Modifier
                 .fillMaxWidth(),
@@ -126,12 +126,12 @@ fun PlayerProgress(vm: AppViewModel, player: Player) {
         Spacer(modifier = Modifier.height(2.dp))
 
         val discNumber = try {
-            player.discNumber.toInt()
+            playerViewModel.discNumber.toInt()
         } catch (e: NumberFormatException) {
             -1
         }
         val track = try {
-            player.track.toInt()
+            playerViewModel.track.toInt()
         } catch (e: NumberFormatException) {
             -1
         }

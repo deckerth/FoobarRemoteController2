@@ -255,7 +255,7 @@ class PlaylistAccess(private val vm: AppViewModel) {
         var pos = 0
         val pathString = StringBuilder()
         for (path in paths) {
-            pathString.append("\"").append(path.replace("\\", "\\\\")).append("\"")
+            pathString.append("\"").append(path).append("\"")
             if (pos < paths.size - 1)  // 0, 1 : indexes.size() = 2
                 pathString.append(", ")
             pos++

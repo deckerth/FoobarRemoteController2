@@ -212,7 +212,7 @@ class PlaylistsViewModel(private val vm: AppViewModel) : ViewModel() {
         }
 
         // check if playing playlist is still current
-        if (vm.playerViewModel.valid && vm.playerViewModel.playlistId.isNotEmpty() && vm.playerViewModel.ipAddress == vm.ipAddress) {
+        if (vm.playerViewModel.valid && vm.playerViewModel.playlistId.isNotEmpty()) {
             val playingList = getPlaylist(vm.playerViewModel.playlistId)
             if (vm.playerViewModel.getIndex() >= 0 && playingList.titles.count() > vm.playerViewModel.getIndex()) {  // otherwise do not yet check
                 val playlistTitle = playingList.titles[vm.playerViewModel.getIndex()]
@@ -231,7 +231,7 @@ class PlaylistsViewModel(private val vm: AppViewModel) : ViewModel() {
         }
 
         // Follow autoscroll
-        if (vm.playerViewModel.valid && vm.playerViewModel.ipAddress == vm.ipAddress &&
+        if (vm.playerViewModel.valid &&
             vm.autoscroll &&
             vm.playerViewModel.playlistId.isNotEmpty() && vm.playerViewModel.playlistId != vm.selectedPlaylist  ) {
             vm.selectedPlaylist = vm.playerViewModel.playlistId

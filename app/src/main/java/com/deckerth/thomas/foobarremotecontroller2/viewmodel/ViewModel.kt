@@ -38,6 +38,11 @@ class AppViewModel(val owner: String) : ViewModel() {
     }
 
     var ipAddress: String? = null
+        set(value) {
+            if (field == value) return
+            playerViewModel.valid = false
+            field = value
+        }
 
     var user: String by mutableStateOf("")
     var password: String by mutableStateOf("")
@@ -156,7 +161,7 @@ class AppViewModel(val owner: String) : ViewModel() {
     }
 
     fun updatePlayer() {
-        if (!playerViewModel.valid || playerViewModel.ipAddress != ipAddress)
+        if (!playerViewModel.valid)
             return
 
         playerViewModel.updatePlayer()  // update timestamps

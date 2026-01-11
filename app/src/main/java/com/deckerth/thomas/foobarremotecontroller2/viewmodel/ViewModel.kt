@@ -151,7 +151,7 @@ class AppViewModel(val owner: String) : ViewModel() {
     }
 
     fun getCurrentAlbumIndex(): Int {
-        if (playerViewModel.valid || playerViewModel.getIndex() == -1 || displayedPlaylist == null || displayedPlaylist!!.albums.isEmpty())
+        if (!playerViewModel.valid || playerViewModel.getIndex() == -1 || displayedPlaylist == null || displayedPlaylist!!.albums.isEmpty())
             return -1
         for ((index, album) in displayedPlaylist!!.albums.withIndex()) {
             if (album.hasIndex(playerViewModel.getIndex()))

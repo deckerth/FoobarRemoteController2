@@ -112,6 +112,7 @@ class AppViewModel(val owner: String) : ViewModel() {
         selectedView = ViewsWithLayout.PLAYER
         isSick = false
         errorHandler.reset()
+        playerViewModel.valid = false
     }
 
     fun increaseNoOfSelectedTitles() {

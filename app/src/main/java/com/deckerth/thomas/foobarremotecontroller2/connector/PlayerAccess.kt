@@ -107,7 +107,27 @@ class PlayerAccess(private val vm: AppViewModel) {
                     usedIpAddress, false
                 )
             } else {
-                vm.playerViewModel.valid = false
+                vm.playerViewModel.update(
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    playbackState,
+                    PlaybackMode.entries[playerObject.getInt("playbackMode")],
+                    usedIpAddress, false
+                )
             }
         } catch (e: JSONException) {
             e.printStackTrace()

@@ -369,6 +369,7 @@ class PlaylistsViewModel(private val vm: AppViewModel) : ViewModel() {
             try {
                 if (vm.addTitlesMode) {
                     if (vm.displayedPlaylist != null) {
+                        vm.browserAccess.getRoots()  // initialize path separator
                         val paths = vm.displayedPlaylist!!.getPathsOfSelectedTracks(vm)
                         vm.disableAddTitlesMode()
                         vm.playlistAccess.addPlaylist(

@@ -56,6 +56,7 @@ fun LayoutComponent(vm: AppViewModel, playerViewModel: PlayerViewModel, layoutIt
 
         LayoutItems.TITLE -> TextComponent(text = playerViewModel.title, item = layoutItem)
         LayoutItems.ALBUM -> TextComponent(text = playerViewModel.album, item = layoutItem)
+        LayoutItems.ALBUM_ARTIST -> TextComponent(text = playerViewModel.albumArtist, item = layoutItem)
         LayoutItems.ARTIST_TITLE -> TextComponent(text = playerViewModel.artist + " - " + playerViewModel.title, item = layoutItem)
         LayoutItems.ARTIST -> TextComponent(text = playerViewModel.artist, item = layoutItem)
         LayoutItems.SAMPLE_RATE -> TextComponent(text = playerViewModel.sampleRate+ " Hz", item = layoutItem)
@@ -82,6 +83,7 @@ fun LayoutComponent(album: Album, layoutItem: LayoutItem) {
 
         LayoutItems.ALBUM -> TextComponent(text = album.originalTitle.album, item = layoutItem)
         LayoutItems.ARTIST -> TextComponent(text = album.originalTitle.artist, item = layoutItem)
+        LayoutItems.ALBUM_ARTIST -> TextComponent(text = album.originalTitle.albumArtist, item = layoutItem)
         LayoutItems.ARTIST_TITLE -> TextComponent(text = album.originalTitle.artist + " - " + album.originalTitle.title, item = layoutItem)
 
         LayoutItems.COMPOSER ->
@@ -104,6 +106,7 @@ fun LayoutComponent(album: Album, title: ITitle, checkArtist: Boolean, layoutIte
         )
 
         LayoutItems.ALBUM -> TextComponent(text = title.album, item = layoutItem)
+        LayoutItems.ALBUM_ARTIST -> TextComponent(text = title.albumArtist, item = layoutItem)
         LayoutItems.TITLE -> TextComponent(text = title.title, item = layoutItem)
         LayoutItems.ARTIST -> TextComponent(text = title.artist, item = layoutItem)
         LayoutItems.ARTIST_TITLE -> TextComponent(text = title.artist + " - " + title.title, item = layoutItem)

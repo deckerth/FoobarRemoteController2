@@ -161,8 +161,8 @@ class Playlist(var playlistEntity: PlaylistEntity) {
         } else {
             var currentAlbum = albums[albums.count() - 1]
             if (title.album == currentAlbum.originalTitle.album &&
-                (title.title != currentAlbum.originalTitle.title ||
-                        title.artist == currentAlbum.originalTitle.artist)
+                title.catalog == currentAlbum.originalTitle.catalog &&
+                title.albumArtist == currentAlbum.originalTitle.albumArtist
             ) {
                 currentAlbum.addTitle(title)
             } else {
@@ -183,7 +183,7 @@ class Playlist(var playlistEntity: PlaylistEntity) {
         for (album in albumList)
             for (title in album.tracks)
                 if (title.isSelected)
-                    result.add(title.details.path)
+                    result.add(vm.browserAccess.escapePathSeparator(title.details.path))
         return result
     }
 

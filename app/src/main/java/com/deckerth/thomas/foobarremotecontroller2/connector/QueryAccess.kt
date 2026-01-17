@@ -61,12 +61,12 @@ class QueryAccess(val vm: AppViewModel) {
                     var endpoint =
                         "query/updates?player=true&" +
                                 "trcolumns=" +
-                                "%25label%25,%25catalog%25,%25composer%25,%25album%25,%25title%25,%25artist%25,%25samplerate%25,%25genre%25,%25discnumber%25,%25track%25,%25playback_time%25,%24filename%28%25path%25%29%24&" +
+                                vm.playerAccess.columnListWithoutPath +
                                 "playlists=true"
                     if (playlistId.isNotEmpty())
                         endpoint += "&playlistItems=true&plref=$playlistId&plrange=0:1" +
                                 "&plcolumns=" +
-                                "%25label%25,%25catalog%25,%25composer%25,%25album%25,%25title%25,%25artist%25,%25samplerate%25,%25genre%25,%25discnumber%25,%25track%25,%25playback_time%25,%24filename%28%25path%25%29%24&"
+                                vm.playerAccess.columnListWithoutPath
 
                     url = URL(vm.connector.serverAddress(usedIpAddress) + endpoint)
                     //open an URL connection

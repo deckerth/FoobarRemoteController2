@@ -481,6 +481,7 @@ fun AlbumCardPreview() {
         "Ibrahim Ferrer (Buena Vista Social Club Presents)",
         "Mamí Me Gustó",
         "Ibrahim Ferrer",
+        "Ibrahim Ferrer",
         "44100",
         "Classical",
         "",
@@ -488,7 +489,7 @@ fun AlbumCardPreview() {
         "",
         "",
         "",
-        "", ""
+        "",""
     )
     val album = Album(title)
     album.addTitle(title)
@@ -519,6 +520,7 @@ fun AlbumCardPreview2() {
         "Composer",
         "Ibrahim Ferrer (Buena Vista Social Club Presents)",
         "",
+        "Ibrahim Ferrer",
         "Ibrahim Ferrer",
         "44100",
         "Classical",
@@ -732,6 +734,7 @@ fun PlaylistPreview() {
             "Ibrahim Ferrer (Buena Vista Social Club Presents)",
             "Mamí Me Gustó",
             "Ibrahim Ferrer",
+            "Ibrahim Ferrer",
             "44100",
             "Classical",
             "",
@@ -756,6 +759,7 @@ fun PlaylistPreview() {
             "Composer",
             "Ibrahim Ferrer (Buena Vista Social Club Presents)",
             "",
+            "Ibrahim Ferrer",
             "Ibrahim Ferrer",
             "44100",
             "Classical",

@@ -10,8 +10,8 @@ Required steps when adding new metadata fields:
 1. add the new field to the enum
 2. add the field to the ITitle interface
 3. adapt the Title class accordingly (also matches())
-4. add the field to Player
-5. adjust the classes PlayerAccess and PlaylistAccess. Play attention to computation of effectiveTitle
+4. add the field to PlayerViewModel
+5. adjust the classes QueryAccess, PlayerAccess (in particular columnsWithPath..) and PlaylistAccess. Pay attention to computation of effectiveTitle
 6. extend LayoutComponent
 7. adapt the example objects in LayoutPreviewPage
 8. extend TitleDetails with the new field (DisplayItemDetail)
@@ -37,6 +37,7 @@ enum class LayoutItems(
         onAlbum = false,
         onPlayer = false
     ),
+    ALBUM_ARTIST(mainActivity!!.baseContext.getString(R.string.layout_item_album_artist)),
     PROGRESS(
         mainActivity!!.baseContext.getString(R.string.layout_item_progress_bar),
         onTitle = false,

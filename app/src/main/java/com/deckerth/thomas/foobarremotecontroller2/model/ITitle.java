@@ -19,6 +19,7 @@ public interface ITitle {
     String getComposer();
 
     String getAlbum();
+    String getAlbumArtist();
 
     String getTitle();
 

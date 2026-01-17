@@ -19,6 +19,24 @@ class PlayerAccess(private val vm: AppViewModel) {
         vm.connector.postData("player/", jsonString, vm)
     }
 
+    // Columns:
+    //    1 %25label%25,
+    //    2 %25catalog%25,
+    //    3 %25composer%25,
+    //    4 %25album%25,
+    //    5 %25title%25,
+    //    6 %25artist%25,
+    //    7 %25album artist%25,
+    //    8 %25samplerate%25,
+    //    9 %25genre%25,
+    //    10 %25discnumber%25,
+    //    11 %25track%25,
+    //    12 %25playback_time%25,
+    //    13 %24filename%28%25path%25%29%24&" becomes:$filename(%path%) / %25path%25%
+
+    val columnListWithoutPath  = "%25label%25,%25catalog%25,%25composer%25,%25album%25,%25title%25,%25artist%25,%25album artist%25,%25samplerate%25,%25genre%25,%25discnumber%25,%25track%25,%25playback_time%25,%24filename%28%25path%25%29%24&"
+    val columnListWithPath     = "%25label%25,%25catalog%25,%25composer%25,%25album%25,%25title%25,%25artist%25,%25album artist%25,%25samplerate%25,%25genre%25,%25discnumber%25,%25track%25,%25playback_time%25,%25path%25%"
+
     fun parsePlayerState(usedIpAddress: String, contentObject: JSONObject) {
         try {
             val playerObject = contentObject.getJSONObject("player")
@@ -35,6 +53,7 @@ class PlayerAccess(private val vm: AppViewModel) {
                             "Klavierquintett f-Moll", !! OPTIONAL may be just ""
                             "1. Molto moderato quasi lento - Allegro",
                             "Khatia Buniatishvili, Klavier / Gidon Kremer & Marija Nemanytė, Violine / Maxim Rysanov, Viola / Giedrė Dirvanauskaitė, Cello",
+                            "Khatia Buniatishvili",
                             "44100",
                             "Orchestral",
                             "01",
@@ -77,7 +96,7 @@ class PlayerAccess(private val vm: AppViewModel) {
 
             if (columns.length() > 0) {
                 val title = columns.getString(4)
-                val filename = columns.getString(11)
+                val filename = columns.getString(12)
                 var effectiveTitle = ""
                 val index = activeItemObject.getString("index")
                 val imageURL = if (!index.isEmpty() && index != "-1") vm.connector.serverAddress(usedIpAddress) + "artwork/" + activeItemObject.getString(
@@ -97,6 +116,7 @@ class PlayerAccess(private val vm: AppViewModel) {
                     columns.getString(8),
                     columns.getString(9),
                     columns.getString(10),
+                    columns.getString(11),
                     activeItemObject.getString("playlistId"),
                     activeItemObject.getString("index"),
                     activeItemObject.getString("duration"),
@@ -108,6 +128,7 @@ class PlayerAccess(private val vm: AppViewModel) {
                 )
             } else {
                 vm.playerViewModel.update(
+                    "",
                     "",
                     "",
                     "",

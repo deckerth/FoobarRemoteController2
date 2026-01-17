@@ -88,6 +88,7 @@ fun DisplayItemDetail(title: ITitle, item: LayoutItems) {
         LayoutItems.TITLE -> title.title
         LayoutItems.ALBUM -> title.album
         LayoutItems.ARTIST -> title.artist
+        LayoutItems.ALBUM_ARTIST -> title.albumArtist
         LayoutItems.COMPOSER -> title.composer
         LayoutItems.CATALOG -> title.catalog
         LayoutItems.LABEL -> title.label
@@ -141,6 +142,7 @@ fun TitleDetailsPreview() {
             "Composer",
             "Ibrahim Ferrer (Buena Vista Social Club Presents)",
             "",
+            "Ibrahim Ferrer",
             "Ibrahim Ferrer",
             "44100",
             "Classical",

@@ -200,4 +200,5 @@
     <string name="release_notes_3_text">Über das Playlist Menü können Sie zum Anfang oder zum Ende der Playlist springen.</string>
     <string name="layout_item_artist_title">Künstler - Titel</string>
     <string name="button_content_copy">Copy to clipboard</string>
+    <string name="layout_item_album_artist">Album Artist</string>
 </resources>

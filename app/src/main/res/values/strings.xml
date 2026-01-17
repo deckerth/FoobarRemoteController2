@@ -199,4 +199,5 @@
     <string name="release_notes_3_text">Directly jump to the top or bottom of the playlist.</string>
     <string name="layout_item_artist_title">Artist - Title</string>
     <string name="button_content_copy">Copy to clipboard</string>
+    <string name="layout_item_album_artist">Album Artist</string>
 </resources>

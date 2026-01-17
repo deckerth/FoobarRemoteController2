@@ -23,19 +23,21 @@ public class Title implements ITitle {
     private final String mArtworkUrl;
     protected String mAlbum;
     protected String mArtist;
+    protected String mAlbumArtist;
     protected String mSampleRate;
     protected String mGenre;
     protected Bitmap mArtwork;
     private Boolean mIsCurrent = false;
     private String mPath = "";
 
-    public Title(String mPlaylistId, int mIndex, String mLabel, String mCatalog, String mComposer, String mAlbum, String mTitle, String mArtist, String mSampleRate, String mGenre, String mDiscNumber, String mTrack, String mPlaybackTime, String duration, String position, String mArtworkUrl, String mPath) {
+    public Title(String mPlaylistId, int mIndex, String mLabel, String mCatalog, String mComposer, String mAlbum, String mTitle, String mArtist, String mAlbumArtist, String mSampleRate, String mGenre, String mDiscNumber, String mTrack, String mPlaybackTime, String duration, String position, String mArtworkUrl, String mPath) {
         this.mLabel = set(mLabel);
         this.mCatalog = set(mCatalog);
         this.mPlaylistId = set(mPlaylistId);
         this.mIndex = mIndex;
         this.mComposer = set(mComposer);
         this.mAlbum = set(mAlbum);
+        this.mAlbumArtist = set(mAlbumArtist);
         this.mTitle = set(mTitle);
         this.mArtist = set(mArtist);
         this.mDiscNumber = set(mDiscNumber);
@@ -96,6 +98,8 @@ public class Title implements ITitle {
     public String getAlbum() {
         return mAlbum;
     }
+    @Override
+    public String getAlbumArtist() {return mAlbumArtist;}
 
     @Override
     public void clearArtist() {
@@ -186,6 +190,7 @@ public class Title implements ITitle {
         String upperPattern = pattern.toUpperCase();
         if (mAlbum.toUpperCase().contains(upperPattern)) return true;
         if (mArtist.toUpperCase().contains(upperPattern)) return true;
+        if (mAlbumArtist.toUpperCase().contains(upperPattern)) return true;
         if (mTitle.toUpperCase().contains(upperPattern)) return true;
         if (mComposer.toUpperCase().contains(upperPattern)) return true;
         if (mCatalog.toUpperCase().contains(upperPattern)) return true;
@@ -213,7 +218,7 @@ public class Title implements ITitle {
     @NonNull
     @Override
     public ITitle clone() {
-        ITitle result = new Title(mPlaylistId, mIndex, mLabel, mCatalog, mComposer, mAlbum, mTitle, mArtist, mSampleRate, mGenre, mDiscNumber, mTrack, mPlaybackTime, mDuration.toString(), mPosition.toString(), mArtworkUrl, mPath);
+        ITitle result = new Title(mPlaylistId, mIndex, mLabel, mCatalog, mComposer, mAlbum, mAlbumArtist, mTitle, mArtist, mSampleRate, mGenre, mDiscNumber, mTrack, mPlaybackTime, mDuration.toString(), mPosition.toString(), mArtworkUrl, mPath);
         result.setArtwork(mArtwork);
         result.setIsCurrentTitle(mIsCurrent);
         return result;

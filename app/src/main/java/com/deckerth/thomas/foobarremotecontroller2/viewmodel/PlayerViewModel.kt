@@ -36,6 +36,7 @@ class PlayerViewModel : ViewModel() {
     var catalog by mutableStateOf("")
     var composer by mutableStateOf("")
     var album by mutableStateOf("")
+    var albumArtist by mutableStateOf("")
     var title by mutableStateOf("")
     var artist by mutableStateOf("")
     var sampleRate by mutableStateOf("")
@@ -64,6 +65,7 @@ class PlayerViewModel : ViewModel() {
         album: String,
         title: String,
         artist: String,
+        albumArtist: String,
         sampleRate: String,
         genre: String,
         discNumber: String,
@@ -84,6 +86,7 @@ class PlayerViewModel : ViewModel() {
         this.catalog = catalog
         this.composer = composer
         this.album = album
+        this.albumArtist = albumArtist
         this.title = title
         this.artist = artist
         this.sampleRate = sampleRate

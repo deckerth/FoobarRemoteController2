@@ -73,13 +73,11 @@ class PlaylistAccess(private val vm: AppViewModel) {
         try {
             response = if (withPaths) vm.connector.getData(
                 "playlists/" + playlistEntity.playlistId +
-                        "/items/" + startIndex + "%3A" + 1000 + "?columns=%25label%25,%25catalog%25,%25composer%25,%25album%25,%25title%25,%25artist%25,%25samplerate%25,%25genre%25,%25discnumber%25,%25track%25,%25length%25,%25path%25",
-                vm
+                        "/items/" + startIndex + "%3A" + 1000 + "?columns=" + vm.playerAccess.columnListWithPath, vm
             )
             else vm.connector.getData(
                 "playlists/" + playlistEntity.playlistId +
-                        "/items/" + startIndex + "%3A" + 1000 + "?columns=%25label%25,%25catalog%25,%25composer%25,%25album%25,%25title%25,%25artist%25,%25samplerate%25,%25genre%25,%25discnumber%25,%25track%25,%25length%25,%24filename%28%25path%25%29%24",
-                vm
+                        "/items/" + startIndex + "%3A" + 1000 + "?columns=" + vm.playerAccess.columnListWithoutPath, vm
             )
         } catch (e: Exception) {
             errorHandler.logError(
@@ -138,17 +136,18 @@ class PlaylistAccess(private val vm: AppViewModel) {
                 val album = columnsArray.getString(3)
                 val title = columnsArray.getString(4)
                 val artist = columnsArray.getString(5)
-                val samplerRate = columnsArray.getString(6)
-                val genre = columnsArray.getString(7)
-                val discNumber = columnsArray.getString(8)
-                val track = columnsArray.getString(9)
-                val length = columnsArray.getString(10)
+                val albumArtist = columnsArray.getString(6)
+                val samplerRate = columnsArray.getString(7)
+                val genre = columnsArray.getString(8)
+                val discNumber = columnsArray.getString(9)
+                val track = columnsArray.getString(10)
+                val length = columnsArray.getString(11)
                 var path = ""
                 val filename: String?
                 if (withPaths) {
-                    path = columnsArray.getString(11)
+                    path = columnsArray.getString(12)
                     filename = getFilenameWithoutExtension(path)
-                } else filename = columnsArray.getString(11)
+                } else filename = columnsArray.getString(12)
                 var effectiveTitle = ""
                 if (title != filename) effectiveTitle = title
 
@@ -162,6 +161,7 @@ class PlaylistAccess(private val vm: AppViewModel) {
                         album,
                         effectiveTitle,
                         artist,
+                        albumArtist,
                         samplerRate,
                         genre,
                         discNumber,
@@ -358,6 +358,7 @@ class PlaylistAccess(private val vm: AppViewModel) {
             encodedName = name // Fallback or throw an error
         }
         vm.connector.postData("playlists/add?index=$position&title=$encodedName", vm)
-        if (paths != null && addBehavior != null) addPathsToPlaylist("" + position, paths, addBehavior)
+        if (paths != null && addBehavior != null)
+            addPathsToPlaylist("" + position, paths, addBehavior)
     }
 }

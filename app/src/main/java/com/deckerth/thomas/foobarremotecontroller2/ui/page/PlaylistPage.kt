@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -80,9 +81,14 @@ import com.deckerth.thomas.foobarremotecontroller2.ui.theme.Foobar2000RemoteCont
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.PlayerViewModel
 
+var showCoverFullscreen by mutableStateOf(false)
+var imageUrl by mutableStateOf("")
+
 @Composable
 fun PlaylistPage(vm: AppViewModel) {
     // The currently displayed playlists may have been changed in foobar so that is got invalidated
+
+    val colors = MaterialTheme.colorScheme
 
     if (vm.displayedPlaylist != null && vm.displayedPlaylist!!.lifecycleState != PlaylistLifecycleState.Valid) {
         val displayToast = vm.playlistEditMode || vm.playlistsViewModel.showFilter
@@ -116,6 +122,21 @@ fun PlaylistPage(vm: AppViewModel) {
                 vm.displayedPlaylist!!
             )
     }
+
+    if (showCoverFullscreen)
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(colors.background)
+                .clickable { showCoverFullscreen = false }
+        ) {
+            ImageWithLoadingPlaceholder(
+                imageUrl, Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+                    .clickable { showCoverFullscreen = false }, vm
+            )
+        }
 
     if (vm.playlistsViewModel.showFilter) TitleSearchBarDialog(
         vm = vm,
@@ -229,7 +250,7 @@ fun TitleDropdownMenu(vm: AppViewModel, title: ITitle? = null, album: Album? = n
                     )
                 }
             )
-            if (title != null || (album != null && album.tracks.size == 1))  {
+            if (title != null || (album != null && album.tracks.size == 1)) {
                 DropdownMenuItem(
                     text = { Text(stringResource(R.string.menu_item_show_title_details)) },
                     onClick = {
@@ -269,11 +290,11 @@ fun TitleDropdownMenu(vm: AppViewModel, title: ITitle? = null, album: Album? = n
 
     if (showTitleDetails)
         if (title != null)
-        TitleDetails(
-            title = title,
-            onDismiss = { showTitleDetails = false },
-        )
-    else if (album != null && album.tracks.size == 1)
+            TitleDetails(
+                title = title,
+                onDismiss = { showTitleDetails = false },
+            )
+        else if (album != null && album.tracks.size == 1)
             TitleDetails(
                 title = album.tracks[0].details,
                 onDismiss = { showTitleDetails = false },
@@ -300,7 +321,13 @@ fun playlistInfoString(vm: AppViewModel): String {
 }
 
 @Composable
-fun AlbumCard(vm: AppViewModel, playerViewModel: PlayerViewModel, album: Album, layout: Layout?, previewMode: Boolean = false) {
+fun AlbumCard(
+    vm: AppViewModel,
+    playerViewModel: PlayerViewModel,
+    album: Album,
+    layout: Layout?,
+    previewMode: Boolean = false
+) {
 
     /*
     in automatic mode (initial state):
@@ -362,7 +389,13 @@ fun AlbumCard(vm: AppViewModel, playerViewModel: PlayerViewModel, album: Album, 
                     modifier = Modifier.size(80.dp)
                 )
                 else ImageWithLoadingPlaceholder(
-                    imageUrl = album.originalTitle.artworkUrl, modifier = Modifier.size(80.dp), vm
+                    imageUrl = album.originalTitle.artworkUrl,
+                    modifier = Modifier
+                        .size(80.dp)
+                        .clickable {
+                            imageUrl = album.originalTitle.artworkUrl; showCoverFullscreen = true
+                        },
+                    vm
                 )
                 Column(
                     verticalArrangement = Arrangement.Center,
@@ -407,14 +440,22 @@ fun AlbumCard(vm: AppViewModel, playerViewModel: PlayerViewModel, album: Album, 
                     Column {
                         album.tracks.forEach { title ->
                             TitleEntry(
-                                vm = vm, playerViewModel = playerViewModel, album = album, title = title, previewMode = previewMode
+                                vm = vm,
+                                playerViewModel = playerViewModel,
+                                album = album,
+                                title = title,
+                                previewMode = previewMode
                             )
                         }
                     }
                 }
             } else if (!albumRepresentsTitle) {
                 TitleEntry(
-                    vm = vm, playerViewModel = playerViewModel, album = album, title = album.tracks[0], previewMode = previewMode
+                    vm = vm,
+                    playerViewModel = playerViewModel,
+                    album = album,
+                    title = album.tracks[0],
+                    previewMode = previewMode
                 )
             }
         }
@@ -424,7 +465,11 @@ fun AlbumCard(vm: AppViewModel, playerViewModel: PlayerViewModel, album: Album, 
 
 @Composable
 fun TitleEntry(
-    vm: AppViewModel, playerViewModel: PlayerViewModel, album: Album, title: SelectableTitle, previewMode: Boolean = false
+    vm: AppViewModel,
+    playerViewModel: PlayerViewModel,
+    album: Album,
+    title: SelectableTitle,
+    previewMode: Boolean = false
 ) {
     var titleSelected = false
     if (previewMode) titleSelected = title.details.index == 0
@@ -489,7 +534,7 @@ fun AlbumCardPreview() {
         "",
         "",
         "",
-        "",""
+        "", ""
     )
     val album = Album(title)
     album.addTitle(title)

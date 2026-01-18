@@ -4,6 +4,8 @@ package com.deckerth.thomas.foobarremotecontroller2.ui.page
 
 import android.annotation.SuppressLint
 import android.content.res.Configuration
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -81,7 +83,7 @@ fun PlayingPage(vm: AppViewModel) {
         onRefresh =
             {
                 isRefreshing = true
-                coroutineScope.launch  {
+                coroutineScope.launch {
                     onRefresh(vm)
                     delay(1000)
                     isRefreshing = false
@@ -329,11 +331,14 @@ fun PlayerCard(
 ) {
     // In phone mode: Trigger loading of the current playlist if it is not already loaded.
     if (!mainActivity!!.isTablet())
-        if(vm.displayedPlaylist != null && vm.displayedPlaylist!!.lifecycleState == PlaylistLifecycleState.RequiresUpdate) {
+        if (vm.displayedPlaylist != null && vm.displayedPlaylist!!.lifecycleState == PlaylistLifecycleState.RequiresUpdate) {
             vm.displayedPlaylist!!.lifecycleState = PlaylistLifecycleState.Valid
             vm.displayedPlaylist!!.clear()
             vm.displayedPlaylist = null
         }
+
+    var showCoverFullscreen by remember { mutableStateOf(false) }
+    val colors = MaterialTheme.colorScheme
 
     // The main layout container, occupying the entire screen.
     Column(
@@ -348,53 +353,77 @@ fun PlayerCard(
                 // Makes the Box occupy the full width of the screen.
                 .fillMaxWidth()
         ) {
-            if (playerViewModel.playbackState == PlaybackState.STOPPED)
-                PlayerStopped(modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.Center))
-            else
-                ArtWork(playerViewModel, previewMode = previewMode, vm)
-        }
+            if (playerViewModel.playbackState == PlaybackState.STOPPED) {
+                PlayerStopped(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .align(Alignment.Center)
+                )
+                showCoverFullscreen = false
+            } else {
+                // Clickable Cover: Opens Fullscreen-Overlay
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .clickable { showCoverFullscreen = true }
+                ) {
+                    ArtWork(playerViewModel, previewMode = previewMode, vm)
+                }
 
-        // This Column contains the text fields and other controls.
-        Box {
-            Column(modifier = Modifier.padding(16.dp)) {
-                if (playerViewModel.playbackState != PlaybackState.STOPPED) {
-                    val layout = layoutManager.getLayout()
-
-                    for (item in layout.playerLayout.items) {
-                        if (item.item != LayoutItems.ARTWORK)
-                            LayoutComponent(vm, playerViewModel,item)
+                // Fullscreen overlay with dark background; tap to close
+                if (showCoverFullscreen) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(colors.background)
+                            .clickable { showCoverFullscreen = false },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        ArtWork(playerViewModel, previewMode = previewMode, vm)
                     }
                 }
-                if (onPreviousTrack != null && onNextTrack != null)
-                    PlayerButtons(
-                        vm,
-                        modifier = Modifier.padding(bottom = 24.dp),
-                        onPreviousTrack,
-                        onNextTrack,
-                        previewMode
-                    )
-                else
-                    PlayerButtons(vm, modifier = Modifier.padding(bottom = 24.dp))
             }
-            var infoButtonClicked by remember { mutableStateOf(false) }
-            IconButton(
-                modifier = Modifier.align(Alignment.TopEnd),
-                onClick = { infoButtonClicked = true }
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.info_i),
-                    contentDescription = stringResource(R.string.button_details),
-                    modifier = Modifier.size(16.dp)
-                )
-            }
-            if (infoButtonClicked && !previewMode)
-                TitleDetails(
-                    vm = vm,
-                    onDismiss = { infoButtonClicked = false },
-                )
         }
+        if (!showCoverFullscreen)
+        // This Column contains the text fields and other controls.
+            Box {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    if (playerViewModel.playbackState != PlaybackState.STOPPED) {
+                        val layout = layoutManager.getLayout()
+
+                        for (item in layout.playerLayout.items) {
+                            if (item.item != LayoutItems.ARTWORK)
+                                LayoutComponent(vm, playerViewModel, item)
+                        }
+                    }
+                    if (onPreviousTrack != null && onNextTrack != null)
+                        PlayerButtons(
+                            vm,
+                            modifier = Modifier.padding(bottom = 24.dp),
+                            onPreviousTrack,
+                            onNextTrack,
+                            previewMode
+                        )
+                    else
+                        PlayerButtons(vm, modifier = Modifier.padding(bottom = 24.dp))
+                }
+                var infoButtonClicked by remember { mutableStateOf(false) }
+                IconButton(
+                    modifier = Modifier.align(Alignment.TopEnd),
+                    onClick = { infoButtonClicked = true }
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.info_i),
+                        contentDescription = stringResource(R.string.button_details),
+                        modifier = Modifier.size(16.dp)
+                    )
+                }
+                if (infoButtonClicked && !previewMode)
+                    TitleDetails(
+                        vm = vm,
+                        onDismiss = { infoButtonClicked = false },
+                    )
+            }
     }
 }
 

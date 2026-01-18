@@ -182,8 +182,8 @@
 <!--    <string name="release_notes_2_text">When creating a new playlist from the current one or copying selected tracks to another playlist, you can now quickly select or deselect all titles with ease.</string>-->
     <string name="release_notes_1_header">Energy Consumption</string>
     <string name="release_notes_1_text">FoobarLink now uses less energy thanks to a substantial reduction of network traffic.</string>
-    <string name="release_notes_2_header">Playlist Editing</string>
-    <string name="release_notes_2_text">Copy or remove titles from the title context menu.</string>
+    <string name="release_notes_2_header">Title Details</string>
+    <string name="release_notes_2_text">Copy any element—such as the artist—directly to your clipboard so you can use it for filtering.</string>
     <string name="release_notes_remark">You can review the release notes later in the app settings.</string>
     <string name="release_notes_version">Version: %1$s</string>
     <string name="menu_item_top_of_playlist">Go to top</string>
@@ -195,8 +195,8 @@
     <string name="menu_item_show_title_details">Details</string>
     <string name="menu_item_add_to_playlist">Add to playlist…</string>
     <string name="menu_item_remove_from_playlist">Remove from playlist</string>
-    <string name="release_notes_3_header">Playlist Navigation</string>
-    <string name="release_notes_3_text">Directly jump to the top or bottom of the playlist.</string>
+    <string name="release_notes_3_header">Cover</string>
+    <string name="release_notes_3_text">Tap the cover to enlarge it; tap once more to return to the previous view.</string>
     <string name="layout_item_artist_title">Artist - Title</string>
     <string name="button_content_copy">Copy to clipboard</string>
     <string name="layout_item_album_artist">Album Artist</string>

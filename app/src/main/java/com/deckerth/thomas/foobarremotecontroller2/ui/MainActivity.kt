@@ -296,7 +296,7 @@ class MainActivity : ComponentActivity() {
                             when (getCurrentRoute(navController)) {
                                 "Playlist" -> Row {
                                     ToggleAutoscrollButton()
-                                    DisableFilterButton()
+                                    FilterButton()
                                     IconButton(onClick = {
                                         appViewModel.playlistsViewModel.updateList()
                                     }) {
@@ -468,7 +468,7 @@ class MainActivity : ComponentActivity() {
                                 )
                                 if (getCurrentRoute(navController) == "Now Playing And Playlist") {
                                     ToggleAutoscrollButton(Modifier.padding(start = 10.dp))
-                                    DisableFilterButton()
+                                    FilterButton()
                                     PlaylistMenu()
                                 }
                             }
@@ -585,7 +585,7 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    private fun DisableFilterButton() {
+    private fun FilterButton() {
         if (appViewModel.playlistsViewModel.filterValue.isActive)
             IconButton(onClick = {
                 appViewModel.playlistsViewModel.showFilter = false
@@ -595,7 +595,16 @@ class MainActivity : ComponentActivity() {
                     painter = painterResource(R.drawable.filter_alt_off),
                     contentDescription = "Filter off"
                 )
+            } else {
+            IconButton(onClick = {
+                appViewModel.playlistsViewModel.showFilter = true
+            }) {
+                Icon(
+                    painter = painterResource(R.drawable.filter_alt),
+                    contentDescription = "Filter on"
+                )
             }
+        }
     }
 
     @Composable
@@ -652,7 +661,7 @@ class MainActivity : ComponentActivity() {
                     )
                 }
             )
-            DropdownMenuItem(
+            /*DropdownMenuItem(
                 text = { Text(stringResource(R.string.filter_titles)) },
                 onClick = {
                     dropdownMenuExpanded =
@@ -665,7 +674,7 @@ class MainActivity : ComponentActivity() {
                         contentDescription = "Filter"
                     )
                 }
-            )
+            )*/
             DropdownMenuItem(
                 text = { Text(stringResource(R.string.add_to_playback_queue)) },
                 onClick = {

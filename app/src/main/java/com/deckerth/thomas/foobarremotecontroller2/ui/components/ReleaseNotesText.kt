@@ -1,6 +1,8 @@
 package com.deckerth.thomas.foobarremotecontroller2.ui.components
 
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -38,18 +40,18 @@ private fun getReleaseNotes(appVersion: String?, withSettingsNote: Boolean) : An
         withStyle(textStyle) {
             append(stringResource(R.string.release_notes_1_text) + "\n\n")
         }
-//        withStyle(titleStyle) {
-//            append(stringResource(R.string.release_notes_2_header) + "\n\n")
-//        }
-//        withStyle(textStyle) {
-//            append(stringResource(R.string.release_notes_2_text) + "\n\n\n")
-//        }
-//        withStyle(titleStyle) {
-//            append(stringResource(R.string.release_notes_3_header) + "\n\n")
-//        }
-//        withStyle(textStyle) {
-//            append(stringResource(R.string.release_notes_3_text) + "\n\n\n")
-//        }
+        withStyle(titleStyle) {
+            append(stringResource(R.string.release_notes_2_header) + "\n\n")
+        }
+        withStyle(textStyle) {
+            append(stringResource(R.string.release_notes_2_text) + "\n\n\n")
+        }
+        withStyle(titleStyle) {
+            append(stringResource(R.string.release_notes_3_header) + "\n\n")
+        }
+        withStyle(textStyle) {
+            append(stringResource(R.string.release_notes_3_text) + "\n\n\n")
+        }
         if (withSettingsNote)
             withStyle(smallTextStyle) {
                 append(stringResource(R.string.release_notes_remark) + "\n")
@@ -70,7 +72,7 @@ fun ReleaseNotesText(
     Text(
         text = annotatedString,
         modifier = modifier
-            .fillMaxWidth()
+            .fillMaxWidth().verticalScroll(rememberScrollState())
     )
 }
 

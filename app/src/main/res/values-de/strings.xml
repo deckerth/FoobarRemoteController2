@@ -183,8 +183,8 @@
 <!--    <string name="release_notes_2_text">Wenn Sie eine neue Playlist aus der aktuellen erstellen oder ausgewählte Titel in eine andere Playlist kopieren, können Sie nun einfach alle Titel auswählen oder abwählen.</string>-->
     <string name="release_notes_1_header">Energieverbrauch</string>
     <string name="release_notes_1_text">Dank der deutlich verringerten Kommunikation mit Foobar benötigt FoobarLink jetzt weniger Energie.</string>
-    <string name="release_notes_2_header">Editieren von Playlists</string>
-    <string name="release_notes_2_text">Über das Titel-Kontextmenü können Sie Titel von der Playlist entfernen oder in eine andere Playlist kopieren.</string>
+    <string name="release_notes_2_header">Detailsicht</string>
+    <string name="release_notes_2_text">Kopieren Sie ein beliebiges Element – etwa den Künstler – in die Zwischenablage, um es anschließend zum Filtern zu verwenden.</string>
     <string name="release_notes_remark">Sie können sich die Informationen über die Neuigkeiten später in den Einstellungen ansehen.</string>
     <string name="release_notes_version">Version: %1$s</string>
     <string name="menu_item_top_of_playlist">Zum Anfang springen</string>
@@ -196,9 +196,9 @@
     <string name="menu_item_show_title_details">Details</string>
     <string name="menu_item_add_to_playlist">Add to playlist…</string>
     <string name="menu_item_remove_from_playlist">Remove from playlist</string>
-    <string name="release_notes_3_header">Navigation in der Playlist</string>
-    <string name="release_notes_3_text">Über das Playlist Menü können Sie zum Anfang oder zum Ende der Playlist springen.</string>
+    <string name="release_notes_3_header">Cover</string>
+    <string name="release_notes_3_text">Tippen Sie auf das Cover, um es zu vergrößern; tippen Sie erneut, um zur vorherigen Ansicht zurückzukehren.</string>
     <string name="layout_item_artist_title">Künstler - Titel</string>
-    <string name="button_content_copy">Copy to clipboard</string>
+    <string name="button_content_copy">In Zwischanablage kopieren</string>
     <string name="layout_item_album_artist">Album Artist</string>
 </resources>

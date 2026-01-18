@@ -44,7 +44,7 @@ private fun getReleaseNotes(appVersion: String?, withSettingsNote: Boolean) : An
             append(stringResource(R.string.release_notes_2_header) + "\n\n")
         }
         withStyle(textStyle) {
-            append(stringResource(R.string.release_notes_2_text) + "\n\n\n")
+            append(stringResource(R.string.release_notes_2_text) + "\n\n")
         }
         withStyle(titleStyle) {
             append(stringResource(R.string.release_notes_3_header) + "\n\n")

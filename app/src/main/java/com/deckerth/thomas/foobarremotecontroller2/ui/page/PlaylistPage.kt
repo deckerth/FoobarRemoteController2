@@ -96,7 +96,7 @@ fun PlaylistPage(vm: AppViewModel) {
         if (vm.playlistEditMode) vm.disablePlaylistEditMode(true)
         if (vm.addTitlesMode) vm.disableAddTitlesMode()
 
-        if (vm.playlistsViewModel.showFilter) {
+        if (vm.playlistsViewModel.filterValue.isActive) {
             vm.playlistsViewModel.showFilter = false
             vm.playlistsViewModel.filterValue.clear()
         }

@@ -143,13 +143,8 @@ class PlaylistAccess(private val vm: AppViewModel) {
                 val track = columnsArray.getString(10)
                 val length = columnsArray.getString(11)
                 var path = ""
-                val filename: String?
-                if (withPaths) {
+                if (withPaths)
                     path = columnsArray.getString(12)
-                    filename = getFilenameWithoutExtension(path)
-                } else filename = columnsArray.getString(12)
-                var effectiveTitle = ""
-                if (title != filename) effectiveTitle = title
 
                 playlist.addTitle(
                     Title(
@@ -159,7 +154,7 @@ class PlaylistAccess(private val vm: AppViewModel) {
                         catalog,
                         composer,
                         album,
-                        effectiveTitle,
+                        title,
                         artist,
                         albumArtist,
                         samplerRate,

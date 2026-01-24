@@ -95,21 +95,17 @@ class PlayerAccess(private val vm: AppViewModel) {
             }
 
             if (columns.length() > 0) {
-                val title = columns.getString(4)
-                val filename = columns.getString(12)
-                var effectiveTitle = ""
                 val index = activeItemObject.getString("index")
                 val imageURL = if (!index.isEmpty() && index != "-1") vm.connector.serverAddress(usedIpAddress) + "artwork/" + activeItemObject.getString(
                     "playlistId"
                 ) + "/" + activeItemObject.getString("index")
                 else vm.connector.serverAddress(usedIpAddress) + "artwork/current"
-                if (title != filename) effectiveTitle = title
                 vm.playerViewModel.update(
                     columns.getString(0),
                     columns.getString(1),
                     columns.getString(2),
                     columns.getString(3),
-                    effectiveTitle,
+                    columns.getString(4),
                     columns.getString(5),
                     columns.getString(6),
                     columns.getString(7),

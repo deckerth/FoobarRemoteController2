@@ -297,14 +297,6 @@ class MainActivity : ComponentActivity() {
                                 "Playlist" -> Row {
                                     ToggleAutoscrollButton()
                                     FilterButton()
-                                    IconButton(onClick = {
-                                        appViewModel.playlistsViewModel.updateList()
-                                    }) {
-                                        Icon(
-                                            imageVector = Icons.Default.Refresh,
-                                            contentDescription = "Refresh"
-                                        )
-                                    }
                                     PlaylistMenu()
                                 }
 
@@ -490,14 +482,6 @@ class MainActivity : ComponentActivity() {
                             when (getCurrentRoute(navController)) {
                                 "Now Playing And Playlist" -> Row {
                                     IconButton(onClick = {
-                                        appViewModel.playlistsViewModel.updateList()
-                                    }) {
-                                        Icon(
-                                            imageVector = Icons.Default.Refresh,
-                                            contentDescription = "Refresh"
-                                        )
-                                    }
-                                    IconButton(onClick = {
                                         navigateTo("Settings")
                                     }) {
                                         Icon(
@@ -661,20 +645,18 @@ class MainActivity : ComponentActivity() {
                     )
                 }
             )
-            /*DropdownMenuItem(
-                text = { Text(stringResource(R.string.filter_titles)) },
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.menu_item_reload_playlist)) },
                 onClick = {
-                    dropdownMenuExpanded =
-                        false; appViewModel.playlistsViewModel.showFilter =
-                    true
+                    appViewModel.playlistsViewModel.updateList()
                 },
                 leadingIcon = {
                     Icon(
-                        painter = painterResource(R.drawable.filter_alt),
-                        contentDescription = "Filter"
+                        imageVector = Icons.Default.Refresh,
+                        contentDescription = "Refresh"
                     )
                 }
-            )*/
+            )
             DropdownMenuItem(
                 text = { Text(stringResource(R.string.add_to_playback_queue)) },
                 onClick = {

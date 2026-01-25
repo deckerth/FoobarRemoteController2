@@ -360,7 +360,6 @@ class MainActivity : ComponentActivity() {
                     SettingsPage(appViewModel)
                 }
                 composable("DeviceSelectionPage") {
-                    appBarLabel = stringResource(R.string.title_device_selection)
                     WizardPage(
                         vm = appViewModel,
                         showIntroduction = false,

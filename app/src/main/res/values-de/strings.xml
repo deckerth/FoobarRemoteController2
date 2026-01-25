@@ -202,4 +202,5 @@
     <string name="button_content_copy">In Zwischanablage kopieren</string>
     <string name="layout_item_album_artist">Album Artist</string>
     <string name="menu_item_reload_playlist">Playlist neu laden</string>
+    <string name="ip_address">IP Adresse eingeben</string>
 </resources>

@@ -105,7 +105,7 @@ fun WizardPage(
     ) {
         composable("Introduction") {
             if (state.navController != null)
-                println("FOOB navstack: ${state.navController!!.graph.nodes.size()}")
+                println("FOOB Wizard navstack: ${state.navController!!.graph.nodes.size()}")
             mainActivity!!.appBarLabel = stringResource(R.string.welcome_heading)
             Box(
                 modifier = Modifier.fillMaxSize()
@@ -138,15 +138,19 @@ fun WizardPage(
         }
         composable("Search Device") {
             if (state.navController != null)
-                println("FOOB navstack: ${state.navController!!.graph.nodes.size()}")
-            mainActivity!!.appBarLabel = stringResource(R.string.search_device_heading)
+                println("FOOB Wizard navstack: ${state.navController!!.graph.nodes.size()}")
+            var hasSearched by remember { mutableStateOf(false) }
+            if (hasSearched)
+                mainActivity!!.appBarLabel = stringResource(R.string.title_device_selection)
+            else
+                mainActivity!!.appBarLabel = stringResource(R.string.search_device_heading)
             Box(
                 modifier = Modifier.fillMaxSize()
             ) {
-                var hasSearched by remember { mutableStateOf(false) }
                 SearchDevices(
                     onFinishedLoading = {
                         hasSearched = true
+                        println("FOOB Wizard Search finished, found ${devices.size} devices.")
                     },
                     onFinished = { device: Device ->
                         saveIpAddress("${device.ipAddress}:8880", mainActivity!!)
@@ -166,7 +170,6 @@ fun WizardPage(
                     ) {
                         FilledTonalButton(
                             onClick = {
-                                prepareDeviceSelectionPage()
                                 hasSearched = false
                                 state.navController!!.navigate("Search Device")
                             }
@@ -175,12 +178,12 @@ fun WizardPage(
                         }
                         Spacer(modifier = Modifier.weight(1f))
                         Spacer(modifier = Modifier.width(12.dp))
-                        Button(
+                        FilledTonalButton(
                             onClick = {
                                 state.navController?.navigate("Manual Device")
                             },
                         ) {
-                            Text(stringResource(id = R.string.button_next))
+                            Text(stringResource(id = R.string.ip_address))
                         }
                     }
                 }
@@ -188,7 +191,7 @@ fun WizardPage(
         }
         composable("No Device Found") {
             if (state.navController != null)
-                println("FOOB navstack: ${state.navController!!.graph.nodes.size()}")
+                println("FOOB Wizard navstack: ${state.navController!!.graph.nodes.size()}")
             mainActivity!!.appBarLabel = stringResource(R.string.device_not_found_heading)
             Box(
                 modifier = Modifier.fillMaxSize()
@@ -203,7 +206,6 @@ fun WizardPage(
                 ) {
                     FilledTonalButton(
                         onClick = {
-                            prepareDeviceSelectionPage()
                             state.navController!!.navigateUp()
                         }
                     ) {
@@ -223,7 +225,7 @@ fun WizardPage(
         }
         composable("Manual Device") {
             if (state.navController != null)
-                println("FOOB navstack: ${state.navController!!.graph.nodes.size()}")
+                println("FOOB Wizard navstack: ${state.navController!!.graph.nodes.size()}")
             mainActivity!!.appBarLabel = stringResource(R.string.manual_device_heading)
             CustomDevicePage(onFinished = { device: Device ->
                 if (device.isValid) {
@@ -257,6 +259,7 @@ fun SearchDevices(
     // LaunchedEffect triggers when the key changes (here, `true`)
     LaunchedEffect(Unit) {
         if (!hasSearched) {
+            println("FOOB Wizard Starting device search...")
             loading = true
             prepareDeviceSelectionPage()
         }
@@ -299,16 +302,17 @@ suspend fun scanForFoobarServers(port: Int, timeout: Int = 1000) {
     }
 
     loading = true
+    println("FOOB Wizard Scan starts.")
     coroutineScope {
         val jobs = (1..254).map { i ->
             launch(Dispatchers.IO) {
                 val ip = "$baseIp.$i"
-                println("FOOB $ip")
+                // println("FOOB Wizard $ip")
                 try {
                     if (isFoobarServer(ip, port, timeout)) {
                         val hostName = getHostName(ip)
                         val element = Device(hostName, ip)
-                        println("FOOB Success $element")
+                        println("FOOB Wizard Success $element")
                         devices.add(element)
                     }
                 } catch (_: Exception) {
@@ -316,6 +320,7 @@ suspend fun scanForFoobarServers(port: Int, timeout: Int = 1000) {
             }
         }
         jobs.joinAll()
+        println("FOOB Wizard Scan complete. Found ${devices.size} devices.")
         loading = false
     }
 }

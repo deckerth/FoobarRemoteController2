@@ -201,4 +201,5 @@
     <string name="button_content_copy">Copy to clipboard</string>
     <string name="layout_item_album_artist">Album Artist</string>
     <string name="menu_item_reload_playlist">Reload playlist</string>
+    <string name="ip_address">Enter IP address</string>
 </resources>

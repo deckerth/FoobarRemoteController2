@@ -179,6 +179,18 @@ class PlayerViewModel : ViewModel() {
         }
     }
 
+    @SuppressLint("DefaultLocale")
+    fun getNicePosition(fraction : Float): String {
+        try {
+            val position = (duration.toFloat() * fraction).toInt()
+            val minutes: Int = position / 60
+            val seconds: Int = position % 60
+            return String.format("%01d:%02d", minutes, seconds)
+        } catch (ex: NumberFormatException) {
+            return ""
+        }
+    }
+
     fun getPos(): Float {
         try {
             val duration = this.duration.toFloat()

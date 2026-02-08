@@ -62,10 +62,16 @@ fun PlayerProgress(vm: AppViewModel, playerViewModel: PlayerViewModel) {
 
     Column {
         Box {
+            val displayedPlaybackTime = if (isDragging)
+                playerViewModel.getNicePosition(sliderValue)
+            else
+                playerViewModel.playbackTime
+
             Text(
                 modifier = Modifier
                     .fillMaxWidth(),
-                text = playerViewModel.playbackTime,
+                //text = if( isDragging ) playerViewModel.playbackTime else "test",
+                text = displayedPlaybackTime,
                 style = MaterialTheme.typography.labelSmall
             )
             Text(

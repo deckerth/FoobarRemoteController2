@@ -67,11 +67,13 @@ import com.deckerth.thomas.foobarremotecontroller2.model.PlaylistLifecycleState
 import com.deckerth.thomas.foobarremotecontroller2.model.Playlists
 import com.deckerth.thomas.foobarremotecontroller2.model.SelectableTitle
 import com.deckerth.thomas.foobarremotecontroller2.model.Title
+import com.deckerth.thomas.foobarremotecontroller2.ui.components.AlbumProgress
 import com.deckerth.thomas.foobarremotecontroller2.ui.components.ImageWithLoadingPlaceholder
 import com.deckerth.thomas.foobarremotecontroller2.ui.components.LayoutComponent
 import com.deckerth.thomas.foobarremotecontroller2.ui.components.PlaylistNameDialog
 import com.deckerth.thomas.foobarremotecontroller2.ui.components.PlaylistSelector
 import com.deckerth.thomas.foobarremotecontroller2.ui.components.TitleDetails
+import com.deckerth.thomas.foobarremotecontroller2.ui.components.TitleProgress
 import com.deckerth.thomas.foobarremotecontroller2.ui.components.TitleSearchBarDialog
 import com.deckerth.thomas.foobarremotecontroller2.ui.isTablet
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.Layout
@@ -345,6 +347,11 @@ fun AlbumCard(
         else album.isAutomaticSelection = album.isExpanded == currentlyPlaying
     }
 
+    val albumIsCurrentlyPlaying =
+        playerViewModel.valid && album.originalTitle.playlistId == playerViewModel.playlistId && album.hasIndex(
+            playerViewModel.getIndex()
+        )
+
     // if the album contains a single title without name, the album itself represents the title, and can be selected
     val albumRepresentsTitle = album.tracks.size == 1 && album.tracks[0].details.title == ""
     var modifier: Modifier = Modifier
@@ -406,6 +413,8 @@ fun AlbumCard(
                     if (layout != null) for (item in layout.albumLayout.items) {
                         LayoutComponent(album, item)
                     }
+                    if (albumIsCurrentlyPlaying)
+                        AlbumProgress(album, playerViewModel, withTimingDetails = true)
                 }
                 TitleDropdownMenu(vm, album = album)
             }
@@ -506,8 +515,9 @@ fun TitleEntry(
                 for (item in layout.titleLayout.items) {
                     LayoutComponent(album, title.details, layout.albumLayoutHasArtist, item)
                 }
+                if (titleSelected)
+                    TitleProgress(playerViewModel, withTimingDetails = true)
             }
-
             TitleDropdownMenu(vm, title.details)
         }
     }

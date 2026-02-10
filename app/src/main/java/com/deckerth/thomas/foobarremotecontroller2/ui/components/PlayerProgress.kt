@@ -14,7 +14,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
@@ -31,6 +33,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.deckerth.thomas.foobarremotecontroller2.R
+import com.deckerth.thomas.foobarremotecontroller2.model.Album
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.PlayerViewModel
 
@@ -70,7 +73,6 @@ fun PlayerProgress(vm: AppViewModel, playerViewModel: PlayerViewModel) {
             Text(
                 modifier = Modifier
                     .fillMaxWidth(),
-                //text = if( isDragging ) playerViewModel.playbackTime else "test",
                 text = displayedPlaybackTime,
                 style = MaterialTheme.typography.labelSmall
             )
@@ -96,7 +98,7 @@ fun PlayerProgress(vm: AppViewModel, playerViewModel: PlayerViewModel) {
                     // Calculate fraction of the slider that is active
                     fraction =
                         (sliderState.value - sliderState.valueRange.start) / (sliderState.valueRange.endInclusive - sliderState.valueRange.start)
-                } catch (e: ArithmeticException) {
+                } catch (_: ArithmeticException) {
                 }
                 if (fraction.isNaN())
                     fraction = 0f
@@ -133,12 +135,12 @@ fun PlayerProgress(vm: AppViewModel, playerViewModel: PlayerViewModel) {
 
         val discNumber = try {
             playerViewModel.discNumber.toInt()
-        } catch (e: NumberFormatException) {
+        } catch (_: NumberFormatException) {
             -1
         }
         val track = try {
             playerViewModel.track.toInt()
-        } catch (e: NumberFormatException) {
+        } catch (_: NumberFormatException) {
             -1
         }
         if (track != -1) {
@@ -161,4 +163,87 @@ fun PlayerProgress(vm: AppViewModel, playerViewModel: PlayerViewModel) {
             )
         }
     }
+}
+
+// Reusable composable for a determinate linear progress indicator with optional timing texts.
+@Composable
+private fun ProgressWithTiming(
+    fraction: Float,
+    positionText: String? = null,
+    durationText: String? = null,
+    withTimingDetails: Boolean = false
+) {
+    Column {
+        val safeFraction = if (fraction.isNaN()) 0f else fraction.coerceIn(0f, 1f)
+
+        if (withTimingDetails) {
+            Box {
+                if (!positionText.isNullOrEmpty()) {
+                    Text(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = positionText,
+                        style = MaterialTheme.typography.labelSmall
+                    )
+                } else {
+                    // keep layout consistent even if positionText is null
+                    Text(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = "",
+                        style = MaterialTheme.typography.labelSmall
+                    )
+                }
+
+                Text(
+                    textAlign = TextAlign.Right,
+                    modifier = Modifier.fillMaxWidth(),
+                    text = durationText ?: "",
+                    style = MaterialTheme.typography.labelSmall
+                )
+            }
+        }
+
+        LinearProgressIndicator(
+            progress = { safeFraction },
+            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+            color = ProgressIndicatorDefaults.linearColor,
+            trackColor = ProgressIndicatorDefaults.linearTrackColor,
+            strokeCap = ProgressIndicatorDefaults.LinearStrokeCap,
+        )
+    }
+}
+
+@Composable
+fun AlbumProgress(album: Album, playerViewModel: PlayerViewModel, withTimingDetails: Boolean = false) {
+    val fraction = try {
+        album.getAlbumPosition(playerViewModel).coerceIn(0f, 1f)
+    } catch (_: Exception) {
+        0f
+    }
+    val position = if (withTimingDetails) album.getNicePosition(fraction) else null
+    val duration = if (withTimingDetails) album.getNiceDuration() else null
+
+    ProgressWithTiming(
+        fraction = fraction,
+        positionText = position,
+        durationText = duration,
+        withTimingDetails = withTimingDetails
+    )
+}
+
+@Composable
+fun TitleProgress(playerViewModel: PlayerViewModel, withTimingDetails: Boolean = false) {
+    val fraction = try {
+        playerViewModel.getPos().coerceIn(0f, 1f)
+    } catch (_: Exception) {
+        0f
+    }
+    val position = if (withTimingDetails) playerViewModel.getNicePosition(fraction) else null
+    val duration = if (withTimingDetails) playerViewModel.getNiceDuration() else null
+
+    ProgressWithTiming(
+        fraction = fraction,
+        positionText = position,
+        durationText = duration,
+        withTimingDetails = withTimingDetails
+    )
 }

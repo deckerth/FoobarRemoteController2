@@ -140,7 +140,7 @@ class PlayerViewModel : ViewModel() {
                     playbackTime =
                         String.format(Locale.getDefault(), "%d:%02d", newMinutes, newSeconds)
 
-                } catch (e: NumberFormatException) {
+                } catch (_: NumberFormatException) {
                     // Handle cases where the string is not in the expected format
                     // For now, we'll just leave the original time
                 }
@@ -153,7 +153,7 @@ class PlayerViewModel : ViewModel() {
         try {
             val pos = index.toInt()
             return pos
-        } catch (ex: NumberFormatException) {
+        } catch (_: NumberFormatException) {
             return -1
         }
     }
@@ -174,7 +174,7 @@ class PlayerViewModel : ViewModel() {
             val minutes: Int = duration / 60
             val seconds: Int = duration % 60
             return String.format("%01d:%02d", minutes, seconds)
-        } catch (ex: NumberFormatException) {
+        } catch (_: NumberFormatException) {
             return ""
         }
     }
@@ -186,7 +186,7 @@ class PlayerViewModel : ViewModel() {
             val minutes: Int = position / 60
             val seconds: Int = position % 60
             return String.format("%01d:%02d", minutes, seconds)
-        } catch (ex: NumberFormatException) {
+        } catch (_: NumberFormatException) {
             return ""
         }
     }
@@ -199,8 +199,16 @@ class PlayerViewModel : ViewModel() {
                 0f
             else
                 position / duration * 1f
-        } catch (ex: NumberFormatException) {
+        } catch (_: NumberFormatException) {
             return 0f
+        }
+    }
+
+    fun getPosInSeconds(): Float {
+        return try {
+            this.position.toFloat()
+        } catch (_: NumberFormatException) {
+            0f
         }
     }
 }

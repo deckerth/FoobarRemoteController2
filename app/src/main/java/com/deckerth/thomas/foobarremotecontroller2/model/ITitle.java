@@ -40,6 +40,8 @@ public interface ITitle {
 
     Double getPosition();
 
+    Float getElapsedTimeWhenTitleStarts();
+
     Boolean getIsAlbum();
 
     Bitmap getArtwork();
@@ -53,6 +55,8 @@ public interface ITitle {
     Boolean isCurrentTitle();
 
     void setIsCurrentTitle(Boolean isCurrentTitle);
+
+    void setElapsedTimeWhenTitleStarts(Float elapsedTimeWhenTitleStarts);
 
     Boolean matches(TitleFilter filter);
 

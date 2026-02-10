@@ -62,7 +62,7 @@ val previewPlayerPop = PlayerViewModel().apply { update(
     "1",
     "0:50",
     "p4",
-    "1",
+    "0",
     "232.2",
     "51.080651833333334",
     R.drawable.cover_abba.toString(),

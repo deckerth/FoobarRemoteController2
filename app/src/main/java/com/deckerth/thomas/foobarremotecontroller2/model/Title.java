@@ -29,6 +29,7 @@ public class Title implements ITitle {
     protected Bitmap mArtwork;
     private Boolean mIsCurrent = false;
     private String mPath = "";
+    protected Float elapsedTimeWhenTitleStarts = 0.0f;
 
     public Title(String mPlaylistId, int mIndex, String mLabel, String mCatalog, String mComposer, String mAlbum, String mTitle, String mArtist, String mAlbumArtist, String mSampleRate, String mGenre, String mDiscNumber, String mTrack, String mPlaybackTime, String duration, String position, String mArtworkUrl, String mPath) {
         this.mLabel = set(mLabel);
@@ -152,6 +153,11 @@ public class Title implements ITitle {
     }
 
     @Override
+    public Float getElapsedTimeWhenTitleStarts() {
+        return elapsedTimeWhenTitleStarts;
+    }
+
+    @Override
     public Boolean getIsAlbum() {
         return false;
     }
@@ -184,6 +190,10 @@ public class Title implements ITitle {
         mIsCurrent = isCurrentTitle;
     }
 
+    @Override
+    public void setElapsedTimeWhenTitleStarts(Float elapsedTimeWhenTitleStarts) {
+        this.elapsedTimeWhenTitleStarts = elapsedTimeWhenTitleStarts;
+    }
 
     private Boolean matchesExact(String pattern) {
         if (pattern.isEmpty()) return true;

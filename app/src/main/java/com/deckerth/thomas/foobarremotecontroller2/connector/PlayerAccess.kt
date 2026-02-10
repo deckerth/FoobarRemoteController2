@@ -34,8 +34,8 @@ class PlayerAccess(private val vm: AppViewModel) {
     //    12 %25playback_time%25,
     //    13 %24filename%28%25path%25%29%24&" becomes:$filename(%path%) / %25path%25%
 
-    val columnListWithoutPath  = "%25label%25,%25catalog%25,%25composer%25,%25album%25,%25title%25,%25artist%25,%25album artist%25,%25samplerate%25,%25genre%25,%25discnumber%25,%25track%25,%25playback_time%25,%24filename%28%25path%25%29%24&"
-    val columnListWithPath     = "%25label%25,%25catalog%25,%25composer%25,%25album%25,%25title%25,%25artist%25,%25album artist%25,%25samplerate%25,%25genre%25,%25discnumber%25,%25track%25,%25playback_time%25,%25path%25%"
+    val columnListWithoutPath  = "%25label%25,%25catalog%25,%25composer%25,%25album%25,%25title%25,%25artist%25,%25album artist%25,%25samplerate%25,%25genre%25,%25discnumber%25,%25track%25,%25playback_time%25,%25length_seconds_fp%25,%24filename%28%25path%25%29%24&"
+    val columnListWithPath     = "%25label%25,%25catalog%25,%25composer%25,%25album%25,%25title%25,%25artist%25,%25album artist%25,%25samplerate%25,%25genre%25,%25discnumber%25,%25track%25,%25playback_time%25,%25length_seconds_fp%25,%25path%25%"
 
     fun parsePlayerState(usedIpAddress: String, contentObject: JSONObject) {
         try {

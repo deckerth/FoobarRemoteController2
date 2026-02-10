@@ -125,6 +125,7 @@ class PlaylistAccess(private val vm: AppViewModel) {
                                     "?",
                                     "01",
                                     "4:18"
+                                    "543.87
                                     "<path>" / "<filename>"
                                 ]
                             },
@@ -142,9 +143,10 @@ class PlaylistAccess(private val vm: AppViewModel) {
                 val discNumber = columnsArray.getString(9)
                 val track = columnsArray.getString(10)
                 val length = columnsArray.getString(11)
+                val duration = columnsArray.getString(12)
                 var path = ""
                 if (withPaths)
-                    path = columnsArray.getString(12)
+                    path = columnsArray.getString(13)
 
                 playlist.addTitle(
                     Title(
@@ -161,7 +163,9 @@ class PlaylistAccess(private val vm: AppViewModel) {
                         genre,
                         discNumber,
                         track,
-                        length, "", "",
+                        length,
+                        duration,
+                        "",
                         vm.connector.serverAddress(input.usedIpAddress) + "artwork/" + playlistEntity.playlistId + "/" + (i + startIndex),
                         path
                     )

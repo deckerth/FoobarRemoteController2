@@ -14,7 +14,8 @@ data class LayoutItem(
     var alignment: TextAlignment = TextAlignment.LEFT,
     var progressBarFormat: ProgressBarFormat = ProgressBarFormat.WAVY_WHEN_PLAYING,
     var progressBarShowTimings: Boolean = false,
-    var progressBarReplacesBackgroundColoring: Boolean = true
+    var progressBarReplacesBackgroundColoring: Boolean = true,
+    var waveSpeed: Int = 5
 ) {
 
     fun verbose(): String {

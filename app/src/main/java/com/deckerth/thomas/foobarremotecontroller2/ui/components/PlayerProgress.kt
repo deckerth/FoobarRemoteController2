@@ -1,3 +1,8 @@
+@file:OptIn(
+    ExperimentalMaterial3Api::class,
+    ExperimentalMaterial3ExpressiveApi::class
+)
+
 package com.deckerth.thomas.foobarremotecontroller2.ui.components
 
 import androidx.compose.foundation.background
@@ -14,7 +19,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.LinearWavyProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.Slider
@@ -31,6 +38,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.deckerth.thomas.foobarremotecontroller2.R
 import com.deckerth.thomas.foobarremotecontroller2.model.Album
@@ -166,13 +174,15 @@ fun PlayerProgress(vm: AppViewModel, playerViewModel: PlayerViewModel) {
 }
 
 // Reusable composable for a determinate linear progress indicator with optional timing texts.
+@ExperimentalMaterial3ExpressiveApi
 @Composable
 private fun ProgressWithTiming(
     fraction: Float,
     positionText: String? = null,
     durationText: String? = null,
     withTimingDetails: Boolean = false,
-    wavy: Boolean = true
+    wavy: Boolean,
+    waveSpeed: Dp
 ) {
     Column {
         val safeFraction = if (fraction.isNaN()) 0f else fraction.coerceIn(0f, 1f)
@@ -203,6 +213,16 @@ private fun ProgressWithTiming(
             }
         }
         if (wavy) {
+            LinearWavyProgressIndicator(
+                progress = { safeFraction },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp),
+                color = ProgressIndicatorDefaults.linearColor,
+                trackColor = ProgressIndicatorDefaults.linearTrackColor,
+                waveSpeed = waveSpeed
+            )
+        } else {
             LinearProgressIndicator(
                 progress = { safeFraction },
                 modifier = Modifier
@@ -212,16 +232,6 @@ private fun ProgressWithTiming(
                 trackColor = ProgressIndicatorDefaults.linearTrackColor,
                 strokeCap = ProgressIndicatorDefaults.LinearStrokeCap
             )
-        } else {
-//            WavyLinearProgressIndicator(
-//                progress = { safeFraction },
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .padding(vertical = 8.dp),
-//                color = ProgressIndicatorDefaults.linearColor,
-//                trackColor = ProgressIndicatorDefaults.linearTrackColor,
-//                strokeCap = ProgressIndicatorDefaults.LinearStrokeCap
-//            )
         }
     }
 }
@@ -230,7 +240,9 @@ private fun ProgressWithTiming(
 fun AlbumProgress(
     album: Album,
     playerViewModel: PlayerViewModel,
-    withTimingDetails: Boolean = false
+    withTimingDetails: Boolean = false,
+    wavy: Boolean = true,
+    waveSpeed: Dp = 5.dp
 ) {
     val fraction = try {
         album.getAlbumPosition(playerViewModel).coerceIn(0f, 1f)
@@ -244,12 +256,19 @@ fun AlbumProgress(
         fraction = fraction,
         positionText = position,
         durationText = duration,
-        withTimingDetails = withTimingDetails
+        withTimingDetails = withTimingDetails,
+        wavy = wavy,
+        waveSpeed = waveSpeed
     )
 }
 
 @Composable
-fun TitleProgress(playerViewModel: PlayerViewModel, withTimingDetails: Boolean = false) {
+fun TitleProgress(
+    playerViewModel: PlayerViewModel,
+    withTimingDetails: Boolean = false,
+    wavy: Boolean = true,
+    waveSpeed: Dp = 5.dp
+) {
     val fraction = try {
         playerViewModel.getPos().coerceIn(0f, 1f)
     } catch (_: Exception) {
@@ -262,6 +281,8 @@ fun TitleProgress(playerViewModel: PlayerViewModel, withTimingDetails: Boolean =
         fraction = fraction,
         positionText = position,
         durationText = duration,
-        withTimingDetails = withTimingDetails
+        withTimingDetails = withTimingDetails,
+        wavy = wavy,
+        waveSpeed = waveSpeed
     )
 }

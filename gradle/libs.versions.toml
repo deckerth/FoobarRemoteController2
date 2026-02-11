@@ -9,6 +9,7 @@ kotlinxSerializationJsonJvm = "1.7.3"
 lifecycleRuntimeKtx = "2.8.4"
 activityCompose = "1.9.1"
 composeBom = "2024.04.01"
+materialIconsExtended = "1.7.8"
 navigationCompose = "2.8.0-beta06"
 lifecycleRuntimeCompose = "2.8.4"
 library = "1.0.0"
@@ -22,8 +23,10 @@ media3CommonKtx = "1.5.1"
 materialColorUtilities = "1.1.1"
 paletteKtx = "1.0.0"
 materialKolor = "2.1.1"
+material3 = "1.4.0"
 
 [libraries]
+androidx-compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIconsExtended" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version = "1.15.0" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
@@ -52,6 +55,7 @@ androidx-media3-common-ktx = { group = "androidx.media3", name = "media3-common-
 material-color-utilities = { group = "com.google.android.material", name = "material-color-utilities", version.ref = "materialColorUtilities" }
 androidx-palette-ktx = { group = "androidx.palette", name = "palette-ktx", version.ref = "paletteKtx" }
 material-kolor = { group = "com.materialkolor", name = "material-kolor", version.ref = "materialKolor" }
+androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

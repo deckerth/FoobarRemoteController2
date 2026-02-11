@@ -39,9 +39,7 @@ enum class LayoutItems(
     ),
     ALBUM_ARTIST(mainActivity!!.baseContext.getString(R.string.layout_item_album_artist)),
     PROGRESS(
-        mainActivity!!.baseContext.getString(R.string.layout_item_progress_bar),
-        onTitle = false,
-        onAlbum = false
+        mainActivity!!.baseContext.getString(R.string.layout_item_progress_bar)
     ),
     ARTWORK(
         mainActivity!!.baseContext.getString(R.string.layout_item_cover),

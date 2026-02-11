@@ -72,7 +72,7 @@ fun LayoutComponent(vm: AppViewModel, playerViewModel: PlayerViewModel, layoutIt
 }
 
 @Composable
-fun LayoutComponent(album: Album, layoutItem: LayoutItem) {
+fun LayoutComponent(vm: AppViewModel, album: Album, layoutItem: LayoutItem, albumIsCurrentlyPlaying: Boolean) {
     when (layoutItem.item) {
         LayoutItems.LABEL -> TextComponent(text = album.originalTitle.label, item = layoutItem)
         LayoutItems.CATALOG -> TextComponent(text = album.originalTitle.catalog, item = layoutItem)
@@ -90,13 +90,14 @@ fun LayoutComponent(album: Album, layoutItem: LayoutItem) {
             if (album.originalTitle.composer != "" && album.originalTitle.composer != "?") {
                 TextComponent(text = album.originalTitle.composer, item = layoutItem)
             }
-
+        LayoutItems.PROGRESS -> if (albumIsCurrentlyPlaying)
+            AlbumProgress(album, vm.playerViewModel, withTimingDetails = layoutItem.progressBarShowTimings)
         else -> Text("UNKNOWN ITEM")
     }
 }
 
 @Composable
-fun LayoutComponent(album: Album, title: ITitle, checkArtist: Boolean, layoutItem: LayoutItem) {
+fun LayoutComponent(vm: AppViewModel, album: Album, title: ITitle, checkArtist: Boolean, layoutItem: LayoutItem, titleIsCurrentlyPlaying: Boolean) {
     when (layoutItem.item) {
         LayoutItems.LABEL -> TextComponent(text = title.label, item = layoutItem)
         LayoutItems.CATALOG -> TextComponent(text = title.catalog, item = layoutItem)
@@ -118,6 +119,7 @@ fun LayoutComponent(album: Album, title: ITitle, checkArtist: Boolean, layoutIte
             if (title.composer != "" && title.composer != "?") {
                 TextComponent(text = title.composer, item = layoutItem)
             }
+        LayoutItems.PROGRESS -> if (titleIsCurrentlyPlaying) TitleProgress(playerViewModel = vm.playerViewModel, withTimingDetails = layoutItem.progressBarShowTimings)
 
         else -> Text("UNKNOWN ITEM")
     }

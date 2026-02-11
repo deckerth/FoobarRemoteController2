@@ -15,9 +15,11 @@ enum class ItemSize(
     TITLE_MEDIUM(mainActivity!!.baseContext.getString(R.string.title_medium)),
     BODY_MEDIUM(mainActivity!!.baseContext.getString(R.string.body_medium)),
     BODY_SMALL(mainActivity!!.baseContext.getString(R.string.body_small)),
+
     SMALL_COVER(mainActivity!!.baseContext.getString(R.string.small_cover), isFontSize = false),
     MEDIUM_COVER(mainActivity!!.baseContext.getString(R.string.medium_cover), isFontSize = false),
     LARGE_COVER(mainActivity!!.baseContext.getString(R.string.large_cover), isFontSize = false),
+
     MAX_COVER(
         mainActivity!!.baseContext.getString(R.string.max_cover),
         isFontSize = false,

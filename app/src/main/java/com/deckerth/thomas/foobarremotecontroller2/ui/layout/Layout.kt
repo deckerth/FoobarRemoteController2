@@ -12,4 +12,9 @@ data class Layout(
         get() {
             return (albumLayout.items.any { it.item == LayoutItems.ARTIST })
         }
+
+    val highlightPlayingItem: Boolean
+        get() {
+            return (!playerLayout.items.any { it.item == LayoutItems.PROGRESS && it.progressBarReplacesBackgroundColoring })
+        }
 }

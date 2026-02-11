@@ -11,7 +11,10 @@ data class LayoutItem(
     var italic: Boolean = false,
     var bold: Boolean = false,
     var maxLines: Int = 1,
-    var alignment: TextAlignment = TextAlignment.LEFT
+    var alignment: TextAlignment = TextAlignment.LEFT,
+    var progressBarFormat: ProgressBarFormat = ProgressBarFormat.WAVY_WHEN_PLAYING,
+    var progressBarShowTimings: Boolean = false,
+    var progressBarReplacesBackgroundColoring: Boolean = true
 ) {
 
     fun verbose(): String {

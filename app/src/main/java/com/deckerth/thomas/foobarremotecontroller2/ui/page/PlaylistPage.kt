@@ -67,13 +67,11 @@ import com.deckerth.thomas.foobarremotecontroller2.model.PlaylistLifecycleState
 import com.deckerth.thomas.foobarremotecontroller2.model.Playlists
 import com.deckerth.thomas.foobarremotecontroller2.model.SelectableTitle
 import com.deckerth.thomas.foobarremotecontroller2.model.Title
-import com.deckerth.thomas.foobarremotecontroller2.ui.components.AlbumProgress
 import com.deckerth.thomas.foobarremotecontroller2.ui.components.ImageWithLoadingPlaceholder
 import com.deckerth.thomas.foobarremotecontroller2.ui.components.LayoutComponent
 import com.deckerth.thomas.foobarremotecontroller2.ui.components.PlaylistNameDialog
 import com.deckerth.thomas.foobarremotecontroller2.ui.components.PlaylistSelector
 import com.deckerth.thomas.foobarremotecontroller2.ui.components.TitleDetails
-import com.deckerth.thomas.foobarremotecontroller2.ui.components.TitleProgress
 import com.deckerth.thomas.foobarremotecontroller2.ui.components.TitleSearchBarDialog
 import com.deckerth.thomas.foobarremotecontroller2.ui.isTablet
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.Layout
@@ -360,7 +358,7 @@ fun AlbumCard(
         if (playerViewModel.valid) titleSelected =
             album.tracks[0].details.index == playerViewModel.getIndex() && album.tracks[0].details.playlistId == playerViewModel.playlistId
 
-        if (titleSelected) modifier =
+        if (titleSelected && ( layout == null || layout.highlightPlayingItem )) modifier =
             modifier.background(MaterialTheme.colorScheme.primaryContainer)
     }
 
@@ -411,10 +409,8 @@ fun AlbumCard(
                         .padding(horizontal = 16.dp)
                 ) {
                     if (layout != null) for (item in layout.albumLayout.items) {
-                        LayoutComponent(album, item)
+                        LayoutComponent(vm, album, item, albumIsCurrentlyPlaying)
                     }
-                    if (albumIsCurrentlyPlaying)
-                        AlbumProgress(album, playerViewModel, withTimingDetails = true)
                 }
                 TitleDropdownMenu(vm, album = album)
             }
@@ -480,6 +476,7 @@ fun TitleEntry(
     title: SelectableTitle,
     previewMode: Boolean = false
 ) {
+    val layout = layoutManager.getLayout()
     var titleSelected = false
     if (previewMode) titleSelected = title.details.index == 0
     else if (playerViewModel.valid) titleSelected =
@@ -495,7 +492,7 @@ fun TitleEntry(
             }
         }
     }
-    if (titleSelected) modifier = modifier.background(MaterialTheme.colorScheme.primaryContainer)
+    if (titleSelected && layout.highlightPlayingItem ) modifier = modifier.background(MaterialTheme.colorScheme.primaryContainer)
     Column(
         modifier = modifier
     ) {
@@ -509,14 +506,10 @@ fun TitleEntry(
             Column(
                 modifier = Modifier
                     .padding(16.dp)
-                    .weight(1f)
             ) {
-                val layout = layoutManager.getLayout()
                 for (item in layout.titleLayout.items) {
-                    LayoutComponent(album, title.details, layout.albumLayoutHasArtist, item)
+                    LayoutComponent(vm, album, title.details, layout.albumLayoutHasArtist, item, titleSelected)
                 }
-                if (titleSelected)
-                    TitleProgress(playerViewModel, withTimingDetails = true)
             }
             TitleDropdownMenu(vm, title.details)
         }

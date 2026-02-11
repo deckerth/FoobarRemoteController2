@@ -171,7 +171,8 @@ private fun ProgressWithTiming(
     fraction: Float,
     positionText: String? = null,
     durationText: String? = null,
-    withTimingDetails: Boolean = false
+    withTimingDetails: Boolean = false,
+    wavy: Boolean = true
 ) {
     Column {
         val safeFraction = if (fraction.isNaN()) 0f else fraction.coerceIn(0f, 1f)
@@ -201,19 +202,36 @@ private fun ProgressWithTiming(
                 )
             }
         }
-
-        LinearProgressIndicator(
-            progress = { safeFraction },
-            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
-            color = ProgressIndicatorDefaults.linearColor,
-            trackColor = ProgressIndicatorDefaults.linearTrackColor,
-            strokeCap = ProgressIndicatorDefaults.LinearStrokeCap,
-        )
+        if (wavy) {
+            LinearProgressIndicator(
+                progress = { safeFraction },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp),
+                color = ProgressIndicatorDefaults.linearColor,
+                trackColor = ProgressIndicatorDefaults.linearTrackColor,
+                strokeCap = ProgressIndicatorDefaults.LinearStrokeCap
+            )
+        } else {
+//            WavyLinearProgressIndicator(
+//                progress = { safeFraction },
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .padding(vertical = 8.dp),
+//                color = ProgressIndicatorDefaults.linearColor,
+//                trackColor = ProgressIndicatorDefaults.linearTrackColor,
+//                strokeCap = ProgressIndicatorDefaults.LinearStrokeCap
+//            )
+        }
     }
 }
 
 @Composable
-fun AlbumProgress(album: Album, playerViewModel: PlayerViewModel, withTimingDetails: Boolean = false) {
+fun AlbumProgress(
+    album: Album,
+    playerViewModel: PlayerViewModel,
+    withTimingDetails: Boolean = false
+) {
     val fraction = try {
         album.getAlbumPosition(playerViewModel).coerceIn(0f, 1f)
     } catch (_: Exception) {

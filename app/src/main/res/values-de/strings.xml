@@ -203,4 +203,7 @@
     <string name="layout_item_album_artist">Album Artist</string>
     <string name="menu_item_reload_playlist">Playlist neu laden</string>
     <string name="ip_address">IP Adresse eingeben</string>
+    <string name="progress_bar_flat">Flat</string>
+    <string name="progress_bar_wavy">Wavy</string>
+    <string name="progress_bar_wavy_when_playing">Wavy when playing</string>
 </resources>

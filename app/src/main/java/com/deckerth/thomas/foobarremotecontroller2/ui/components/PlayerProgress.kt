@@ -171,8 +171,7 @@ private fun ProgressWithTiming(
     fraction: Float,
     positionText: String? = null,
     durationText: String? = null,
-    withTimingDetails: Boolean = false,
-    wavy: Boolean = true
+    withTimingDetails: Boolean = false
 ) {
     Column {
         val safeFraction = if (fraction.isNaN()) 0f else fraction.coerceIn(0f, 1f)
@@ -202,27 +201,15 @@ private fun ProgressWithTiming(
                 )
             }
         }
-        if (wavy) {
-            LinearProgressIndicator(
-                progress = { safeFraction },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp),
-                color = ProgressIndicatorDefaults.linearColor,
-                trackColor = ProgressIndicatorDefaults.linearTrackColor,
-                strokeCap = ProgressIndicatorDefaults.LinearStrokeCap
-            )
-        } else {
-//            WavyLinearProgressIndicator(
-//                progress = { safeFraction },
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .padding(vertical = 8.dp),
-//                color = ProgressIndicatorDefaults.linearColor,
-//                trackColor = ProgressIndicatorDefaults.linearTrackColor,
-//                strokeCap = ProgressIndicatorDefaults.LinearStrokeCap
-//            )
-        }
+        LinearProgressIndicator(
+            progress = { safeFraction },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp),
+            color = ProgressIndicatorDefaults.linearColor,
+            trackColor = ProgressIndicatorDefaults.linearTrackColor,
+            strokeCap = ProgressIndicatorDefaults.LinearStrokeCap
+        )
     }
 }
 

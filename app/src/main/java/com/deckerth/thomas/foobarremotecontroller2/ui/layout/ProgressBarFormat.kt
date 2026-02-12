@@ -10,4 +10,9 @@ enum class ProgressBarFormat(
     FLAT(mainActivity!!.baseContext.getString(R.string.progress_bar_flat)),
     WAVY(mainActivity!!.baseContext.getString(R.string.progress_bar_wavy)),
     WAVY_WHEN_PLAYING(mainActivity!!.baseContext.getString(R.string.progress_bar_wavy_when_playing))
+
+}
+
+fun getProgressBarFormats(): List<ProgressBarFormat> {
+    return listOf(ProgressBarFormat.FLAT, ProgressBarFormat.WAVY_WHEN_PLAYING, ProgressBarFormat.WAVY)
 }

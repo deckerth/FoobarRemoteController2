@@ -23,15 +23,9 @@ import java.time.Instant
 
 var mediaSession: MediaSessionCompat? = null
 var foobarMediaService: FoobarMediaService? = null
-lateinit var volumeProvider: VolumeProviderCompat
+var volumeProvider: VolumeProviderCompat? = null
 var lastChanged: Instant = Instant.now()
 
-
-fun enableVolumeControl() {
-    if (mediaSession != null) {
-        mediaSession!!.setPlaybackToRemote(volumeProvider)
-    }
-}
 
 class FoobarMediaService : Service() {
     private lateinit var audioManager: AudioManager
@@ -153,7 +147,7 @@ class FoobarMediaService : Service() {
             runBlocking { volumeControlEnabled = getFoobarVolumeControlBlocking() }
 
             if (volumeControlEnabled)
-                setPlaybackToRemote(volumeProvider)
+                volumeProvider?.let { setPlaybackToRemote(it) }
         }
     }
 
@@ -203,5 +197,13 @@ class FoobarMediaService : Service() {
     override fun onTaskRemoved(rootIntent: Intent?) {
         super.onTaskRemoved(rootIntent)
         stopSelf()
+    }
+}
+
+fun enableVolumeControl() {
+    mediaSession?.let { ms ->
+        volumeProvider?.let { vp ->
+            ms.setPlaybackToRemote(vp)
+        }
     }
 }

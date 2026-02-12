@@ -18,6 +18,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -48,9 +49,12 @@ import androidx.compose.ui.unit.dp
 import com.deckerth.thomas.foobarremotecontroller2.R
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.ItemSize
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.LayoutItems
+import com.deckerth.thomas.foobarremotecontroller2.ui.layout.ProgressBarFormat
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.TextAlignment
+import com.deckerth.thomas.foobarremotecontroller2.ui.layout.ViewsWithLayout
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.getItemSizesForAlbums
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.getItemSizesForFonts
+import com.deckerth.thomas.foobarremotecontroller2.ui.layout.getProgressBarFormats
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.LayoutField
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.LayoutViewModel
 import org.burnoutcrew.reorderable.ReorderableItem
@@ -142,14 +146,26 @@ fun LayoutEditorPage(
                         }
                         HorizontalDivider()
                     }
-                    if (isClicked && item.layoutItem!!.item != LayoutItems.PROGRESS) {
-                        EditProperties(item,
-                            onDismiss = { dirty: Boolean ->
-                                if (dirty) {
-                                    vm.saveChanges()
-                                }
-                                isClicked = false
-                            })
+                    if (isClicked) {
+                        if (item.layoutItem!!.item == LayoutItems.PROGRESS) {
+                            if (vm.currentView != ViewsWithLayout.PLAYER)
+                                EditProgressBarProperties(
+                                    item,
+                                    onDismiss = { dirty: Boolean ->
+                                        if (dirty) {
+                                            vm.saveChanges()
+                                        }
+                                        isClicked = false
+                                    })
+                        } else
+                            EditProperties(
+                                item,
+                                onDismiss = { dirty: Boolean ->
+                                    if (dirty) {
+                                        vm.saveChanges()
+                                    }
+                                    isClicked = false
+                                })
                     }
                 }
             }
@@ -355,6 +371,135 @@ fun EditProperties(
                     }
             }
 
+        },
+        modifier = Modifier
+            .padding(16.dp)
+            .fillMaxWidth()
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun EditProgressBarProperties(
+    layoutField: LayoutField,
+    onDismiss: (Boolean) -> Unit
+) {
+    var dirty by remember { mutableStateOf(false) }
+    var progressBarFormat: ProgressBarFormat by remember { mutableStateOf(layoutField.layoutItem!!.progressBarFormat) }
+    var progressBarShowTimings: Boolean by remember { mutableStateOf(layoutField.layoutItem!!.progressBarShowTimings) }
+    var progressBarReplacesBackgroundColoring: Boolean by remember { mutableStateOf(layoutField.layoutItem!!.progressBarReplacesBackgroundColoring) }
+    var waveSpeed: Int by remember { mutableIntStateOf(layoutField.layoutItem!!.waveSpeed) }
+
+    AlertDialog(
+        onDismissRequest = { onDismiss(false) },
+        dismissButton = {
+            TextButton(onClick = { onDismiss(false) }) {
+                Text(
+                    stringResource(android.R.string.cancel),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = {
+                if (dirty) {
+                    layoutField.layoutItem!!.progressBarFormat = progressBarFormat
+                    layoutField.layoutItem.progressBarShowTimings = progressBarShowTimings
+                    layoutField.layoutItem.progressBarReplacesBackgroundColoring =
+                        progressBarReplacesBackgroundColoring
+                    layoutField.layoutItem.waveSpeed = waveSpeed
+                    onDismiss(true)
+                } else
+                    onDismiss(false)
+            }) {
+                Text(
+                    stringResource(android.R.string.ok),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+        },
+        title = {
+            Text(
+                text = stringResource(R.string.item_format),
+                style = MaterialTheme.typography.headlineSmall
+            )
+        },
+        text = {
+            Column(
+                modifier = Modifier.padding(start = 16.dp)
+            ) {
+
+                // Format
+                Text(
+                    modifier = Modifier.padding(bottom = 4.dp),
+                    text = stringResource(R.string.progress_bar_format)
+                )
+
+                // Font
+                DropdownSelector(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(38.dp),
+                    values = getProgressBarFormats(),
+                    selectedItem = progressBarFormat,
+                    onClick = { format: ProgressBarFormat? ->
+                        if (format != null) {
+                            progressBarFormat = format; dirty = true
+                        }
+                    },
+                    getText = { format: ProgressBarFormat -> format.text })
+
+                // Show timings
+                Row {
+                    Checkbox(
+                        checked = progressBarShowTimings,
+                        onCheckedChange = { progressBarShowTimings = it; dirty = true }
+                    )
+                    Text(
+                        modifier = Modifier
+                            .padding(8.dp),
+                        text = stringResource(R.string.show_progress_bar_timings),
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+
+                // Background coloring
+                Row {
+                    Checkbox(
+                        checked = progressBarReplacesBackgroundColoring,
+                        onCheckedChange = {
+                            progressBarReplacesBackgroundColoring = it; dirty = true
+                        }
+                    )
+                    Text(
+                        modifier = Modifier
+                            .padding(8.dp),
+                        text = stringResource(R.string.show_progress_background_coloring),
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+
+                // Wave speed
+                Row(
+                    verticalAlignment = Alignment.Top,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        modifier = Modifier.padding(top = 12.dp, end = 8.dp),
+                        text = stringResource(R.string.progress_bar_wave_speed)
+                    )
+                    Text(
+                        modifier = Modifier.padding(top = 12.dp, start = 8.dp, end = 8.dp),
+                        text = waveSpeed.toString()
+                    )
+                    Slider(
+                        value = waveSpeed.toFloat(),
+                        onValueChange = { waveSpeed = it.toInt(); dirty = true },
+                        valueRange = 0f..10f,
+                        steps = 2
+                    )
+                }
+            }
         },
         modifier = Modifier
             .padding(16.dp)

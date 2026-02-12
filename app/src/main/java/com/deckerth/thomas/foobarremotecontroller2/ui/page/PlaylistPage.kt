@@ -80,6 +80,7 @@ import com.deckerth.thomas.foobarremotecontroller2.ui.layout.layoutManager
 import com.deckerth.thomas.foobarremotecontroller2.ui.mainActivity
 import com.deckerth.thomas.foobarremotecontroller2.ui.theme.Foobar2000RemoteControllerTheme
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.PlaybackState
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.PlayerViewModel
 
 var showCoverFullscreen by mutableStateOf(false)
@@ -353,8 +354,9 @@ fun AlbumCard(
     // if the album contains a single title without name, the album itself represents the title, and can be selected
     val albumRepresentsTitle = album.tracks.size == 1 && album.tracks[0].details.title == ""
     var modifier: Modifier = Modifier
+    var titleSelected = false
+
     if (albumRepresentsTitle) {
-        var titleSelected = false
         if (playerViewModel.valid) titleSelected =
             album.tracks[0].details.index == playerViewModel.getIndex() && album.tracks[0].details.playlistId == playerViewModel.playlistId
 
@@ -367,9 +369,16 @@ fun AlbumCard(
         else {
             vm.playlistsViewModel.filterValue.clear()
             vm.playlistsViewModel.showFilter = false
-            vm.playerAccess.playTrack(
-                album.tracks[0].details.playlistId, album.tracks[0].details.index
-            )
+
+            if (titleSelected)
+                if (playerViewModel.playbackState == PlaybackState.PLAYING)
+                    vm.playerAccess.pausePlayback()
+                else
+                    vm.playerAccess.startPlayback()
+            else
+                vm.playerAccess.playTrack(
+                    album.tracks[0].details.playlistId, album.tracks[0].details.index
+                )
             vm.autoscroll = true
         }
     }
@@ -489,12 +498,20 @@ fun TitleEntry(
             else {
                 vm.playlistsViewModel.filterValue.clear()
                 vm.playlistsViewModel.showFilter = false
-                vm.playerAccess.playTrack(title.details.playlistId, title.details.index)
-                vm.autoscroll = true
+                if (titleSelected)
+                    if (playerViewModel.playbackState == PlaybackState.PLAYING)
+                        vm.playerAccess.pausePlayback()
+                    else
+                        vm.playerAccess.startPlayback()
+                else {
+                    vm.playerAccess.playTrack(title.details.playlistId, title.details.index)
+                    vm.autoscroll = true
+                }
             }
         }
     }
-    if (titleSelected && highlightPlayingItem(layout.titleLayout) ) modifier = modifier.background(MaterialTheme.colorScheme.primaryContainer)
+    if (titleSelected && highlightPlayingItem(layout.titleLayout)) modifier =
+        modifier.background(MaterialTheme.colorScheme.primaryContainer)
     Column(
         modifier = modifier
     ) {
@@ -510,7 +527,14 @@ fun TitleEntry(
                     .padding(16.dp)
             ) {
                 for (item in layout.titleLayout.items) {
-                    LayoutComponent(vm, album, title.details, layout.albumLayoutHasArtist, item, titleSelected)
+                    LayoutComponent(
+                        vm,
+                        album,
+                        title.details,
+                        layout.albumLayoutHasArtist,
+                        item,
+                        titleSelected
+                    )
                 }
             }
             TitleDropdownMenu(vm, title.details)

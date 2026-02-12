@@ -18,6 +18,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -49,6 +50,7 @@ import com.deckerth.thomas.foobarremotecontroller2.R
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.ItemSize
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.LayoutItems
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.TextAlignment
+import com.deckerth.thomas.foobarremotecontroller2.ui.layout.ViewsWithLayout
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.getItemSizesForAlbums
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.getItemSizesForFonts
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.LayoutField
@@ -142,14 +144,26 @@ fun LayoutEditorPage(
                         }
                         HorizontalDivider()
                     }
-                    if (isClicked && item.layoutItem!!.item != LayoutItems.PROGRESS) {
-                        EditProperties(item,
-                            onDismiss = { dirty: Boolean ->
-                                if (dirty) {
-                                    vm.saveChanges()
-                                }
-                                isClicked = false
-                            })
+                    if (isClicked) {
+                        if (item.layoutItem!!.item == LayoutItems.PROGRESS) {
+                            if (vm.currentView != ViewsWithLayout.PLAYER)
+                                EditProgressBarProperties(
+                                    item,
+                                    onDismiss = { dirty: Boolean ->
+                                        if (dirty) {
+                                            vm.saveChanges()
+                                        }
+                                        isClicked = false
+                                    })
+                        } else
+                            EditProperties(
+                                item,
+                                onDismiss = { dirty: Boolean ->
+                                    if (dirty) {
+                                        vm.saveChanges()
+                                    }
+                                    isClicked = false
+                                })
                     }
                 }
             }
@@ -355,6 +369,87 @@ fun EditProperties(
                     }
             }
 
+        },
+        modifier = Modifier
+            .padding(16.dp)
+            .fillMaxWidth()
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun EditProgressBarProperties(
+    layoutField: LayoutField,
+    onDismiss: (Boolean) -> Unit
+) {
+    var dirty by remember { mutableStateOf(false) }
+    var progressBarShowTimings: Boolean by remember { mutableStateOf(layoutField.layoutItem!!.progressBarShowTimings) }
+    var highlightPlayingTitle: Boolean by remember { mutableStateOf(!layoutField.layoutItem!!.progressBarReplacesBackgroundColoring) }
+
+    AlertDialog(
+        onDismissRequest = { onDismiss(false) },
+        dismissButton = {
+            TextButton(onClick = { onDismiss(false) }) {
+                Text(
+                    stringResource(android.R.string.cancel),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = {
+                if (dirty && layoutField.layoutItem != null) {
+                    layoutField.layoutItem.progressBarShowTimings = progressBarShowTimings
+                    layoutField.layoutItem.progressBarReplacesBackgroundColoring =
+                        !highlightPlayingTitle
+                    onDismiss(true)
+                } else
+                    onDismiss(false)
+            }) {
+                Text(
+                    stringResource(android.R.string.ok),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+        },
+        title = {
+            Text(
+                text = stringResource(R.string.item_format),
+                style = MaterialTheme.typography.headlineSmall
+            )
+        },
+        text = {
+            Column( modifier = Modifier.padding(start = 16.dp)) {
+                // Show timings
+                Row {
+                    Checkbox(
+                        checked = progressBarShowTimings,
+                        onCheckedChange = { progressBarShowTimings = it; dirty = true }
+                    )
+                    Text(
+                        modifier = Modifier
+                            .padding(8.dp),
+                        text = stringResource(R.string.show_progress_bar_timings),
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+
+                // Background coloring
+                Row {
+                    Checkbox(
+                        checked = highlightPlayingTitle,
+                        onCheckedChange = {
+                            highlightPlayingTitle = it; dirty = true
+                        }
+                    )
+                    Text(
+                        modifier = Modifier
+                            .padding(8.dp),
+                        text = stringResource(R.string.show_progress_background_coloring),
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+            }
         },
         modifier = Modifier
             .padding(16.dp)

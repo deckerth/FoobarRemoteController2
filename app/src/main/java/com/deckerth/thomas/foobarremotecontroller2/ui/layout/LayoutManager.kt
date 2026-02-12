@@ -92,8 +92,12 @@ class LayoutManager {
     }
 
     @Composable
-    fun getLayout(): Layout {
-        return when (getViewMode()) {
+    fun getLayout(requestedViewMode: Layouts? = null): Layout {
+        val viewMode = requestedViewMode ?: getViewMode()
+
+        println("FOOB getLayout: viewMode = $viewMode")
+
+        return when (viewMode) {
             Layouts.LAYOUT_MODERN -> modernLayout
             Layouts.LAYOUT_CLASSIC -> classicLayout
             Layouts.LAYOUT_CUSTOM -> customLayout!!

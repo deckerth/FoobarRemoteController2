@@ -205,4 +205,6 @@
     <string name="progress_bar_flat">Flat</string>
     <string name="progress_bar_wavy">Wavy</string>
     <string name="progress_bar_wavy_when_playing">Wavy when playing</string>
+    <string name="show_progress_bar_timings">Show playback time and duration</string>
+    <string name="show_progress_background_coloring">Highlight background of currently playing title</string>
 </resources>

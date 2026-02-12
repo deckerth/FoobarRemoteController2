@@ -18,6 +18,7 @@ import com.deckerth.thomas.foobarremotecontroller2.R
 import com.deckerth.thomas.foobarremotecontroller2.model.Playlist
 import com.deckerth.thomas.foobarremotecontroller2.model.PlaylistEntity
 import com.deckerth.thomas.foobarremotecontroller2.model.Title
+import com.deckerth.thomas.foobarremotecontroller2.ui.layout.Layouts
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.ViewsWithLayout
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.layoutManager
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
@@ -160,7 +161,7 @@ fun PlaylistPreview(vm: AppViewModel, playlist: Playlist) {
     LazyColumn(state = playlistState) {
         try {
             items(playlist.albums) { album ->
-                AlbumCard(vm, currentPlayer, album, layoutManager.getLayout(), true)
+                AlbumCard(vm, currentPlayer, album, layoutManager.getLayout(Layouts.LAYOUT_CUSTOM), true)
             }
         } catch (e: Exception) {
             e.printStackTrace()

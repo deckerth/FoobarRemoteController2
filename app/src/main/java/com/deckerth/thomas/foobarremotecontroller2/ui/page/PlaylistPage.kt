@@ -75,6 +75,7 @@ import com.deckerth.thomas.foobarremotecontroller2.ui.components.TitleDetails
 import com.deckerth.thomas.foobarremotecontroller2.ui.components.TitleSearchBarDialog
 import com.deckerth.thomas.foobarremotecontroller2.ui.isTablet
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.Layout
+import com.deckerth.thomas.foobarremotecontroller2.ui.layout.highlightPlayingItem
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.layoutManager
 import com.deckerth.thomas.foobarremotecontroller2.ui.mainActivity
 import com.deckerth.thomas.foobarremotecontroller2.ui.theme.Foobar2000RemoteControllerTheme
@@ -87,7 +88,6 @@ var imageUrl by mutableStateOf("")
 @Composable
 fun PlaylistPage(vm: AppViewModel) {
     // The currently displayed playlists may have been changed in foobar so that is got invalidated
-
     val colors = MaterialTheme.colorScheme
 
     if (vm.displayedPlaylist != null && vm.displayedPlaylist!!.lifecycleState != PlaylistLifecycleState.Valid) {
@@ -325,7 +325,7 @@ fun AlbumCard(
     vm: AppViewModel,
     playerViewModel: PlayerViewModel,
     album: Album,
-    layout: Layout?,
+    layout: Layout,
     previewMode: Boolean = false
 ) {
 
@@ -358,7 +358,7 @@ fun AlbumCard(
         if (playerViewModel.valid) titleSelected =
             album.tracks[0].details.index == playerViewModel.getIndex() && album.tracks[0].details.playlistId == playerViewModel.playlistId
 
-        if (titleSelected && ( layout == null || layout.highlightPlayingItem )) modifier =
+        if (titleSelected && highlightPlayingItem(layout.albumLayout)) modifier =
             modifier.background(MaterialTheme.colorScheme.primaryContainer)
     }
 
@@ -408,7 +408,7 @@ fun AlbumCard(
                         .weight(1f)
                         .padding(horizontal = 16.dp)
                 ) {
-                    if (layout != null) for (item in layout.albumLayout.items) {
+                    for (item in layout.albumLayout.items) {
                         LayoutComponent(vm, album, item, albumIsCurrentlyPlaying)
                     }
                 }
@@ -449,6 +449,7 @@ fun AlbumCard(
                                 playerViewModel = playerViewModel,
                                 album = album,
                                 title = title,
+                                layout,
                                 previewMode = previewMode
                             )
                         }
@@ -460,6 +461,7 @@ fun AlbumCard(
                     playerViewModel = playerViewModel,
                     album = album,
                     title = album.tracks[0],
+                    layout,
                     previewMode = previewMode
                 )
             }
@@ -474,9 +476,9 @@ fun TitleEntry(
     playerViewModel: PlayerViewModel,
     album: Album,
     title: SelectableTitle,
+    layout: Layout,
     previewMode: Boolean = false
 ) {
-    val layout = layoutManager.getLayout()
     var titleSelected = false
     if (previewMode) titleSelected = title.details.index == 0
     else if (playerViewModel.valid) titleSelected =
@@ -492,7 +494,7 @@ fun TitleEntry(
             }
         }
     }
-    if (titleSelected && layout.highlightPlayingItem ) modifier = modifier.background(MaterialTheme.colorScheme.primaryContainer)
+    if (titleSelected && highlightPlayingItem(layout.titleLayout) ) modifier = modifier.background(MaterialTheme.colorScheme.primaryContainer)
     Column(
         modifier = modifier
     ) {
@@ -514,83 +516,6 @@ fun TitleEntry(
             TitleDropdownMenu(vm, title.details)
         }
     }
-}
-
-
-@Preview(showBackground = true)
-@Composable
-fun AlbumCardPreview() {
-    val title = Title(
-        "",
-        -1,
-        "",
-        "",
-        "Composer",
-        "Ibrahim Ferrer (Buena Vista Social Club Presents)",
-        "Mamí Me Gustó",
-        "Ibrahim Ferrer",
-        "Ibrahim Ferrer",
-        "44100",
-        "Classical",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "", ""
-    )
-    val album = Album(title)
-    album.addTitle(title)
-    album.addTitle(title)
-    album.addTitle(title)
-    album.addTitle(title)
-    album.addTitle(title)
-
-    //val fields = LayoutDescription()
-    //val albumItem = LayoutItem(LayoutItems.ALBUM, ItemSize.TITLE_MEDIUM)
-    //val albumItem = LayoutItem() // <--- does not work for some reason
-    //fields.items.add(LayoutItem(LayoutItems.ALBUM, ItemSize.TITLE_MEDIUM))
-    //fields.items.add(LayoutItem(LayoutItems.ARTIST, ItemSize.BODY_SMALL))
-    //fields.items.add(LayoutItem(LayoutItems.COMPOSER, ItemSize.BODY_SMALL))
-
-    //val layout = Layout(playerLayout = fields, albumLayout = fields, titleLayout = fields)
-    AlbumCard(AppViewModel("Preview"), PlayerViewModel(), album, null)
-}
-
-@Preview(showBackground = true)
-@Composable
-fun AlbumCardPreview2() {
-    val title = Title(
-        "",
-        -1,
-        "",
-        "",
-        "Composer",
-        "Ibrahim Ferrer (Buena Vista Social Club Presents)",
-        "",
-        "Ibrahim Ferrer",
-        "Ibrahim Ferrer",
-        "44100",
-        "Classical",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "", ""
-    )
-    val album = Album(title)
-    album.addTitle(title)
-
-    //val fields = LayoutDescription()
-    //val albumItem = LayoutItem(LayoutItems.ALBUM, ItemSize.TITLE_MEDIUM)
-    //val albumItem = LayoutItem() // <--- does not work for some reason
-    //fields.items.add(LayoutItem(LayoutItems.ALBUM, ItemSize.TITLE_MEDIUM))
-    //fields.items.add(LayoutItem(LayoutItems.ARTIST, ItemSize.BODY_SMALL))
-    //fields.items.add(LayoutItem(LayoutItems.COMPOSER, ItemSize.BODY_SMALL))
-
-    //val layout = Layout(playerLayout = fields, albumLayout = fields, titleLayout = fields)
-    AlbumCard(AppViewModel("Preview"), PlayerViewModel(), album, null)
 }
 
 @Composable

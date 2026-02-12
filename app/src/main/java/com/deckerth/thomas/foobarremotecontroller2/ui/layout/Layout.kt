@@ -13,8 +13,9 @@ data class Layout(
             return (albumLayout.items.any { it.item == LayoutItems.ARTIST })
         }
 
-    val highlightPlayingItem: Boolean
-        get() {
-            return (!playerLayout.items.any { it.item == LayoutItems.PROGRESS && it.progressBarReplacesBackgroundColoring })
-        }
 }
+
+fun highlightPlayingItem(layout: LayoutDescription): Boolean
+    {
+        return (!layout.items.any { it.item == LayoutItems.PROGRESS && it.progressBarReplacesBackgroundColoring })
+    }

@@ -353,6 +353,8 @@ fun AlbumCard(
 
     // if the album contains a single title without name, the album itself represents the title, and can be selected
     val albumRepresentsTitle = album.tracks.size == 1 && album.tracks[0].details.title == ""
+    val renderTitleProgressBar = albumRepresentsTitle && !layout.albumLayoutHasProgressBar && layout.titleLayoutHasProgressBar
+
     var modifier: Modifier = Modifier
     var titleSelected = false
 
@@ -360,7 +362,8 @@ fun AlbumCard(
         if (playerViewModel.valid) titleSelected =
             album.tracks[0].details.index == playerViewModel.getIndex() && album.tracks[0].details.playlistId == playerViewModel.playlistId
 
-        if (titleSelected && highlightPlayingItem(layout.albumLayout)) modifier =
+        if (titleSelected &&
+            ( renderTitleProgressBar && highlightPlayingItem(layout.titleLayout) || !renderTitleProgressBar && highlightPlayingItem(layout.albumLayout))) modifier =
             modifier.background(MaterialTheme.colorScheme.primaryContainer)
     }
 
@@ -420,6 +423,8 @@ fun AlbumCard(
                     for (item in layout.albumLayout.items) {
                         LayoutComponent(vm, album, item, albumIsCurrentlyPlaying)
                     }
+                    if (renderTitleProgressBar)
+                        LayoutComponent(vm, album, layout.titleProgress, albumIsCurrentlyPlaying)
                 }
                 TitleDropdownMenu(vm, album = album)
             }

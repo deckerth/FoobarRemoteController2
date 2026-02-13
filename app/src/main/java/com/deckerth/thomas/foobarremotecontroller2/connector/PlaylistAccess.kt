@@ -30,10 +30,10 @@ class PlaylistAccess(private val vm: AppViewModel) {
             }
         }
 
-    fun fetchPlaylists()  {
+    fun fetchPlaylists() {
         val response = queryPlaylists()
         playlists = if (response == null) null
-        else  parsePlaylists(response)
+        else parsePlaylists(response)
     }
 
     private fun queryPlaylists(): Response? {
@@ -73,11 +73,13 @@ class PlaylistAccess(private val vm: AppViewModel) {
         try {
             response = if (withPaths) vm.connector.getData(
                 "playlists/" + playlistEntity.playlistId +
-                        "/items/" + startIndex + "%3A" + 1000 + "?columns=" + vm.playerAccess.columnListWithPath, vm
+                        "/items/" + startIndex + "%3A" + 1000 + "?columns=" + vm.playerAccess.columnListWithPath,
+                vm
             )
             else vm.connector.getData(
                 "playlists/" + playlistEntity.playlistId +
-                        "/items/" + startIndex + "%3A" + 1000 + "?columns=" + vm.playerAccess.columnListWithoutPath, vm
+                        "/items/" + startIndex + "%3A" + 1000 + "?columns=" + vm.playerAccess.columnListWithoutPath,
+                vm
             )
         } catch (e: Exception) {
             errorHandler.logError(
@@ -145,8 +147,22 @@ class PlaylistAccess(private val vm: AppViewModel) {
                 val length = columnsArray.getString(11)
                 val duration = columnsArray.getString(12)
                 var path = ""
-                if (withPaths)
+
+                // %title%
+                // Title of the track. If "title" metadata field is missing, ___file name is used instead___.
+                // For a SHOUTcast stream which contains metadata,
+                // it is the StreamTitle after the first "-" character.
+                //
+                // Do not display the title if the title was replaced by the filename by foobar
+
+                var filename : String
+                if (withPaths) {
                     path = columnsArray.getString(13)
+                    filename = getFilenameWithoutExtension(path)
+                } else
+                    filename = columnsArray.getString(13)
+                var effectiveTitle = ""
+                if (!title.equals(filename)) effectiveTitle = title
 
                 playlist.addTitle(
                     Title(
@@ -156,7 +172,7 @@ class PlaylistAccess(private val vm: AppViewModel) {
                         catalog,
                         composer,
                         album,
-                        title,
+                        effectiveTitle,
                         artist,
                         albumArtist,
                         samplerRate,
@@ -189,7 +205,7 @@ class PlaylistAccess(private val vm: AppViewModel) {
         return parsePlaylists(input.usedIpAddress, JSONObject(input.message))
     }
 
-    fun parsePlaylists(usedIpAddress: String, playlistsObject : JSONObject): Playlists? {
+    fun parsePlaylists(usedIpAddress: String, playlistsObject: JSONObject): Playlists? {
         val result = Playlists()
         result.ipAddress = usedIpAddress
         try {
@@ -345,12 +361,13 @@ class PlaylistAccess(private val vm: AppViewModel) {
 
         var encodedName: String?
         try {
-            encodedName = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) { // TIRAMISU is API level 33
-                URLEncoder.encode(name, StandardCharsets.UTF_8)
-            } else {
-                // Use the deprecated version for older APIs
-                URLEncoder.encode(name, StandardCharsets.UTF_8.name())
-            }
+            encodedName =
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) { // TIRAMISU is API level 33
+                    URLEncoder.encode(name, StandardCharsets.UTF_8)
+                } else {
+                    // Use the deprecated version for older APIs
+                    URLEncoder.encode(name, StandardCharsets.UTF_8.name())
+                }
         } catch (e: UnsupportedEncodingException) {
             // Handle the exception, though UTF-8 should always be supported
             e.printStackTrace()

@@ -180,10 +180,10 @@
 <!--    <string name="release_notes_1_text">The Beefweb plugin can now be configured to require credentials. When Foobar Link detects that authentication is needed, it prompts the user to enter a username and password. These credentials are then stored by Foobar Link for each IP address running Foobar.</string>-->
 <!--    <string name="release_notes_2_header">Playlist Editing</string>-->
 <!--    <string name="release_notes_2_text">When creating a new playlist from the current one or copying selected tracks to another playlist, you can now quickly select or deselect all titles with ease.</string>-->
-    <string name="release_notes_1_header">Energy Consumption</string>
-    <string name="release_notes_1_text">FoobarLink now uses less energy thanks to a substantial reduction of network traffic.</string>
+    <string name="release_notes_1_header">Playlist</string>
+    <string name="release_notes_1_text">You can customize your title and album layouts to include a progress bar.</string>
     <string name="release_notes_2_header">Title Details</string>
-    <string name="release_notes_2_text">Copy any element—such as the artist—directly to your clipboard so you can use it for filtering.</string>
+    <string name="release_notes_2_text">Pause or resume playback by tapping the current title in the playlist.</string>
     <string name="release_notes_remark">You can review the release notes later in the app settings.</string>
     <string name="release_notes_version">Version: %1$s</string>
     <string name="menu_item_top_of_playlist">Go to top</string>

@@ -12,18 +12,19 @@ import com.deckerth.thomas.foobarremotecontroller2.ui.layout.ViewsWithLayout
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.getLayoutItemsFor
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.layoutManager
 import com.deckerth.thomas.foobarremotecontroller2.ui.mainActivity
-import org.burnoutcrew.reorderable.ItemPosition
 
 data class LayoutField(
     val key: Int,
     val layoutItem: LayoutItem? = null,
     val sectionTitle: String = "",
     val isSectionTitle: Boolean = false,
-    val isEndMarker: Boolean = false,
 )
 
 class LayoutViewModel(private val vm: AppViewModel) : ViewModel() {
-    var layoutFields = mutableStateOf(listOf<LayoutField>())
+    var layoutFields = mutableStateOf<List<LayoutField>>(emptyList())
+
+    var dirty = mutableStateOf(false)
+
     var currentView: ViewsWithLayout = ViewsWithLayout.UNDEFINED
         set(value) {
             if (value == field) return
@@ -32,38 +33,22 @@ class LayoutViewModel(private val vm: AppViewModel) : ViewModel() {
         }
     private var layoutDescription: LayoutDescription? = null
 
-    fun moveField(from: ItemPosition, to: ItemPosition) {
-        layoutFields.value = layoutFields.value.toMutableList().apply {
-            add(to.index, removeAt(from.index))
-        }
-    }
-
-    fun onDragEnd(startIndex: Int, endIndex: Int) {
-        if (startIndex == endIndex) return
-        saveChanges()
-    }
-
     fun saveChanges() {
-        var sectionCount = 0
-        val description = LayoutDescription(currentView)
-        for (field in layoutFields.value) {
-            if (field.isSectionTitle) {
-                sectionCount++
-                if (sectionCount == 2)
-                    break
-                else
-                    continue
+        if (dirty.value) {
+            var sectionCount = 0
+            val description = LayoutDescription(currentView)
+            for (field in layoutFields.value) {
+                if (field.isSectionTitle) {
+                    sectionCount++
+                    if (sectionCount == 2)
+                        break
+                } else
+                    if (field.layoutItem != null) description.items.add(field.layoutItem)
             }
-            if (!field.isEndMarker)
-                description.items.add(field.layoutItem!!)
+            layoutManager.setCustomLayoutDescription(vm.selectedView, description)
+            dirty.value = false
         }
-        layoutManager.setCustomLayoutDescription(vm.selectedView, description)
     }
-
-    fun isFieldDraggable(draggedOver: ItemPosition, dragging: ItemPosition) =
-        layoutFields.value.getOrNull(draggedOver.index)?.isSectionTitle != true && layoutFields.value.getOrNull(
-            dragging.index
-        )?.isSectionTitle != true
 
     private fun initializeViewModel() {
         layoutDescription = layoutManager.getCustomLayoutDescription(vm.selectedView)
@@ -81,8 +66,6 @@ class LayoutViewModel(private val vm: AppViewModel) : ViewModel() {
             fields.add(LayoutField(i, item))
             i++
         }
-        fields.add(LayoutField(i, null, "", isSectionTitle = false, isEndMarker = true))
-        i++
         fields.add(LayoutField(i, null, mainActivity!!.getString(R.string.available_fields), true))
         i++
         for (item in unusedItems) {
@@ -97,7 +80,6 @@ class LayoutViewModel(private val vm: AppViewModel) : ViewModel() {
             )
             i++
         }
-        fields.add(LayoutField(i, null, "", isSectionTitle = false, isEndMarker = true))
         layoutFields.value = fields
     }
 

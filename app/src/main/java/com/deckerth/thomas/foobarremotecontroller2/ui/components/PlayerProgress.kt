@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ProgressIndicatorDefaults
@@ -166,6 +167,7 @@ fun PlayerProgress(vm: AppViewModel, playerViewModel: PlayerViewModel) {
 }
 
 // Reusable composable for a determinate linear progress indicator with optional timing texts.
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun ProgressWithTiming(
     fraction: Float,
@@ -201,6 +203,18 @@ private fun ProgressWithTiming(
                 )
             }
         }
+
+//        LinearWavyProgressIndicator(
+//            progress = { safeFraction },
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .padding(vertical = 8.dp),
+//            color = ProgressIndicatorDefaults.linearColor,
+//            trackColor = ProgressIndicatorDefaults.linearTrackColor,
+//            waveSpeed = 5.dp
+//        )
+
+
         LinearProgressIndicator(
             progress = { safeFraction },
             modifier = Modifier

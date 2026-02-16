@@ -45,17 +45,17 @@ fun LicenseText(modifier: Modifier = Modifier) {
                 append(stringResource(R.string.privacy_statement) + "\n\n")
             }
         }
-        withStyle(boldTextStyle) {
-            append(stringResource(R.string.third_party_text) + "\n\n")
-        }
-        withStyle(textStyle) {
-            append(stringResource(R.string.library_usage_text))
-        }
-        withLink(LinkAnnotation.Url(url = "https://github.com/aclassen/ComposeReorderable/tree/main")) {
-            withStyle(linkStyle) {
-                append(stringResource(R.string.compose_reorderable) + "\n\n")
-            }
-        }
+//        withStyle(boldTextStyle) {
+//            append(stringResource(R.string.third_party_text) + "\n\n")
+//        }
+//        withStyle(textStyle) {
+//            append(stringResource(R.string.library_usage_text))
+//        }
+//        withLink(LinkAnnotation.Url(url = "https://github.com/aclassen/ComposeReorderable/tree/main")) {
+//            withStyle(linkStyle) {
+//                append(stringResource(R.string.compose_reorderable) + "\n\n")
+//            }
+//        }
         withStyle(textStyle) {
             append(stringResource(R.string.license_text))
         }

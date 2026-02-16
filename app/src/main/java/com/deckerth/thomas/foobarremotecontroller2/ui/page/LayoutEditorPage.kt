@@ -1,28 +1,31 @@
 package com.deckerth.thomas.foobarremotecontroller2.ui.page
 
 import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.foundation.background
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.snap
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.InputChip
 import androidx.compose.material3.InputChipDefaults
@@ -36,16 +39,24 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import com.deckerth.thomas.foobarremotecontroller2.R
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.ItemSize
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.LayoutItems
@@ -55,121 +66,198 @@ import com.deckerth.thomas.foobarremotecontroller2.ui.layout.getItemSizesForAlbu
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.getItemSizesForFonts
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.LayoutField
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.LayoutViewModel
-import org.burnoutcrew.reorderable.ReorderableItem
-import org.burnoutcrew.reorderable.detectReorderAfterLongPress
-import org.burnoutcrew.reorderable.rememberReorderableLazyListState
-import org.burnoutcrew.reorderable.reorderable
-
 
 @Composable
 fun LayoutEditorPage(
     modifier: Modifier = Modifier,
     vm: LayoutViewModel
 ) {
-    val state = rememberReorderableLazyListState(
-        onMove = vm::moveField,
-        canDragOver = vm::isFieldDraggable,
-        onDragEnd = vm::onDragEnd
-    )
+    // State for drag and drop
+    var draggedItemId by remember { mutableStateOf<Int?>(null) }
+    var draggedIndex by remember { mutableIntStateOf(-1) }
+    var totalDragOffset by remember { mutableFloatStateOf(0f) }
+    // IMPORTANT: lets pointerInput read the latest list without restarting the gesture
+    val latestItems by rememberUpdatedState(vm.layoutFields.value)
+
+    // Better than a hard-coded 80.dp: measure the actual card height once.
+
+    var measuredItemHeightPx by remember { mutableFloatStateOf(0f) }
+    val spacingDp = 8.dp
+    val spacingPx = with(LocalDensity.current) { spacingDp.toPx() }
+    val fallbackItemHeightPx = with(LocalDensity.current) { 80.dp.toPx() }
+
+    fun <T> List<T>.move(from: Int, to: Int): List<T> {
+        if (from == to) return this
+        val m = toMutableList()
+        val item = m.removeAt(from)
+        m.add(to, item)
+        return m
+    }
+
     LazyColumn(
-        state = state.listState,
-        modifier = modifier.reorderable(state)
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(spacingDp)
     ) {
-        items(vm.layoutFields.value, { item -> item.key }) { item ->
-            ReorderableItem(state, item.key) { dragging ->
-                val elevation = animateDpAsState(if (dragging) 8.dp else 0.dp, label = "")
-                if (item.isSectionTitle) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(MaterialTheme.colorScheme.surfaceContainerHigh)
-                    ) {
-                        Text(
-                            text = item.sectionTitle,
-                            modifier = Modifier.padding(24.dp)
-                        )
-                    }
-                } else if (item.isEndMarker) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                    ) {
-                        Spacer(modifier = Modifier.height(16.dp))
-                        HorizontalDivider()
-                    }
-                } else {
-                    var isClicked by remember { mutableStateOf(false) }
-                    Box {
-                        Row(
-                            Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Column(
-                                modifier = Modifier
-                                    .detectReorderAfterLongPress(state)
-                                    .shadow(elevation.value)
-                                    .weight(1f)
-                                    .background(MaterialTheme.colorScheme.surface)
-                                    .clickable { isClicked = true }
-                            ) {
-                                Text(
-                                    text = item.layoutItem!!.item.text,
-                                    modifier = Modifier.padding(
-                                        top = 16.dp,
-                                        start = 16.dp,
-                                        end = 16.dp
-                                    )
-                                )
-                                Text(
-                                    text = item.layoutItem.verbose(),
-                                    modifier = Modifier.padding(
-                                        bottom = 16.dp,
-                                        start = 16.dp,
-                                        end = 16.dp
-                                    ),
-                                    maxLines = 2,
-                                    style = MaterialTheme.typography.bodySmall
-                                )
+        itemsIndexed(
+            items = vm.layoutFields.value,
+            key = { _, item -> item.key }
+        ) { index, item ->
+            val isDragging = draggedItemId == item.key
 
-                            }
-                            Icon(
-                                painter = painterResource(R.drawable.drag_handle),
-                                contentDescription = "Drag handle",
-                                modifier = Modifier
-                                    .size(24.dp)
-                                    .align(Alignment.CenterVertically)
 
-                            )
-                            Spacer(modifier = Modifier.width(16.dp))
-                        }
-                        HorizontalDivider()
-                    }
-                    if (isClicked) {
-                        if (item.layoutItem!!.item == LayoutItems.PROGRESS) {
-                            if (vm.currentView != ViewsWithLayout.PLAYER)
-                                EditProgressBarProperties(
-                                    item,
-                                    onDismiss = { dirty: Boolean ->
-                                        if (dirty) {
-                                            vm.saveChanges()
-                                        }
-                                        isClicked = false
-                                    })
-                        } else
-                            EditProperties(
-                                item,
-                                onDismiss = { dirty: Boolean ->
-                                    if (dirty) {
-                                        vm.saveChanges()
+            // "Fly over" effect
+            val flyElevation by animateDpAsState(
+                targetValue = if (isDragging) 24.dp else 0.dp,
+                animationSpec = spring(),
+                label = "flyElevation"
+            )
+            val flyScale by animateFloatAsState(
+                targetValue = if (isDragging) 1.02f else 1f,
+                animationSpec = spring(),
+                label = "flyScale"
+            )
+
+            // Snap to finger while dragging; spring back when released.
+            val translationY by animateFloatAsState(
+                targetValue = if (isDragging) totalDragOffset else 0f,
+                animationSpec = if (isDragging) snap() else spring(),
+                label = "translationY"
+            )
+            var isClicked by remember { mutableStateOf(false) }
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable(onClick = {
+                        isClicked = !isClicked && !item.isSectionTitle
+                    })
+                    .onSizeChanged { measuredItemHeightPx = it.height.toFloat() }
+                    // Animate OTHER items when list order changes.
+                    .then(if (!isDragging) Modifier.animateItem() else Modifier)
+                    .zIndex(if (isDragging) 10f else 0f)
+                    .scale(flyScale)
+                    .shadow(
+                        elevation = flyElevation,
+                        shape = RoundedCornerShape(8.dp),
+                        clip = false
+                    )
+                    .graphicsLayer { this.translationY = translationY }
+                    .pointerInput(item.key, measuredItemHeightPx) {
+                        if (!item.isSectionTitle)
+                            detectDragGesturesAfterLongPress(
+                                onDragStart = {
+                                    draggedItemId = item.key
+                                    draggedIndex = latestItems.indexOfFirst { it.key == item.key }
+                                    totalDragOffset = 0f
+                                },
+                                onDrag = { change, dragAmount ->
+                                    change.consume()
+
+                                    // Accumulate the drag offset
+                                    totalDragOffset += dragAmount.y
+
+                                    val itemStepPx =
+                                        (if (measuredItemHeightPx > 0f) measuredItemHeightPx else fallbackItemHeightPx) + spacingPx
+
+                                    val currentItems = latestItems
+                                    val from = draggedIndex
+                                    if (from !in currentItems.indices) return@detectDragGesturesAfterLongPress
+
+                                    val offsetItems = totalDragOffset / itemStepPx
+
+                                    val to = if (offsetItems < 0)
+                                        (from.toFloat() + offsetItems + 0.9f).toInt() // ceiling
+                                            .coerceIn(0, currentItems.lastIndex)
+                                    else
+                                        (from.toFloat() + offsetItems).toInt()
+                                            .coerceIn(0, currentItems.lastIndex)
+
+                                    if (to != from && to != 0) {
+                                        // Reorder DURING the drag -> other items animate via animateItemPlacement()
+                                        vm.layoutFields.value = currentItems.move(from, to)
+                                        vm.dirty.value = true
+                                        draggedIndex = to
+                                        // Compensate offset so the card stays under the finger after the move
+                                        totalDragOffset -= (to - from) * itemStepPx
                                     }
-                                    isClicked = false
-                                })
+                                },
+                                onDragEnd = {
+                                    draggedItemId = null
+                                    totalDragOffset = 0f
+                                    draggedIndex = -1
+                                    vm.saveChanges()
+                                },
+                                onDragCancel = {
+                                    draggedItemId = null
+                                    totalDragOffset = 0f
+                                    draggedIndex = -1
+                                }
+                            )
+                    },
+                elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+                shape = if (item.isSectionTitle) RoundedCornerShape(0.dp) else RoundedCornerShape(8.dp),
+                colors = CardDefaults.cardColors(
+                    if (item.isSectionTitle) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant
+                )
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column() {
+                        if (item.isSectionTitle) {
+                            Text(
+                                text = item.sectionTitle,
+                            )
+                        } else if (item.layoutItem != null) {
+                            Text(
+                                text = item.layoutItem.item.text,
+                            )
+                            Text(
+                                text = item.layoutItem.verbose(),
+                                maxLines = 2,
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                        }
                     }
+                    if (!item.isSectionTitle)
+                        Text(
+                            text = "⋮⋮",
+                            style = MaterialTheme.typography.headlineSmall
+                        )
                 }
+            } // end Card
+            if (isClicked) {
+                if (item.layoutItem!!.item == LayoutItems.PROGRESS) {
+                    if (vm.currentView != ViewsWithLayout.PLAYER)
+                        EditProgressBarProperties(
+                            item,
+                            onDismiss = { dirty: Boolean ->
+                                if (dirty) {
+                                    vm.dirty.value = true
+                                    vm.saveChanges()
+                                }
+                                isClicked = false
+                            })
+                } else
+                    EditProperties(
+                        item,
+                        onDismiss = { dirty: Boolean ->
+                            if (dirty) {
+                                vm.dirty.value = true
+                                vm.saveChanges()
+                            }
+                            isClicked = false
+                        })
             }
-        }
+        } // items Indexed
     }
 }
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -419,7 +507,7 @@ fun EditProgressBarProperties(
             )
         },
         text = {
-            Column( modifier = Modifier.padding(start = 16.dp)) {
+            Column(modifier = Modifier.padding(start = 16.dp)) {
                 // Show timings
                 Row {
                     Checkbox(
@@ -499,4 +587,5 @@ fun <T> DropdownSelector(
         }
     }
 }
+
 

@@ -25,6 +25,7 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.HorizontalDivider
@@ -32,7 +33,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -55,18 +55,15 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.deckerth.thomas.foobarremotecontroller2.R
 import com.deckerth.thomas.foobarremotecontroller2.getAddTrackBehavior
 import com.deckerth.thomas.foobarremotecontroller2.model.Album
 import com.deckerth.thomas.foobarremotecontroller2.model.ITitle
 import com.deckerth.thomas.foobarremotecontroller2.model.Playlist
-import com.deckerth.thomas.foobarremotecontroller2.model.PlaylistEntity
 import com.deckerth.thomas.foobarremotecontroller2.model.PlaylistLifecycleState
 import com.deckerth.thomas.foobarremotecontroller2.model.Playlists
 import com.deckerth.thomas.foobarremotecontroller2.model.SelectableTitle
-import com.deckerth.thomas.foobarremotecontroller2.model.Title
 import com.deckerth.thomas.foobarremotecontroller2.ui.components.ImageWithLoadingPlaceholder
 import com.deckerth.thomas.foobarremotecontroller2.ui.components.LayoutComponent
 import com.deckerth.thomas.foobarremotecontroller2.ui.components.PlaylistNameDialog
@@ -78,7 +75,6 @@ import com.deckerth.thomas.foobarremotecontroller2.ui.layout.Layout
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.highlightPlayingItem
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.layoutManager
 import com.deckerth.thomas.foobarremotecontroller2.ui.mainActivity
-import com.deckerth.thomas.foobarremotecontroller2.ui.theme.Foobar2000RemoteControllerTheme
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.PlaybackState
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.PlayerViewModel
@@ -637,7 +633,7 @@ fun PlaylistSwitcher(vm: AppViewModel, playlists: Playlists) {
         OutlinedTextField(
             modifier = Modifier
                 .fillMaxWidth()
-                .menuAnchor(MenuAnchorType.PrimaryNotEditable, true)
+                .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable, true)
                 .focusRequester(focusRequester)
                 .onFocusChanged {
                     if (it.isFocused) // clear focus immediately
@@ -679,108 +675,3 @@ fun PlaylistSwitcher(vm: AppViewModel, playlists: Playlists) {
 
 }
 
-@Preview(
-    showBackground = true
-)
-@Composable
-fun PlaylistSwitcherPreview() {
-//    var text by remember {
-//        mutableStateOf("text")
-//    }
-//    OutlinedTextField(
-//        value = text,
-//        onValueChange = {s: String ->
-//            text = s
-//        },
-//        label = {
-//            Text(text = "Playlist")
-//        }
-//    )
-    val playlists = Playlists()
-    playlists.addPlaylistEntity(
-        PlaylistEntity(
-            "p1", "name1", false, 10
-        )
-    )
-    playlists.addPlaylistEntity(
-        PlaylistEntity(
-            "p2", "name2", false, 10
-        )
-    )
-    playlists.addPlaylistEntity(
-        PlaylistEntity(
-            "p3", "name3", true, 10
-        )
-    )
-    playlists.addPlaylistEntity(
-        PlaylistEntity(
-            "p4", "name4", false, 10
-        )
-    )
-    PlaylistSwitcher(AppViewModel("Preview"), playlists = playlists)
-}
-
-
-@Preview(
-    showBackground = true,
-)
-@Composable
-fun PlaylistPreview() {
-    Foobar2000RemoteControllerTheme {
-        val title = Title(
-            "",
-            0,
-            "",
-            "",
-            "Composer",
-            "Ibrahim Ferrer (Buena Vista Social Club Presents)",
-            "Mamí Me Gustó",
-            "Ibrahim Ferrer",
-            "Ibrahim Ferrer",
-            "44100",
-            "Classical",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "", ""
-        )
-        val playlist = Playlist(PlaylistEntity("p4", "main", true, 10))
-        playlist.addTitle(title)
-        playlist.addTitle(title)
-        playlist.addTitle(title)
-        playlist.addTitle(title)
-        playlist.addTitle(title)
-        playlist.addTitle(title)
-        val title2 = Title(
-            "",
-            0,
-            "",
-            "",
-            "Composer",
-            "Ibrahim Ferrer (Buena Vista Social Club Presents)",
-            "",
-            "Ibrahim Ferrer",
-            "Ibrahim Ferrer",
-            "44100",
-            "Classical",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "", ""
-        )
-        playlist.addTitle(title2)
-        playlist.addTitle(title2)
-//        var titles = PlaylistAccess().getCurrentPlaylist();
-//        if (titles == null) {
-//            return@ComposePlaylistTheme
-//        }
-        Column {
-            PlaylistSwitcherPreview()
-            Playlist(AppViewModel("Preview"), playlist)
-        }
-    }
-}

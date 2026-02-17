@@ -195,8 +195,8 @@
     <string name="menu_item_show_title_details">Details</string>
     <string name="menu_item_add_to_playlist">Add to playlist…</string>
     <string name="menu_item_remove_from_playlist">Remove from playlist</string>
-    <string name="release_notes_3_header">Cover</string>
-    <string name="release_notes_3_text">Tap the cover to enlarge it; tap once more to return to the previous view.</string>
+    <string name="release_notes_3_header">Layout editor</string>
+    <string name="release_notes_3_text">The editor features a redesigned interface and now includes an undo function.</string>
     <string name="layout_item_artist_title">Artist - Title</string>
     <string name="button_content_copy">Copy to clipboard</string>
     <string name="layout_item_album_artist">Album Artist</string>

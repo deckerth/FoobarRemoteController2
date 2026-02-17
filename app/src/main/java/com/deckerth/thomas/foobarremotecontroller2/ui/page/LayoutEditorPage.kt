@@ -7,6 +7,7 @@ import androidx.compose.animation.core.spring
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,6 +19,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
@@ -26,6 +28,7 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.InputChip
 import androidx.compose.material3.InputChipDefaults
@@ -103,7 +106,7 @@ fun LayoutEditorPage(
         itemsIndexed(
             items = vm.layoutFields.value,
             key = { _, item -> item.key }
-        ) { index, item ->
+        ) { _, item ->
             val isDragging = draggedItemId == item.key
 
 
@@ -256,8 +259,21 @@ fun LayoutEditorPage(
             }
         } // items Indexed
     }
+    if (vm.history.value.isNotEmpty())
+        Box(
+            modifier = Modifier.fillMaxSize()
+        )
+        {
+            FloatingActionButton(
+                onClick = { vm.undo() },
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(16.dp) // optional spacing from edges
+                    .size(48.dp)
+            )
+            { Icon(Icons.AutoMirrored.Filled.Undo, "Undo") }
+        }
 }
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

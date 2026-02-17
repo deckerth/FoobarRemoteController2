@@ -31,29 +31,48 @@ class LayoutViewModel(private val vm: AppViewModel) : ViewModel() {
             field = value
             initializeViewModel()
         }
-    private var layoutDescription: LayoutDescription? = null
+    private var currentLayoutDescription: LayoutDescription? = null
+
+    val history = mutableStateOf<List<LayoutDescription>>(emptyList())
 
     fun saveChanges() {
         if (dirty.value) {
+            val m = history.value.toMutableList()
+            m.add(currentLayoutDescription!!)
+            history.value = m
             var sectionCount = 0
-            val description = LayoutDescription(currentView)
+            currentLayoutDescription = LayoutDescription(currentView)
             for (field in layoutFields.value) {
                 if (field.isSectionTitle) {
                     sectionCount++
                     if (sectionCount == 2)
                         break
                 } else
-                    if (field.layoutItem != null) description.items.add(field.layoutItem)
+                    if (field.layoutItem != null) currentLayoutDescription!!.items.add(field.layoutItem)
             }
-            layoutManager.setCustomLayoutDescription(vm.selectedView, description)
+            layoutManager.setCustomLayoutDescription(vm.selectedView, currentLayoutDescription!!)
             dirty.value = false
         }
     }
 
-    private fun initializeViewModel() {
-        layoutDescription = layoutManager.getCustomLayoutDescription(vm.selectedView)
+    fun undo() {
+        if (history.value.isNotEmpty()) {
+            val m = history.value.toMutableList()
+            currentLayoutDescription = m.removeAt(m.lastIndex)
+            history.value = m
+            layoutManager.setCustomLayoutDescription(
+                vm.selectedView,
+                currentLayoutDescription!!
+            )
+            dirty.value = false
+            initializeViewModel()
+        }
+    }
 
-        val layoutItems = layoutDescription!!.items
+    private fun initializeViewModel() {
+        currentLayoutDescription = layoutManager.getCustomLayoutDescription(vm.selectedView)
+
+        val layoutItems = currentLayoutDescription!!.items
         val allItems = getLayoutItemsFor(vm.selectedView)
         val unusedItems = allItems.filter { item -> !layoutItems.any { it.item == item } }
         val fields = mutableListOf<LayoutField>()

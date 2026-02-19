@@ -208,4 +208,6 @@
     <string name="progress_bar_wavy_when_playing">Wellenförmig während der Wiedergabe</string>
     <string name="show_progress_bar_timings">Wiedergabezeit und Dauer anzeigen</string>
     <string name="show_progress_background_coloring">Hintergrund des gerade gespielten Titels hervorheben</string>
+    <string name="progress_bar_format">Linienstil</string>
+    <string name="progress_bar_wave_speed">Wellengeschwindigkeit</string>
 </resources>

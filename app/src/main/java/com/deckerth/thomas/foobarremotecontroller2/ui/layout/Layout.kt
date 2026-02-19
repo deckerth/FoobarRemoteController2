@@ -32,5 +32,5 @@ data class Layout(
 
 fun highlightPlayingItem(layout: LayoutDescription): Boolean
     {
-        return (!layout.items.any { it.item == LayoutItems.PROGRESS && it.progressBarReplacesBackgroundColoring })
+        return (!layout.items.any { it.item == LayoutItems.PROGRESS && !it.progressBarReplacesBackgroundColoring })
     }

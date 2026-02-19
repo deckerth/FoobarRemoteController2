@@ -16,6 +16,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.LinearWavyProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.Slider
@@ -32,6 +33,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.deckerth.thomas.foobarremotecontroller2.R
 import com.deckerth.thomas.foobarremotecontroller2.model.Album
@@ -173,7 +175,9 @@ private fun ProgressWithTiming(
     fraction: Float,
     positionText: String? = null,
     durationText: String? = null,
-    withTimingDetails: Boolean = false
+    withTimingDetails: Boolean = false,
+    wavy: Boolean,
+    waveSpeed: Dp
 ) {
     Column {
         val safeFraction = if (fraction.isNaN()) 0f else fraction.coerceIn(0f, 1f)
@@ -204,26 +208,27 @@ private fun ProgressWithTiming(
             }
         }
 
-//        LinearWavyProgressIndicator(
-//            progress = { safeFraction },
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .padding(vertical = 8.dp),
-//            color = ProgressIndicatorDefaults.linearColor,
-//            trackColor = ProgressIndicatorDefaults.linearTrackColor,
-//            waveSpeed = 5.dp
-//        )
-
-
-        LinearProgressIndicator(
-            progress = { safeFraction },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp),
-            color = ProgressIndicatorDefaults.linearColor,
-            trackColor = ProgressIndicatorDefaults.linearTrackColor,
-            strokeCap = ProgressIndicatorDefaults.LinearStrokeCap
-        )
+        if (wavy) {
+            LinearWavyProgressIndicator(
+                progress = { safeFraction },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp),
+                color = ProgressIndicatorDefaults.linearColor,
+                trackColor = ProgressIndicatorDefaults.linearTrackColor,
+                waveSpeed = waveSpeed
+            )
+        } else {
+            LinearProgressIndicator(
+                progress = { safeFraction },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp),
+                color = ProgressIndicatorDefaults.linearColor,
+                trackColor = ProgressIndicatorDefaults.linearTrackColor,
+                strokeCap = ProgressIndicatorDefaults.LinearStrokeCap
+            )
+        }
     }
 }
 
@@ -231,7 +236,9 @@ private fun ProgressWithTiming(
 fun AlbumProgress(
     album: Album,
     playerViewModel: PlayerViewModel,
-    withTimingDetails: Boolean = false
+    withTimingDetails: Boolean = false,
+    wavy: Boolean = true,
+    waveSpeed: Dp = 5.dp
 ) {
     val fraction = try {
         album.getAlbumPosition(playerViewModel).coerceIn(0f, 1f)
@@ -245,12 +252,19 @@ fun AlbumProgress(
         fraction = fraction,
         positionText = position,
         durationText = duration,
-        withTimingDetails = withTimingDetails
+        withTimingDetails = withTimingDetails,
+        wavy = wavy,
+        waveSpeed = waveSpeed
     )
 }
 
 @Composable
-fun TitleProgress(playerViewModel: PlayerViewModel, withTimingDetails: Boolean = false) {
+fun TitleProgress(
+    playerViewModel: PlayerViewModel,
+    withTimingDetails: Boolean = false,
+    wavy: Boolean = true,
+    waveSpeed: Dp = 5.dp
+) {
     val fraction = try {
         playerViewModel.getPos().coerceIn(0f, 1f)
     } catch (_: Exception) {
@@ -263,6 +277,8 @@ fun TitleProgress(playerViewModel: PlayerViewModel, withTimingDetails: Boolean =
         fraction = fraction,
         positionText = position,
         durationText = duration,
-        withTimingDetails = withTimingDetails
+        withTimingDetails = withTimingDetails,
+        wavy = wavy,
+        waveSpeed = waveSpeed
     )
 }

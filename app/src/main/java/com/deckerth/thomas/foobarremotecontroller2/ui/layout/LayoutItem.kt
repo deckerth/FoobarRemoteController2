@@ -12,8 +12,10 @@ data class LayoutItem(
     var bold: Boolean = false,
     var maxLines: Int = 1,
     var alignment: TextAlignment = TextAlignment.LEFT,
+    var progressBarFormat: ProgressBarFormat = ProgressBarFormat.WAVY_WHEN_PLAYING,
     var progressBarShowTimings: Boolean = false,
-    var progressBarReplacesBackgroundColoring: Boolean = true
+    var progressBarReplacesBackgroundColoring: Boolean = true,
+    var waveSpeed: Int = 5
 ) {
 
     fun verbose(): String {
@@ -22,7 +24,7 @@ data class LayoutItem(
                 return mainActivity!!.baseContext.getString(R.string.size_property) + " ${itemSize.text}"
 
             LayoutItems.PROGRESS ->
-                return ""
+                return progressBarFormat.text
 
             else -> {
                 val italic =

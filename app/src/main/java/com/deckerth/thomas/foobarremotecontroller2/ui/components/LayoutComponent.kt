@@ -8,14 +8,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import com.deckerth.thomas.foobarremotecontroller2.model.Album
 import com.deckerth.thomas.foobarremotecontroller2.model.ITitle
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.ItemSize
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.LayoutItem
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.LayoutItems
+import com.deckerth.thomas.foobarremotecontroller2.ui.layout.ProgressBarFormat
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.TextAlignment
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.PlaybackState
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.PlayerViewModel
+
+private fun intToDp(value: Int): Dp = value.dp
 
 @Composable
 fun getTextStyle(itemSize: ItemSize): TextStyle {
@@ -90,14 +96,22 @@ fun LayoutComponent(vm: AppViewModel, album: Album, layoutItem: LayoutItem, albu
             if (album.originalTitle.composer != "" && album.originalTitle.composer != "?") {
                 TextComponent(text = album.originalTitle.composer, item = layoutItem)
             }
-        LayoutItems.PROGRESS -> if (albumIsCurrentlyPlaying)
-            AlbumProgress(album, vm.playerViewModel, withTimingDetails = layoutItem.progressBarShowTimings)
+        LayoutItems.PROGRESS -> if (albumIsCurrentlyPlaying) {
+            val wavy = when (layoutItem.progressBarFormat) {
+                ProgressBarFormat.WAVY_WHEN_PLAYING -> vm.playerViewModel.playbackState == PlaybackState.PLAYING
+                ProgressBarFormat.UNDEFINED -> false
+                ProgressBarFormat.WAVY -> true
+                ProgressBarFormat.FLAT -> false
+            }
+            AlbumProgress(album, vm.playerViewModel, withTimingDetails = layoutItem.progressBarShowTimings, wavy, intToDp(layoutItem.waveSpeed))
+
+        }
         else -> Text("UNKNOWN ITEM")
     }
 }
 
 @Composable
-fun LayoutComponent(vm: AppViewModel, album: Album, title: ITitle, checkArtist: Boolean, layoutItem: LayoutItem, titleIsCurrentlyPlaying: Boolean) {
+fun LayoutComponent(vm: PlayerViewModel, album: Album, title: ITitle, checkArtist: Boolean, layoutItem: LayoutItem, titleIsCurrentlyPlaying: Boolean) {
     when (layoutItem.item) {
         LayoutItems.LABEL -> TextComponent(text = title.label, item = layoutItem)
         LayoutItems.CATALOG -> TextComponent(text = title.catalog, item = layoutItem)
@@ -119,8 +133,20 @@ fun LayoutComponent(vm: AppViewModel, album: Album, title: ITitle, checkArtist: 
             if (title.composer != "" && title.composer != "?") {
                 TextComponent(text = title.composer, item = layoutItem)
             }
-        LayoutItems.PROGRESS -> if (titleIsCurrentlyPlaying) TitleProgress(playerViewModel = vm.playerViewModel, withTimingDetails = layoutItem.progressBarShowTimings)
-
+        LayoutItems.PROGRESS -> if (titleIsCurrentlyPlaying) {
+            val wavy = when (layoutItem.progressBarFormat) {
+                ProgressBarFormat.WAVY_WHEN_PLAYING -> vm.playbackState == PlaybackState.PLAYING
+                ProgressBarFormat.UNDEFINED -> false
+                ProgressBarFormat.WAVY -> true
+                ProgressBarFormat.FLAT -> false
+            }
+            TitleProgress(
+                playerViewModel = vm,
+                withTimingDetails = layoutItem.progressBarShowTimings,
+                wavy = wavy,
+                waveSpeed = intToDp(layoutItem.waveSpeed)
+            )
+        }
         else -> Text("UNKNOWN ITEM")
     }
 }

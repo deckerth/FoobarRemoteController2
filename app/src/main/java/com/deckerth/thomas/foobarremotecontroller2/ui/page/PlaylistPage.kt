@@ -529,7 +529,7 @@ fun TitleEntry(
             ) {
                 for (item in layout.titleLayout.items) {
                     LayoutComponent(
-                        vm,
+                        playerViewModel,
                         album,
                         title.details,
                         layout.albumLayoutHasArtist,

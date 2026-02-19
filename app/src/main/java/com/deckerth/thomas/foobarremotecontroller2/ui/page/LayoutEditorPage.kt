@@ -9,6 +9,7 @@ import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -28,12 +29,16 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.InputChip
 import androidx.compose.material3.InputChipDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MultiChoiceSegmentedButtonRow
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
@@ -63,10 +68,12 @@ import androidx.compose.ui.zIndex
 import com.deckerth.thomas.foobarremotecontroller2.R
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.ItemSize
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.LayoutItems
+import com.deckerth.thomas.foobarremotecontroller2.ui.layout.ProgressBarFormat
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.TextAlignment
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.ViewsWithLayout
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.getItemSizesForAlbums
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.getItemSizesForFonts
+import com.deckerth.thomas.foobarremotecontroller2.ui.layout.getProgressBarFormats
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.LayoutField
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.LayoutViewModel
 
@@ -220,11 +227,12 @@ fun LayoutEditorPage(
                             Text(
                                 text = item.layoutItem.item.text,
                             )
-                            Text(
-                                text = item.layoutItem.verbose(),
-                                maxLines = 2,
-                                style = MaterialTheme.typography.bodySmall
-                            )
+                            if (item.layoutItem.item != LayoutItems.PROGRESS || vm.currentView != ViewsWithLayout.PLAYER)
+                                Text(
+                                    text = item.layoutItem.verbose(),
+                                    maxLines = 2,
+                                    style = MaterialTheme.typography.bodySmall
+                                )
                         }
                     }
                     if (!item.isSectionTitle)
@@ -487,8 +495,10 @@ fun EditProgressBarProperties(
     onDismiss: (Boolean) -> Unit
 ) {
     var dirty by remember { mutableStateOf(false) }
+    var progressBarFormat: ProgressBarFormat by remember { mutableStateOf(layoutField.layoutItem!!.progressBarFormat) }
     var progressBarShowTimings: Boolean by remember { mutableStateOf(layoutField.layoutItem!!.progressBarShowTimings) }
-    var highlightPlayingTitle: Boolean by remember { mutableStateOf(!layoutField.layoutItem!!.progressBarReplacesBackgroundColoring) }
+    var progressBarReplacesBackgroundColoring: Boolean by remember { mutableStateOf(layoutField.layoutItem!!.progressBarReplacesBackgroundColoring) }
+    var waveSpeed: Int by remember { mutableIntStateOf(layoutField.layoutItem!!.waveSpeed) }
 
     AlertDialog(
         onDismissRequest = { onDismiss(false) },
@@ -502,10 +512,12 @@ fun EditProgressBarProperties(
         },
         confirmButton = {
             TextButton(onClick = {
-                if (dirty && layoutField.layoutItem != null) {
+                if (dirty) {
+                    layoutField.layoutItem!!.progressBarFormat = progressBarFormat
                     layoutField.layoutItem.progressBarShowTimings = progressBarShowTimings
                     layoutField.layoutItem.progressBarReplacesBackgroundColoring =
-                        !highlightPlayingTitle
+                        progressBarReplacesBackgroundColoring
+                    layoutField.layoutItem.waveSpeed = waveSpeed
                     onDismiss(true)
                 } else
                     onDismiss(false)
@@ -523,7 +535,49 @@ fun EditProgressBarProperties(
             )
         },
         text = {
-            Column(modifier = Modifier.padding(start = 16.dp)) {
+            Column(
+                modifier = Modifier.padding(start = 16.dp)
+            ) {
+                // Format
+                AlternativeDropdown(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(38.dp),
+                    values = getProgressBarFormats(),
+                    selectedItem = progressBarFormat,
+                    label = stringResource(R.string.progress_bar_format),
+                    onClick = { format: ProgressBarFormat? ->
+                        if (format != null) {
+                            progressBarFormat = format; dirty = true
+                        }
+                    },
+                    getText = { format: ProgressBarFormat -> format.text })
+
+                // Wave speed
+                if (progressBarFormat != ProgressBarFormat.FLAT)
+                    Column {
+                        Text(
+                            modifier = Modifier.padding(top = 12.dp, end = 8.dp),
+                            text = stringResource(R.string.progress_bar_wave_speed)
+                        )
+                        Row(
+                            verticalAlignment = Alignment.Top,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp)
+                        ) {
+                            Text(
+                                modifier = Modifier.padding(top = 12.dp, start = 8.dp, end = 8.dp),
+                                text = waveSpeed.toString()
+                            )
+                            Slider(
+                                value = waveSpeed.toFloat(),
+                                onValueChange = { waveSpeed = it.toInt(); dirty = true },
+                                valueRange = 0f..10f,
+                                steps = 11
+                            )
+                        }
+                    }
                 // Show timings
                 Row {
                     Checkbox(
@@ -541,9 +595,9 @@ fun EditProgressBarProperties(
                 // Background coloring
                 Row {
                     Checkbox(
-                        checked = highlightPlayingTitle,
+                        checked = progressBarReplacesBackgroundColoring,
                         onCheckedChange = {
-                            highlightPlayingTitle = it; dirty = true
+                            progressBarReplacesBackgroundColoring = it; dirty = true
                         }
                     )
                     Text(
@@ -572,13 +626,20 @@ fun <T> DropdownSelector(
     var expanded by remember { mutableStateOf(false) }
     var currentItem by remember { mutableStateOf(selectedItem) }
     currentItem = selectedItem
-    Column {
+    Column() {
         InputChip(
-            modifier = modifier,
+            modifier = modifier.height(IntrinsicSize.Max),
             onClick = {
                 expanded = !expanded
             },
-            label = { Text(text = getText(currentItem)) },
+            label = {
+                Row(modifier = modifier.padding(vertical = 4.dp)) {
+                    Text(
+                        text = getText(currentItem),
+                        maxLines = 2
+                    )
+                }
+            },
             selected = expanded,
             trailingIcon = {
                 Icon(
@@ -589,19 +650,65 @@ fun <T> DropdownSelector(
             },
         )
         if (expanded) {
-            DropdownMenu(expanded = true, onDismissRequest = { onClick(null) }) {
+            DropdownMenu(expanded = true, onDismissRequest = { expanded = false }) {
                 for (option in values) {
                     DropdownMenuItem(onClick = {
                         currentItem = option
                         expanded = false
                         onClick(option)
-                    }, text = {
-                        Text(text = getText(option))
-                    })
+                    }, text = { Text(text = getText(option)) }
+                    )
                 }
             }
         }
     }
 }
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun <T> AlternativeDropdown(
+    modifier: Modifier = Modifier,
+    values: List<T>,
+    selectedItem: T,
+    onClick: (T?) -> Unit,
+    label: String = "",
+    getText: (T) -> String = { v -> v.toString() }
+) {
+    var expanded by remember { mutableStateOf(false) }
+    var currentItem by remember { mutableStateOf(selectedItem) }
+    currentItem = selectedItem
+
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { expanded = !expanded }
+    ) {
+        OutlinedTextField(
+            value = getText(currentItem),
+            onValueChange = {},
+            readOnly = true,
+            label = { Text(label) },
+            trailingIcon = {
+                ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+            },
+            modifier = Modifier
+                .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable, true)
+        )
+
+        ExposedDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            for (option in values) {
+                DropdownMenuItem(onClick = {
+                    currentItem = option
+                    expanded = false
+                    onClick(option)
+                }, text = { Text(text = getText(option)) }
+                )
+            }
+        }
+    }
+}
+
 
 

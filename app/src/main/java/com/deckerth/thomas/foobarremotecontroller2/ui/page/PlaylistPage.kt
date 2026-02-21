@@ -526,6 +526,7 @@ fun TitleEntry(
             Column(
                 modifier = Modifier
                     .padding(16.dp)
+                    .weight(1f)
             ) {
                 for (item in layout.titleLayout.items) {
                     LayoutComponent(

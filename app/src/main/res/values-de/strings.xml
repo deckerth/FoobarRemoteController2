@@ -194,9 +194,9 @@
     <string name="titles_added_to_playback_queue">%1$s Titel wurden der Playback Queue hinzugefügt</string>
     <string name="menu_item_add_to_playback_queue">Zur Playback Queue hinzufügen</string>
     <string name="menu_item_show_title_details">Details</string>
-    <string name="menu_item_add_to_playlist">Add to playlist…</string>
-    <string name="menu_item_remove_from_playlist">Remove from playlist</string>
-    <string name="release_notes_3_header">Cover</string>
+    <string name="menu_item_add_to_playlist">Zur Playlist hinzufügen…</string>
+    <string name="menu_item_remove_from_playlist">Von der Playlist entfernen</string>
+    <string name="release_notes_3_header">Layout editor</string>
     <string name="release_notes_3_text">Der Editor hat ein neues Design bekommen inklusiver einer Undo Funktion.</string>
     <string name="layout_item_artist_title">Künstler - Titel</string>
     <string name="button_content_copy">In Zwischanablage kopieren</string>

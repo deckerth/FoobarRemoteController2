@@ -181,7 +181,7 @@
 <!--    <string name="release_notes_2_header">Playlist Editing</string>-->
 <!--    <string name="release_notes_2_text">When creating a new playlist from the current one or copying selected tracks to another playlist, you can now quickly select or deselect all titles with ease.</string>-->
     <string name="release_notes_1_header">Playlist</string>
-    <string name="release_notes_1_text">You can customize your title and album layouts to include a progress bar.</string>
+    <string name="release_notes_1_text">Progress indicators are now also available in the playlist view.</string>
     <string name="release_notes_2_header">Title Details</string>
     <string name="release_notes_2_text">Pause or resume playback by tapping the current title in the playlist.</string>
     <string name="release_notes_remark">You can review the release notes later in the app settings.</string>

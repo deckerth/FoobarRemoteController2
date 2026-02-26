@@ -182,7 +182,7 @@
 <!--    <string name="release_notes_2_header">Editieren von Playlists</string>-->
 <!--    <string name="release_notes_2_text">Wenn Sie eine neue Playlist aus der aktuellen erstellen oder ausgewählte Titel in eine andere Playlist kopieren, können Sie nun einfach alle Titel auswählen oder abwählen.</string>-->
     <string name="release_notes_1_header">Playlist</string>
-    <string name="release_notes_1_text">Sie können den angepassten Layouts eine Fortschrittsanzeige hinzufügen.</string>
+    <string name="release_notes_1_text">Fortschrittsanzeigen sind jetzt auch in der Playlist-Ansicht verfügbar.</string>
     <string name="release_notes_2_header">Detailsicht</string>
     <string name="release_notes_2_text">Durch Antippen des aktuellen Titels in der Playlist können Sie die Wiedergabe pausieren oder starten.</string>
     <string name="release_notes_remark">Sie können sich die Informationen über die Neuigkeiten später in den Einstellungen ansehen.</string>

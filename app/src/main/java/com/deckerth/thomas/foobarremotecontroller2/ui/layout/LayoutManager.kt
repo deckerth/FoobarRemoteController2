@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import com.deckerth.thomas.foobarremotecontroller2.getCustomLayout
 import com.deckerth.thomas.foobarremotecontroller2.getViewMode
 import com.deckerth.thomas.foobarremotecontroller2.saveCustomLayout
+import com.deckerth.thomas.foobarremotecontroller2.ui.isTablet
 import com.deckerth.thomas.foobarremotecontroller2.ui.mainActivity
 
 val layoutManager = LayoutManager()
@@ -49,6 +50,7 @@ class LayoutManager {
         val fields = LayoutDescription(ViewsWithLayout.TITLE)
         fields.items.add(LayoutItem(LayoutItems.TITLE, ItemSize.TITLE_MEDIUM))
         fields.items.add(LayoutItem(LayoutItems.SMART_ARTIST, ItemSize.BODY_SMALL))
+        if (!mainActivity!!.isTablet()) fields.items.add(LayoutItem(LayoutItems.ALBUM, ItemSize.BODY_SMALL))
         return fields
     }
 
@@ -88,6 +90,7 @@ class LayoutManager {
         val fields = LayoutDescription(ViewsWithLayout.TITLE)
         fields.items.add(LayoutItem(LayoutItems.TITLE, ItemSize.TITLE_MEDIUM))
         fields.items.add(LayoutItem(LayoutItems.SMART_ARTIST, ItemSize.BODY_SMALL))
+        if (!mainActivity!!.isTablet()) fields.items.add(LayoutItem(LayoutItems.ALBUM, ItemSize.BODY_SMALL))
         return fields
     }
 

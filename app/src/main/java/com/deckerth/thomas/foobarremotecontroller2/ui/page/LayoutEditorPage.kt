@@ -579,7 +579,7 @@ fun EditProgressBarProperties(
                         }
                     }
                 // Show timings
-                Row {
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     Checkbox(
                         checked = progressBarShowTimings,
                         onCheckedChange = { progressBarShowTimings = it; dirty = true }
@@ -593,11 +593,11 @@ fun EditProgressBarProperties(
                 }
 
                 // Background coloring
-                Row {
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     Checkbox(
-                        checked = progressBarReplacesBackgroundColoring,
+                        checked = !progressBarReplacesBackgroundColoring,
                         onCheckedChange = {
-                            progressBarReplacesBackgroundColoring = it; dirty = true
+                            progressBarReplacesBackgroundColoring = !it; dirty = true
                         }
                     )
                     Text(

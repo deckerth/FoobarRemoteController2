@@ -32,5 +32,6 @@ data class Layout(
 
 fun highlightPlayingItem(layout: LayoutDescription): Boolean
     {
-        return (!layout.items.any { it.item == LayoutItems.PROGRESS && !it.progressBarReplacesBackgroundColoring })
+    // Always highlight the current title. The only exception: The layout contains a progress bar that shall replace the background color.
+        return (!layout.items.any { it.item == LayoutItems.PROGRESS && it.progressBarReplacesBackgroundColoring })
     }

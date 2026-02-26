@@ -85,11 +85,15 @@ class PlaylistsViewModel(private val vm: AppViewModel) : ViewModel() {
     val playlists: Playlists
         get() {
             val playlists = Playlists()
-            for (list in playlistRegistry)
-                if (list.ipAddress == vm.ipAddress &&
-                    list.lifecycleState != PlaylistLifecycleState.Invalid
-                )
-                    playlists.addPlaylistEntity(list.playlistEntity)
+            try {
+                for (list in playlistRegistry)
+                    if (list.ipAddress == vm.ipAddress &&
+                        list.lifecycleState != PlaylistLifecycleState.Invalid
+                    )
+                        playlists.addPlaylistEntity(list.playlistEntity)
+            } catch (_ : IllegalStateException) {
+                println("FOOB PLAYLISTPAGE IllegalStateException")
+            }
             return playlists
         }
 
@@ -319,7 +323,7 @@ class PlaylistsViewModel(private val vm: AppViewModel) : ViewModel() {
                 } while (currentPlaylist != null && !vm.errorHandler.sick())
                 withContext(Dispatchers.Main) { vm.loadingList = false }
                 println("FOOBUPDATE updatePlaylist finished")
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 withContext(Dispatchers.Main) { vm.loadingList = false }
             }
         }
@@ -399,7 +403,7 @@ class PlaylistsViewModel(private val vm: AppViewModel) : ViewModel() {
                         Toast.LENGTH_SHORT
                     ).show()
                 }
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 withContext(Dispatchers.Main) {
                     Toast.makeText(
                         mainActivity!!,

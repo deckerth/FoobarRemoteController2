@@ -58,7 +58,9 @@ fun TitleDetails(title: ITitle, onDismiss: () -> Unit) {
         },
         text = {
             Column(
-                modifier = Modifier.padding(start = 16.dp).verticalScroll(rememberScrollState())
+                modifier = Modifier
+                    .padding(start = 16.dp)
+                    .verticalScroll(rememberScrollState())
             ) {
                 for (item in playerItems.items)
                     DisplayItemDetail(title, item.item)
@@ -102,20 +104,23 @@ fun DisplayItemDetail(title: ITitle, item: LayoutItems) {
     if (value.isEmpty()) return
 
     if (item == LayoutItems.ARTWORK || item == LayoutItems.PROGRESS || item == LayoutItems.LABEL_CATALOG) return
-    Text(
-        text = item.text,
-        style = MaterialTheme.typography.titleMedium
-    )
     Row(verticalAlignment = Alignment.CenterVertically) {
-        Text(
-            modifier = Modifier.weight(1f),
-            text = value,
-            style = MaterialTheme.typography.bodySmall,
-            maxLines = 20
-        )
+        Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.Start) {
+            Text(
+                text = item.text,
+                style = MaterialTheme.typography.titleMedium
+            )
+
+            Text(
+                text = value,
+                style = MaterialTheme.typography.bodySmall,
+                maxLines = 20
+            )
+        }
         IconButton(onClick = {
             // Get the ClipboardManager from the context
-            val clipboardManager = mainActivity?.getSystemService(android.content.ClipboardManager::class.java)
+            val clipboardManager =
+                mainActivity?.getSystemService(android.content.ClipboardManager::class.java)
             // Create a ClipData object
             val clip = android.content.ClipData.newPlainText(item.text, value)
             // Set the data to the clipboard
@@ -128,6 +133,8 @@ fun DisplayItemDetail(title: ITitle, item: LayoutItems) {
             )
         }
     }
+
+
 }
 
 @Preview(
@@ -153,7 +160,8 @@ fun TitleDetailsPreview() {
             "",
             "",
             "",
-            "", "")
+            "", ""
+        )
         val item = LayoutItems.COMPOSER
         DisplayItemDetail(title, item)
     }

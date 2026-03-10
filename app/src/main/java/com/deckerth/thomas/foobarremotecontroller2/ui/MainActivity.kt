@@ -138,8 +138,8 @@ class MainActivity : ComponentActivity() {
         startForegroundService(intent)
         enableEdgeToEdge()
         setContent {
-            // The ip address in the view model must be set to an invalid value until it is sure
-            // that the preference was read. Therefore the value is read into a temporary variable.
+            // The ip address in the view model must be set to an invalid value until it the
+            // preference were read. Therefore, the value is read into a temporary variable.
             // Only after it was set, the value is taken over to the view model.
 
             var ipAddress by remember { mutableStateOf("<invalid>") }

@@ -167,7 +167,7 @@ class FoobarMediaService : Service() {
         updateNotification()
         requestAudioFocus()
 
-        return START_STICKY
+        return START_NOT_STICKY // prevent that Android restarts the service if it is killed
     }
 
     private fun createNotification(): Notification {

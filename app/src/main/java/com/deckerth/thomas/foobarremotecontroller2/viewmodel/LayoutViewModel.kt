@@ -1,13 +1,15 @@
 package com.deckerth.thomas.foobarremotecontroller2.viewmodel
 
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.deckerth.thomas.foobarremotecontroller2.R
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.ItemSize
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.LayoutDescription
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.LayoutItem
-import com.deckerth.thomas.foobarremotecontroller2.ui.layout.LayoutItems
+import com.deckerth.thomas.foobarremotecontroller2.ui.layout.StandardLayoutItems
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.ViewsWithLayout
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.getLayoutItemsFor
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.layoutManager
@@ -19,7 +21,6 @@ data class LayoutField(
     val sectionTitle: String = "",
     val isSectionTitle: Boolean = false,
 )
-
 class LayoutViewModel(private val vm: AppViewModel) : ViewModel() {
     var layoutFields = mutableStateOf<List<LayoutField>>(emptyList())
 
@@ -34,6 +35,63 @@ class LayoutViewModel(private val vm: AppViewModel) : ViewModel() {
     private var currentLayoutDescription: LayoutDescription? = null
 
     val history = mutableStateOf<List<LayoutDescription>>(emptyList())
+
+    val previewPlayerClassic = PlayerViewModel()
+
+    val previewPlayerPop = PlayerViewModel()
+
+    var currentPlayer by mutableStateOf(previewPlayerPop)
+
+    init {
+        val customFields = vm.customFields.getMockedContent()
+        previewPlayerClassic.update(
+            "Decca",
+            "421 670-2",
+            "Puccini, Giacomo",
+            "Tosca",
+            "Act 1 - Scene 1 - \"Ah! Finalmente!\"",
+            "Leontyne Price / Giuseppe di Stefano / Giuseppe Taddei / Carlo Cava / Fernando Corena / Piero de Palma / Leonardo Monreale / Alfredo Mariotti / Herbert Weiss / Wiener Staatsopernchor / Wiener Philharmoniker / Herbert von Karajan",
+            "Price / Karajan",
+            "44100",
+            "Opera",
+            "1",
+            "1",
+            "0:53",
+            "p4",
+            "1",
+            "125.1700625",
+            "53.58589853333333",
+            R.drawable.cover_tosca.toString(),
+            PlaybackState.PLAYING,
+            PlaybackMode.DEFAULT,
+            "",
+            false,
+            customFields )
+
+        previewPlayerPop.update(
+            "Polydor",
+            "517 007-2",
+            "Björn Ulvaeus",
+            "Gold - Greatest Hits",
+            "Dancing Queen",
+            "ABBA",
+            "ABBA",
+            "44100",
+            "Pop",
+            "1",
+            "1",
+            "0:50",
+            "p4",
+            "0",
+            "232.2",
+            "51.080651833333334",
+            R.drawable.cover_abba.toString(),
+            PlaybackState.PLAYING,
+            PlaybackMode.DEFAULT,
+            "",
+            false,
+            customFields )
+    }
 
     fun saveChanges() {
         if (dirty.value) {
@@ -73,14 +131,14 @@ class LayoutViewModel(private val vm: AppViewModel) : ViewModel() {
         currentLayoutDescription = layoutManager.getCustomLayoutDescription(vm.selectedView)
 
         val layoutItems = currentLayoutDescription!!.items
-        val allItems = getLayoutItemsFor(vm.selectedView)
-        val unusedItems = allItems.filter { item -> !layoutItems.any { it.item == item } }
+        val allItems = getLayoutItemsFor(vm, vm.selectedView)
+        val unusedItems = allItems.filter { item -> !layoutItems.any { it.item == item.item } }
         val fields = mutableListOf<LayoutField>()
 
         fields.add(LayoutField(0, null, vm.selectedView.getText(vm.selectedView), true))
         var i = 1
         for (item in layoutItems) {
-            if (item.item == LayoutItems.ARTWORK)
+            if (item.item == StandardLayoutItems.ARTWORK)
                 continue
             fields.add(LayoutField(i, item))
             i++
@@ -92,8 +150,9 @@ class LayoutViewModel(private val vm: AppViewModel) : ViewModel() {
                 LayoutField(
                     i,
                     LayoutItem(
-                        item,
-                        itemSize = if (item == LayoutItems.ARTWORK) ItemSize.MEDIUM_COVER else ItemSize.BODY_MEDIUM
+                        item.item,
+                        item.customFieldReference,
+                        itemSize = if (item.item == StandardLayoutItems.ARTWORK) ItemSize.MEDIUM_COVER else ItemSize.BODY_MEDIUM
                     )
                 )
             )

@@ -1,6 +1,7 @@
 package com.deckerth.thomas.foobarremotecontroller2.connector
 
 import com.deckerth.thomas.foobarremotecontroller2.lastChanged
+import com.deckerth.thomas.foobarremotecontroller2.model.CustomFieldsContent
 import com.deckerth.thomas.foobarremotecontroller2.model.OutputDevice
 import com.deckerth.thomas.foobarremotecontroller2.model.OutputDevices
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
@@ -35,8 +36,13 @@ class PlayerAccess(private val vm: AppViewModel) {
     //    13 %25length_seconds_fp%25,
     //    14 %24filename%28%25path%25%29%24&" becomes:$filename(%path%) / %25path%25%
 
-    val columnListWithoutPath  = "%25label%25,%25catalog%25,%25composer%25,%25album%25,%25title%25,%25artist%25,%25album artist%25,%25samplerate%25,%25genre%25,%25discnumber%25,%25track%25,%25playback_time%25,%25length_seconds_fp%25,%24filename%28%25path%25%29%24&"
-    val columnListWithPath     = "%25label%25,%25catalog%25,%25composer%25,%25album%25,%25title%25,%25artist%25,%25album artist%25,%25samplerate%25,%25genre%25,%25discnumber%25,%25track%25,%25playback_time%25,%25length_seconds_fp%25,%25path%25%"
+    private val columnListWithoutPath  = "%25label%25,%25catalog%25,%25composer%25,%25album%25,%25title%25,%25artist%25,%25album artist%25,%25samplerate%25,%25genre%25,%25discnumber%25,%25track%25,%25playback_time%25,%25length_seconds_fp%25,%24filename%28%25path%25%29%24"
+    private val columnListWithPath     = "%25label%25,%25catalog%25,%25composer%25,%25album%25,%25title%25,%25artist%25,%25album artist%25,%25samplerate%25,%25genre%25,%25discnumber%25,%25track%25,%25playback_time%25,%25length_seconds_fp%25,%25path%25%"
+
+    fun getColumnList(withPath: Boolean): String {
+        val standardPath =  if (withPath) columnListWithPath else columnListWithoutPath
+        return standardPath + vm.customFields.getEscapedColumnList()
+    }
 
     fun parsePlayerState(usedIpAddress: String, contentObject: JSONObject) {
         try {
@@ -101,6 +107,18 @@ class PlayerAccess(private val vm: AppViewModel) {
                     "playlistId"
                 ) + "/" + activeItemObject.getString("index")
                 else vm.connector.serverAddress(usedIpAddress) + "artwork/current"
+
+                val customFieldsContent = CustomFieldsContent()
+                if (columns.length() > 13) {
+                    for (i in 14 until columns.length()) {
+                        val field = vm.customFields.get(i - 14)
+                        if (field != null)
+                            customFieldsContent.setCustomFieldContent(
+                                field,
+                                columns.getString(i)
+                            )
+                    }
+                }
                 vm.playerViewModel.update(
                     columns.getString(0),
                     columns.getString(1),
@@ -121,7 +139,8 @@ class PlayerAccess(private val vm: AppViewModel) {
                     imageURL,
                     playbackState,
                     PlaybackMode.entries[playerObject.getInt("playbackMode")],
-                    usedIpAddress, false
+                    usedIpAddress, false,
+                    customFieldsContent
                 )
             } else {
                 vm.playerViewModel.update(
@@ -144,7 +163,8 @@ class PlayerAccess(private val vm: AppViewModel) {
                     "",
                     playbackState,
                     PlaybackMode.entries[playerObject.getInt("playbackMode")],
-                    usedIpAddress, false
+                    usedIpAddress, false,
+                    CustomFieldsContent()
                 )
             }
         } catch (e: JSONException) {

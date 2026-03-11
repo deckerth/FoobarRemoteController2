@@ -67,27 +67,29 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.deckerth.thomas.foobarremotecontroller2.R
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.ItemSize
-import com.deckerth.thomas.foobarremotecontroller2.ui.layout.LayoutItems
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.ProgressBarFormat
+import com.deckerth.thomas.foobarremotecontroller2.ui.layout.StandardLayoutItems
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.TextAlignment
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.ViewsWithLayout
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.getItemSizesForAlbums
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.getItemSizesForFonts
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.getProgressBarFormats
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.LayoutField
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.LayoutViewModel
 
 @Composable
 fun LayoutEditorPage(
     modifier: Modifier = Modifier,
-    vm: LayoutViewModel
+    appViewModel: AppViewModel,
+    layoutViewModel: LayoutViewModel
 ) {
     // State for drag and drop
     var draggedItemId by remember { mutableStateOf<Int?>(null) }
     var draggedIndex by remember { mutableIntStateOf(-1) }
     var totalDragOffset by remember { mutableFloatStateOf(0f) }
     // IMPORTANT: lets pointerInput read the latest list without restarting the gesture
-    val latestItems by rememberUpdatedState(vm.layoutFields.value)
+    val latestItems by rememberUpdatedState(layoutViewModel.layoutFields.value)
 
     // Better than a hard-coded 80.dp: measure the actual card height once.
 
@@ -111,7 +113,7 @@ fun LayoutEditorPage(
         verticalArrangement = Arrangement.spacedBy(spacingDp)
     ) {
         itemsIndexed(
-            items = vm.layoutFields.value,
+            items = layoutViewModel.layoutFields.value,
             key = { _, item -> item.key }
         ) { _, item ->
             val isDragging = draggedItemId == item.key
@@ -185,8 +187,8 @@ fun LayoutEditorPage(
 
                                     if (to != from && to != 0) {
                                         // Reorder DURING the drag -> other items animate via animateItemPlacement()
-                                        vm.layoutFields.value = currentItems.move(from, to)
-                                        vm.dirty.value = true
+                                        layoutViewModel.layoutFields.value = currentItems.move(from, to)
+                                        layoutViewModel.dirty.value = true
                                         draggedIndex = to
                                         // Compensate offset so the card stays under the finger after the move
                                         totalDragOffset -= (to - from) * itemStepPx
@@ -196,7 +198,7 @@ fun LayoutEditorPage(
                                     draggedItemId = null
                                     totalDragOffset = 0f
                                     draggedIndex = -1
-                                    vm.saveChanges()
+                                    layoutViewModel.saveChanges()
                                 },
                                 onDragCancel = {
                                     draggedItemId = null
@@ -225,9 +227,9 @@ fun LayoutEditorPage(
                             )
                         } else if (item.layoutItem != null) {
                             Text(
-                                text = item.layoutItem.item.text,
+                                text = item.layoutItem.getText(appViewModel),
                             )
-                            if (item.layoutItem.item != LayoutItems.PROGRESS || vm.currentView != ViewsWithLayout.PLAYER)
+                            if (item.layoutItem.item != StandardLayoutItems.PROGRESS || layoutViewModel.currentView != ViewsWithLayout.PLAYER)
                                 Text(
                                     text = item.layoutItem.verbose(),
                                     maxLines = 2,
@@ -243,14 +245,14 @@ fun LayoutEditorPage(
                 }
             } // end Card
             if (isClicked) {
-                if (item.layoutItem!!.item == LayoutItems.PROGRESS) {
-                    if (vm.currentView != ViewsWithLayout.PLAYER)
+                if (item.layoutItem!!.item == StandardLayoutItems.PROGRESS) {
+                    if (layoutViewModel.currentView != ViewsWithLayout.PLAYER)
                         EditProgressBarProperties(
                             item,
                             onDismiss = { dirty: Boolean ->
                                 if (dirty) {
-                                    vm.dirty.value = true
-                                    vm.saveChanges()
+                                    layoutViewModel.dirty.value = true
+                                    layoutViewModel.saveChanges()
                                 }
                                 isClicked = false
                             })
@@ -259,21 +261,21 @@ fun LayoutEditorPage(
                         item,
                         onDismiss = { dirty: Boolean ->
                             if (dirty) {
-                                vm.dirty.value = true
-                                vm.saveChanges()
+                                layoutViewModel.dirty.value = true
+                                layoutViewModel.saveChanges()
                             }
                             isClicked = false
                         })
             }
         } // items Indexed
     }
-    if (vm.history.value.isNotEmpty())
+    if (layoutViewModel.history.value.isNotEmpty())
         Box(
             modifier = Modifier.fillMaxSize()
         )
         {
             FloatingActionButton(
-                onClick = { vm.undo() },
+                onClick = { layoutViewModel.undo() },
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
                     .padding(16.dp) // optional spacing from edges
@@ -334,7 +336,7 @@ fun EditProperties(
             Column(
                 modifier = Modifier.padding(start = 16.dp)
             ) {
-                if (layoutField.layoutItem!!.item != LayoutItems.ARTWORK) {
+                if (layoutField.layoutItem!!.item != StandardLayoutItems.ARTWORK) {
                     // Font settings
                     Text(
                         modifier = Modifier.padding(bottom = 4.dp),
@@ -346,7 +348,7 @@ fun EditProperties(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(38.dp),
-                        values = if (layoutField.layoutItem.item == LayoutItems.ARTWORK) getItemSizesForAlbums() else getItemSizesForFonts(),
+                        values = if (layoutField.layoutItem.item == StandardLayoutItems.ARTWORK) getItemSizesForAlbums() else getItemSizesForFonts(),
                         selectedItem = itemSize,
                         onClick = { size: ItemSize? ->
                             if (size != null) {
@@ -470,7 +472,7 @@ fun EditProperties(
                         )
                         DropdownSelector(
                             modifier = Modifier.fillMaxWidth(),
-                            values = if (layoutField.layoutItem.item == LayoutItems.ARTWORK) getItemSizesForAlbums() else getItemSizesForFonts(),
+                            values = if (layoutField.layoutItem.item == StandardLayoutItems.ARTWORK) getItemSizesForAlbums() else getItemSizesForFonts(),
                             selectedItem = itemSize,
                             onClick = { size: ItemSize? ->
                                 if (size != null) {

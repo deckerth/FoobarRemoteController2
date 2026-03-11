@@ -2,6 +2,7 @@ package com.deckerth.thomas.foobarremotecontroller2.connector
 
 import android.os.Build
 import com.deckerth.thomas.foobarremotecontroller2.model.AddTracksBehaviors
+import com.deckerth.thomas.foobarremotecontroller2.model.CustomFieldsContent
 import com.deckerth.thomas.foobarremotecontroller2.model.Playlist
 import com.deckerth.thomas.foobarremotecontroller2.model.PlaylistEntity
 import com.deckerth.thomas.foobarremotecontroller2.model.Playlists
@@ -73,12 +74,16 @@ class PlaylistAccess(private val vm: AppViewModel) {
         try {
             response = if (withPaths) vm.connector.getData(
                 "playlists/" + playlistEntity.playlistId +
-                        "/items/" + startIndex + "%3A" + 1000 + "?columns=" + vm.playerAccess.columnListWithPath,
+                        "/items/" + startIndex + "%3A" + 1000 + "?columns=" + vm.playerAccess.getColumnList(
+                    true
+                ),
                 vm
             )
             else vm.connector.getData(
                 "playlists/" + playlistEntity.playlistId +
-                        "/items/" + startIndex + "%3A" + 1000 + "?columns=" + vm.playerAccess.columnListWithoutPath,
+                        "/items/" + startIndex + "%3A" + 1000 + "?columns=" + vm.playerAccess.getColumnList(
+                    false
+                ),
                 vm
             )
         } catch (e: Exception) {
@@ -155,7 +160,7 @@ class PlaylistAccess(private val vm: AppViewModel) {
                 //
                 // Do not display the title if the title was replaced by the filename by foobar
 
-                var filename : String
+                var filename: String
                 if (withPaths) {
                     path = columnsArray.getString(13)
                     filename = getFilenameWithoutExtension(path)
@@ -163,6 +168,18 @@ class PlaylistAccess(private val vm: AppViewModel) {
                     filename = columnsArray.getString(13)
                 var effectiveTitle = ""
                 if (!title.equals(filename)) effectiveTitle = title
+
+                val customFieldsContent = CustomFieldsContent()
+                if (columnsArray.length() > 13) {
+                    for (i in 14 until columnsArray.length()) {
+                        val field = vm.customFields.get(i - 14)
+                        if (field != null)
+                            customFieldsContent.setCustomFieldContent(
+                                field,
+                                columnsArray.getString(i)
+                            )
+                    }
+                }
 
                 playlist.addTitle(
                     Title(
@@ -183,7 +200,8 @@ class PlaylistAccess(private val vm: AppViewModel) {
                         duration,
                         "",
                         vm.connector.serverAddress(input.usedIpAddress) + "artwork/" + playlistEntity.playlistId + "/" + (i + startIndex),
-                        path
+                        path,
+                        customFieldsContent
                     )
                 )
             }

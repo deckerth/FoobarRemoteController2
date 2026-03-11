@@ -18,26 +18,23 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.deckerth.thomas.foobarremotecontroller2.R
 import com.deckerth.thomas.foobarremotecontroller2.model.ITitle
-import com.deckerth.thomas.foobarremotecontroller2.model.Title
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.LayoutItems
+import com.deckerth.thomas.foobarremotecontroller2.ui.layout.StandardLayoutItems
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.ViewsWithLayout
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.getLayoutItemsFor
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.layoutManager
 import com.deckerth.thomas.foobarremotecontroller2.ui.mainActivity
-import com.deckerth.thomas.foobarremotecontroller2.ui.theme.Foobar2000RemoteControllerTheme
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
 
 @Composable
-fun TitleDetails(title: ITitle, onDismiss: () -> Unit) {
+fun TitleDetails(vm: AppViewModel, title: ITitle, onDismiss: () -> Unit) {
     val layout = layoutManager.getLayout()
-    val playerItems = layout.playerLayout
-    val allItems = getLayoutItemsFor(ViewsWithLayout.PLAYER)
-    val unusedItems = allItems.filter { item -> !playerItems.items.any { it.item == item } }
-
+    val playerItems = layout.playerLayout.getLayoutItems(vm)
+    val availableItemsForPlayer = getLayoutItemsFor(vm, ViewsWithLayout.PLAYER)
+    val itemsNotDisplayedOnPlayer = availableItemsForPlayer.filter { item -> !playerItems.any { it.item == item.item } }
 
     AlertDialog(
         onDismissRequest = { onDismiss() },
@@ -62,10 +59,10 @@ fun TitleDetails(title: ITitle, onDismiss: () -> Unit) {
                     .padding(start = 16.dp)
                     .verticalScroll(rememberScrollState())
             ) {
-                for (item in playerItems.items)
-                    DisplayItemDetail(title, item.item)
-                for (item in unusedItems)
-                    DisplayItemDetail(title, item)
+                for (item in playerItems)
+                    DisplayItemDetail(vm, title, item)
+                for (item in itemsNotDisplayedOnPlayer)
+                    DisplayItemDetail(vm, title, item)
             }
         },
         modifier = Modifier
@@ -81,29 +78,30 @@ fun TitleDetails(vm: AppViewModel, onDismiss: () -> Unit) {
     val playlist = vm.playlistsViewModel.getPlaylist(vm.playerViewModel.playlistId)
     val title = playlist.getTitle(vm.playerViewModel.index.toInt())
     if (title != null) {
-        TitleDetails(title, onDismiss)
+        TitleDetails(vm, title, onDismiss)
     }
 }
 
 @Composable
-fun DisplayItemDetail(title: ITitle, item: LayoutItems) {
+fun DisplayItemDetail(vm: AppViewModel, title: ITitle, item: LayoutItems) {
 
-    val value = when (item) {
-        LayoutItems.TITLE -> title.title
-        LayoutItems.ALBUM -> title.album
-        LayoutItems.ARTIST -> title.artist
-        LayoutItems.ALBUM_ARTIST -> title.albumArtist
-        LayoutItems.COMPOSER -> title.composer
-        LayoutItems.CATALOG -> title.catalog
-        LayoutItems.LABEL -> title.label
-        LayoutItems.SAMPLE_RATE -> title.sampleRate + " Hz"
-        LayoutItems.GENRE -> title.genre
+    val value = when (item.item) {
+        StandardLayoutItems.TITLE -> title.title
+        StandardLayoutItems.ALBUM -> title.album
+        StandardLayoutItems.ARTIST -> title.artist
+        StandardLayoutItems.ALBUM_ARTIST -> title.albumArtist
+        StandardLayoutItems.COMPOSER -> title.composer
+        StandardLayoutItems.CATALOG -> title.catalog
+        StandardLayoutItems.LABEL -> title.label
+        StandardLayoutItems.SAMPLE_RATE -> title.sampleRate + " Hz"
+        StandardLayoutItems.GENRE -> title.genre
+        StandardLayoutItems.CUSTOM_FIELD -> title.customFields.getText(item.customFieldReference)
         else -> ""
     }
 
     if (value.isEmpty()) return
 
-    if (item == LayoutItems.ARTWORK || item == LayoutItems.PROGRESS || item == LayoutItems.LABEL_CATALOG) return
+    if (item.item == StandardLayoutItems.ARTWORK || item.item == StandardLayoutItems.PROGRESS || item.item == StandardLayoutItems.LABEL_CATALOG) return
     Row(verticalAlignment = Alignment.CenterVertically) {
         Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.Start) {
             Text(
@@ -135,34 +133,4 @@ fun DisplayItemDetail(title: ITitle, item: LayoutItems) {
     }
 
 
-}
-
-@Preview(
-    showBackground = true,
-)
-@Composable
-fun TitleDetailsPreview() {
-    Foobar2000RemoteControllerTheme {
-        val title = Title(
-            "",
-            0,
-            "",
-            "",
-            "Composer",
-            "Ibrahim Ferrer (Buena Vista Social Club Presents)",
-            "",
-            "Ibrahim Ferrer",
-            "Ibrahim Ferrer",
-            "44100",
-            "Classical",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "", ""
-        )
-        val item = LayoutItems.COMPOSER
-        DisplayItemDetail(title, item)
-    }
 }

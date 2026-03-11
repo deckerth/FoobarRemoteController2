@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import com.deckerth.thomas.foobarremotecontroller2.model.CustomFieldsContent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -58,6 +59,8 @@ class PlayerViewModel : ViewModel() {
     var lastKnownPlaybackTime by mutableStateOf("")
     var lastUpdateTimestamp by mutableLongStateOf(0L)
 
+    var customFields by mutableStateOf(CustomFieldsContent())
+
     fun update(
         label: String,
         catalog: String,
@@ -79,7 +82,8 @@ class PlayerViewModel : ViewModel() {
         playbackState: PlaybackState,
         playbackMode: PlaybackMode,
         ipAddress: String,
-        invalidCredentials: Boolean
+        invalidCredentials: Boolean,
+        customFields: CustomFieldsContent
     ) {
         this.valid = true
         this.label = label
@@ -106,6 +110,7 @@ class PlayerViewModel : ViewModel() {
         this.lastKnownPosition = position
         this.lastKnownPlaybackTime = playbackTime
         this.lastUpdateTimestamp = System.currentTimeMillis()
+        this.customFields = customFields
     }
 
     fun updatePlayer() {

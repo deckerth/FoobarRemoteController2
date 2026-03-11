@@ -58,7 +58,9 @@ public interface ITitle {
 
     void setElapsedTimeWhenTitleStarts(Float elapsedTimeWhenTitleStarts);
 
-    Boolean matches(TitleFilter filter);
+    Boolean matches(TitleFilter filter, CustomFields customFields);
+
+    CustomFieldsContent getCustomFields();
 
     @NonNull
     ITitle clone();

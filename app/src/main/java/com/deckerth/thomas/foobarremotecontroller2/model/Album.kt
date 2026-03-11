@@ -75,10 +75,10 @@ data class Album(
 
     private var totalPlayingTime = 0.0f
 
-    fun matches(filter: TitleFilter): Boolean {
+    fun matches(filter: TitleFilter, customFields: CustomFields): Boolean {
         if (!filter.isActive) return true
         for (title in _tracks)
-            if (title.details.matches(filter)) return true
+            if (title.details.matches(filter, customFields)) return true
         return false
     }
 

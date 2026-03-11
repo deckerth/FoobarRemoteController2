@@ -32,25 +32,25 @@ class LayoutManager {
 
     private fun createModernPlayerLayout(): LayoutDescription {
         val fields = LayoutDescription(ViewsWithLayout.PLAYER)
-        fields.items.add(LayoutItem(LayoutItems.TITLE, ItemSize.TITLE_LARGE))
-        fields.items.add(LayoutItem(LayoutItems.ALBUM, ItemSize.BODY_SMALL))
-        fields.items.add(LayoutItem(LayoutItems.PROGRESS))
+        fields.items.add(LayoutItem(StandardLayoutItems.TITLE,  itemSize = ItemSize.TITLE_LARGE))
+        fields.items.add(LayoutItem(StandardLayoutItems.ALBUM,  itemSize = ItemSize.BODY_SMALL))
+        fields.items.add(LayoutItem(StandardLayoutItems.PROGRESS))
         return fields
     }
 
     private fun createModernAlbumLayout(): LayoutDescription {
         val fields = LayoutDescription(ViewsWithLayout.ALBUM)
-        fields.items.add(LayoutItem(LayoutItems.ALBUM, ItemSize.TITLE_MEDIUM))
-        fields.items.add(LayoutItem(LayoutItems.ARTIST, ItemSize.BODY_SMALL))
-        fields.items.add(LayoutItem(LayoutItems.COMPOSER, ItemSize.BODY_SMALL))
+        fields.items.add(LayoutItem(StandardLayoutItems.ALBUM, itemSize = ItemSize.TITLE_MEDIUM))
+        fields.items.add(LayoutItem(StandardLayoutItems.ARTIST, itemSize = ItemSize.BODY_SMALL))
+        fields.items.add(LayoutItem(StandardLayoutItems.COMPOSER, itemSize = ItemSize.BODY_SMALL))
         return fields
     }
 
     private fun createModernTitleLayout(): LayoutDescription {
         val fields = LayoutDescription(ViewsWithLayout.TITLE)
-        fields.items.add(LayoutItem(LayoutItems.TITLE, ItemSize.TITLE_MEDIUM))
-        fields.items.add(LayoutItem(LayoutItems.SMART_ARTIST, ItemSize.BODY_SMALL))
-        if (!mainActivity!!.isTablet()) fields.items.add(LayoutItem(LayoutItems.ALBUM, ItemSize.BODY_SMALL))
+        fields.items.add(LayoutItem(StandardLayoutItems.TITLE, itemSize = ItemSize.TITLE_MEDIUM))
+        fields.items.add(LayoutItem(StandardLayoutItems.SMART_ARTIST, itemSize = ItemSize.BODY_SMALL))
+        if (!mainActivity!!.isTablet()) fields.items.add(LayoutItem(StandardLayoutItems.ALBUM, itemSize = ItemSize.BODY_SMALL))
         return fields
     }
 
@@ -64,33 +64,33 @@ class LayoutManager {
 
     private fun createClassicPlayerLayout(): LayoutDescription {
         val fields = LayoutDescription(ViewsWithLayout.PLAYER)
-        fields.items.add(LayoutItem(LayoutItems.COMPOSER, ItemSize.TITLE_LARGE))
+        fields.items.add(LayoutItem(StandardLayoutItems.COMPOSER, itemSize = ItemSize.TITLE_LARGE))
         fields.items.add(
             LayoutItem(
-                LayoutItems.ALBUM,
-                ItemSize.TITLE_MEDIUM,
+                StandardLayoutItems.ALBUM,
+                itemSize = ItemSize.TITLE_MEDIUM,
                 italic = true
             )
         )
-        fields.items.add(LayoutItem(LayoutItems.TITLE, ItemSize.BODY_SMALL))
-        fields.items.add(LayoutItem(LayoutItems.ARTIST, ItemSize.BODY_SMALL, maxLines = 10))
-        fields.items.add(LayoutItem(LayoutItems.PROGRESS))
+        fields.items.add(LayoutItem(StandardLayoutItems.TITLE, itemSize = ItemSize.BODY_SMALL))
+        fields.items.add(LayoutItem(StandardLayoutItems.ARTIST, itemSize = ItemSize.BODY_SMALL, maxLines = 10))
+        fields.items.add(LayoutItem(StandardLayoutItems.PROGRESS))
         return fields
     }
 
     private fun createClassicAlbumLayout(): LayoutDescription {
         val fields = LayoutDescription(ViewsWithLayout.ALBUM)
-        fields.items.add(LayoutItem(LayoutItems.COMPOSER, ItemSize.TITLE_MEDIUM))
-        fields.items.add(LayoutItem(LayoutItems.ALBUM, ItemSize.BODY_MEDIUM))
-        fields.items.add(LayoutItem(LayoutItems.ARTIST, ItemSize.BODY_SMALL))
+        fields.items.add(LayoutItem(StandardLayoutItems.COMPOSER, itemSize = ItemSize.TITLE_MEDIUM))
+        fields.items.add(LayoutItem(StandardLayoutItems.ALBUM, itemSize = ItemSize.BODY_MEDIUM))
+        fields.items.add(LayoutItem(StandardLayoutItems.ARTIST, itemSize = ItemSize.BODY_SMALL))
         return fields
     }
 
     private fun createClassicTitleLayout(): LayoutDescription {
         val fields = LayoutDescription(ViewsWithLayout.TITLE)
-        fields.items.add(LayoutItem(LayoutItems.TITLE, ItemSize.TITLE_MEDIUM))
-        fields.items.add(LayoutItem(LayoutItems.SMART_ARTIST, ItemSize.BODY_SMALL))
-        if (!mainActivity!!.isTablet()) fields.items.add(LayoutItem(LayoutItems.ALBUM, ItemSize.BODY_SMALL))
+        fields.items.add(LayoutItem(StandardLayoutItems.TITLE, itemSize = ItemSize.TITLE_MEDIUM))
+        fields.items.add(LayoutItem(StandardLayoutItems.SMART_ARTIST, itemSize = ItemSize.BODY_SMALL))
+        if (!mainActivity!!.isTablet()) fields.items.add(LayoutItem(StandardLayoutItems.ALBUM, itemSize = ItemSize.BODY_SMALL))
         return fields
     }
 

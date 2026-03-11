@@ -10,22 +10,22 @@ data class Layout(
 ) {
     val albumLayoutHasArtist: Boolean
         get() {
-            return (albumLayout.items.any { it.item == LayoutItems.ARTIST })
+            return (albumLayout.items.any { it.item == StandardLayoutItems.ARTIST })
         }
 
     val albumLayoutHasProgressBar: Boolean
         get() {
-            return (albumLayout.items.any { it.item == LayoutItems.PROGRESS })
+            return (albumLayout.items.any { it.item == StandardLayoutItems.PROGRESS })
         }
 
     val titleLayoutHasProgressBar: Boolean
         get() {
-            return (titleLayout.items.any { it.item == LayoutItems.PROGRESS })
+            return (titleLayout.items.any { it.item == StandardLayoutItems.PROGRESS })
         }
 
     val titleProgress: LayoutItem
         get() {
-            return titleLayout.items.first { it.item == LayoutItems.PROGRESS }
+            return titleLayout.items.first { it.item == StandardLayoutItems.PROGRESS }
         }
 
 }
@@ -33,5 +33,5 @@ data class Layout(
 fun highlightPlayingItem(layout: LayoutDescription): Boolean
     {
     // Always highlight the current title. The only exception: The layout contains a progress bar that shall replace the background color.
-        return (!layout.items.any { it.item == LayoutItems.PROGRESS && it.progressBarReplacesBackgroundColoring })
+        return (!layout.items.any { it.item == StandardLayoutItems.PROGRESS && it.progressBarReplacesBackgroundColoring })
     }

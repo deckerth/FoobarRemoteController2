@@ -128,11 +128,11 @@ class Playlist(var playlistEntity: PlaylistEntity) {
                 launch(Dispatchers.Default) { // Use Dispatchers.Default for CPU-bound tasks
                     for ((index, title) in items.withIndex()) {
                         if (!filter.isActive) break
-                        if (i == 0) // progress bar is visualizes progress for first chunk
+                        if (i == 0) // progress bar visualizes progress for first chunk
                             withContext(Dispatchers.Main) {
                                 vm.loadingListProgress = index.toFloat() / items.size
                             }
-                        if (title.matches(filter)) {
+                        if (title.matches(filter, vm.customFields)) {
                             resultArray[i].add(title)
                         }
                     }

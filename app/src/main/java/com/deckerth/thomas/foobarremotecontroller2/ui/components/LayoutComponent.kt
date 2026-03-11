@@ -14,8 +14,8 @@ import com.deckerth.thomas.foobarremotecontroller2.model.Album
 import com.deckerth.thomas.foobarremotecontroller2.model.ITitle
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.ItemSize
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.LayoutItem
-import com.deckerth.thomas.foobarremotecontroller2.ui.layout.LayoutItems
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.ProgressBarFormat
+import com.deckerth.thomas.foobarremotecontroller2.ui.layout.StandardLayoutItems
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.TextAlignment
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.PlaybackState
@@ -53,25 +53,28 @@ fun TextComponent(text: String, item: LayoutItem) {
 @Composable
 fun LayoutComponent(vm: AppViewModel, playerViewModel: PlayerViewModel, layoutItem: LayoutItem) {
     when (layoutItem.item) {
-        LayoutItems.LABEL -> TextComponent(text = playerViewModel.label, item = layoutItem)
-        LayoutItems.CATALOG -> TextComponent(text = playerViewModel.catalog, item = layoutItem)
-        LayoutItems.LABEL_CATALOG -> TextComponent(
+        StandardLayoutItems.LABEL -> TextComponent(text = playerViewModel.label, item = layoutItem)
+        StandardLayoutItems.CATALOG -> TextComponent(text = playerViewModel.catalog, item = layoutItem)
+        StandardLayoutItems.LABEL_CATALOG -> TextComponent(
             text = playerViewModel.label + " " + playerViewModel.catalog,
             item = layoutItem
         )
 
-        LayoutItems.TITLE -> TextComponent(text = playerViewModel.title, item = layoutItem)
-        LayoutItems.ALBUM -> TextComponent(text = playerViewModel.album, item = layoutItem)
-        LayoutItems.ALBUM_ARTIST -> TextComponent(text = playerViewModel.albumArtist, item = layoutItem)
-        LayoutItems.ARTIST_TITLE -> TextComponent(text = playerViewModel.artist + " - " + playerViewModel.title, item = layoutItem)
-        LayoutItems.ARTIST -> TextComponent(text = playerViewModel.artist, item = layoutItem)
-        LayoutItems.SAMPLE_RATE -> TextComponent(text = playerViewModel.sampleRate+ " Hz", item = layoutItem)
-        LayoutItems.GENRE -> TextComponent(text = playerViewModel.genre, item = layoutItem)
-        LayoutItems.PROGRESS -> PlayerProgress(vm, playerViewModel)
-        LayoutItems.COMPOSER ->
+        StandardLayoutItems.TITLE -> TextComponent(text = playerViewModel.title, item = layoutItem)
+        StandardLayoutItems.ALBUM -> TextComponent(text = playerViewModel.album, item = layoutItem)
+        StandardLayoutItems.ALBUM_ARTIST -> TextComponent(text = playerViewModel.albumArtist, item = layoutItem)
+        StandardLayoutItems.ARTIST_TITLE -> TextComponent(text = playerViewModel.artist + " - " + playerViewModel.title, item = layoutItem)
+        StandardLayoutItems.ARTIST -> TextComponent(text = playerViewModel.artist, item = layoutItem)
+        StandardLayoutItems.SAMPLE_RATE -> TextComponent(text = playerViewModel.sampleRate+ " Hz", item = layoutItem)
+        StandardLayoutItems.GENRE -> TextComponent(text = playerViewModel.genre, item = layoutItem)
+        StandardLayoutItems.PROGRESS -> PlayerProgress(vm, playerViewModel)
+        StandardLayoutItems.COMPOSER ->
             if (playerViewModel.composer != "" && playerViewModel.composer != "?") {
                 TextComponent(text = playerViewModel.composer, item = layoutItem)
             }
+        StandardLayoutItems.CUSTOM_FIELD -> {
+            TextComponent(text = playerViewModel.customFields.getText(layoutItem.customFieldReference), item = layoutItem)
+        }
 
         else -> Text("UNKNOWN ITEM")
     }
@@ -80,23 +83,23 @@ fun LayoutComponent(vm: AppViewModel, playerViewModel: PlayerViewModel, layoutIt
 @Composable
 fun LayoutComponent(vm: AppViewModel, album: Album, layoutItem: LayoutItem, albumIsCurrentlyPlaying: Boolean) {
     when (layoutItem.item) {
-        LayoutItems.LABEL -> TextComponent(text = album.originalTitle.label, item = layoutItem)
-        LayoutItems.CATALOG -> TextComponent(text = album.originalTitle.catalog, item = layoutItem)
-        LayoutItems.LABEL_CATALOG -> TextComponent(
+        StandardLayoutItems.LABEL -> TextComponent(text = album.originalTitle.label, item = layoutItem)
+        StandardLayoutItems.CATALOG -> TextComponent(text = album.originalTitle.catalog, item = layoutItem)
+        StandardLayoutItems.LABEL_CATALOG -> TextComponent(
             text = album.originalTitle.label + " " + album.originalTitle.catalog,
             item = layoutItem
         )
 
-        LayoutItems.ALBUM -> TextComponent(text = album.originalTitle.album, item = layoutItem)
-        LayoutItems.ARTIST -> TextComponent(text = album.originalTitle.artist, item = layoutItem)
-        LayoutItems.ALBUM_ARTIST -> TextComponent(text = album.originalTitle.albumArtist, item = layoutItem)
-        LayoutItems.ARTIST_TITLE -> TextComponent(text = album.originalTitle.artist + " - " + album.originalTitle.title, item = layoutItem)
+        StandardLayoutItems.ALBUM -> TextComponent(text = album.originalTitle.album, item = layoutItem)
+        StandardLayoutItems.ARTIST -> TextComponent(text = album.originalTitle.artist, item = layoutItem)
+        StandardLayoutItems.ALBUM_ARTIST -> TextComponent(text = album.originalTitle.albumArtist, item = layoutItem)
+        StandardLayoutItems.ARTIST_TITLE -> TextComponent(text = album.originalTitle.artist + " - " + album.originalTitle.title, item = layoutItem)
 
-        LayoutItems.COMPOSER ->
+        StandardLayoutItems.COMPOSER ->
             if (album.originalTitle.composer != "" && album.originalTitle.composer != "?") {
                 TextComponent(text = album.originalTitle.composer, item = layoutItem)
             }
-        LayoutItems.PROGRESS -> if (albumIsCurrentlyPlaying) {
+        StandardLayoutItems.PROGRESS -> if (albumIsCurrentlyPlaying) {
             val wavy = when (layoutItem.progressBarFormat) {
                 ProgressBarFormat.WAVY_WHEN_PLAYING -> vm.playerViewModel.playbackState == PlaybackState.PLAYING
                 ProgressBarFormat.UNDEFINED -> false
@@ -106,6 +109,9 @@ fun LayoutComponent(vm: AppViewModel, album: Album, layoutItem: LayoutItem, albu
             AlbumProgress(album, vm.playerViewModel, withTimingDetails = layoutItem.progressBarShowTimings, wavy, intToDp(layoutItem.waveSpeed))
 
         }
+        StandardLayoutItems.CUSTOM_FIELD ->
+            TextComponent(text = album.originalTitle.customFields.getText(layoutItem.customFieldReference), item = layoutItem)
+
         else -> Text("UNKNOWN ITEM")
     }
 }
@@ -113,27 +119,27 @@ fun LayoutComponent(vm: AppViewModel, album: Album, layoutItem: LayoutItem, albu
 @Composable
 fun LayoutComponent(vm: PlayerViewModel, album: Album, title: ITitle, checkArtist: Boolean, layoutItem: LayoutItem, titleIsCurrentlyPlaying: Boolean) {
     when (layoutItem.item) {
-        LayoutItems.LABEL -> TextComponent(text = title.label, item = layoutItem)
-        LayoutItems.CATALOG -> TextComponent(text = title.catalog, item = layoutItem)
-        LayoutItems.LABEL_CATALOG -> TextComponent(
+        StandardLayoutItems.LABEL -> TextComponent(text = title.label, item = layoutItem)
+        StandardLayoutItems.CATALOG -> TextComponent(text = title.catalog, item = layoutItem)
+        StandardLayoutItems.LABEL_CATALOG -> TextComponent(
             text = title.label + " " + title.catalog,
             item = layoutItem
         )
 
-        LayoutItems.ALBUM -> TextComponent(text = title.album, item = layoutItem)
-        LayoutItems.ALBUM_ARTIST -> TextComponent(text = title.albumArtist, item = layoutItem)
-        LayoutItems.TITLE -> TextComponent(text = title.title, item = layoutItem)
-        LayoutItems.ARTIST -> TextComponent(text = title.artist, item = layoutItem)
-        LayoutItems.ARTIST_TITLE -> TextComponent(text = title.artist + " - " + title.title, item = layoutItem)
-        LayoutItems.SMART_ARTIST ->
+        StandardLayoutItems.ALBUM -> TextComponent(text = title.album, item = layoutItem)
+        StandardLayoutItems.ALBUM_ARTIST -> TextComponent(text = title.albumArtist, item = layoutItem)
+        StandardLayoutItems.TITLE -> TextComponent(text = title.title, item = layoutItem)
+        StandardLayoutItems.ARTIST -> TextComponent(text = title.artist, item = layoutItem)
+        StandardLayoutItems.ARTIST_TITLE -> TextComponent(text = title.artist + " - " + title.title, item = layoutItem)
+        StandardLayoutItems.SMART_ARTIST ->
             if (!checkArtist || !title.artist.equals(album.originalTitle.artist))
                 TextComponent(text = title.artist, item = layoutItem)
 
-        LayoutItems.COMPOSER ->
+        StandardLayoutItems.COMPOSER ->
             if (title.composer != "" && title.composer != "?") {
                 TextComponent(text = title.composer, item = layoutItem)
             }
-        LayoutItems.PROGRESS -> if (titleIsCurrentlyPlaying) {
+        StandardLayoutItems.PROGRESS -> if (titleIsCurrentlyPlaying) {
             val wavy = when (layoutItem.progressBarFormat) {
                 ProgressBarFormat.WAVY_WHEN_PLAYING -> vm.playbackState == PlaybackState.PLAYING
                 ProgressBarFormat.UNDEFINED -> false
@@ -147,6 +153,9 @@ fun LayoutComponent(vm: PlayerViewModel, album: Album, title: ITitle, checkArtis
                 waveSpeed = intToDp(layoutItem.waveSpeed)
             )
         }
+        StandardLayoutItems.CUSTOM_FIELD ->
+            TextComponent(text = title.customFields.getText(layoutItem.customFieldReference), item = layoutItem)
+
         else -> Text("UNKNOWN ITEM")
     }
 }

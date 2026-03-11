@@ -18,6 +18,7 @@ import com.deckerth.thomas.foobarremotecontroller2.connector.PlaylistAccess
 import com.deckerth.thomas.foobarremotecontroller2.connector.QueryAccess
 import com.deckerth.thomas.foobarremotecontroller2.foobarMediaService
 import com.deckerth.thomas.foobarremotecontroller2.mediaSession
+import com.deckerth.thomas.foobarremotecontroller2.model.CustomFields
 import com.deckerth.thomas.foobarremotecontroller2.model.Playlist
 import com.deckerth.thomas.foobarremotecontroller2.model.VolumeControl
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.ViewsWithLayout
@@ -62,6 +63,7 @@ class AppViewModel(val owner: String) : ViewModel() {
 
     lateinit var browserViewModel: BrowserViewModel
     lateinit var connector: HTTPConnector
+    lateinit var customFields: CustomFields
     lateinit var foobVolumeControl: VolumeControl
     lateinit var credentialsManager: CredentialsManager
 
@@ -101,6 +103,7 @@ class AppViewModel(val owner: String) : ViewModel() {
         browserAccess = BrowserAccess(this)
         playlistsViewModel = PlaylistsViewModel(this)
         browserViewModel = BrowserViewModel(this)
+        customFields = CustomFields()
         foobVolumeControl = VolumeControl(false, 0, 1, "db", 0)
     }
 

@@ -2,11 +2,13 @@ package com.deckerth.thomas.foobarremotecontroller2.ui.layout
 
 import com.deckerth.thomas.foobarremotecontroller2.R
 import com.deckerth.thomas.foobarremotecontroller2.ui.mainActivity
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class LayoutItem(
-    val item: LayoutItems = LayoutItems.UNDEFINED,  // enable anonymous constructor
+    val item: StandardLayoutItems = StandardLayoutItems.UNDEFINED,  // enable anonymous constructor
+    val customFieldReference: String = "",
     var itemSize: ItemSize = ItemSize.UNDEFINED,
     var italic: Boolean = false,
     var bold: Boolean = false,
@@ -20,10 +22,10 @@ data class LayoutItem(
 
     fun verbose(): String {
         when (item) {
-            LayoutItems.ARTWORK ->
+            StandardLayoutItems.ARTWORK ->
                 return mainActivity!!.baseContext.getString(R.string.size_property) + " ${itemSize.text}"
 
-            LayoutItems.PROGRESS ->
+            StandardLayoutItems.PROGRESS ->
                 return progressBarFormat.text
 
             else -> {
@@ -37,4 +39,13 @@ data class LayoutItem(
             }
         }
     }
+
+    fun getText(vm : AppViewModel) : String {
+        return if (item == StandardLayoutItems.CUSTOM_FIELD) {
+            vm.customFields.get(customFieldReference)?.fieldName?: ""
+        } else {
+            item.text
+        }
+    }
+
 }

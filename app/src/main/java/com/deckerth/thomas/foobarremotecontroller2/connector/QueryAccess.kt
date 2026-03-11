@@ -61,12 +61,12 @@ class QueryAccess(val vm: AppViewModel) {
                     var endpoint =
                         "query/updates?player=true&" +
                                 "trcolumns=" +
-                                vm.playerAccess.columnListWithoutPath +
-                                "playlists=true"
+                                vm.playerAccess.getColumnList(false)  +
+                                "&playlists=true"
                     if (playlistId.isNotEmpty())
                         endpoint += "&playlistItems=true&plref=$playlistId&plrange=0:1" +
                                 "&plcolumns=" +
-                                vm.playerAccess.columnListWithoutPath
+                                vm.playerAccess.getColumnList(false)
 
                     url = URL(vm.connector.serverAddress(usedIpAddress) + endpoint)
                     //open an URL connection

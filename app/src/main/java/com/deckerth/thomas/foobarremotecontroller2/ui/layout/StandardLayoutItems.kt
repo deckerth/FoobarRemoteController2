@@ -1,8 +1,8 @@
 package com.deckerth.thomas.foobarremotecontroller2.ui.layout
 
 import com.deckerth.thomas.foobarremotecontroller2.R
-import com.deckerth.thomas.foobarremotecontroller2.ui.layout.LayoutItems.entries
 import com.deckerth.thomas.foobarremotecontroller2.ui.mainActivity
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
 
 /**
 Required steps when adding new metadata fields:
@@ -16,7 +16,7 @@ Required steps when adding new metadata fields:
 7. adapt the example objects in LayoutPreviewPage
 8. extend TitleDetails with the new field (DisplayItemDetail)
  */
-enum class LayoutItems(
+enum class StandardLayoutItems(
     val text: String,
     val onPlayer: Boolean = true,
     val onAlbum: Boolean = true,
@@ -48,26 +48,44 @@ enum class LayoutItems(
         onPlayer = false
     ),
     SAMPLE_RATE(mainActivity!!.baseContext.getString(R.string.layout_item_samplerate)),
-    UNDEFINED("UNDEFINED", onTitle = false, onAlbum = false, onPlayer = false);
+    CUSTOM_FIELD("CUSTOM_FIELD", onTitle = false, onAlbum = false, onPlayer = false),
+    UNDEFINED("UNDEFINED", onTitle = false, onAlbum = false, onPlayer = false)
 }
 
-fun getLayoutItemsFor(viewWithLayout: ViewsWithLayout): List<LayoutItems> {
-    return when (viewWithLayout) {
-        ViewsWithLayout.PLAYER -> {
-            entries.filter { it.onPlayer }
-        }
+class LayoutItems(
+    val item: StandardLayoutItems,
+    val customFieldReference: String,
+    val text: String
+)
 
-        ViewsWithLayout.ALBUM -> {
-            entries.filter { it.onAlbum }
-        }
+fun getLayoutItemsFor(vm: AppViewModel, viewWithLayout: ViewsWithLayout): List<LayoutItems> {
+    val entries = mutableListOf<LayoutItems>()
 
-        ViewsWithLayout.TITLE -> {
-            entries.filter { it.onTitle }
-        }
+    for (item in StandardLayoutItems.entries) {
+        if (item != StandardLayoutItems.CUSTOM_FIELD) {
+            if (viewWithLayout == ViewsWithLayout.PLAYER && !item.onPlayer)
+                continue
+            if (viewWithLayout == ViewsWithLayout.ALBUM && !item.onAlbum)
+                continue
+            if (viewWithLayout == ViewsWithLayout.TITLE && !item.onTitle)
+                continue
 
-        else -> {
-            emptyList()
+             entries.add(
+                LayoutItems(
+                    item,
+                    "",
+                    item.text))
         }
     }
+
+    for (field in vm.customFields.customFields) {
+        entries.add(
+            LayoutItems(
+                StandardLayoutItems.CUSTOM_FIELD,
+                field.value.fieldReference,
+                field.value.fieldName))
+    }
+
+    return entries
 }
 

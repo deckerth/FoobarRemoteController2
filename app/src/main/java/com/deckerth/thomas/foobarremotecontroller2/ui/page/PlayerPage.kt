@@ -3,7 +3,6 @@
 package com.deckerth.thomas.foobarremotecontroller2.ui.page
 
 import android.annotation.SuppressLint
-import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -28,7 +27,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
@@ -44,7 +42,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.deckerth.thomas.foobarremotecontroller2.R
@@ -55,10 +52,9 @@ import com.deckerth.thomas.foobarremotecontroller2.ui.components.ReleaseNotes
 import com.deckerth.thomas.foobarremotecontroller2.ui.components.TitleDetails
 import com.deckerth.thomas.foobarremotecontroller2.ui.components.UserPasswordDialog
 import com.deckerth.thomas.foobarremotecontroller2.ui.isTablet
-import com.deckerth.thomas.foobarremotecontroller2.ui.layout.LayoutItems
+import com.deckerth.thomas.foobarremotecontroller2.ui.layout.StandardLayoutItems
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.layoutManager
 import com.deckerth.thomas.foobarremotecontroller2.ui.mainActivity
-import com.deckerth.thomas.foobarremotecontroller2.ui.theme.Foobar2000RemoteControllerTheme
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.PlaybackMode
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.PlaybackState
@@ -392,7 +388,7 @@ fun PlayerCard(
                         val layout = layoutManager.getLayout()
 
                         for (item in layout.playerLayout.items) {
-                            if (item.item != LayoutItems.ARTWORK)
+                            if (item.item != StandardLayoutItems.ARTWORK)
                                 LayoutComponent(vm, playerViewModel, item)
                         }
                     }
@@ -424,30 +420,5 @@ fun PlayerCard(
                         onDismiss = { infoButtonClicked = false },
                     )
             }
-    }
-}
-
-@Preview(
-    name = "light mode",
-    showBackground = true,
-    uiMode = Configuration.UI_MODE_NIGHT_NO
-)
-@Preview(
-    name = "dark mode",
-    showBackground = true,
-    uiMode = Configuration.UI_MODE_NIGHT_YES
-)
-
-@Composable
-fun PlayerCardPreview() {
-    Foobar2000RemoteControllerTheme {
-        Surface {
-            PlayerCard(
-                vm = AppViewModel("Preview"),
-                playerViewModel = PlayerViewModel(),
-                boxSize = IntSize(200, 200)
-            )
-        }
-
     }
 }

@@ -287,12 +287,12 @@ fun TitleDropdownMenu(vm: AppViewModel, title: ITitle? = null, album: Album? = n
 
     if (showTitleDetails)
         if (title != null)
-            TitleDetails(
+            TitleDetails(vm,
                 title = title,
                 onDismiss = { showTitleDetails = false },
             )
         else if (album != null && album.tracks.size == 1)
-            TitleDetails(
+            TitleDetails(vm,
                 title = album.tracks[0].details,
                 onDismiss = { showTitleDetails = false },
             )
@@ -565,7 +565,7 @@ fun Playlist(vm: AppViewModel, playlist: Playlist) {
                 println("FOOB filtered albums: ${playlist.filteredAlbums.size}")
                 try {
                     items(playlist.filteredAlbums) { album ->
-                        if (album.matches(vm.playlistsViewModel.filterValue)) AlbumCard(
+                        if (album.matches(vm.playlistsViewModel.filterValue, vm.customFields )) AlbumCard(
                             vm,
                             vm.playerViewModel,
                             album,

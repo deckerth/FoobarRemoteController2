@@ -9,18 +9,18 @@ import com.deckerth.thomas.foobarremotecontroller2.viewmodel.TitleFilter;
 public class Title implements ITitle {
 
     // mPlaylistId, mCatalog, mIndex, mComposer, mAlbum, mArtist
-    protected final String mLabel;
-    protected final String mCatalog;
-    protected final String mPlaylistId;
-    protected final int mIndex;
-    protected final String mComposer;
-    private final String mTitle;
-    private final String mDiscNumber;
-    private final String mTrack;
-    private final String mPlaybackTime;
-    private final Double mDuration;
-    private final Double mPosition;
-    private final String mArtworkUrl;
+    protected String mLabel;
+    protected String mCatalog;
+    protected String mPlaylistId;
+    protected int mIndex;
+    protected String mComposer;
+    private String mTitle;
+    private String mDiscNumber;
+    private String mTrack;
+    private String mPlaybackTime;
+    private Double mDuration;
+    private Double mPosition;
+    private String mArtworkUrl;
     protected String mAlbum;
     protected String mArtist;
     protected String mAlbumArtist;
@@ -31,7 +31,17 @@ public class Title implements ITitle {
     private String mPath = "";
     protected Float elapsedTimeWhenTitleStarts = 0.0f;
 
+    protected CustomFieldsContent mCustomFields;
+
+    public Title(String mPlaylistId, int mIndex, String mLabel, String mCatalog, String mComposer, String mAlbum, String mTitle, String mArtist, String mAlbumArtist, String mSampleRate, String mGenre, String mDiscNumber, String mTrack, String mPlaybackTime, String duration, String position, String mArtworkUrl, String mPath, CustomFieldsContent customFields) {
+        init(mPlaylistId, mIndex, mLabel, mCatalog, mComposer, mAlbum, mTitle, mArtist, mAlbumArtist, mSampleRate, mGenre, mDiscNumber, mTrack, mPlaybackTime, duration, position, mArtworkUrl, mPath, customFields);
+    }
+
     public Title(String mPlaylistId, int mIndex, String mLabel, String mCatalog, String mComposer, String mAlbum, String mTitle, String mArtist, String mAlbumArtist, String mSampleRate, String mGenre, String mDiscNumber, String mTrack, String mPlaybackTime, String duration, String position, String mArtworkUrl, String mPath) {
+        init(mPlaylistId, mIndex, mLabel, mCatalog, mComposer, mAlbum, mTitle, mArtist, mAlbumArtist, mSampleRate, mGenre, mDiscNumber, mTrack, mPlaybackTime, duration, position, mArtworkUrl, mPath, new CustomFieldsContent());
+    }
+
+    private void init(String mPlaylistId, int mIndex, String mLabel, String mCatalog, String mComposer, String mAlbum, String mTitle, String mArtist, String mAlbumArtist, String mSampleRate, String mGenre, String mDiscNumber, String mTrack, String mPlaybackTime, String duration, String position, String mArtworkUrl, String mPath, CustomFieldsContent customFields) {
         this.mLabel = set(mLabel);
         this.mCatalog = set(mCatalog);
         this.mPlaylistId = set(mPlaylistId);
@@ -61,6 +71,7 @@ public class Title implements ITitle {
             value = 0.0;
         }
         mPosition = value;
+        mCustomFields = customFields;
     }
 
     protected String set(String v) {
@@ -99,8 +110,11 @@ public class Title implements ITitle {
     public String getAlbum() {
         return mAlbum;
     }
+
     @Override
-    public String getAlbumArtist() {return mAlbumArtist;}
+    public String getAlbumArtist() {
+        return mAlbumArtist;
+    }
 
     @Override
     public void clearArtist() {
@@ -118,15 +132,20 @@ public class Title implements ITitle {
     }
 
     @Override
-    public String getSampleRate() { return mSampleRate; }
+    public String getSampleRate() {
+        return mSampleRate;
+    }
 
     @Override
-    public String getGenre() { return mGenre; }
+    public String getGenre() {
+        return mGenre;
+    }
 
     @Override
     public void clearAlbum() {
         mAlbum = "";
     }
+
     @Override
     public String getDiscNumber() {
         return mDiscNumber;
@@ -168,7 +187,9 @@ public class Title implements ITitle {
     }
 
     @Override
-    public String getPath() { return mPath; }
+    public String getPath() {
+        return mPath;
+    }
 
     @Override
     public void setArtwork(Bitmap artwork) {
@@ -195,7 +216,7 @@ public class Title implements ITitle {
         this.elapsedTimeWhenTitleStarts = elapsedTimeWhenTitleStarts;
     }
 
-    private Boolean matchesExact(String pattern) {
+    private Boolean matchesExact(String pattern, CustomFields customFields) {
         if (pattern.isEmpty()) return true;
         String upperPattern = pattern.toUpperCase();
         if (mAlbum.toUpperCase().contains(upperPattern)) return true;
@@ -204,14 +225,16 @@ public class Title implements ITitle {
         if (mTitle.toUpperCase().contains(upperPattern)) return true;
         if (mComposer.toUpperCase().contains(upperPattern)) return true;
         if (mCatalog.toUpperCase().contains(upperPattern)) return true;
-        return mLabel.toUpperCase().contains(upperPattern);
+        if (mDiscNumber.toUpperCase().contains(upperPattern)) return true;
+        return this.getCustomFields().matches(upperPattern);
     }
+
     @Override
-    public Boolean matches(TitleFilter filter) {
+    public Boolean matches(TitleFilter filter, CustomFields customFields) {
         if (!filter.isActive()) return true;
         String[] tokens = filter.getPattern().trim().split("\\s+");
         for (String token : tokens)
-            if (!matchesExact(token)) return false;
+            if (!matchesExact(token, customFields)) return false;
         if (filter.getHighRes()) {
             try {
                 int bitRate = Integer.parseInt(mSampleRate);
@@ -223,6 +246,11 @@ public class Title implements ITitle {
         if (!filter.getGenre().isBlank())
             return getGenre().equals(filter.getGenre());
         return true;
+    }
+
+    @Override
+    public CustomFieldsContent getCustomFields() {
+        return null;
     }
 
     @NonNull

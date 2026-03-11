@@ -82,10 +82,10 @@ fun LayoutEditorMainPage(
             modifier = Modifier.padding(innerPadding)
         ) {
             composable("Preview") {
-                LayoutPreviewPage(appViewModel = appViewModel )
+                LayoutPreviewPage(appViewModel = appViewModel, vm )
             }
             composable("Editor") {
-                LayoutEditorPage(vm = vm)
+                LayoutEditorPage(appViewModel = appViewModel, layoutViewModel = vm)
             }
         }
 

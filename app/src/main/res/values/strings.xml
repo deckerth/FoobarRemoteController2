@@ -209,4 +209,13 @@
     <string name="show_progress_background_coloring">Highlight background of currently playing title</string>
     <string name="progress_bar_format">Progress bar style</string>
     <string name="progress_bar_wave_speed">Wave speed</string>
+    <string name="settings_custom_fields">Custom fields</string>
+    <string name="button_cancel">Cancel</string>
+    <string name="button_custom_field">Custom field</string>
+    <string name="error_standard_field">This field is available by default.</string>
+    <string name="custom_field_editor">Custom fields</string>
+    <string name="error_duplicate_field">The field is already selected.</string>
+    <string name="custom_field_contributor">Contributor</string>
+    <string name="custom_field_name">Field description</string>
+    <string name="custom_field_reference">Field reference</string>
 </resources>

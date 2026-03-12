@@ -82,6 +82,7 @@ import androidx.navigation.compose.rememberNavController
 import com.deckerth.thomas.foobarremotecontroller2.FoobarMediaService
 import com.deckerth.thomas.foobarremotecontroller2.R
 import com.deckerth.thomas.foobarremotecontroller2.getAlwaysOnDisplay
+import com.deckerth.thomas.foobarremotecontroller2.getCustomFieldsBlocking
 import com.deckerth.thomas.foobarremotecontroller2.getIpAddressBlocking
 import com.deckerth.thomas.foobarremotecontroller2.getIvStringBlocking
 import com.deckerth.thomas.foobarremotecontroller2.getPasswordBlocking
@@ -91,6 +92,7 @@ import com.deckerth.thomas.foobarremotecontroller2.model.checkIpAddressSyntax
 import com.deckerth.thomas.foobarremotecontroller2.ui.components.AddTitlesAppBar
 import com.deckerth.thomas.foobarremotecontroller2.ui.components.EditPlaylistAppBar
 import com.deckerth.thomas.foobarremotecontroller2.ui.page.BrowserMainPage
+import com.deckerth.thomas.foobarremotecontroller2.ui.page.CustomFieldsEditor
 import com.deckerth.thomas.foobarremotecontroller2.ui.page.LayoutEditorMainPage
 import com.deckerth.thomas.foobarremotecontroller2.ui.page.LayoutSelection
 import com.deckerth.thomas.foobarremotecontroller2.ui.page.PlayingPage
@@ -145,12 +147,16 @@ class MainActivity : ComponentActivity() {
             var ipAddress by remember { mutableStateOf("<invalid>") }
             appViewModel.ipAddress = ipAddress
 
+            // Read important settings from preferences
             LaunchedEffect(Unit) {
                 val user = getUsernameBlocking()
                 val encryptedPassword = getPasswordBlocking()
                 val iv = getIvStringBlocking()
                 appViewModel.releaseNotesDisplayedForRelease =
                     getReleaseNotesDisplayedForReleaseBlocking()
+                val customFields = getCustomFieldsBlocking()
+                if (customFields != null)
+                    appViewModel.customFields.setCustomFields(customFields)
                 ipAddress = getIpAddressBlocking() // executed exactly once
                 appViewModel.credentialsManager.setCurrentUserPassword(
                     ipAddress,
@@ -369,6 +375,10 @@ class MainActivity : ComponentActivity() {
                         onFinished = {
                             navController.navigateUp()
                         })
+                }
+                composable("Custom field selection") {
+                    appBarLabel = stringResource(R.string.custom_field_editor)
+                    CustomFieldsEditor(appViewModel)
                 }
                 composable("Layout selection") {
                     appBarLabel = stringResource(R.string.choose_layout_to_change)

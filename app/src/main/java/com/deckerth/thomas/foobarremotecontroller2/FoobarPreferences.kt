@@ -12,6 +12,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.deckerth.thomas.foobarremotecontroller2.connector.ConnectionManager
 import com.deckerth.thomas.foobarremotecontroller2.model.AddTracksBehaviors
+import com.deckerth.thomas.foobarremotecontroller2.model.CustomFieldList
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.Layout
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.Layouts
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.layoutManager
@@ -39,6 +40,7 @@ private val CREATION_OF_NON_EMPTY_PLAYLISTS_KEY =
     booleanPreferencesKey("creation_of_non_empty_playlists")
 private val CONNECTIONS_KEY = stringPreferencesKey("connections")
 private val RELEASE_KEY = stringPreferencesKey("release")
+private val CUSTOM_FIELDS_KEY = stringPreferencesKey("custom_fields")
 
 private fun <T> getFlow(context: Context, key: Preferences.Key<T>): Flow<T?> {
     return context.dataStore.data.map { preferences ->
@@ -159,6 +161,23 @@ fun saveCustomLayout(context: Context, layout: Layout) {
     }
 }
 
+suspend fun getCustomFieldsBlocking(): CustomFieldList? {
+    if (mainActivity == null)
+        return null
+
+    val customFieldsString = getValueBlocking(mainActivity!!.baseContext, CUSTOM_FIELDS_KEY, "")
+    return if (customFieldsString.isEmpty()) null
+    else Json.decodeFromString(customFieldsString)
+}
+
+fun saveCustomFields(context: Context, fields: CustomFieldList) {
+    val layoutString = Json.encodeToString(fields)
+    runBlocking {
+        saveValue(context, layoutString, CUSTOM_FIELDS_KEY)
+    }
+}
+
+
 fun saveFoobarVolumeControl(enabled: Boolean, context: Context) {
     runBlocking {
         saveValue(context, enabled, FOOBAR_VOLUME_CONTROL_KEY)
@@ -277,7 +296,7 @@ suspend fun getFoobarConnectionsBlocking(): ConnectionManager {
     if (mainActivity == null)
         return ConnectionManager()
     val connectionsString = getValueBlocking(mainActivity!!.baseContext, CONNECTIONS_KEY, "")
-    return if (connectionsString.isEmpty()) return ConnectionManager()
+    return if (connectionsString.isEmpty()) ConnectionManager()
     else Json.decodeFromString(connectionsString)
 }
 

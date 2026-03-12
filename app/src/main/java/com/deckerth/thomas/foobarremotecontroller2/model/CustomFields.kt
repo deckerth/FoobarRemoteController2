@@ -1,6 +1,14 @@
 package com.deckerth.thomas.foobarremotecontroller2.model
 
+import androidx.compose.runtime.mutableStateOf
+import com.deckerth.thomas.foobarremotecontroller2.saveCustomFields
+import com.deckerth.thomas.foobarremotecontroller2.ui.mainActivity
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class CustomField(val fieldReference: String, val fieldName: String)
+@Serializable
+data class CustomFieldList(val customFields: List<CustomField>) // for settings
 
 // Columns:
 //    1 %25label%25,
@@ -28,18 +36,60 @@ class CustomFields {
     val customFields = mutableMapOf<String, CustomField>()
     val customFieldIndex = mutableListOf<String>()
 
-    //todo: read from settings
-    init {
-        addCustomField("contributor", "Contributor")
-        }
+    val customFieldsList = mutableStateOf(CustomFieldList(listOf()))
 
-    fun addCustomField(fieldReference: String, fieldName: String) {
-        customFields[fieldReference] = CustomField(fieldReference, fieldName)
-        customFieldIndex.add(fieldReference)
+    fun setCustomFields(customFieldList: CustomFieldList) {
+//        customFields.clear()
+//        customFieldIndex.clear()
+//        for (customField in customFieldList.customFields)
+//            addCustomField(customField.fieldReference, customField.fieldName, updateList = false)
+//        initCustomFieldList()
+    }
+
+    private fun initCustomFieldList() {
+        customFieldsList.value = getCustomFields()
+    }
+
+    private fun getCustomFields() : CustomFieldList {
+        val customFieldList = mutableListOf<CustomField>()
+        for (customField in customFields) {
+            customFieldList.add(customField.value)
+        }
+        return CustomFieldList(customFieldList)
+    }
+
+    private fun convertToReference(fieldReference: String): String {
+        var correctedFieldRef = fieldReference
+        if (!correctedFieldRef.startsWith("%")) correctedFieldRef = "%$correctedFieldRef"
+        if (!correctedFieldRef.endsWith("%")) correctedFieldRef = "${correctedFieldRef}%"
+        return correctedFieldRef
+    }
+
+    fun addCustomField(fieldReference: String, fieldName: String, updateList: Boolean = true) {
+        val correctedFieldRef = convertToReference(fieldReference)
+        if (customFields.containsKey(correctedFieldRef)) return
+        customFields[correctedFieldRef] = CustomField(correctedFieldRef, fieldName)
+        customFieldIndex.add(correctedFieldRef)
+        if (updateList) initCustomFieldList()
+    }
+
+    fun removeCustomField(fieldReference: String) {
+        customFields.remove(fieldReference)
+        customFieldIndex.remove(fieldReference)
+        initCustomFieldList()
+    }
+
+    fun saveCustomFieldsSetting() {
+        val customFieldList = getCustomFields()
+        saveCustomFields(mainActivity!!, customFieldList)
     }
 
     fun iaStandardField(fieldReference: String): Boolean {
-        return standardFields.contains(fieldReference)
+        return standardFields.contains(convertToReference(fieldReference))
+    }
+
+    fun hasField(fieldReference: String): Boolean {
+        return customFields.containsKey(convertToReference(fieldReference))
     }
 
     fun get(index: Int): CustomField? {
@@ -53,7 +103,7 @@ class CustomFields {
     fun getEscapedColumnList(): String {
         var columnList = ""
         for (i in 0 until customFieldIndex.size) {
-            columnList += ",%25" + customFields[customFieldIndex[i]]!!.fieldReference + "%25"
+            columnList += "," + customFields[customFieldIndex[i]]!!.fieldReference
         }
         return columnList
     }

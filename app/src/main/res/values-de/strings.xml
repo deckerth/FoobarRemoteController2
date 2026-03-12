@@ -210,4 +210,13 @@
     <string name="show_progress_background_coloring">Hintergrund des gerade gespielten Titels hervorheben</string>
     <string name="progress_bar_format">Linienstil</string>
     <string name="progress_bar_wave_speed">Wellengeschwindigkeit</string>
+    <string name="settings_custom_fields">Zusätzliche Felder</string>
+    <string name="button_cancel">Abbrechen</string>
+    <string name="button_custom_field">Zusätzlichs Feld</string>
+    <string name="error_standard_field">Das Feld steht standardmäßig zur Verfügung.</string>
+    <string name="custom_field_editor">Zusätzliche Felder</string>
+    <string name="error_duplicate_field">Das Feld ist bereits ausgewählt.</string>
+    <string name="custom_field_contributor">Hinzugefügt von</string>
+    <string name="custom_field_name">Fieldbeschreibung</string>
+    <string name="custom_field_reference">Feldreferenz</string>
 </resources>

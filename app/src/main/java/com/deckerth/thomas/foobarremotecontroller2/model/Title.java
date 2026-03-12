@@ -250,13 +250,13 @@ public class Title implements ITitle {
 
     @Override
     public CustomFieldsContent getCustomFields() {
-        return null;
+        return mCustomFields;
     }
 
     @NonNull
     @Override
     public ITitle clone() {
-        ITitle result = new Title(mPlaylistId, mIndex, mLabel, mCatalog, mComposer, mAlbum, mAlbumArtist, mTitle, mArtist, mSampleRate, mGenre, mDiscNumber, mTrack, mPlaybackTime, mDuration.toString(), mPosition.toString(), mArtworkUrl, mPath);
+        ITitle result = new Title(mPlaylistId, mIndex, mLabel, mCatalog, mComposer, mAlbum, mAlbumArtist, mTitle, mArtist, mSampleRate, mGenre, mDiscNumber, mTrack, mPlaybackTime, mDuration.toString(), mPosition.toString(), mArtworkUrl, mPath, mCustomFields);
         result.setArtwork(mArtwork);
         result.setIsCurrentTitle(mIsCurrent);
         return result;

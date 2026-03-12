@@ -133,7 +133,7 @@ fun SettingsPage(vm: AppViewModel) {
                 isEnabled = true
             )
 
-            var isOpen by remember { mutableStateOf(false) }
+            var isLayoutSelectionOpen by remember { mutableStateOf(false) }
             val viewMode = getViewMode()
             PreferenceItem<Boolean>(
                 stringResource(R.string.settings_view_mode),
@@ -142,9 +142,9 @@ fun SettingsPage(vm: AppViewModel) {
                 buttonText = stringResource(R.string.open_layout_editor),
                 onButtonClick = { mainActivity!!.navigateTo("Layout selection") },
                 onClick = {
-                    isOpen = true
+                    isLayoutSelectionOpen = true
                 })
-            if (isOpen) {
+            if (isLayoutSelectionOpen) {
                 ListPreference(
                     values = Layouts.entries,
                     title = stringResource(R.string.settings_view_mode),
@@ -153,11 +153,16 @@ fun SettingsPage(vm: AppViewModel) {
                         if (mode != null) {
                             saveViewMode(viewMode, mode, mainActivity!!)
                         }
-                        isOpen = false
+                        isLayoutSelectionOpen = false
                     },
                     getText = { v: Layouts -> v.text }
                 )
             }
+
+            PreferenceItem<Boolean>(
+                title = stringResource(R.string.settings_custom_fields),
+                summary = "", // TODO
+                onClick = { _ -> mainActivity!!.navigateTo("Custom field selection") })
 
             Title(stringResource(R.string.settings_playback))
             PreferenceItem(
@@ -179,7 +184,12 @@ fun SettingsPage(vm: AppViewModel) {
             PreferenceItem(
                 stringResource(R.string.settings_pause_during_phone_call),
                 summary = "",
-                onClick = { enabled: Boolean -> savePauseDuringPhoneCalls(!enabled, mainActivity!!) },
+                onClick = { enabled: Boolean ->
+                    savePauseDuringPhoneCalls(
+                        !enabled,
+                        mainActivity!!
+                    )
+                },
                 showToggle = true,
                 isChecked = getPauseDuringPhoneCalls(),
                 isEnabled = true

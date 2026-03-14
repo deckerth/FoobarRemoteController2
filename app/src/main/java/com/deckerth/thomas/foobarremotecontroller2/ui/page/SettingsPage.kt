@@ -161,7 +161,7 @@ fun SettingsPage(vm: AppViewModel) {
 
             PreferenceItem<Boolean>(
                 title = stringResource(R.string.settings_custom_fields),
-                summary = "", // TODO
+                summary = vm.customFields.getPreferenceSummary(),
                 onClick = { _ -> mainActivity!!.navigateTo("Custom field selection") })
 
             Title(stringResource(R.string.settings_playback))

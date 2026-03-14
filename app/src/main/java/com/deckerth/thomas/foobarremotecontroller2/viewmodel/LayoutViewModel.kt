@@ -21,6 +21,7 @@ data class LayoutField(
     val sectionTitle: String = "",
     val isSectionTitle: Boolean = false,
 )
+
 class LayoutViewModel(private val vm: AppViewModel) : ViewModel() {
     var layoutFields = mutableStateOf<List<LayoutField>>(emptyList())
 
@@ -41,6 +42,8 @@ class LayoutViewModel(private val vm: AppViewModel) : ViewModel() {
     val previewPlayerPop = PlayerViewModel()
 
     var currentPlayer by mutableStateOf(previewPlayerPop)
+
+    val impactedViews = mutableStateOf(listOf<ViewsWithLayout>())
 
     init {
         val customFields = vm.customFields.getMockedContent()
@@ -66,7 +69,8 @@ class LayoutViewModel(private val vm: AppViewModel) : ViewModel() {
             PlaybackMode.DEFAULT,
             "",
             false,
-            customFields )
+            customFields
+        )
 
         previewPlayerPop.update(
             "Polydor",
@@ -90,7 +94,8 @@ class LayoutViewModel(private val vm: AppViewModel) : ViewModel() {
             PlaybackMode.DEFAULT,
             "",
             false,
-            customFields )
+            customFields
+        )
     }
 
     fun saveChanges() {
@@ -107,6 +112,10 @@ class LayoutViewModel(private val vm: AppViewModel) : ViewModel() {
                         break
                 } else
                     if (field.layoutItem != null) currentLayoutDescription!!.items.add(field.layoutItem)
+            }
+            val old = layoutManager.getCustomLayoutDescription(vm.selectedView)
+            if (currentLayoutDescription!!.customFieldsDiffer(old)) {
+                if (!impactedViews.value.contains(currentView)) impactedViews.value += currentView
             }
             layoutManager.setCustomLayoutDescription(vm.selectedView, currentLayoutDescription!!)
             dirty.value = false

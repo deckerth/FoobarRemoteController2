@@ -9,7 +9,7 @@ import com.deckerth.thomas.foobarremotecontroller2.ui.mainActivity
 
 val layoutManager = LayoutManager()
 
-class LayoutManager {
+class LayoutManager  {
 
     private val classicLayout: Layout = createClassicLayout()
     private val modernLayout: Layout = createModernLayout()
@@ -108,6 +108,16 @@ class LayoutManager {
             // if the user has not saved a custom layout, it gets initialized
             // when the user selects the custom layout in the settings page
         }
+    }
+
+    fun getViewModesWith(fieldReference : String) : List<ViewsWithLayout> {
+        return customLayout?.getViewModesWith(fieldReference) ?: emptyList()
+    }
+
+    fun removeFieldFromLayouts(fieldReference : String) {
+        if (customLayout == null) return
+        customLayout!!.removeFieldFromLayouts(fieldReference)
+        saveCustomLayout(mainActivity!!.baseContext, customLayout!!)
     }
 
     fun changeLayout(previousMode: Layouts, newLayout: Layouts) {

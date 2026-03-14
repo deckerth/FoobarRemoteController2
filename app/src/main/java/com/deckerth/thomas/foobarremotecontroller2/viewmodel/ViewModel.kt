@@ -257,4 +257,11 @@ class AppViewModel(val owner: String) : ViewModel() {
             foobarMediaService?.updateNotification()
         }
     }
+
+    fun triggerDataUpdatesForViews(views: List<ViewsWithLayout>) {
+        if (views.contains(ViewsWithLayout.PLAYER))
+            playlistsViewModel.restartObserver()
+        if (views.contains(ViewsWithLayout.ALBUM) || views.contains(ViewsWithLayout.TITLE))
+            playlistsViewModel.triggerPlaylistsUpdate()
+    }
 }

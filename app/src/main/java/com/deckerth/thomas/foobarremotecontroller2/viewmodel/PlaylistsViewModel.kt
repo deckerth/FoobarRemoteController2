@@ -342,6 +342,13 @@ class PlaylistsViewModel(private val vm: AppViewModel) : ViewModel() {
             playlist.lifecycleState = PlaylistLifecycleState.RequiresUpdate
     }
 
+    fun triggerPlaylistsUpdate() {
+        for (playlist in playlistRegistry) {
+            playlist.clear()
+        }
+        updatePlaylists()
+    }
+
     fun updateList() {
         triggerPlaylistUpdate(vm.selectedPlaylist)
     }

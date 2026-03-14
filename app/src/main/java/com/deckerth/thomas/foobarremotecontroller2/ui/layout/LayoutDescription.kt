@@ -20,4 +20,17 @@ data class LayoutDescription(val view: ViewsWithLayout) {
         return layoutItems
     }
 
+    fun isUsedInLayout(fieldReference : String) : Boolean {
+        return items.any { it.customFieldReference == fieldReference }
+    }
+
+    fun removeFieldFromLayout(fieldReference : String) {
+        items.removeIf { it.customFieldReference == fieldReference }
+    }
+
+    fun customFieldsDiffer(other : LayoutDescription) : Boolean {
+        return items.any { it.item == StandardLayoutItems.CUSTOM_FIELD && !other.items.contains(it) } ||
+                other.items.any { it.item == StandardLayoutItems.CUSTOM_FIELD && !items.contains(it) }
+    }
+
 }

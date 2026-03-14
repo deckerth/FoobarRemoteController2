@@ -378,7 +378,7 @@ class MainActivity : ComponentActivity() {
                 }
                 composable("Custom field selection") {
                     appBarLabel = stringResource(R.string.custom_field_editor)
-                    CustomFieldsEditor(appViewModel)
+                    CustomFieldsEditor(navController, appViewModel)
                 }
                 composable("Layout selection") {
                     appBarLabel = stringResource(R.string.choose_layout_to_change)
@@ -386,7 +386,7 @@ class MainActivity : ComponentActivity() {
                 }
                 composable("Layout editor") {
                     appBarLabel = stringResource(R.string.choose_layout_to_change)
-                    LayoutEditorMainPage(appViewModel = appViewModel)
+                    LayoutEditorMainPage(mainNavController = navController, appViewModel = appViewModel)
                 }
                 composable("Browser") {
                     appBarLabel = stringResource(R.string.browser)
@@ -561,7 +561,7 @@ class MainActivity : ComponentActivity() {
                 }
                 composable("Layout editor") {
                     appBarLabel = stringResource(R.string.choose_layout_to_change)
-                    LayoutEditorMainPage(appViewModel = appViewModel)
+                    LayoutEditorMainPage(mainNavController = navController, appViewModel = appViewModel)
                 }
                 composable("Browser") {
                     appBarLabel = stringResource(R.string.browser)

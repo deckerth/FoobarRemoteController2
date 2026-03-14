@@ -118,7 +118,6 @@ fun LayoutEditorPage(
         ) { _, item ->
             val isDragging = draggedItemId == item.key
 
-
             // "Fly over" effect
             val flyElevation by animateDpAsState(
                 targetValue = if (isDragging) 24.dp else 0.dp,

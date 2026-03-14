@@ -219,4 +219,9 @@
     <string name="custom_field_contributor">Hinzugefügt von</string>
     <string name="custom_field_name">Fieldbeschreibung</string>
     <string name="custom_field_reference">Feldreferenz</string>
+    <string name="views_with_field_reference">Das Feld %1$s wird auf den folgenden Layouts angezeigt: %2$s. Wenn Sie das Feld löschen, wird es von diesen Layouts entfernt.</string>
+    <string name="ask_for_removal_of_custom_field_from_layouts">Möchten Sie das Feld löschen?</string>
+    <string name="view_with_field_reference">Das Feld %1$s wird auf dem Layout \"%2$s\" angezeigt. Wenn Sie das Feld löschen, wird es von diesem Layout entfernt.</string>
+    <string name="button_delete">Löschen</string>
+    <string name="no_custom_fields_defined">No custom fields defined.</string>
 </resources>

@@ -28,7 +28,22 @@ data class Layout(
             return titleLayout.items.first { it.item == StandardLayoutItems.PROGRESS }
         }
 
+    fun getViewModesWith(fieldReference : String) : List<ViewsWithLayout> {
+        val layouts = mutableListOf<ViewsWithLayout>()
+        if (playerLayout.isUsedInLayout(fieldReference)) layouts.add(ViewsWithLayout.PLAYER)
+        if (albumLayout.isUsedInLayout(fieldReference)) layouts.add(ViewsWithLayout.ALBUM)
+        if (titleLayout.isUsedInLayout(fieldReference)) layouts.add(ViewsWithLayout.TITLE)
+        return layouts
+    }
+
+    fun removeFieldFromLayouts(fieldReference: String) {
+        playerLayout.removeFieldFromLayout(fieldReference)
+        albumLayout.removeFieldFromLayout(fieldReference)
+        titleLayout.removeFieldFromLayout(fieldReference)
+    }
 }
+
+
 
 fun highlightPlayingItem(layout: LayoutDescription): Boolean
     {

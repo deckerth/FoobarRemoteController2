@@ -164,7 +164,6 @@ fun saveCustomLayout(context: Context, layout: Layout) {
 suspend fun getCustomFieldsBlocking(): CustomFieldList? {
     if (mainActivity == null)
         return null
-
     val customFieldsString = getValueBlocking(mainActivity!!.baseContext, CUSTOM_FIELDS_KEY, "")
     return if (customFieldsString.isEmpty()) null
     else Json.decodeFromString(customFieldsString)

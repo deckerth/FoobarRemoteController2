@@ -1,6 +1,7 @@
 package com.deckerth.thomas.foobarremotecontroller2.model
 
 import androidx.compose.runtime.mutableStateOf
+import com.deckerth.thomas.foobarremotecontroller2.R
 import com.deckerth.thomas.foobarremotecontroller2.saveCustomFields
 import com.deckerth.thomas.foobarremotecontroller2.ui.mainActivity
 import kotlinx.serialization.Serializable
@@ -39,11 +40,11 @@ class CustomFields {
     val customFieldsList = mutableStateOf(CustomFieldList(listOf()))
 
     fun setCustomFields(customFieldList: CustomFieldList) {
-//        customFields.clear()
-//        customFieldIndex.clear()
-//        for (customField in customFieldList.customFields)
-//            addCustomField(customField.fieldReference, customField.fieldName, updateList = false)
-//        initCustomFieldList()
+        customFields.clear()
+        customFieldIndex.clear()
+        for (customField in customFieldList.customFields)
+            addCustomField(customField.fieldReference, customField.fieldName, updateList = false)
+        initCustomFieldList()
     }
 
     private fun initCustomFieldList() {
@@ -56,6 +57,16 @@ class CustomFields {
             customFieldList.add(customField.value)
         }
         return CustomFieldList(customFieldList)
+    }
+
+    fun getPreferenceSummary(): String {
+        if (customFields.isEmpty()) return mainActivity!!.getString(R.string.no_custom_fields_defined)
+        var summary = ""
+        for (i in 0 until customFields.size) {
+            if (i > 0) summary += ", "
+            summary += customFields[customFieldIndex[i]]!!.fieldName
+        }
+        return summary
     }
 
     private fun convertToReference(fieldReference: String): String {

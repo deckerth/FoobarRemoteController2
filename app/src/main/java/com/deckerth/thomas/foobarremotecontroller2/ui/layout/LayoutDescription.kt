@@ -1,6 +1,5 @@
 package com.deckerth.thomas.foobarremotecontroller2.ui.layout
 
-import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
 import kotlinx.serialization.Serializable
 import kotlin.reflect.KProperty
 
@@ -12,7 +11,7 @@ data class LayoutDescription(val view: ViewsWithLayout) {
 
     var items = mutableListOf<LayoutItem>()
 
-    fun getLayoutItems(vm: AppViewModel): MutableList<LayoutItems> {
+    fun getLayoutItems(): MutableList<LayoutItems> {
         val layoutItems = mutableListOf<LayoutItems>()
         for (item in items) {
             layoutItems.add(LayoutItems(item.item, item.customFieldName, item.getText()))
@@ -28,9 +27,8 @@ data class LayoutDescription(val view: ViewsWithLayout) {
         items.removeIf { it.customFieldName == fieldName }
     }
 
-    fun customFieldsDiffer(other : LayoutDescription) : Boolean {
-        return items.any { it.item == StandardLayoutItems.CUSTOM_FIELD && !other.items.contains(it) } ||
-                other.items.any { it.item == StandardLayoutItems.CUSTOM_FIELD && !items.contains(it) }
+    fun customFieldsAdded(other : LayoutDescription) : Boolean {
+        return items.any { it.item == StandardLayoutItems.CUSTOM_FIELD && !other.items.contains(it) }
     }
 
 }

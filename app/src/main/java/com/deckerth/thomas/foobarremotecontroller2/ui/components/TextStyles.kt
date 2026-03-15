@@ -14,6 +14,8 @@ lateinit var boldLinkStyle: SpanStyle
 lateinit var titleStyle: SpanStyle
 lateinit var headingStyle: SpanStyle
 lateinit var smallTextStyle: SpanStyle
+lateinit var mediumLinkStyle: SpanStyle
+
 
 @Composable
 fun InitStyles() {
@@ -34,6 +36,12 @@ fun InitStyles() {
         textDecoration = TextDecoration.Underline,
         fontSize = MaterialTheme.typography.bodyLarge.fontSize,
         fontWeight = MaterialTheme.typography.bodyLarge.fontWeight
+    )
+    mediumLinkStyle = SpanStyle(
+        color = MaterialTheme.colorScheme.primary,
+        textDecoration = TextDecoration.Underline,
+        fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+        fontWeight = MaterialTheme.typography.bodyMedium.fontWeight
     )
     boldTextStyle = SpanStyle(
         color = MaterialTheme.colorScheme.secondary,

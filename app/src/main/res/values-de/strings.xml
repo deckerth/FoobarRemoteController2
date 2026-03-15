@@ -223,5 +223,6 @@
     <string name="ask_for_removal_of_custom_field_from_layouts">Möchten Sie das Feld löschen?</string>
     <string name="view_with_field_reference">Das Feld "%1$s" wird auf dem Layout \"%2$s\" angezeigt. Wenn Sie das Feld löschen, wird es von diesem Layout entfernt.</string>
     <string name="button_delete">Löschen</string>
-    <string name="no_custom_fields_defined">No custom fields defined.</string>
+    <string name="no_custom_fields_defined">Es sind noch keine Zusatzfelder vorhanden.</string>
+    <string name="link_title_formatting_reference">Title‑Formatting‑Referenz</string>
 </resources>

@@ -114,7 +114,7 @@ class LayoutViewModel(private val vm: AppViewModel) : ViewModel() {
                     if (field.layoutItem != null) currentLayoutDescription!!.items.add(field.layoutItem)
             }
             val old = layoutManager.getCustomLayoutDescription(vm.selectedView)
-            if (currentLayoutDescription!!.customFieldsDiffer(old)) {
+            if (currentLayoutDescription!!.customFieldsAdded(old)) {
                 if (!impactedViews.value.contains(currentView)) impactedViews.value += currentView
             }
             layoutManager.setCustomLayoutDescription(vm.selectedView, currentLayoutDescription!!)

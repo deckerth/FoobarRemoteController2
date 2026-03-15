@@ -31,14 +31,12 @@ data class CustomFieldList(val customFields: List<CustomField>) // for settings
 
 val standardFields: List<String> = listOf(
     "%label%", "%catalog%", "%composer%", "%album%", "%title%", "%artist%", "%album artist%",
-    "%samplerate%", "%genre%", "%discnumber%", "%track%", "%playback_time%", "%length_seconds_fp%",
-    "%filename%", "%path%"
+    "%samplerate%", "%genre%"
 )
 
 class CustomFields {
     val customFields = mutableMapOf<String, CustomField>()
     val customFieldIndex = mutableListOf<String>()
-
     val customFieldsList = mutableStateOf(CustomFieldList(listOf()))
 
     fun setCustomFields(customFieldList: CustomFieldList) {

@@ -223,4 +223,5 @@
     <string name="view_with_field_reference">The field "%1$s" appears in the layout: %2$s. Deleting the field will also remove it from this layout.</string>
     <string name="button_delete">Delete</string>
     <string name="no_custom_fields_defined">No custom fields defined.</string>
+    <string name="link_title_formatting_reference">Title formatting reference</string>
 </resources>

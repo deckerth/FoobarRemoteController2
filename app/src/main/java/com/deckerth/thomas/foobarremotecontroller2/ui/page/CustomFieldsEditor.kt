@@ -29,7 +29,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -37,16 +36,19 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.LinkAnnotation
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withLink
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
-import androidx.navigation.NavController
 import com.deckerth.thomas.foobarremotecontroller2.R
 import com.deckerth.thomas.foobarremotecontroller2.model.CustomField
+import com.deckerth.thomas.foobarremotecontroller2.ui.components.InitStyles
+import com.deckerth.thomas.foobarremotecontroller2.ui.components.mediumLinkStyle
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.ViewsWithLayout
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.layoutManager
 import com.deckerth.thomas.foobarremotecontroller2.ui.mainActivity
@@ -63,28 +65,12 @@ val JetBrainsMono = FontFamily(
 )
 
 @Composable
-fun CustomFieldsEditor(navController: NavController, vm: AppViewModel) {
+fun CustomFieldsEditor(vm: AppViewModel) {
     var displayCustomFieldsEditor by remember { mutableStateOf(false) }
     var askForRemovalOfCustomFieldFromLayouts by remember { mutableStateOf(false) }
     var fieldToEdit by remember { mutableStateOf<CustomField?>(null) }
     var fieldName by remember { mutableStateOf("") }
-    val navBackStackEntry = remember { navController.currentBackStackEntry!! }
-    val impactedViews = remember { mutableStateOf(listOf<ViewsWithLayout>()) }
 
-    // When leaving the page, trigger data updates for views with changes regarding custom fields
-    DisposableEffect(navBackStackEntry) {
-        val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_STOP || event == Lifecycle.Event.ON_DESTROY) {
-                vm.triggerDataUpdatesForViews(impactedViews.value)
-            }
-        }
-
-        navBackStackEntry.lifecycle.addObserver(observer)
-
-        onDispose {
-            navBackStackEntry.lifecycle.removeObserver(observer)
-        }
-    }
     Scaffold(
         topBar = {
         },
@@ -170,9 +156,6 @@ fun CustomFieldsEditor(navController: NavController, vm: AppViewModel) {
                         vm.customFields.removeCustomField(fieldName)
                         vm.customFields.saveCustomFieldsSetting()
                         layoutManager.removeFieldFromLayouts(fieldName)
-                        for (layout in layouts)
-                            if (!impactedViews.value.contains(layout)) impactedViews.value += layout
-
                     })
             } else {
                 askForRemovalOfCustomFieldFromLayouts = false
@@ -185,15 +168,22 @@ fun CustomFieldsEditor(navController: NavController, vm: AppViewModel) {
 }
 
 @Composable
-fun CustomFieldEditor(vm: AppViewModel, onDismiss: () -> Unit, field: CustomField? = null) {
+fun CustomFieldEditor(vm: AppViewModel, onDismiss: () -> Unit, fieldToEdit: CustomField? = null) {
     var fieldName by remember { mutableStateOf("") }
     var fieldReference by remember { mutableStateOf("") }
 
-    //checkFieldReference(vm, fieldName, fieldReference)
+    InitStyles()
+    val annotatedString = buildAnnotatedString {
+        withLink(LinkAnnotation.Url(url = "https://wiki.hydrogenaudio.org/index.php?title=Foobar2000:Title_Formatting_Reference")) {
+            withStyle(mediumLinkStyle) {
+                append(stringResource(R.string.link_title_formatting_reference))
+            }
+        }
+    }
 
-    if (field != null) {
-        fieldName = field.fieldName
-        fieldReference = field.fieldReference
+    if (fieldToEdit != null) {
+        fieldName = fieldToEdit.fieldName
+        fieldReference = fieldToEdit.fieldReference
     }
 
     AlertDialog(
@@ -209,7 +199,7 @@ fun CustomFieldEditor(vm: AppViewModel, onDismiss: () -> Unit, field: CustomFiel
         confirmButton = {
             TextButton(
                 onClick = {
-                    if (field == null)
+                    if (fieldToEdit == null)
                         vm.customFields.addCustomField(fieldReference, fieldName)
                     else
                         vm.customFields.setFieldReference(fieldName, fieldReference)
@@ -236,17 +226,29 @@ fun CustomFieldEditor(vm: AppViewModel, onDismiss: () -> Unit, field: CustomFiel
             ) {
                 OutlinedTextField(
                     value = fieldName,
-                    onValueChange = { fieldName = it; checkFieldReference(vm, fieldName, fieldReference)},
+                    onValueChange = {
+                        fieldName = it; checkFieldReference(
+                        vm,
+                        fieldName,
+                        fieldReference
+                    )
+                    },
                     label = { Text(stringResource(R.string.custom_field_name)) },
                     placeholder = { Text(stringResource(R.string.custom_field_contributor)) },
                     singleLine = true,
                     isError = errorWithName,
-                    enabled = field == null
+                    enabled = fieldToEdit == null
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 OutlinedTextField( // TODO: Help button with link to hydrogen docs
                     value = fieldReference,
-                    onValueChange = { fieldReference = it; checkFieldReference(vm, fieldName, fieldReference) },
+                    onValueChange = {
+                        fieldReference = it; checkFieldReference(
+                        vm,
+                        fieldName,
+                        fieldReference
+                    )
+                    },
                     label = { Text(stringResource(R.string.custom_field_reference)) },
                     isError = errorWithReference,
                     placeholder = { Text("%contributor%", fontFamily = JetBrainsMono) },
@@ -256,6 +258,11 @@ fun CustomFieldEditor(vm: AppViewModel, onDismiss: () -> Unit, field: CustomFiel
                     singleLine = true,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
+//                Row(modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp), horizontalArrangement = Arrangement.Center) {
+//                    Text (annotatedString)
+//                }
+                Text (modifier = Modifier.padding(bottom = 8.dp), text = annotatedString)
+
                 if (errorMessage.isNotEmpty()) {
                     Text(errorMessage, color = MaterialTheme.colorScheme.error)
                 }

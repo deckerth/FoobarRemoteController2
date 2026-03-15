@@ -32,7 +32,7 @@ import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
 @Composable
 fun TitleDetails(vm: AppViewModel, title: ITitle, onDismiss: () -> Unit) {
     val layout = layoutManager.getLayout()
-    val playerItems = layout.playerLayout.getLayoutItems(vm)
+    val playerItems = layout.playerLayout.getLayoutItems()
     val availableItemsForPlayer = getLayoutItemsFor(vm, ViewsWithLayout.PLAYER)
     val itemsNotDisplayedOnPlayer = availableItemsForPlayer.filter { item -> !playerItems.any { it.item == item.item } }
 
@@ -60,9 +60,9 @@ fun TitleDetails(vm: AppViewModel, title: ITitle, onDismiss: () -> Unit) {
                     .verticalScroll(rememberScrollState())
             ) {
                 for (item in playerItems)
-                    DisplayItemDetail(vm, title, item)
+                    DisplayItemDetail(title, item)
                 for (item in itemsNotDisplayedOnPlayer)
-                    DisplayItemDetail(vm, title, item)
+                    DisplayItemDetail(title, item)
             }
         },
         modifier = Modifier
@@ -83,7 +83,7 @@ fun TitleDetails(vm: AppViewModel, onDismiss: () -> Unit) {
 }
 
 @Composable
-fun DisplayItemDetail(vm: AppViewModel, title: ITitle, item: LayoutItems) {
+fun DisplayItemDetail(title: ITitle, item: LayoutItems) {
 
     val value = when (item.item) {
         StandardLayoutItems.TITLE -> title.title

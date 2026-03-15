@@ -15,17 +15,17 @@ data class LayoutDescription(val view: ViewsWithLayout) {
     fun getLayoutItems(vm: AppViewModel): MutableList<LayoutItems> {
         val layoutItems = mutableListOf<LayoutItems>()
         for (item in items) {
-            layoutItems.add(LayoutItems(item.item, item.customFieldReference, item.getText(vm)))
+            layoutItems.add(LayoutItems(item.item, item.customFieldName, item.getText()))
         }
         return layoutItems
     }
 
-    fun isUsedInLayout(fieldReference : String) : Boolean {
-        return items.any { it.customFieldReference == fieldReference }
+    fun isUsedInLayout(fieldName : String) : Boolean {
+        return items.any { it.customFieldName == fieldName }
     }
 
-    fun removeFieldFromLayout(fieldReference : String) {
-        items.removeIf { it.customFieldReference == fieldReference }
+    fun removeFieldFromLayout(fieldName : String) {
+        items.removeIf { it.customFieldName == fieldName }
     }
 
     fun customFieldsDiffer(other : LayoutDescription) : Boolean {

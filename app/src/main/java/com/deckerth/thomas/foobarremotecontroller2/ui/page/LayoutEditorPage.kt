@@ -225,9 +225,18 @@ fun LayoutEditorPage(
                                 text = item.sectionTitle,
                             )
                         } else if (item.layoutItem != null) {
-                            Text(
-                                text = item.layoutItem.getText(appViewModel),
-                            )
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                if (item.layoutItem.item == StandardLayoutItems.CUSTOM_FIELD) {
+                                    Icon(
+                                        painter = painterResource(R.drawable.adjust),
+                                        contentDescription = "Custom field",
+                                        modifier = Modifier.size(24.dp).padding(end = 8.dp)
+                                    )
+                                }
+                                Text(
+                                    text = item.layoutItem.getText(),
+                                )
+                            }
                             if (item.layoutItem.item != StandardLayoutItems.PROGRESS || layoutViewModel.currentView != ViewsWithLayout.PLAYER)
                                 Text(
                                     text = item.layoutItem.verbose(),

@@ -2,13 +2,12 @@ package com.deckerth.thomas.foobarremotecontroller2.ui.layout
 
 import com.deckerth.thomas.foobarremotecontroller2.R
 import com.deckerth.thomas.foobarremotecontroller2.ui.mainActivity
-import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class LayoutItem(
     val item: StandardLayoutItems = StandardLayoutItems.UNDEFINED,  // enable anonymous constructor
-    val customFieldReference: String = "",
+    val customFieldName: String = "",
     var itemSize: ItemSize = ItemSize.UNDEFINED,
     var italic: Boolean = false,
     var bold: Boolean = false,
@@ -40,9 +39,9 @@ data class LayoutItem(
         }
     }
 
-    fun getText(vm : AppViewModel) : String {
+    fun getText() : String {
         return if (item == StandardLayoutItems.CUSTOM_FIELD) {
-            vm.customFields.get(customFieldReference)?.fieldName?: ""
+            customFieldName
         } else {
             item.text
         }

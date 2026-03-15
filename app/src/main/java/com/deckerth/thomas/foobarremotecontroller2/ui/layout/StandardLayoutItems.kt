@@ -54,7 +54,7 @@ enum class StandardLayoutItems(
 
 class LayoutItems(
     val item: StandardLayoutItems,
-    val customFieldReference: String,
+    val customFieldName: String,
     val text: String
 )
 
@@ -82,7 +82,7 @@ fun getLayoutItemsFor(vm: AppViewModel, viewWithLayout: ViewsWithLayout): List<L
         entries.add(
             LayoutItems(
                 StandardLayoutItems.CUSTOM_FIELD,
-                field.value.fieldReference,
+                field.value.fieldName,
                 field.value.fieldName))
     }
 

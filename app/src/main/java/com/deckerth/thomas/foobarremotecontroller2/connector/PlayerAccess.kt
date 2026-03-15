@@ -41,7 +41,7 @@ class PlayerAccess(private val vm: AppViewModel) {
 
     fun getColumnList(withPath: Boolean): String {
         val standardPath =  if (withPath) columnListWithPath else columnListWithoutPath
-        return standardPath + vm.customFields.getEscapedColumnList()
+        return standardPath + vm.customFields.getEncodedColumnList()
     }
 
     fun parsePlayerState(usedIpAddress: String, contentObject: JSONObject) {

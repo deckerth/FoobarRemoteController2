@@ -5,9 +5,11 @@ import com.deckerth.thomas.foobarremotecontroller2.R
 import com.deckerth.thomas.foobarremotecontroller2.saveCustomFields
 import com.deckerth.thomas.foobarremotecontroller2.ui.mainActivity
 import kotlinx.serialization.Serializable
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 
 @Serializable
-data class CustomField(val fieldReference: String, val fieldName: String)
+data class CustomField(var fieldReference: String, val fieldName: String)
 @Serializable
 data class CustomFieldList(val customFields: List<CustomField>) // for settings
 
@@ -70,23 +72,32 @@ class CustomFields {
     }
 
     private fun convertToReference(fieldReference: String): String {
-        var correctedFieldRef = fieldReference
-        if (!correctedFieldRef.startsWith("%")) correctedFieldRef = "%$correctedFieldRef"
-        if (!correctedFieldRef.endsWith("%")) correctedFieldRef = "${correctedFieldRef}%"
+        var correctedFieldRef = fieldReference.trim()
+        if (!correctedFieldRef.startsWith("$")) {
+            if (!correctedFieldRef.startsWith("%"))
+                correctedFieldRef = "%$correctedFieldRef"
+            if (!correctedFieldRef.endsWith("%")) correctedFieldRef = "${correctedFieldRef}%"
+        }
         return correctedFieldRef
     }
 
     fun addCustomField(fieldReference: String, fieldName: String, updateList: Boolean = true) {
         val correctedFieldRef = convertToReference(fieldReference)
-        if (customFields.containsKey(correctedFieldRef)) return
-        customFields[correctedFieldRef] = CustomField(correctedFieldRef, fieldName)
-        customFieldIndex.add(correctedFieldRef)
+        if (customFields.containsKey(fieldName)) return
+        customFields[fieldName] = CustomField(correctedFieldRef, fieldName)
+        customFieldIndex.add(fieldName)
         if (updateList) initCustomFieldList()
     }
 
-    fun removeCustomField(fieldReference: String) {
-        customFields.remove(fieldReference)
-        customFieldIndex.remove(fieldReference)
+    fun setFieldReference(fieldName: String, fieldReference: String) {
+        if (!customFields.containsKey(fieldName)) return
+        val correctedFieldRef = convertToReference(fieldReference)
+        customFields[fieldName]!!.fieldReference = correctedFieldRef
+    }
+
+    fun removeCustomField(fieldName: String) {
+        customFields.remove(fieldName)
+        customFieldIndex.remove(fieldName)
         initCustomFieldList()
     }
 
@@ -99,24 +110,24 @@ class CustomFields {
         return standardFields.contains(convertToReference(fieldReference))
     }
 
-    fun hasField(fieldReference: String): Boolean {
-        return customFields.containsKey(convertToReference(fieldReference))
+    fun hasField(fieldName: String): Boolean {
+        return customFields.containsKey(fieldName)
     }
 
     fun get(index: Int): CustomField? {
         return if (index >= customFields.size) null else customFields[customFieldIndex[index]]
     }
 
-    fun get(fieldReference: String): CustomField? {
-        return customFields[fieldReference]
+    fun get(fieldName: String): CustomField? {
+        return customFields[fieldName]
     }
 
-    fun getEscapedColumnList(): String {
+    fun getEncodedColumnList(): String {
         var columnList = ""
         for (i in 0 until customFieldIndex.size) {
             columnList += "," + customFields[customFieldIndex[i]]!!.fieldReference
         }
-        return columnList
+        return URLEncoder.encode(columnList, StandardCharsets.UTF_8.toString())
     }
 
     fun getMockedContent(): CustomFieldsContent {
@@ -133,7 +144,7 @@ class CustomFieldsContent {
 
     fun setCustomFieldContent(field: CustomField?, value: String) {
         if (field != null) {
-            customFieldsContent[field.fieldReference] = value
+            customFieldsContent[field.fieldName] = value
         }
     }
 
@@ -146,8 +157,8 @@ class CustomFieldsContent {
         return false
     }
 
-    fun getText(fieldReference: String): String {
-        return customFieldsContent[fieldReference] ?: ""
+    fun getContent(fieldName: String): String {
+        return customFieldsContent[fieldName] ?: ""
     }
 }
 

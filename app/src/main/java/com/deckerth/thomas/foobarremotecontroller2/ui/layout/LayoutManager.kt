@@ -110,13 +110,13 @@ class LayoutManager  {
         }
     }
 
-    fun getViewModesWith(fieldReference : String) : List<ViewsWithLayout> {
-        return customLayout?.getViewModesWith(fieldReference) ?: emptyList()
+    fun getViewModesWith(fieldName : String) : List<ViewsWithLayout> {
+        return customLayout?.getViewModesWith(fieldName) ?: emptyList()
     }
 
-    fun removeFieldFromLayouts(fieldReference : String) {
+    fun removeFieldFromLayouts(fieldName : String) {
         if (customLayout == null) return
-        customLayout!!.removeFieldFromLayouts(fieldReference)
+        customLayout!!.removeFieldFromLayouts(fieldName)
         saveCustomLayout(mainActivity!!.baseContext, customLayout!!)
     }
 

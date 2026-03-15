@@ -1,6 +1,7 @@
 package com.deckerth.thomas.foobarremotecontroller2.ui.page
 
 import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -36,12 +37,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.navigation.NavController
 import com.deckerth.thomas.foobarremotecontroller2.R
+import com.deckerth.thomas.foobarremotecontroller2.model.CustomField
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.ViewsWithLayout
 import com.deckerth.thomas.foobarremotecontroller2.ui.layout.layoutManager
 import com.deckerth.thomas.foobarremotecontroller2.ui.mainActivity
@@ -49,12 +54,20 @@ import com.deckerth.thomas.foobarremotecontroller2.ui.theme.Foobar2000RemoteCont
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
 
 private var errorMessage by mutableStateOf("")
+private var errorWithName by mutableStateOf(false)
+private var errorWithReference by mutableStateOf(false)
+
+
+val JetBrainsMono = FontFamily(
+    Font(R.font.jetbrains_mono, FontWeight.Normal)
+)
 
 @Composable
 fun CustomFieldsEditor(navController: NavController, vm: AppViewModel) {
     var displayCustomFieldsEditor by remember { mutableStateOf(false) }
     var askForRemovalOfCustomFieldFromLayouts by remember { mutableStateOf(false) }
-    var fieldReference by remember { mutableStateOf("") }
+    var fieldToEdit by remember { mutableStateOf<CustomField?>(null) }
+    var fieldName by remember { mutableStateOf("") }
     val navBackStackEntry = remember { navController.currentBackStackEntry!! }
     val impactedViews = remember { mutableStateOf(listOf<ViewsWithLayout>()) }
 
@@ -98,17 +111,21 @@ fun CustomFieldsEditor(navController: NavController, vm: AppViewModel) {
                             .animateContentSize()
                             .fillMaxWidth()
                             .padding(vertical = 8.dp, horizontal = 16.dp)
+                            .clickable(onClick = {
+                                fieldToEdit = it
+                                displayCustomFieldsEditor = true
+                            })
                     ) {
                         Row(Modifier.padding(8.dp)) {
                             Column(modifier = Modifier.weight(1f)) {
                                 Text(
                                     text = it.fieldName,
-                                    style = MaterialTheme.typography.bodyMedium
+                                    style = MaterialTheme.typography.titleMedium
                                 )
-                                Text(it.fieldReference)
+                                Text(it.fieldReference, fontFamily = JetBrainsMono)
                             }
                             IconButton(onClick = {
-                                fieldReference = it.fieldReference
+                                fieldName = it.fieldName
                                 askForRemovalOfCustomFieldFromLayouts = true
                             }) {
                                 Icon(
@@ -134,31 +151,50 @@ fun CustomFieldsEditor(navController: NavController, vm: AppViewModel) {
             { Icon(Icons.Default.Add, "Add field") }
         }
         if (displayCustomFieldsEditor) {
-            CustomFieldEditor(vm, onDismiss = { displayCustomFieldsEditor = false })
+            CustomFieldEditor(vm, onDismiss = {
+                displayCustomFieldsEditor = false
+                errorWithName = false
+                errorWithReference = false
+                errorMessage = ""
+                fieldToEdit = null
+            }, fieldToEdit)
         }
         if (askForRemovalOfCustomFieldFromLayouts) {
-            val layouts = layoutManager.getViewModesWith(fieldReference)
+            val layouts = layoutManager.getViewModesWith(fieldName)
             if (!layouts.isEmpty()) {
                 AskForRemovalOfCustomFieldFromLayouts(
-                    fieldReference, layouts,
+                    fieldName, layouts,
                     onDismiss = { askForRemovalOfCustomFieldFromLayouts = false },
                     onConfirm = {
                         askForRemovalOfCustomFieldFromLayouts = false
-                        layoutManager.removeFieldFromLayouts(fieldReference)
-                        vm.customFields.removeCustomField(fieldReference)
+                        vm.customFields.removeCustomField(fieldName)
                         vm.customFields.saveCustomFieldsSetting()
+                        layoutManager.removeFieldFromLayouts(fieldName)
                         for (layout in layouts)
                             if (!impactedViews.value.contains(layout)) impactedViews.value += layout
+
                     })
+            } else {
+                askForRemovalOfCustomFieldFromLayouts = false
+                vm.customFields.removeCustomField(fieldName)
+                vm.customFields.saveCustomFieldsSetting()
             }
+            vm.customFields.saveCustomFieldsSetting()
         }
     }
 }
 
 @Composable
-fun CustomFieldEditor(vm: AppViewModel, onDismiss: () -> Unit) {
+fun CustomFieldEditor(vm: AppViewModel, onDismiss: () -> Unit, field: CustomField? = null) {
     var fieldName by remember { mutableStateOf("") }
     var fieldReference by remember { mutableStateOf("") }
+
+    //checkFieldReference(vm, fieldName, fieldReference)
+
+    if (field != null) {
+        fieldName = field.fieldName
+        fieldReference = field.fieldReference
+    }
 
     AlertDialog(
         onDismissRequest = { onDismiss() },
@@ -173,11 +209,14 @@ fun CustomFieldEditor(vm: AppViewModel, onDismiss: () -> Unit) {
         confirmButton = {
             TextButton(
                 onClick = {
-                    vm.customFields.addCustomField(fieldReference, fieldName)
+                    if (field == null)
+                        vm.customFields.addCustomField(fieldReference, fieldName)
+                    else
+                        vm.customFields.setFieldReference(fieldName, fieldReference)
                     vm.customFields.saveCustomFieldsSetting()
                     onDismiss()
                 },
-                enabled = checkFieldReference(vm, fieldReference)
+                enabled = !errorWithReference && !errorWithName && fieldReference.isNotEmpty() && fieldName.isNotEmpty()
             ) {
                 Text(
                     stringResource(R.string.button_save),
@@ -197,20 +236,25 @@ fun CustomFieldEditor(vm: AppViewModel, onDismiss: () -> Unit) {
             ) {
                 OutlinedTextField(
                     value = fieldName,
-                    onValueChange = { fieldName = it },
+                    onValueChange = { fieldName = it; checkFieldReference(vm, fieldName, fieldReference)},
                     label = { Text(stringResource(R.string.custom_field_name)) },
-                    placeholder = { Text(stringResource(R.string.custom_field_contributor)) }
+                    placeholder = { Text(stringResource(R.string.custom_field_contributor)) },
+                    singleLine = true,
+                    isError = errorWithName,
+                    enabled = field == null
                 )
                 Spacer(modifier = Modifier.height(8.dp))
-                OutlinedTextField(
+                OutlinedTextField( // TODO: Help button with link to hydrogen docs
                     value = fieldReference,
-                    onValueChange = { fieldReference = it },
+                    onValueChange = { fieldReference = it; checkFieldReference(vm, fieldName, fieldReference) },
                     label = { Text(stringResource(R.string.custom_field_reference)) },
-                    isError = !checkFieldReference(
-                        vm,
-                        fieldReference
-                    ) && errorMessage.isNotEmpty(),
-                    placeholder = { Text("%contributor%") }
+                    isError = errorWithReference,
+                    placeholder = { Text("%contributor%", fontFamily = JetBrainsMono) },
+                    textStyle = MaterialTheme.typography.bodyMedium.copy(
+                        fontFamily = JetBrainsMono
+                    ),
+                    singleLine = true,
+                    modifier = Modifier.padding(bottom = 8.dp)
                 )
                 if (errorMessage.isNotEmpty()) {
                     Text(errorMessage, color = MaterialTheme.colorScheme.error)
@@ -221,23 +265,30 @@ fun CustomFieldEditor(vm: AppViewModel, onDismiss: () -> Unit) {
     )
 }
 
-private fun checkFieldReference(vm: AppViewModel, fieldReference: String): Boolean {
-    if (fieldReference.isEmpty()) return false
-    if (vm.customFields.iaStandardField(fieldReference)) {
-        errorMessage = mainActivity!!.baseContext.getString(R.string.error_standard_field)
-        return false
-    }
-    if (vm.customFields.hasField(fieldReference)) {
-        errorMessage = mainActivity!!.baseContext.getString(R.string.error_duplicate_field)
-        return false
-    }
+private fun checkFieldReference(
+    vm: AppViewModel,
+    fieldName: String,
+    fieldReference: String
+): Boolean {
+    errorWithName = false
+    errorWithReference = false
     errorMessage = ""
+    if (!fieldReference.isEmpty() && vm.customFields.iaStandardField(fieldReference)) {
+        errorMessage = mainActivity!!.baseContext.getString(R.string.error_standard_field)
+        errorWithReference = true
+        return false
+    }
+    if (!fieldName.isEmpty() && vm.customFields.hasField(fieldName)) {
+        errorMessage = mainActivity!!.baseContext.getString(R.string.error_duplicate_field)
+        errorWithName = true
+        return false
+    }
     return true
 }
 
 @Composable
 fun AskForRemovalOfCustomFieldFromLayouts(
-    fieldReference: String,
+    fieldName: String,
     layouts: List<ViewsWithLayout>,
     onDismiss: () -> Unit,
     onConfirm: () -> Unit = {}
@@ -249,9 +300,9 @@ fun AskForRemovalOfCustomFieldFromLayouts(
 
     val usages =
         if (layouts.size == 1)
-            stringResource(R.string.view_with_field_reference, fieldReference, views)
+            stringResource(R.string.view_with_field_reference, fieldName, views)
         else
-            stringResource(R.string.views_with_field_reference, fieldReference, views)
+            stringResource(R.string.views_with_field_reference, fieldName, views)
     val question = stringResource(R.string.ask_for_removal_of_custom_field_from_layouts)
 
     AlertDialog(

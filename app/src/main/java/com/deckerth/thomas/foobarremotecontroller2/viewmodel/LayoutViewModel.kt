@@ -160,7 +160,7 @@ class LayoutViewModel(private val vm: AppViewModel) : ViewModel() {
                     i,
                     LayoutItem(
                         item.item,
-                        item.customFieldReference,
+                        item.customFieldName,
                         itemSize = if (item.item == StandardLayoutItems.ARTWORK) ItemSize.MEDIUM_COVER else ItemSize.BODY_MEDIUM
                     )
                 )

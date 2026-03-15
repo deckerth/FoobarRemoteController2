@@ -95,7 +95,7 @@ fun DisplayItemDetail(vm: AppViewModel, title: ITitle, item: LayoutItems) {
         StandardLayoutItems.LABEL -> title.label
         StandardLayoutItems.SAMPLE_RATE -> title.sampleRate + " Hz"
         StandardLayoutItems.GENRE -> title.genre
-        StandardLayoutItems.CUSTOM_FIELD -> title.customFields.getText(item.customFieldReference)
+        StandardLayoutItems.CUSTOM_FIELD -> title.customFields.getContent(item.customFieldName)
         else -> ""
     }
 

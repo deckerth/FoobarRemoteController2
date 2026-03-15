@@ -73,7 +73,7 @@ fun LayoutComponent(vm: AppViewModel, playerViewModel: PlayerViewModel, layoutIt
                 TextComponent(text = playerViewModel.composer, item = layoutItem)
             }
         StandardLayoutItems.CUSTOM_FIELD -> {
-            TextComponent(text = playerViewModel.customFields.getText(layoutItem.customFieldReference), item = layoutItem)
+            TextComponent(text = playerViewModel.customFields.getContent(layoutItem.customFieldName), item = layoutItem)
         }
 
         else -> Text("UNKNOWN ITEM")
@@ -110,7 +110,7 @@ fun LayoutComponent(vm: AppViewModel, album: Album, layoutItem: LayoutItem, albu
 
         }
         StandardLayoutItems.CUSTOM_FIELD ->
-            TextComponent(text = album.originalTitle.customFields.getText(layoutItem.customFieldReference), item = layoutItem)
+            TextComponent(text = album.originalTitle.customFields.getContent(layoutItem.customFieldName), item = layoutItem)
 
         else -> Text("UNKNOWN ITEM")
     }
@@ -154,7 +154,7 @@ fun LayoutComponent(vm: PlayerViewModel, album: Album, title: ITitle, checkArtis
             )
         }
         StandardLayoutItems.CUSTOM_FIELD ->
-            TextComponent(text = title.customFields.getText(layoutItem.customFieldReference), item = layoutItem)
+            TextComponent(text = title.customFields.getContent(layoutItem.customFieldName), item = layoutItem)
 
         else -> Text("UNKNOWN ITEM")
     }

@@ -12,9 +12,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class BrowserViewModel(private val vm : AppViewModel) : ViewModel() {
+class BrowserViewModel(private val vm: AppViewModel) : ViewModel() {
 
-    private var filesystem = mutableStateOf(MusicDirectory(vm,"ROOT", "", "NULL"))
+    private var filesystem = mutableStateOf(MusicDirectory(vm, "ROOT", "", "NULL"))
     private var currentPath = mutableStateOf("")
     var loadingData = mutableStateOf(false)
     private var directories = HashMap<String, MusicDirectory>()
@@ -26,6 +26,10 @@ class BrowserViewModel(private val vm : AppViewModel) : ViewModel() {
 
     fun setCurrentPath(path: String) {
         currentPath.value = path
+    }
+
+    fun reset() {
+        directories[""]?.setIsAdded(false)
     }
 
     fun getDirectory(): MusicDirectory {
@@ -46,7 +50,7 @@ class BrowserViewModel(private val vm : AppViewModel) : ViewModel() {
                         if (entry is MusicDirectory && !entry.isParentDirectory())
                             withContext(Dispatchers.Main) { directories[entry.path] = entry }
                     withContext(Dispatchers.Main) { loadingData.value = false }
-                } catch (e: Exception) {
+                } catch (_: Exception) {
                     withContext(Dispatchers.Main) { loadingData.value = false }
                 }
             }

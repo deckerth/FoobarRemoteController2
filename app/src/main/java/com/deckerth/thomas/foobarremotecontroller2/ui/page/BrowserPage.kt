@@ -187,8 +187,7 @@ fun DirectoryEntry(
                     println("FOOB BrowserPage navigating to ${entry.path}")
                     if (entry.isParentDirectory())
                         navController.popBackStack()
-                    else
-                        navController.navigate("${Screen.Directory.ROUTE_TEMPLATE}${entry.path}")
+                    else navController.navigate("${Screen.Directory.ROUTE_TEMPLATE}${entry.path}")
                 }
             if (entry.isDirectory())
                 Icon(

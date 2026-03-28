@@ -59,6 +59,7 @@ fun RootScreen(vm: AppViewModel, navController: NavHostController) {
     // Display root directory contents
     // Use navController.navigate() to navigate to subdirectories or files
 
+    vm.browserViewModel.reset()  // reset isAdded-Flags
     vm.browserViewModel.setCurrentPath("")
     BrowserPage(vm, navController)
 }

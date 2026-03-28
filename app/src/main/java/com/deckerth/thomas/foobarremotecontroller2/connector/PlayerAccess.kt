@@ -137,6 +137,7 @@ class PlayerAccess(private val vm: AppViewModel) {
                     activeItemObject.getString("duration"),
                     activeItemObject.getString("position"),
                     imageURL,
+                    columns.getString(13),
                     playbackState,
                     PlaybackMode.entries[playerObject.getInt("playbackMode")],
                     usedIpAddress, false,
@@ -144,6 +145,7 @@ class PlayerAccess(private val vm: AppViewModel) {
                 )
             } else {
                 vm.playerViewModel.update(
+                    "",
                     "",
                     "",
                     "",

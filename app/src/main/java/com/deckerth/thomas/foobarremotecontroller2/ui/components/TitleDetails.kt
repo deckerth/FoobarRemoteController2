@@ -95,6 +95,9 @@ fun DisplayItemDetail(title: ITitle, item: LayoutItems) {
         StandardLayoutItems.LABEL -> title.label
         StandardLayoutItems.SAMPLE_RATE -> title.sampleRate + " Hz"
         StandardLayoutItems.GENRE -> title.genre
+        StandardLayoutItems.TRACK -> title.discNumberTrack
+        StandardLayoutItems.DURATION -> title.getNiceDuration()
+        StandardLayoutItems.PATH -> title.path
         StandardLayoutItems.CUSTOM_FIELD -> title.customFields.getContent(item.customFieldName)
         else -> ""
     }

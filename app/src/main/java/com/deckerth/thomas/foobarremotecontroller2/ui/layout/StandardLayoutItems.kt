@@ -11,7 +11,9 @@ Required steps when adding new metadata fields:
 2. add the field to the ITitle interface
 3. adapt the Title class accordingly (also matches())
 4. add the field to PlayerViewModel
-5. adjust the classes QueryAccess, PlayerAccess (in particular columnsWithPath..) and PlaylistAccess. Pay attention to computation of effectiveTitle
+5. adjust the classes QueryAccess, PlayerAccess (in particular columnsWithPath..) and PlaylistAccess.
+   Pay attention to computation of effectiveTitle
+   Adjust DisplayItemDetail (TitleDetails)
 6. extend LayoutComponent
 7. adapt the example objects in LayoutPreviewPage
 8. extend TitleDetails with the new field (DisplayItemDetail)
@@ -48,6 +50,11 @@ enum class StandardLayoutItems(
         onPlayer = false
     ),
     SAMPLE_RATE(mainActivity!!.baseContext.getString(R.string.layout_item_samplerate)),
+
+    TRACK(mainActivity!!.baseContext.getString(R.string.layout_item_track)),
+    DURATION(mainActivity!!.baseContext.getString(R.string.layout_item_duration)),
+    PATH(mainActivity!!.baseContext.getString(R.string.layout_item_path)),
+
     CUSTOM_FIELD("CUSTOM_FIELD", onTitle = false, onAlbum = false, onPlayer = false),
     UNDEFINED("UNDEFINED", onTitle = false, onAlbum = false, onPlayer = false)
 }

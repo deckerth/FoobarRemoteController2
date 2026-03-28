@@ -36,7 +36,7 @@ fun getTextStyle(itemSize: ItemSize): TextStyle {
 
 @Composable
 fun TextComponent(text: String, item: LayoutItem) {
-    if (text == "") return
+    if (text == "" || text == "?") return
     Text(
         modifier = Modifier
             .fillMaxWidth(),
@@ -72,6 +72,10 @@ fun LayoutComponent(vm: AppViewModel, playerViewModel: PlayerViewModel, layoutIt
             if (playerViewModel.composer != "" && playerViewModel.composer != "?") {
                 TextComponent(text = playerViewModel.composer, item = layoutItem)
             }
+        StandardLayoutItems.TRACK -> TextComponent(text = playerViewModel.getNiceTrack(), item = layoutItem)
+        StandardLayoutItems.DURATION -> TextComponent(text = playerViewModel.getNiceDuration(), item = layoutItem)
+        StandardLayoutItems.PATH -> TextComponent(text = playerViewModel.path, item = layoutItem)
+
         StandardLayoutItems.CUSTOM_FIELD -> {
             TextComponent(text = playerViewModel.customFields.getContent(layoutItem.customFieldName), item = layoutItem)
         }
@@ -99,6 +103,10 @@ fun LayoutComponent(vm: AppViewModel, album: Album, layoutItem: LayoutItem, albu
             if (album.originalTitle.composer != "" && album.originalTitle.composer != "?") {
                 TextComponent(text = album.originalTitle.composer, item = layoutItem)
             }
+        StandardLayoutItems.TRACK -> TextComponent(text = album.originalTitle.discNumberTrack, item = layoutItem)
+        StandardLayoutItems.DURATION -> TextComponent(text = album.originalTitle.getNiceDuration(), item = layoutItem)
+        StandardLayoutItems.PATH -> TextComponent(text = album.originalTitle.path, item = layoutItem)
+
         StandardLayoutItems.PROGRESS -> if (albumIsCurrentlyPlaying) {
             val wavy = when (layoutItem.progressBarFormat) {
                 ProgressBarFormat.WAVY_WHEN_PLAYING -> vm.playerViewModel.playbackState == PlaybackState.PLAYING
@@ -139,6 +147,10 @@ fun LayoutComponent(vm: PlayerViewModel, album: Album, title: ITitle, checkArtis
             if (title.composer != "" && title.composer != "?") {
                 TextComponent(text = title.composer, item = layoutItem)
             }
+        StandardLayoutItems.TRACK -> TextComponent(text = title.discNumberTrack, item = layoutItem)
+        StandardLayoutItems.DURATION -> TextComponent(text = title.getNiceDuration(), item = layoutItem)
+        StandardLayoutItems.PATH -> TextComponent(text = title.path, item = layoutItem)
+
         StandardLayoutItems.PROGRESS -> if (titleIsCurrentlyPlaying) {
             val wavy = when (layoutItem.progressBarFormat) {
                 ProgressBarFormat.WAVY_WHEN_PLAYING -> vm.playbackState == PlaybackState.PLAYING

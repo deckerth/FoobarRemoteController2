@@ -34,9 +34,12 @@ public interface ITitle {
 
     String getTrack();
 
+    String getDiscNumberTrack();
+
     String getPlaybackTime();
 
     Double getDuration();
+    String getNiceDuration();
 
     Double getPosition();
 

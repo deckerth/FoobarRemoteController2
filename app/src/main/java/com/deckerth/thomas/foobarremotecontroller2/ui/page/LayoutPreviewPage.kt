@@ -46,7 +46,8 @@ private fun setupPreviewPlaylist() {
             "0:50",
             "232.2",
             "51.080651833333334",
-            R.drawable.cover_abba.toString(), ""
+            R.drawable.cover_abba.toString(),
+            "M:\\music\\Polydor\\517 007-2\\01.flac"
         )
     )
     previewPlaylist.addTitle(
@@ -67,7 +68,8 @@ private fun setupPreviewPlaylist() {
             "0:53",
             "125.1700625",
             "53.58589853333333",
-            R.drawable.cover_tosca.toString(), ""
+            R.drawable.cover_tosca.toString(),
+            "M:\\music\\Decca\\421 670-2\\01.flac"
         )
     )
     previewPlaylist.albums[0].isExpanded = true

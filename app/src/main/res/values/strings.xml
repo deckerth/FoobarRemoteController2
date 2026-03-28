@@ -224,4 +224,10 @@
     <string name="button_delete">Delete</string>
     <string name="no_custom_fields_defined">No custom fields defined.</string>
     <string name="link_title_formatting_reference">Title formatting reference</string>
+    <string name="layout_item_track">Track</string>
+    <string name="layout_item_disc_number">Disc number</string>
+    <string name="layout_item_playback_time">Playback time</string>
+    <string name="layout_item_duration">Duration</string>
+    <string name="layout_item_filename">Filename</string>
+    <string name="layout_item_path">Path</string>
 </resources>

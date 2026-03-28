@@ -1,5 +1,6 @@
 package com.deckerth.thomas.foobarremotecontroller2.model;
 
+import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 
 import androidx.annotation.NonNull;
@@ -157,6 +158,13 @@ public class Title implements ITitle {
     }
 
     @Override
+    public String getDiscNumberTrack() {
+        if (!mDiscNumber.isBlank() && !mDiscNumber.equals("?"))
+            return mDiscNumber + ":" + mTrack;
+        else return mTrack;
+    }
+
+    @Override
     public String getPlaybackTime() {
         return mPlaybackTime;
     }
@@ -164,6 +172,19 @@ public class Title implements ITitle {
     @Override
     public Double getDuration() {
         return mDuration;
+    }
+
+    @Override
+    @SuppressLint("DefaultLocale")
+    public String getNiceDuration() {
+        try {
+            int duration = mDuration.intValue();
+            int minutes = duration / 60;
+            int seconds = duration % 60;
+            return String.format("%01d:%02d", minutes, seconds);
+        } catch (NumberFormatException e) {
+            return "";
+        }
     }
 
     @Override

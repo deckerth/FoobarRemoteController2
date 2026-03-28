@@ -50,6 +50,7 @@ class PlayerViewModel : ViewModel() {
     var duration by mutableStateOf("")
     var position by mutableStateOf("")
     var artworkUrl by mutableStateOf("")
+    var path by mutableStateOf("")
     var playbackState by mutableStateOf(PlaybackState.STOPPED)
     var playbackMode by mutableStateOf(PlaybackMode.DEFAULT)
     var ipAddress by mutableStateOf("")
@@ -79,6 +80,7 @@ class PlayerViewModel : ViewModel() {
         duration: String,
         position: String,
         artworkUrl: String,
+        path: String,
         playbackState: PlaybackState,
         playbackMode: PlaybackMode,
         ipAddress: String,
@@ -103,6 +105,7 @@ class PlayerViewModel : ViewModel() {
         this.duration = duration
         this.position = position
         this.artworkUrl = artworkUrl
+        this.path = path
         this.playbackState = playbackState
         this.playbackMode = playbackMode
         this.ipAddress = ipAddress
@@ -215,5 +218,11 @@ class PlayerViewModel : ViewModel() {
         } catch (_: NumberFormatException) {
             0f
         }
+    }
+
+    fun getNiceTrack():String{
+        return if (discNumber.isNotBlank() && discNumber != "?")
+            "$discNumber:$track"
+        else track
     }
 }

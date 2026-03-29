@@ -151,23 +151,12 @@ class PlaylistAccess(private val vm: AppViewModel) {
                 val track = columnsArray.getString(10)
                 val length = columnsArray.getString(11)
                 val duration = columnsArray.getString(12)
-                var path = ""
+                val path = ""
 
-                // %title%
-                // Title of the track. If "title" metadata field is missing, ___file name is used instead___.
                 // For a SHOUTcast stream which contains metadata,
                 // it is the StreamTitle after the first "-" character.
                 //
                 // Do not display the title if the title was replaced by the filename by foobar
-
-                var filename: String
-                if (withPaths) {
-                    path = columnsArray.getString(13)
-                    filename = getFilenameWithoutExtension(path)
-                } else
-                    filename = columnsArray.getString(13)
-                var effectiveTitle = ""
-                if (!title.equals(filename)) effectiveTitle = title
 
                 val customFieldsContent = CustomFieldsContent()
                 if (columnsArray.length() > 13) {
@@ -189,7 +178,7 @@ class PlaylistAccess(private val vm: AppViewModel) {
                         catalog,
                         composer,
                         album,
-                        effectiveTitle,
+                        title,
                         artist,
                         albumArtist,
                         samplerRate,

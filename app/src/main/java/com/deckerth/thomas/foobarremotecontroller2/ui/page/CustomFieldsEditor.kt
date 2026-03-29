@@ -230,7 +230,8 @@ fun CustomFieldEditor(vm: AppViewModel, onDismiss: () -> Unit, fieldToEdit: Cust
                         fieldName = it; checkFieldReference(
                         vm,
                         fieldName,
-                        fieldReference
+                        fieldReference,
+                        fieldToEdit == null
                     )
                     },
                     label = { Text(stringResource(R.string.custom_field_name)) },
@@ -240,13 +241,14 @@ fun CustomFieldEditor(vm: AppViewModel, onDismiss: () -> Unit, fieldToEdit: Cust
                     enabled = fieldToEdit == null
                 )
                 Spacer(modifier = Modifier.height(8.dp))
-                OutlinedTextField( // TODO: Help button with link to hydrogen docs
+                OutlinedTextField(
                     value = fieldReference,
                     onValueChange = {
                         fieldReference = it; checkFieldReference(
                         vm,
                         fieldName,
-                        fieldReference
+                        fieldReference,
+                        fieldToEdit == null
                     )
                     },
                     label = { Text(stringResource(R.string.custom_field_reference)) },
@@ -261,7 +263,7 @@ fun CustomFieldEditor(vm: AppViewModel, onDismiss: () -> Unit, fieldToEdit: Cust
 //                Row(modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp), horizontalArrangement = Arrangement.Center) {
 //                    Text (annotatedString)
 //                }
-                Text (modifier = Modifier.padding(bottom = 8.dp), text = annotatedString)
+                Text(modifier = Modifier.padding(bottom = 8.dp), text = annotatedString)
 
                 if (errorMessage.isNotEmpty()) {
                     Text(errorMessage, color = MaterialTheme.colorScheme.error)
@@ -275,17 +277,18 @@ fun CustomFieldEditor(vm: AppViewModel, onDismiss: () -> Unit, fieldToEdit: Cust
 private fun checkFieldReference(
     vm: AppViewModel,
     fieldName: String,
-    fieldReference: String
+    fieldReference: String,
+    checkFieldName: Boolean
 ): Boolean {
     errorWithName = false
     errorWithReference = false
     errorMessage = ""
-    if (!fieldReference.isEmpty() && vm.customFields.iaStandardField(fieldReference)) {
+    if (!fieldReference.isEmpty() && vm.customFields.isStandardField(fieldReference)) {
         errorMessage = mainActivity!!.baseContext.getString(R.string.error_standard_field)
         errorWithReference = true
         return false
     }
-    if (!fieldName.isEmpty() && vm.customFields.hasField(fieldName)) {
+    if (checkFieldName && !fieldName.isEmpty() && vm.customFields.hasField(fieldName)) {
         errorMessage = mainActivity!!.baseContext.getString(R.string.error_duplicate_field)
         errorWithName = true
         return false

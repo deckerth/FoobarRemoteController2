@@ -91,6 +91,8 @@ class CustomFields {
         if (!customFields.containsKey(fieldName)) return
         val correctedFieldRef = convertToReference(fieldReference)
         customFields[fieldName]!!.fieldReference = correctedFieldRef
+        customFieldsList.value = CustomFieldList( listOf()) // clear list to enforce update of LazyList
+        initCustomFieldList()
     }
 
     fun removeCustomField(fieldName: String) {
@@ -104,7 +106,7 @@ class CustomFields {
         saveCustomFields(mainActivity!!, customFieldList)
     }
 
-    fun iaStandardField(fieldReference: String): Boolean {
+    fun isStandardField(fieldReference: String): Boolean {
         return standardFields.contains(convertToReference(fieldReference))
     }
 

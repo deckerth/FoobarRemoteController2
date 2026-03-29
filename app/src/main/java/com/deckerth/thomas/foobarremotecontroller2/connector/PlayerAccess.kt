@@ -25,7 +25,7 @@ class PlayerAccess(private val vm: AppViewModel) {
     //    2 %25catalog%25,
     //    3 %25composer%25,
     //    4 %25album%25,
-    //    5 %25title%25,
+    //    5 %24meta%28title%29,  = $meta(title)
     //    6 %25artist%25,
     //    7 %25album artist%25,
     //    8 %25samplerate%25,
@@ -34,10 +34,10 @@ class PlayerAccess(private val vm: AppViewModel) {
     //    11 %25track%25,
     //    12 %25playback_time%25,
     //    13 %25length_seconds_fp%25,
-    //    14 %24filename%28%25path%25%29%24&" becomes:$filename(%path%) / %25path%25%
+    //    14 %24filename%28%25path%25%29" becomes:$filename(%path%) or %25path%25%
 
-    private val columnListWithoutPath  = "%25label%25,%25catalog%25,%25composer%25,%25album%25,%25title%25,%25artist%25,%25album artist%25,%25samplerate%25,%25genre%25,%25discnumber%25,%25track%25,%25playback_time%25,%25length_seconds_fp%25,%24filename%28%25path%25%29%24"
-    private val columnListWithPath     = "%25label%25,%25catalog%25,%25composer%25,%25album%25,%25title%25,%25artist%25,%25album artist%25,%25samplerate%25,%25genre%25,%25discnumber%25,%25track%25,%25playback_time%25,%25length_seconds_fp%25,%25path%25%"
+    private val columnListWithoutPath  = "%25label%25,%25catalog%25,%25composer%25,%25album%25,%24meta%28title%29,%25artist%25,%25album artist%25,%25samplerate%25,%25genre%25,%25discnumber%25,%25track%25,%25playback_time%25,%25length_seconds_fp%25,%24filename%28%25path%25%29"
+    private val columnListWithPath     = "%25label%25,%25catalog%25,%25composer%25,%25album%25,%24meta%28title%29,%25artist%25,%25album artist%25,%25samplerate%25,%25genre%25,%25discnumber%25,%25track%25,%25playback_time%25,%25length_seconds_fp%25,%25path%25%"
 
     fun getColumnList(withPath: Boolean): String {
         val standardPath =  if (withPath) columnListWithPath else columnListWithoutPath

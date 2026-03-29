@@ -14,6 +14,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -32,9 +33,9 @@ import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
 @Composable
 fun TitleDetails(vm: AppViewModel, title: ITitle, onDismiss: () -> Unit) {
     val layout = layoutManager.getLayout()
-    val playerItems = layout.playerLayout.getLayoutItems()
-    val availableItemsForPlayer = getLayoutItemsFor(vm, ViewsWithLayout.PLAYER)
-    val itemsNotDisplayedOnPlayer = availableItemsForPlayer.filter { item -> !playerItems.any { it.item == item.item } }
+    val playerItems = remember { layout.playerLayout.getLayoutItems() }
+    val availableItemsForPlayer = remember { getLayoutItemsFor(vm, ViewsWithLayout.PLAYER) }
+    val itemsNotDisplayedOnPlayer = remember { availableItemsForPlayer.filter { item -> !playerItems.any { it.item == item.item } } }
 
     AlertDialog(
         onDismissRequest = { onDismiss() },

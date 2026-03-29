@@ -1,6 +1,7 @@
 package com.deckerth.thomas.foobarremotecontroller2.viewmodel
 
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
@@ -17,9 +18,11 @@ import com.deckerth.thomas.foobarremotecontroller2.ui.mainActivity
 
 data class LayoutField(
     val key: Int,
+    var index: Int,
     val layoutItem: LayoutItem? = null,
     val sectionTitle: String = "",
     val isSectionTitle: Boolean = false,
+    var isPartOfCurrentLayout: Boolean = false
 )
 
 class LayoutViewModel(private val vm: AppViewModel) : ViewModel() {
@@ -44,6 +47,8 @@ class LayoutViewModel(private val vm: AppViewModel) : ViewModel() {
     var currentPlayer by mutableStateOf(previewPlayerPop)
 
     val impactedViews = mutableStateOf(listOf<ViewsWithLayout>())
+    val indexOfFirstAvailableField = mutableIntStateOf(0)
+
 
     init {
         val customFields = vm.customFields.getMockedContent()
@@ -107,13 +112,19 @@ class LayoutViewModel(private val vm: AppViewModel) : ViewModel() {
             history.value = m
             var sectionCount = 0
             currentLayoutDescription = LayoutDescription(currentView)
+            var isPartOfCurrentLayout = true
+            var index = 0
             for (field in layoutFields.value) {
+                field.index = index++
                 if (field.isSectionTitle) {
                     sectionCount++
                     if (sectionCount == 2)
-                        break
-                } else
-                    if (field.layoutItem != null) currentLayoutDescription!!.items.add(field.layoutItem)
+                        isPartOfCurrentLayout = false
+                    indexOfFirstAvailableField.intValue = field.index+1
+                } else {
+                    field.isPartOfCurrentLayout = isPartOfCurrentLayout
+                    if (isPartOfCurrentLayout && field.layoutItem != null) currentLayoutDescription!!.items.add(field.layoutItem)
+                }
             }
             val old = layoutManager.getCustomLayoutDescription(vm.selectedView)
             if (currentLayoutDescription!!.customFieldsAdded(old)) {
@@ -146,25 +157,27 @@ class LayoutViewModel(private val vm: AppViewModel) : ViewModel() {
         val unusedItems = allItems.filter { item -> !layoutItems.any { it.item == item.item } }
         val fields = mutableListOf<LayoutField>()
 
-        fields.add(LayoutField(0, null, vm.selectedView.getText(vm.selectedView), true))
+        fields.add(LayoutField(0,0, null, vm.selectedView.getText(vm.selectedView), true))
         var i = 1
         for (item in layoutItems) {
             if (item.item == StandardLayoutItems.ARTWORK)
                 continue
-            fields.add(LayoutField(i, item))
+            fields.add(LayoutField(i, i,item, isPartOfCurrentLayout = true))
             i++
         }
-        fields.add(LayoutField(i, null, mainActivity!!.getString(R.string.available_fields), true))
+        fields.add(LayoutField(i, i,null, mainActivity!!.getString(R.string.available_fields), true))
         i++
+        indexOfFirstAvailableField.intValue = i
         for (item in unusedItems) {
             fields.add(
                 LayoutField(
-                    i,
+                    i,i,
                     LayoutItem(
                         item.item,
                         item.customFieldName,
                         itemSize = if (item.item == StandardLayoutItems.ARTWORK) ItemSize.MEDIUM_COVER else ItemSize.BODY_MEDIUM
-                    )
+                    ),
+                    isPartOfCurrentLayout = false
                 )
             )
             i++

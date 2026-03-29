@@ -1,7 +1,9 @@
 package com.deckerth.thomas.foobarremotecontroller2.ui.page
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
@@ -94,7 +96,9 @@ fun LayoutEditorMainPage(
             }
         },
         bottomBar = {
-
+            Box(
+                modifier = Modifier.height(4.dp)
+            ){} // empty bottom bar
         },
         modifier = Modifier.fillMaxSize()
     ) { innerPadding ->

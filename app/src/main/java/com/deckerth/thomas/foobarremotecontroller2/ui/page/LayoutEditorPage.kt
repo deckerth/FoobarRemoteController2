@@ -18,10 +18,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -46,6 +48,7 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
@@ -106,11 +109,22 @@ fun LayoutEditorPage(
         return m
     }
 
+    val listState = rememberLazyListState()
+    var scrollTo by remember { mutableStateOf<Int?>(null) }
+
+    LaunchedEffect(scrollTo) {
+        scrollTo?.let { index ->
+            listState.animateScrollToItem(index, -200)
+            scrollTo = null
+        }
+    }
+
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(spacingDp)
+            .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(spacingDp),
+        state = listState
     ) {
         itemsIndexed(
             items = layoutViewModel.layoutFields.value,
@@ -186,7 +200,8 @@ fun LayoutEditorPage(
 
                                     if (to != from && to != 0) {
                                         // Reorder DURING the drag -> other items animate via animateItemPlacement()
-                                        layoutViewModel.layoutFields.value = currentItems.move(from, to)
+                                        layoutViewModel.layoutFields.value =
+                                            currentItems.move(from, to)
                                         layoutViewModel.dirty.value = true
                                         draggedIndex = to
                                         // Compensate offset so the card stays under the finger after the move
@@ -230,7 +245,9 @@ fun LayoutEditorPage(
                                     Icon(
                                         painter = painterResource(R.drawable.adjust),
                                         contentDescription = "Custom field",
-                                        modifier = Modifier.size(24.dp).padding(end = 8.dp)
+                                        modifier = Modifier
+                                            .size(24.dp)
+                                            .padding(end = 8.dp)
                                     )
                                 }
                                 Text(
@@ -246,9 +263,34 @@ fun LayoutEditorPage(
                         }
                     }
                     if (!item.isSectionTitle)
-                        Text(
-                            text = "⋮⋮",
-                            style = MaterialTheme.typography.headlineSmall
+                        /*
+                        A) Moving down
+                        (LAYOUT, _1_, 2, 3, AVAILABLE, 5, 6, 7) Action: move 1 down, new_position = 4
+                        ->
+                        (LAYOUT, 1, 2 AVAILABLE, _4_, 5, 6, 7) Move to: 4
+
+                        B) Moving up
+                        (LAYOUT, 1, 2, 3, AVAILABLE, _5_, 6, 7) Action: move 5 up, new_position = 1
+                        ->
+                        (LAYOUT, _1_, 2, 3, 4, AVAILABLE, 6, 7) Move to: 1
+                         */
+
+                        Icon(
+                            modifier = Modifier.clickable(onClick = {
+                                val newPosition =
+                                    if (item.isPartOfCurrentLayout) layoutViewModel.indexOfFirstAvailableField.intValue-1 else 1
+                                layoutViewModel.layoutFields.value =
+                                    layoutViewModel.layoutFields.value.move(
+                                        item.index,
+                                        newPosition
+                                    )
+                                scrollTo = 1 //newPosition
+                                layoutViewModel.dirty.value = true
+                                layoutViewModel.saveChanges()
+
+                            }),
+                            imageVector = if (item.isPartOfCurrentLayout) Icons.Default.KeyboardArrowDown else Icons.Default.KeyboardArrowUp,
+                            contentDescription = "move"
                         )
                 }
             } // end Card
@@ -286,7 +328,7 @@ fun LayoutEditorPage(
                 onClick = { layoutViewModel.undo() },
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
-                    .padding(16.dp) // optional spacing from edges
+                    .padding(end=56.dp, bottom=8.dp) // optional spacing from edges
                     .size(48.dp)
             )
             { Icon(Icons.AutoMirrored.Filled.Undo, "Undo") }

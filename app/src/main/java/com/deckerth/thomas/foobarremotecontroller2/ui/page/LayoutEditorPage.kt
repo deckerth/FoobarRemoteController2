@@ -6,6 +6,7 @@ import androidx.compose.animation.core.snap
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
+import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -80,6 +81,7 @@ import com.deckerth.thomas.foobarremotecontroller2.ui.layout.getProgressBarForma
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.LayoutField
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.LayoutViewModel
+import kotlinx.coroutines.delay
 
 @Composable
 fun LayoutEditorPage(
@@ -111,11 +113,37 @@ fun LayoutEditorPage(
 
     val listState = rememberLazyListState()
     var scrollTo by remember { mutableStateOf<Int?>(null) }
+    var pointerYInViewport by remember { mutableFloatStateOf(0f) }
+    val edgeThresholdPx = with(LocalDensity.current) { 80.dp.toPx() }
 
     LaunchedEffect(scrollTo) {
         scrollTo?.let { index ->
             listState.animateScrollToItem(index, -200)
             scrollTo = null
+        }
+    }
+
+    LaunchedEffect(draggedIndex) {
+        val viewportHeight = listState.layoutInfo.viewportSize.height.toFloat()
+        while (true) {
+            val scrollDelta = when {
+                pointerYInViewport < edgeThresholdPx -> {
+                    val fraction = 1f - (pointerYInViewport / edgeThresholdPx).coerceIn(0f, 1f)
+                    -fraction * 18f
+                }
+                pointerYInViewport > viewportHeight - edgeThresholdPx -> {
+                    val fraction = 1f - ((viewportHeight - pointerYInViewport) /
+                            edgeThresholdPx).coerceIn(0f, 1f)
+                    fraction * 18f
+                }
+                else -> 0f
+            }
+            if (scrollDelta != 0f) {
+                val actualScrolled = listState.scrollBy(scrollDelta)
+                // Keep card under finger: viewport moved, so shift totalDragOffset to match
+                totalDragOffset += actualScrolled
+            }
+            delay(16L) // ~60 fps
         }
     }
 
@@ -171,16 +199,21 @@ fun LayoutEditorPage(
                     .pointerInput(item.key, measuredItemHeightPx) {
                         if (!item.isSectionTitle)
                             detectDragGesturesAfterLongPress(
-                                onDragStart = {
+                                onDragStart = { startOffset ->
                                     draggedItemId = item.key
                                     draggedIndex = latestItems.indexOfFirst { it.key == item.key }
                                     totalDragOffset = 0f
+                                    val thisItemInfo = listState.layoutInfo.visibleItemsInfo
+                                        .firstOrNull { it.index == draggedIndex }
+                                    pointerYInViewport = (thisItemInfo?.offset?.toFloat() ?: 0f) + startOffset.y
                                 },
                                 onDrag = { change, dragAmount ->
                                     change.consume()
 
                                     // Accumulate the drag offset
                                     totalDragOffset += dragAmount.y
+
+                                    pointerYInViewport += dragAmount.y
 
                                     val itemStepPx =
                                         (if (measuredItemHeightPx > 0f) measuredItemHeightPx else fallbackItemHeightPx) + spacingPx

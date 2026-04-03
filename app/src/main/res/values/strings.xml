@@ -180,10 +180,10 @@
 <!--    <string name="release_notes_1_text">The Beefweb plugin can now be configured to require credentials. When Foobar Link detects that authentication is needed, it prompts the user to enter a username and password. These credentials are then stored by Foobar Link for each IP address running Foobar.</string>-->
 <!--    <string name="release_notes_2_header">Playlist Editing</string>-->
 <!--    <string name="release_notes_2_text">When creating a new playlist from the current one or copying selected tracks to another playlist, you can now quickly select or deselect all titles with ease.</string>-->
-    <string name="release_notes_1_header">Playlist</string>
-    <string name="release_notes_1_text">Progress indicators are now also available in the playlist view.</string>
+    <string name="release_notes_1_header">Custom fields</string>
+    <string name="release_notes_1_text">In addition to the standard track information, foobar Link now supports custom fields.</string>
     <string name="release_notes_2_header">Title Details</string>
-    <string name="release_notes_2_text">Pause or resume playback by tapping the current title in the playlist.</string>
+    <string name="release_notes_2_text">"These fields are automatically transferred to the app, shown in the detail view, included when filtering, and can be used in custom layouts. "</string>
     <string name="release_notes_remark">You can review the release notes later in the app settings.</string>
     <string name="release_notes_version">Version: %1$s</string>
     <string name="menu_item_top_of_playlist">Go to top</string>
@@ -196,7 +196,7 @@
     <string name="menu_item_add_to_playlist">Add to playlist…</string>
     <string name="menu_item_remove_from_playlist">Remove from playlist</string>
     <string name="release_notes_3_header">Layout editor</string>
-    <string name="release_notes_3_text">The editor features a redesigned interface and now includes an undo function.</string>
+    <string name="release_notes_3_text">Custom fields are defined in Settings → “Custom fields”.</string>
     <string name="layout_item_artist_title">Artist - Title</string>
     <string name="button_content_copy">Copy to clipboard</string>
     <string name="layout_item_album_artist">Album Artist</string>

@@ -181,10 +181,10 @@
 <!--    <string name="release_notes_1_text">Sie können das Beefweb plugin so konfigurieren, dass Zugangsdaten eingegeben werden müssen. Sobald Foobar Link erkennt, dass Zugangsdaten benötigt werden, wird der Nutzer aufgefordert, einen Benutzernamen und ein Passwort einzugeben. Foobar Link speichert die Zugangsdaten für jede IP-Adresse, unter der ein Foobar-Server läuft.</string>-->
 <!--    <string name="release_notes_2_header">Editieren von Playlists</string>-->
 <!--    <string name="release_notes_2_text">Wenn Sie eine neue Playlist aus der aktuellen erstellen oder ausgewählte Titel in eine andere Playlist kopieren, können Sie nun einfach alle Titel auswählen oder abwählen.</string>-->
-    <string name="release_notes_1_header">Playlist</string>
-    <string name="release_notes_1_text">Fortschrittsanzeigen sind jetzt auch in der Playlist-Ansicht verfügbar.</string>
+    <string name="release_notes_1_header">Zusätzliche Felder</string>
+    <string name="release_notes_1_text">Zusätzlich zu den Standard Track Informationen unterstützt foobar Link jetzt auch benutzerdefinierte Felder.</string>
     <string name="release_notes_2_header">Detailsicht</string>
-    <string name="release_notes_2_text">Durch Antippen des aktuellen Titels in der Playlist können Sie die Wiedergabe pausieren oder starten.</string>
+    <string name="release_notes_2_text">Diese werden in der Detailansicht angezeigt, beim Filtern berücksichtigt und können in benutzerdefinierten Layouts verwendet werden.</string>
     <string name="release_notes_remark">Sie können sich die Informationen über die Neuigkeiten später in den Einstellungen ansehen.</string>
     <string name="release_notes_version">Version: %1$s</string>
     <string name="menu_item_top_of_playlist">Zum Anfang springen</string>
@@ -197,7 +197,7 @@
     <string name="menu_item_add_to_playlist">Zur Playlist hinzufügen…</string>
     <string name="menu_item_remove_from_playlist">Von der Playlist entfernen</string>
     <string name="release_notes_3_header">Layout editor</string>
-    <string name="release_notes_3_text">Der Editor hat ein neues Design bekommen inklusiver einer Undo Funktion.</string>
+    <string name="release_notes_3_text">Die neuen Felder werden in den Einstellungen unter „Zusätzliche Felder“ definiert.</string>
     <string name="layout_item_artist_title">Künstler - Titel</string>
     <string name="button_content_copy">In Zwischanablage kopieren</string>
     <string name="layout_item_album_artist">Album Artist</string>
@@ -227,8 +227,8 @@
     <string name="link_title_formatting_reference">Title‑Formatting‑Referenz</string>
     <string name="layout_item_track">Track</string>
     <string name="layout_item_disc_number">Disc number</string>
-    <string name="layout_item_playback_time">Playback time</string>
-    <string name="layout_item_duration">Duration</string>
-    <string name="layout_item_filename">Filename</string>
-    <string name="layout_item_path">Path</string>
+    <string name="layout_item_playback_time">Wiedergabezeit</string>
+    <string name="layout_item_duration">Titellänge</string>
+    <string name="layout_item_filename">Dateiname</string>
+    <string name="layout_item_path">Pfad</string>
 </resources>

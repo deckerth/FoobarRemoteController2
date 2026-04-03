@@ -2,6 +2,7 @@ package com.deckerth.thomas.foobarremotecontroller2.connector
 
 import android.os.Process
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.PlaybackState
 import org.json.JSONObject
 import java.io.BufferedReader
 import java.io.IOException
@@ -89,7 +90,7 @@ class QueryAccess(val vm: AppViewModel) {
                                 isReading = true
                                 line = reader!!.readLine() ?: break
                                 isReading = false
-                            } catch (e: Exception) {
+                            } catch (_: Exception) {
                                 break
                             }
 
@@ -192,7 +193,7 @@ fun analyzePlayer(
     val activeItem = player.optJSONObject("activeItem") ?: return
     val columns = activeItem.optJSONArray("columns") ?: return
     val playbackState = player.getString("playbackState")
-    if (columns.length() == 0 && playbackState == "playing")
+    if (columns.length() == 0 && playbackState == "playing" && vm.playerViewModel.playbackState == PlaybackState.PLAYING)
         return
     println("FOOBQUERY(${vm.owner}) Player: $playbackState")
     println("FOOBQUERY(${vm.owner})  Current Title: ${columns.optString(0)}")

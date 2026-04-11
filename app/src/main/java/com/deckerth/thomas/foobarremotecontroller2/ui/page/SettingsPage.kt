@@ -59,6 +59,7 @@ import com.deckerth.thomas.foobarremotecontroller2.saveAddTrackBehavior
 import com.deckerth.thomas.foobarremotecontroller2.saveAlwaysOnDisplay
 import com.deckerth.thomas.foobarremotecontroller2.saveCreationOfNonEmptyPlaylists
 import com.deckerth.thomas.foobarremotecontroller2.saveDynamicColorScheme
+import com.deckerth.thomas.foobarremotecontroller2.saveErrorLogging
 import com.deckerth.thomas.foobarremotecontroller2.saveFoobarVolumeControl
 import com.deckerth.thomas.foobarremotecontroller2.savePauseDuringPhoneCalls
 import com.deckerth.thomas.foobarremotecontroller2.saveViewMode
@@ -301,6 +302,29 @@ fun SettingsPage(vm: AppViewModel) {
                 summary = ""
             )
             ReleaseNotes(vm)
+
+            PreferenceItem(
+                title = stringResource(
+                    R.string.settings_error_logging
+                ),
+                onClick = { enabled: Boolean ->
+                    saveErrorLogging(mainActivity!!, !enabled)
+                    vm.errorLogging = !enabled
+                    if (vm.errorLogging) vm.errorHandler.startNewTraceFile(mainActivity!!.baseContext)
+                },
+                showToggle = true,
+                isChecked = vm.errorLogging,
+                isEnabled = true,
+                summary = "",
+            )
+
+            PreferenceItem<Boolean>(
+                title = stringResource(
+                    R.string.share_trace_file
+                ),
+                onClick = { vm.errorHandler.shareTraceFile(mainActivity!!) },
+                summary = ""
+            )
         }
     }
 }

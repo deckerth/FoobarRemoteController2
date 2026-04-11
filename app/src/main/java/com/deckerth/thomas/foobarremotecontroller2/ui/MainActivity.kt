@@ -83,6 +83,7 @@ import com.deckerth.thomas.foobarremotecontroller2.FoobarMediaService
 import com.deckerth.thomas.foobarremotecontroller2.R
 import com.deckerth.thomas.foobarremotecontroller2.getAlwaysOnDisplay
 import com.deckerth.thomas.foobarremotecontroller2.getCustomFieldsBlocking
+import com.deckerth.thomas.foobarremotecontroller2.getErrorLoggingBlocking
 import com.deckerth.thomas.foobarremotecontroller2.getIpAddressBlocking
 import com.deckerth.thomas.foobarremotecontroller2.getIvStringBlocking
 import com.deckerth.thomas.foobarremotecontroller2.getPasswordBlocking
@@ -157,6 +158,7 @@ class MainActivity : ComponentActivity() {
                 val customFields = getCustomFieldsBlocking()
                 if (customFields != null)
                     appViewModel.customFields.setCustomFields(customFields)
+                appViewModel.errorLogging = getErrorLoggingBlocking()
                 ipAddress = getIpAddressBlocking() // executed exactly once
                 appViewModel.credentialsManager.setCurrentUserPassword(
                     ipAddress,

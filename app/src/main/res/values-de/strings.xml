@@ -231,4 +231,7 @@
     <string name="layout_item_duration">Titellänge</string>
     <string name="layout_item_filename">Dateiname</string>
     <string name="layout_item_path">Pfad</string>
+    <string name="settings_error_logging">Fehler protokollieren</string>
+    <string name="share_trace_file">Fehlerprotokoll teilen</string>
+    <string name="delete_trace_file">Fehlerprotokoll löschen</string>
 </resources>

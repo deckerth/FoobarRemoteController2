@@ -41,6 +41,7 @@ private val CREATION_OF_NON_EMPTY_PLAYLISTS_KEY =
 private val CONNECTIONS_KEY = stringPreferencesKey("connections")
 private val RELEASE_KEY = stringPreferencesKey("release")
 private val CUSTOM_FIELDS_KEY = stringPreferencesKey("custom_fields")
+private val ERROR_LOGGING_KEY = booleanPreferencesKey("error_logging")
 
 private fun <T> getFlow(context: Context, key: Preferences.Key<T>): Flow<T?> {
     return context.dataStore.data.map { preferences ->
@@ -173,6 +174,18 @@ fun saveCustomFields(context: Context, fields: CustomFieldList) {
     val layoutString = Json.encodeToString(fields)
     runBlocking {
         saveValue(context, layoutString, CUSTOM_FIELDS_KEY)
+    }
+}
+
+suspend fun getErrorLoggingBlocking(): Boolean {
+    if (mainActivity == null)
+        return false
+    return getValueBlocking(mainActivity!!.baseContext, ERROR_LOGGING_KEY, false)
+}
+
+fun saveErrorLogging(context: Context, errorLogging: Boolean) {
+    runBlocking {
+        saveValue(context, errorLogging, ERROR_LOGGING_KEY)
     }
 }
 

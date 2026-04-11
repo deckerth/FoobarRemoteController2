@@ -50,6 +50,8 @@ class AppViewModel(val owner: String) : ViewModel() {
     var connectionManager: ConnectionManager? by mutableStateOf(null)
     var ipAddressIsValid = false
 
+    var errorLogging by mutableStateOf(false)
+
     var askForPassword by mutableStateOf(false)
 
     lateinit var errorHandler: ErrorHandler

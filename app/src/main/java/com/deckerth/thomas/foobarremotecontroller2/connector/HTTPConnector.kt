@@ -48,9 +48,11 @@ open class HTTPConnector() {
         val result = StringBuilder()
 
         var url: URL
+        var urlPath = ""
         var urlConnection: HttpURLConnection? = null
         try {
-            url = URL(serverAddress(response.usedIpAddress) + endpoint)
+            urlPath = serverAddress(response.usedIpAddress) + endpoint
+            url = URL(urlPath)
             //open a URL connection
             urlConnection = url.openConnection() as HttpURLConnection
             setCredentials(urlConnection, vm)
@@ -77,6 +79,8 @@ open class HTTPConnector() {
                 return response
             }
         } catch (e: Exception) {
+            if (urlPath.isNotEmpty())
+                vm.errorHandler.logString("URL: $urlPath")
             if (e.message != null && e.message.equals("Unauthorized"))
                 vm.errorHandler.logError(
                     ErrorType.NETWORK,
@@ -153,9 +157,11 @@ open class HTTPConnector() {
         val result = StringBuilder()
         //vm.credentialsManager.setAuthenticator()
         var url: URL
+        var urlPath: String
         var urlConnection: HttpURLConnection? = null
         try {
-            url = URL(serverAddress(vm.ipAddress!!) + endpoint)
+            urlPath = serverAddress(vm.ipAddress!!) + endpoint
+            url = URL(urlPath)
             //open an URL connection
             urlConnection = url.openConnection() as HttpURLConnection
             setCredentials(urlConnection, vm)
@@ -172,6 +178,23 @@ open class HTTPConnector() {
                     result.append(data.toChar())
                     data = isw.read()
                 }
+            } else {
+                if (urlPath.isNotEmpty())
+                    vm.errorHandler.logString("URL: $urlPath")
+                if (response == NOT_AUTHORIZED)
+                    vm.errorHandler.logError(
+                        ErrorType.NETWORK,
+                        ErrorCode.AUTHORIZATION_ERROR,
+                        ErrorSource.HTTP_CONNECTOR,
+                        Exception("Unauthorized")
+                    )
+                else
+                    vm.errorHandler.logError(
+                        ErrorType.NETWORK,
+                        ErrorCode.BAD_RESPONSE,
+                        ErrorSource.HTTP_CONNECTOR,
+                        Exception("Bad response")
+                    )
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -184,9 +207,11 @@ open class HTTPConnector() {
         val result = StringBuilder()
         //vm.credentialsManager.setAuthenticator()
         var url: URL
+        var urlPath : String
         var urlConnection: HttpURLConnection? = null
         try {
-            url = URL(serverAddress(vm.ipAddress!!) + endpoint)
+            urlPath = serverAddress(vm.ipAddress!!) + endpoint
+            url = URL(urlPath)
             //open a URL connection
             urlConnection = url.openConnection() as HttpURLConnection
             setCredentials(urlConnection, vm)
@@ -211,7 +236,24 @@ open class HTTPConnector() {
                 } catch (io: IOException) {
                     io.printStackTrace()
                 }
-            }
+            } else {
+            if (urlPath.isNotEmpty())
+                vm.errorHandler.logString("URL: $urlPath")
+            if (response == NOT_AUTHORIZED)
+                vm.errorHandler.logError(
+                    ErrorType.NETWORK,
+                    ErrorCode.AUTHORIZATION_ERROR,
+                    ErrorSource.HTTP_CONNECTOR,
+                    Exception("Unauthorized")
+                )
+            else
+                vm.errorHandler.logError(
+                    ErrorType.NETWORK,
+                    ErrorCode.BAD_RESPONSE,
+                    ErrorSource.HTTP_CONNECTOR,
+                    Exception("Bad response")
+                )
+        }
         } catch (e: Exception) {
             e.printStackTrace()
         } finally {

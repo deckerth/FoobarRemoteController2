@@ -41,7 +41,7 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = "17"
+        jvmTarget = "1.8"
     }
     buildFeatures {
         compose = true
@@ -68,6 +68,7 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.lifecycle.runtime.compose)
+    implementation(libs.core.ktx)
     implementation(libs.library)
     implementation(libs.coil.compose)
     implementation(libs.androidx.core.splashscreen)

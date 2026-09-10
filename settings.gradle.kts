@@ -1,6 +1,12 @@
 pluginManagement {
     repositories {
-        google()
+        google {
+            content {
+                includeGroupByRegex("com\\.android.*")
+                includeGroupByRegex("com\\.google.*")
+                includeGroupByRegex("androidx.*")
+            }
+        }
         mavenCentral()
         gradlePluginPortal()
     }
@@ -13,6 +19,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "FoobarRemoteController2"
+rootProject.name = "Foobar2000 Remote Controller"
 include(":app")
  

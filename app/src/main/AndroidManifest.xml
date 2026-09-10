@@ -2,7 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
 
     <application
         android:allowBackup="true"
@@ -13,24 +16,36 @@
         android:networkSecurityConfig="@xml/network_security_config"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.FoobarRemoteController2"
+        android:theme="@style/Theme.Foobar2000RemoteController"
         >
-        <activity
-            android:name=".SettingsActivity"
+        <service
+            android:name=".FoobarMediaService"
             android:exported="false"
-            android:label="@string/title_activity_settings" />
+            android:foregroundServiceType="mediaPlayback"
+            android:stopWithTask="true"/>
+
+
         <activity
-            android:name=".TitleDetailHostActivity"
+            android:name=".ui.MainActivity"
             android:exported="true"
-            android:label="@string/title_activity_title_detail_host"
-            android:resizeableActivity="true"
-            >
+            android:theme="@style/Theme.Foobar2000RemoteController">
             <intent-filter>
+
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
     </application>
 
 </manifest>

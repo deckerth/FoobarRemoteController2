@@ -1,0 +1,174 @@
+package com.deckerth.thomas.foobarremotecontroller2.ui.components
+
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import com.deckerth.thomas.foobarremotecontroller2.model.Album
+import com.deckerth.thomas.foobarremotecontroller2.model.ITitle
+import com.deckerth.thomas.foobarremotecontroller2.ui.layout.ItemSize
+import com.deckerth.thomas.foobarremotecontroller2.ui.layout.LayoutItem
+import com.deckerth.thomas.foobarremotecontroller2.ui.layout.ProgressBarFormat
+import com.deckerth.thomas.foobarremotecontroller2.ui.layout.StandardLayoutItems
+import com.deckerth.thomas.foobarremotecontroller2.ui.layout.TextAlignment
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.PlaybackState
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.PlayerViewModel
+
+private fun intToDp(value: Int): Dp = value.dp
+
+@Composable
+fun getTextStyle(itemSize: ItemSize): TextStyle {
+    return when (itemSize) {
+        ItemSize.TITLE_LARGE -> MaterialTheme.typography.titleLarge
+        ItemSize.TITLE_MEDIUM -> MaterialTheme.typography.titleMedium
+        ItemSize.BODY_MEDIUM -> MaterialTheme.typography.bodyMedium
+        ItemSize.BODY_SMALL -> MaterialTheme.typography.bodySmall
+        else -> MaterialTheme.typography.bodySmall
+    }
+}
+
+@Composable
+fun TextComponent(text: String, item: LayoutItem) {
+    if (text == "" || text == "?") return
+    Text(
+        modifier = Modifier
+            .fillMaxWidth(),
+        textAlign = when (item.alignment) {
+            TextAlignment.LEFT -> TextAlign.Left; TextAlignment.RIGHT -> TextAlign.Right; TextAlignment.CENTER -> TextAlign.Center
+        },
+        text = text,
+        style = getTextStyle(item.itemSize),
+        fontStyle = if (item.italic) FontStyle.Italic else FontStyle.Normal,
+        maxLines = item.maxLines
+    )
+}
+
+@Composable
+fun LayoutComponent(vm: AppViewModel, playerViewModel: PlayerViewModel, layoutItem: LayoutItem) {
+    when (layoutItem.item) {
+        StandardLayoutItems.LABEL -> TextComponent(text = playerViewModel.label, item = layoutItem)
+        StandardLayoutItems.CATALOG -> TextComponent(text = playerViewModel.catalog, item = layoutItem)
+        StandardLayoutItems.LABEL_CATALOG -> TextComponent(
+            text = playerViewModel.label + " " + playerViewModel.catalog,
+            item = layoutItem
+        )
+
+        StandardLayoutItems.TITLE -> TextComponent(text = playerViewModel.title, item = layoutItem)
+        StandardLayoutItems.ALBUM -> TextComponent(text = playerViewModel.album, item = layoutItem)
+        StandardLayoutItems.ALBUM_ARTIST -> TextComponent(text = playerViewModel.albumArtist, item = layoutItem)
+        StandardLayoutItems.ARTIST_TITLE -> TextComponent(text = playerViewModel.artist + " - " + playerViewModel.title, item = layoutItem)
+        StandardLayoutItems.ARTIST -> TextComponent(text = playerViewModel.artist, item = layoutItem)
+        StandardLayoutItems.SAMPLE_RATE -> TextComponent(text = playerViewModel.sampleRate+ " Hz", item = layoutItem)
+        StandardLayoutItems.GENRE -> TextComponent(text = playerViewModel.genre, item = layoutItem)
+        StandardLayoutItems.PROGRESS -> PlayerProgress(vm, playerViewModel)
+        StandardLayoutItems.COMPOSER ->
+            if (playerViewModel.composer != "" && playerViewModel.composer != "?") {
+                TextComponent(text = playerViewModel.composer, item = layoutItem)
+            }
+        StandardLayoutItems.TRACK -> TextComponent(text = playerViewModel.getNiceTrack(), item = layoutItem)
+        StandardLayoutItems.DURATION -> TextComponent(text = playerViewModel.getNiceDuration(), item = layoutItem)
+        StandardLayoutItems.PATH -> TextComponent(text = playerViewModel.path, item = layoutItem)
+
+        StandardLayoutItems.CUSTOM_FIELD -> {
+            TextComponent(text = playerViewModel.customFields.getContent(layoutItem.customFieldName), item = layoutItem)
+        }
+
+        else -> Text("UNKNOWN ITEM")
+    }
+}
+
+@Composable
+fun LayoutComponent(vm: AppViewModel, album: Album, layoutItem: LayoutItem, albumIsCurrentlyPlaying: Boolean) {
+    when (layoutItem.item) {
+        StandardLayoutItems.LABEL -> TextComponent(text = album.originalTitle.label, item = layoutItem)
+        StandardLayoutItems.CATALOG -> TextComponent(text = album.originalTitle.catalog, item = layoutItem)
+        StandardLayoutItems.LABEL_CATALOG -> TextComponent(
+            text = album.originalTitle.label + " " + album.originalTitle.catalog,
+            item = layoutItem
+        )
+
+        StandardLayoutItems.ALBUM -> TextComponent(text = album.originalTitle.album, item = layoutItem)
+        StandardLayoutItems.ARTIST -> TextComponent(text = album.originalTitle.artist, item = layoutItem)
+        StandardLayoutItems.ALBUM_ARTIST -> TextComponent(text = album.originalTitle.albumArtist, item = layoutItem)
+        StandardLayoutItems.ARTIST_TITLE -> TextComponent(text = album.originalTitle.artist + " - " + album.originalTitle.title, item = layoutItem)
+
+        StandardLayoutItems.COMPOSER ->
+            if (album.originalTitle.composer != "" && album.originalTitle.composer != "?") {
+                TextComponent(text = album.originalTitle.composer, item = layoutItem)
+            }
+        StandardLayoutItems.TRACK -> TextComponent(text = album.originalTitle.discNumberTrack, item = layoutItem)
+        StandardLayoutItems.DURATION -> TextComponent(text = album.originalTitle.getNiceDuration(), item = layoutItem)
+        StandardLayoutItems.PATH -> TextComponent(text = album.originalTitle.path, item = layoutItem)
+
+        StandardLayoutItems.PROGRESS -> if (albumIsCurrentlyPlaying) {
+            val wavy = when (layoutItem.progressBarFormat) {
+                ProgressBarFormat.WAVY_WHEN_PLAYING -> vm.playerViewModel.playbackState == PlaybackState.PLAYING
+                ProgressBarFormat.UNDEFINED -> false
+                ProgressBarFormat.WAVY -> true
+                ProgressBarFormat.FLAT -> false
+            }
+            AlbumProgress(album, vm.playerViewModel, withTimingDetails = layoutItem.progressBarShowTimings, wavy, intToDp(layoutItem.waveSpeed))
+
+        }
+        StandardLayoutItems.CUSTOM_FIELD ->
+            TextComponent(text = album.originalTitle.customFields.getContent(layoutItem.customFieldName), item = layoutItem)
+
+        else -> Text("UNKNOWN ITEM")
+    }
+}
+
+@Composable
+fun LayoutComponent(vm: PlayerViewModel, album: Album, title: ITitle, checkArtist: Boolean, layoutItem: LayoutItem, titleIsCurrentlyPlaying: Boolean) {
+    when (layoutItem.item) {
+        StandardLayoutItems.LABEL -> TextComponent(text = title.label, item = layoutItem)
+        StandardLayoutItems.CATALOG -> TextComponent(text = title.catalog, item = layoutItem)
+        StandardLayoutItems.LABEL_CATALOG -> TextComponent(
+            text = title.label + " " + title.catalog,
+            item = layoutItem
+        )
+
+        StandardLayoutItems.ALBUM -> TextComponent(text = title.album, item = layoutItem)
+        StandardLayoutItems.ALBUM_ARTIST -> TextComponent(text = title.albumArtist, item = layoutItem)
+        StandardLayoutItems.TITLE -> TextComponent(text = title.title, item = layoutItem)
+        StandardLayoutItems.ARTIST -> TextComponent(text = title.artist, item = layoutItem)
+        StandardLayoutItems.ARTIST_TITLE -> TextComponent(text = title.artist + " - " + title.title, item = layoutItem)
+        StandardLayoutItems.SMART_ARTIST ->
+            if (!checkArtist || !title.artist.equals(album.originalTitle.artist))
+                TextComponent(text = title.artist, item = layoutItem)
+
+        StandardLayoutItems.COMPOSER ->
+            if (title.composer != "" && title.composer != "?") {
+                TextComponent(text = title.composer, item = layoutItem)
+            }
+        StandardLayoutItems.TRACK -> TextComponent(text = title.discNumberTrack, item = layoutItem)
+        StandardLayoutItems.DURATION -> TextComponent(text = title.getNiceDuration(), item = layoutItem)
+        StandardLayoutItems.PATH -> TextComponent(text = title.path, item = layoutItem)
+
+        StandardLayoutItems.PROGRESS -> if (titleIsCurrentlyPlaying) {
+            val wavy = when (layoutItem.progressBarFormat) {
+                ProgressBarFormat.WAVY_WHEN_PLAYING -> vm.playbackState == PlaybackState.PLAYING
+                ProgressBarFormat.UNDEFINED -> false
+                ProgressBarFormat.WAVY -> true
+                ProgressBarFormat.FLAT -> false
+            }
+            TitleProgress(
+                playerViewModel = vm,
+                withTimingDetails = layoutItem.progressBarShowTimings,
+                wavy = wavy,
+                waveSpeed = intToDp(layoutItem.waveSpeed)
+            )
+        }
+        StandardLayoutItems.CUSTOM_FIELD ->
+            TextComponent(text = title.customFields.getContent(layoutItem.customFieldName), item = layoutItem)
+
+        else -> Text("UNKNOWN ITEM")
+    }
+}
+

@@ -1,0 +1,64 @@
+package com.deckerth.thomas.foobarremotecontroller2.model
+
+import androidx.compose.runtime.mutableStateOf
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
+
+open class MusicDirectory(val vm: AppViewModel, name: String, path: String, private val parentDirectory: String) :
+    MusicDirectoryEntry(name, path) {
+
+    private val entries = mutableListOf<MusicDirectoryEntry>()
+    protected val expanded = mutableStateOf(false)
+
+    fun addEntry(entry: MusicDirectoryEntry) {
+        entries.add(entry)
+    }
+
+    fun getEntries(): List<MusicDirectoryEntry> {
+        return entries
+    }
+
+    override fun isDirectory(): Boolean {
+        return true
+    }
+
+    override fun setIsAdded(added: Boolean) {
+        super.setIsAdded(added)
+        for (entry in entries) {
+            entry.setIsAdded(added)
+        }
+    }
+
+    fun isExpanded(): Boolean {
+        return expanded.value
+    }
+
+    fun setExpanded(expanded: Boolean) {
+        this.expanded.value = expanded
+    }
+
+    fun expand() {
+        val result =
+            if (path == "")
+                vm.browserAccess.getRoots()
+            else
+                vm.browserAccess.getDirectory(path, parentDirectory)
+        if (result != null) {
+            for (entry in result.entries) {
+                println("FOOB addEntry: ${entry.name}")
+                entry.setIsAdded(isAdded.value)
+                addEntry(entry)
+            }
+            expanded.value = true
+        }
+    }
+}
+
+class ParentDirectory(vm: AppViewModel, name: String, path: String) : MusicDirectory(vm, name, path, "?") {
+    init {
+        expanded.value = true
+    }
+
+    override fun isParentDirectory(): Boolean {
+        return true
+    }
+}

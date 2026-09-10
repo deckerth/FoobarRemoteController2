@@ -6,6 +6,7 @@ import java.util.Optional;
 
 public class Playlists {
 
+    public String ipAddress = "";
     private final List<PlaylistEntity> mPlaylists = new ArrayList<>();
 
     public void addPlaylistEntity(PlaylistEntity playlistEntity) {
@@ -13,7 +14,7 @@ public class Playlists {
     }
 
     public List<PlaylistEntity> getPlaylists() {
-        return  mPlaylists;
+        return mPlaylists;
     }
 
     public PlaylistEntity getCurrentPlaylist() {

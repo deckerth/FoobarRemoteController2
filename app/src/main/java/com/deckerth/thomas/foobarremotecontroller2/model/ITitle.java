@@ -4,21 +4,29 @@ import android.graphics.Bitmap;
 
 import androidx.annotation.NonNull;
 
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.TitleFilter;
+
 public interface ITitle {
 
     String getCatalog();
 
+    String getLabel();
+
     String getPlaylistId();
 
-    String getIndex();
+    int getIndex();
 
     String getComposer();
 
     String getAlbum();
+    String getAlbumArtist();
 
     String getTitle();
 
     String getArtist();
+
+    String getSampleRate();
+    String getGenre();
 
     void clearArtist();
 
@@ -26,24 +34,40 @@ public interface ITitle {
 
     String getTrack();
 
+    String getDiscNumberTrack();
+
     String getPlaybackTime();
 
     Double getDuration();
+    String getNiceDuration();
 
     Double getPosition();
+
+    Float getElapsedTimeWhenTitleStarts();
 
     Boolean getIsAlbum();
 
     Bitmap getArtwork();
 
+    String getPath();
+
     void setArtwork(Bitmap artwork);
+
+    String getArtworkUrl();
 
     Boolean isCurrentTitle();
 
     void setIsCurrentTitle(Boolean isCurrentTitle);
 
+    void setElapsedTimeWhenTitleStarts(Float elapsedTimeWhenTitleStarts);
+
+    Boolean matches(TitleFilter filter, CustomFields customFields);
+
+    CustomFieldsContent getCustomFields();
+
     @NonNull
     ITitle clone();
 
     void clearAlbum();
+
 }

@@ -17,7 +17,7 @@ android {
     defaultConfig {
         applicationId = "com.deckerth.thomas.foobarremotecontroller2"
         minSdk = 31
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 35
         versionName = "2604.1"
 

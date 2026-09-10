@@ -154,7 +154,7 @@ class LayoutViewModel(private val vm: AppViewModel) : ViewModel() {
 
         val layoutItems = currentLayoutDescription!!.items
         val allItems = getLayoutItemsFor(vm, vm.selectedView)
-        val unusedItems = allItems.filter { item -> !layoutItems.any { it.item == item.item } }
+        val unusedItems = allItems.filter { item -> if (item.item == StandardLayoutItems.CUSTOM_FIELD) !layoutItems.any { it.item == item.item && it.customFieldName == item.customFieldName } else  !layoutItems.any { it.item == item.item } }
         val fields = mutableListOf<LayoutField>()
 
         fields.add(LayoutField(0,0, null, vm.selectedView.getText(vm.selectedView), true))

@@ -77,6 +77,10 @@ class PlaylistsViewModel(private val vm: AppViewModel) : ViewModel() {
 
     private val playerObserver = PlayerObserver(vm)
 
+    fun stopObserver() {
+        playerObserver.stop()
+    }
+
     /**
      *   @return all known playlists that are not invalid
      *   @see Playlists

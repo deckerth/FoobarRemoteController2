@@ -98,7 +98,15 @@ class PlayerAccess(private val vm: AppViewModel) {
                 volumeControl.max = volumeObject.getInt("max")
                 volumeControl.type = volumeObject.getString("type")
                 volumeControl.value = volumeObject.getInt("value")
-                volumeProvider.setCurrentVolume(volumeControl.currentValuePercent)
+                // Only update global volumeProvider from active ViewModel; stale leaked
+                // ViewModels (after orientation recreation / server switch) would otherwise
+                // overwrite the provider with the wrong server's volume and make volume
+                // keys appear broken.
+                if (vm === com.deckerth.thomas.foobarremotecontroller2.viewmodel.appViewModel) {
+                    try {
+                        volumeProvider.setCurrentVolume(volumeControl.currentValuePercent)
+                    } catch (_: Exception) {}
+                }
             }
 
             if (columns.length() > 0) {

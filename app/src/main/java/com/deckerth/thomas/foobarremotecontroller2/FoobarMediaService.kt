@@ -28,9 +28,17 @@ var lastChanged: Instant = Instant.now()
 
 
 fun enableVolumeControl() {
-    if (mediaSession != null) {
+    if (mediaSession != null && ::volumeProvider.isInitialized) {
         mediaSession!!.setPlaybackToRemote(volumeProvider)
     }
+}
+
+private fun getActiveViewModel(fallback: AppViewModel): AppViewModel {
+    // Always prefer the global appViewModel (activity's ViewModel) if it exists,
+    // because the service's viewModelInstance can become stale after MainActivity
+    // recreation (portrait lock) or server switch. This prevents volume keys and
+    // media buttons from being routed to the wrong server.
+    return appViewModel ?: fallback
 }
 
 class FoobarMediaService : Service() {
@@ -48,12 +56,12 @@ class FoobarMediaService : Service() {
                 if (pause)
                     when (focusChange) {
                         AudioManager.AUDIOFOCUS_LOSS_TRANSIENT -> {
-                            viewModelInstance.playerAccess.pausePlayback()
+                            getActiveViewModel(viewModelInstance).playerAccess.pausePlayback()
                             // Handle audio focus loss (e.g., stop playback)
                         }
 
                         AudioManager.AUDIOFOCUS_GAIN -> {
-                            viewModelInstance.playerAccess.startPlayback()
+                            getActiveViewModel(viewModelInstance).playerAccess.startPlayback()
                             // Handle audio focus gain (e.g., resume playback)
                         }
                     }
@@ -104,24 +112,24 @@ class FoobarMediaService : Service() {
             setCallback(object : MediaSessionCompat.Callback() {
                 override fun onPlay() {
                     // Handle play action
-                    viewModelInstance.playerAccess.startPlayback()
+                    getActiveViewModel(viewModelInstance).playerAccess.startPlayback()
                     //updateNotification(true)
                 }
 
                 override fun onPause() {
                     // Handle pause action
-                    viewModelInstance.playerAccess.pausePlayback()
+                    getActiveViewModel(viewModelInstance).playerAccess.pausePlayback()
                     //updateNotification(false)
                 }
 
                 override fun onSkipToNext() {
                     // Handle skip to next action
-                    viewModelInstance.playerAccess.nextTrack()
+                    getActiveViewModel(viewModelInstance).playerAccess.nextTrack()
                 }
 
                 override fun onSkipToPrevious() {
                     // Handle skip to previous action
-                    viewModelInstance.playerAccess.previousTrack()
+                    getActiveViewModel(viewModelInstance).playerAccess.previousTrack()
                 }
             })
 
@@ -134,18 +142,20 @@ class FoobarMediaService : Service() {
             ) {
                 override fun onSetVolumeTo(volume: Int) {
                     lastChanged = Instant.now()
-                    currentVolume = volume
-                    viewModelInstance.foobVolumeControl.value =
-                        viewModelInstance.foobVolumeControl.getDecibelValue(currentVolume)
-                    viewModelInstance.playerAccess.setVolume(viewModelInstance.foobVolumeControl.value)
+                    currentVolume = volume.coerceIn(0, 100)
+                    val vm = getActiveViewModel(viewModelInstance)
+                    vm.foobVolumeControl.value =
+                        vm.foobVolumeControl.getDecibelValue(currentVolume)
+                    vm.playerAccess.setVolume(vm.foobVolumeControl.value)
                 }
 
                 override fun onAdjustVolume(direction: Int) {
                     lastChanged = Instant.now()
-                    currentVolume += direction
-                    viewModelInstance.foobVolumeControl.value =
-                        viewModelInstance.foobVolumeControl.getDecibelValue(currentVolume)
-                    viewModelInstance.playerAccess.setVolume(viewModelInstance.foobVolumeControl.value)
+                    currentVolume = (currentVolume + direction).coerceIn(0, 100)
+                    val vm = getActiveViewModel(viewModelInstance)
+                    vm.foobVolumeControl.value =
+                        vm.foobVolumeControl.getDecibelValue(currentVolume)
+                    vm.playerAccess.setVolume(vm.foobVolumeControl.value)
                 }
             }
 
@@ -164,6 +174,23 @@ class FoobarMediaService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         // Start the service as a foreground service
+        // Sync viewModelInstance with the current global appViewModel which may have
+        // changed after MainActivity recreation (portrait lock). Without this, volume
+        // and media buttons stay bound to the stale ViewModel / wrong server.
+        val currentGlobal = appViewModel
+        if (currentGlobal != null && currentGlobal !== viewModelInstance) {
+            viewModelInstance = currentGlobal
+            // Re-sync volume provider to current server's volume and ensure remote handling
+            if (::volumeProvider.isInitialized) {
+                volumeProvider.setCurrentVolume(viewModelInstance.foobVolumeControl.currentValuePercent)
+                // Re-apply remote playback if enabled (covers case where mediaSession was reset)
+                runBlocking {
+                    if (getFoobarVolumeControlBlocking() && mediaSession != null) {
+                        mediaSession!!.setPlaybackToRemote(volumeProvider)
+                    }
+                }
+            }
+        }
         updateNotification()
         requestAudioFocus()
 

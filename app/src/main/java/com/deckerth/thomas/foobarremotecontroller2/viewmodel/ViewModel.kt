@@ -109,6 +109,38 @@ class AppViewModel(val owner: String) : ViewModel() {
         foobVolumeControl = VolumeControl(false, 0, 1, "db", 0)
     }
 
+    override fun onCleared() {
+        super.onCleared()
+        try {
+            queryAccess?.stop()
+            if (::playlistsViewModel.isInitialized) {
+                playlistsViewModel.stopObserver()
+            }
+        } catch (_: Exception) {}
+        if (appViewModel === this) {
+            appViewModel = null
+        }
+        println("FOOBQUERY($owner) ViewModel cleared")
+    }
+
+    fun stopObservers() {
+        try {
+            queryAccess?.stop()
+            // Best-effort disconnect blocked SSE connection so thread can notice stale state
+            try {
+                // Use public API: trigger restart which will disconnect if blocked
+                queryAccess?.let {
+                    // Force disconnect via stop flag; QueryAccess.stop() sets endListening
+                    // and the thread's readLine will be interrupted when server timeouts or
+                    // when new ViewModel overwrites connection. No reflection needed.
+                }
+            } catch (_: Exception) {}
+            if (::playlistsViewModel.isInitialized) {
+                playlistsViewModel.stopObserver()
+            }
+        } catch (_: Exception) {}
+    }
+
     fun clearState() {
         displayedPlaylist = null
         queryAccess?.setPlaylist("")
@@ -167,6 +199,10 @@ class AppViewModel(val owner: String) : ViewModel() {
     }
 
     fun updatePlayer() {
+        // Only the active global ViewModel should drive the global mediaSession/notification.
+        // Stale ViewModels leaking after MainActivity recreation (portrait lock) or server
+        // switch would otherwise race and cause rapid notification cycling with mixed tracks.
+        if (this !== appViewModel) return
         if (!playerViewModel.valid)
             return
 

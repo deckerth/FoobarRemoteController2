@@ -9,6 +9,13 @@ class PlayerObserver(private val vm: AppViewModel) {
 
     var observer: ScheduledFuture<*>? = null
 
+    fun stop() {
+        try {
+            observer?.cancel(true)
+            observer = null
+        } catch (_: Exception) {}
+    }
+
     fun startPlayerObserver() {
         try {
             if (observer != null && !observer!!.isDone)
@@ -16,6 +23,11 @@ class PlayerObserver(private val vm: AppViewModel) {
             val scheduler = Executors.newSingleThreadScheduledExecutor()
             vm.errorHandler.reset()
             observer = scheduler.scheduleWithFixedDelay({
+                // Stop stale ViewModels that leaked after MainActivity recreation
+                if (vm !== com.deckerth.thomas.foobarremotecontroller2.viewmodel.appViewModel) {
+                    observer?.cancel(true)
+                    return@scheduleWithFixedDelay
+                }
                 if (!vm.errorHandler.sick())
                     try {
                         vm.updatePlayer()

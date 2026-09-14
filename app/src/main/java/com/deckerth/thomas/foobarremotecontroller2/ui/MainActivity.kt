@@ -133,8 +133,25 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         mainActivity = this
 
-        appViewModel = AppViewModel("MainActivity")
-        appViewModel.initialize()
+        // Enforce portrait orientation early before heavy initialization to avoid
+        // creating a second ViewModel / service instance when launched in landscape.
+        // Setting requestedOrientation when already in landscape triggers a recreation;
+        // without reusing the ViewModel this leaks QueryAccess / PlayerObserver threads
+        // which then both compete for the global mediaSession -> volume breaks and
+        // rapid notification cycling with multiple servers.
+        if (!this.isTablet())
+            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+
+        // Reuse existing global ViewModel on recreation (orientation lock / config change)
+        // to prevent duplicate QueryAccess and PlayerObserver instances.
+        val existingGlobal = com.deckerth.thomas.foobarremotecontroller2.viewmodel.appViewModel
+        if (existingGlobal != null) {
+            appViewModel = existingGlobal
+            println("FOOBQUERY MainActivity reusing existing AppViewModel")
+        } else {
+            appViewModel = AppViewModel("MainActivity")
+            appViewModel.initialize()
+        }
 
         //start FoobarMediaSessionService
         val intent = Intent(this, FoobarMediaService::class.java)
@@ -144,9 +161,14 @@ class MainActivity : ComponentActivity() {
             // The ip address in the view model must be set to an invalid value until it the
             // preference were read. Therefore, the value is read into a temporary variable.
             // Only after it was set, the value is taken over to the view model.
+            // When reusing ViewModel after recreation (portrait lock), preserve existing IP
+            // to avoid briefly resetting to "<invalid>" which would clear validity and leak observers.
 
-            var ipAddress by remember { mutableStateOf("<invalid>") }
-            appViewModel.ipAddress = ipAddress
+            var ipAddress by remember { mutableStateOf(appViewModel.ipAddress ?: "<invalid>") }
+            // Only overwrite if needed; avoid clobbering reused VM's valid IP with placeholder
+            if (appViewModel.ipAddress == null || appViewModel.ipAddress == "<invalid>") {
+                appViewModel.ipAddress = ipAddress
+            }
 
             // Read important settings from preferences
             LaunchedEffect(Unit) {

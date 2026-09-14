@@ -52,6 +52,12 @@ class QueryAccess(val vm: AppViewModel) {
 
             try {
                 while (!endListening) {
+                    // Exit stale ViewModels that leaked after MainActivity recreation
+                    // (portrait lock) or server change - prevents two servers racing
+                    if (vm !== com.deckerth.thomas.foobarremotecontroller2.viewmodel.appViewModel) {
+                        println("FOOBQUERY(${vm.owner}) Stale ViewModel detected, exiting listener")
+                        break
+                    }
                     restart = false
 
                     if (vm.ipAddress == null) break
@@ -85,6 +91,11 @@ class QueryAccess(val vm: AppViewModel) {
                         reader = BufferedReader(InputStreamReader(urlConnection!!.inputStream))
 
                         while (!endListening && !restart) {
+                            // Also exit if ViewModel became stale mid-read
+                            if (vm !== com.deckerth.thomas.foobarremotecontroller2.viewmodel.appViewModel) {
+                                restart = true
+                                break
+                            }
                             var line: String
                             try {
                                 isReading = true
@@ -95,6 +106,7 @@ class QueryAccess(val vm: AppViewModel) {
                             }
 
                             if (usedIpAddress != vm.ipAddress) restart = true
+                            if (vm !== com.deckerth.thomas.foobarremotecontroller2.viewmodel.appViewModel) restart = true
 
                             if (!endListening && !restart && line.startsWith("data: ")) {
                                 val data = line.removePrefix("data: ")
@@ -189,6 +201,9 @@ fun analyzePlayer(
     observedPlaylistId: String,
     json: JSONObject
 ) {
+    // Ignore updates from stale ViewModels (leaked after recreation / server switch)
+    // which would otherwise cause notification to rapidly alternate between servers.
+    if (vm !== com.deckerth.thomas.foobarremotecontroller2.viewmodel.appViewModel) return
     val player = json.optJSONObject("player") ?: return
     val activeItem = player.optJSONObject("activeItem") ?: return
     val columns = activeItem.optJSONArray("columns") ?: return
@@ -208,6 +223,7 @@ fun analyzePlaylists(
     observedPlaylistId: String,
     json: JSONObject
 ) {
+    if (vm !== com.deckerth.thomas.foobarremotecontroller2.viewmodel.appViewModel) return
     val playlists = json.optJSONArray("playlists") ?: return
 
     println("FOOBQUERY(${vm.owner}) Playlists:")
@@ -227,6 +243,7 @@ fun analyzePlaylistItems(
     observedPlaylistId: String,
     json: JSONObject
 ) {
+    if (vm !== com.deckerth.thomas.foobarremotecontroller2.viewmodel.appViewModel) return
     json.optJSONObject("playlistItems") ?: return
 
     println("FOOBQUERY(${vm.owner}) PlaylistItems for $observedPlaylistId changed")

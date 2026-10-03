@@ -1,6 +1,7 @@
 package com.deckerth.thomas.foobarremotecontroller2.connector
 
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.appViewModel
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledFuture
 import java.util.concurrent.TimeUnit
@@ -24,7 +25,7 @@ class PlayerObserver(private val vm: AppViewModel) {
             vm.errorHandler.reset()
             observer = scheduler.scheduleWithFixedDelay({
                 // Stop stale ViewModels that leaked after MainActivity recreation
-                if (vm !== com.deckerth.thomas.foobarremotecontroller2.viewmodel.appViewModel) {
+                if (vm !== appViewModel) {
                     observer?.cancel(true)
                     return@scheduleWithFixedDelay
                 }

@@ -3,6 +3,7 @@ package com.deckerth.thomas.foobarremotecontroller2.connector
 import android.os.Process
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.PlaybackState
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.appViewModel
 import org.json.JSONObject
 import java.io.BufferedReader
 import java.io.IOException
@@ -54,7 +55,7 @@ class QueryAccess(val vm: AppViewModel) {
                 while (!endListening) {
                     // Exit stale ViewModels that leaked after MainActivity recreation
                     // (portrait lock) or server change - prevents two servers racing
-                    if (vm !== com.deckerth.thomas.foobarremotecontroller2.viewmodel.appViewModel) {
+                    if (vm !== appViewModel) {
                         println("FOOBQUERY(${vm.owner}) Stale ViewModel detected, exiting listener")
                         break
                     }

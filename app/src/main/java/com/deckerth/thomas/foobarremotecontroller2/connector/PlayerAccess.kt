@@ -7,6 +7,7 @@ import com.deckerth.thomas.foobarremotecontroller2.model.OutputDevices
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.PlaybackMode
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.PlaybackState
+import com.deckerth.thomas.foobarremotecontroller2.viewmodel.appViewModel
 import com.deckerth.thomas.foobarremotecontroller2.volumeProvider
 import org.json.JSONException
 import org.json.JSONObject
@@ -102,7 +103,7 @@ class PlayerAccess(private val vm: AppViewModel) {
                 // ViewModels (after orientation recreation / server switch) would otherwise
                 // overwrite the provider with the wrong server's volume and make volume
                 // keys appear broken.
-                if (vm === com.deckerth.thomas.foobarremotecontroller2.viewmodel.appViewModel) {
+                if (vm === appViewModel) {
                     try {
                         volumeProvider.setCurrentVolume(volumeControl.currentValuePercent)
                     } catch (_: Exception) {}

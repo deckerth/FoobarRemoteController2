@@ -104,6 +104,7 @@ import com.deckerth.thomas.foobarremotecontroller2.ui.page.WizardPage
 import com.deckerth.thomas.foobarremotecontroller2.ui.theme.Foobar2000RemoteControllerTheme
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.PlaylistEditOperation
+import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -144,9 +145,9 @@ class MainActivity : ComponentActivity() {
 
         // Reuse existing global ViewModel on recreation (orientation lock / config change)
         // to prevent duplicate QueryAccess and PlayerObserver instances.
-        val existingGlobal = com.deckerth.thomas.foobarremotecontroller2.viewmodel.appViewModel
-        if (existingGlobal != null) {
-            appViewModel = existingGlobal
+        val existingGlobal = ::appViewModel
+        if (::appViewModel.isInitialized) {
+            appViewModel = existingGlobal.get()
             println("FOOBQUERY MainActivity reusing existing AppViewModel")
         } else {
             appViewModel = AppViewModel("MainActivity")
@@ -420,7 +421,7 @@ class MainActivity : ComponentActivity() {
             }
             LaunchedEffect(appViewModel.showTopAppBar) {
                 if (!appViewModel.showTopAppBar) {
-                    delay(500)
+                    delay(500.milliseconds)
                     appViewModel.playlistEditMode = true
                 }
             }
@@ -598,7 +599,7 @@ class MainActivity : ComponentActivity() {
             }
             LaunchedEffect(appViewModel.showTopAppBar) {
                 if (!appViewModel.showTopAppBar) {
-                    delay(500)
+                    delay(500.milliseconds)
                     appViewModel.playlistEditMode = true
                 }
             }

@@ -73,7 +73,10 @@ fun BrowserPage(vm: AppViewModel, navController: NavHostController) {
         ) {
             if (path != "")
                 ElevatedCard(modifier = Modifier.fillMaxWidth()) {
-                    Text(modifier = Modifier.padding(8.dp), text = vm.browserViewModel.getCurrentPath())
+                    Text(
+                        modifier = Modifier.padding(8.dp),
+                        text = vm.browserViewModel.getCurrentPath()
+                    )
                 }
 
             if (vm.browserViewModel.loadingData.value)

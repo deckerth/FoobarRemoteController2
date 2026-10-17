@@ -70,6 +70,7 @@ class AppViewModel(val owner: String) : ViewModel() {
     lateinit var credentialsManager: CredentialsManager
 
     var autoscroll by mutableStateOf(true)
+    var autoscrollRequest by mutableStateOf(true)
     var enforceAutoscroll by mutableStateOf(false)
     private var autoscrollSave by mutableStateOf(true)
     var autoScrollIndex by mutableIntStateOf(0)

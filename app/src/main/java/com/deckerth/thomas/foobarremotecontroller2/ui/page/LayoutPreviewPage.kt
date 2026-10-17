@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.deckerth.thomas.foobarremotecontroller2.R
+import com.deckerth.thomas.foobarremotecontroller2.model.CustomFieldsContent
 import com.deckerth.thomas.foobarremotecontroller2.model.Playlist
 import com.deckerth.thomas.foobarremotecontroller2.model.PlaylistEntity
 import com.deckerth.thomas.foobarremotecontroller2.model.Title
@@ -26,7 +27,7 @@ import com.deckerth.thomas.foobarremotecontroller2.viewmodel.LayoutViewModel
 
 val previewPlaylist = Playlist(PlaylistEntity("p4", "Preview", true, 2))
 
-private fun setupPreviewPlaylist() {
+private fun setupPreviewPlaylist(vm: AppViewModel) {
     previewPlaylist.clear()
     previewPlaylist.addTitle(
         Title(
@@ -47,7 +48,8 @@ private fun setupPreviewPlaylist() {
             "232.2",
             "51.080651833333334",
             R.drawable.cover_abba.toString(),
-            "M:\\music\\Polydor\\517 007-2\\01.flac"
+            "M:\\music\\Polydor\\517 007-2\\01.flac",
+            vm.customFields.getMockedContent()
         )
     )
     previewPlaylist.addTitle(
@@ -69,7 +71,8 @@ private fun setupPreviewPlaylist() {
             "125.1700625",
             "53.58589853333333",
             R.drawable.cover_tosca.toString(),
-            "M:\\music\\Decca\\421 670-2\\01.flac"
+            "M:\\music\\Decca\\421 670-2\\01.flac",
+            vm.customFields.getMockedContent()
         )
     )
     previewPlaylist.albums[0].isExpanded = true
@@ -98,7 +101,7 @@ fun LayoutPreviewPage(appViewModel: AppViewModel, layoutViewModel: LayoutViewMod
             )
         }
     } else {
-        setupPreviewPlaylist()
+        setupPreviewPlaylist(appViewModel)
         PlaylistPreview(appViewModel, layoutViewModel, previewPlaylist)
     }
 }

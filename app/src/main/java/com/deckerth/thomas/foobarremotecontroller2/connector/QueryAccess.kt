@@ -33,6 +33,66 @@ class QueryAccess(val vm: AppViewModel) {
         listeners.add(listener)
     }
 
+    private var getPlayerStateRunning = false
+    fun getPlayerState() {
+        if (getPlayerStateRunning) return
+        Thread {
+            try {
+                getPlayerStateRunning = true
+                if (vm !== appViewModel) return@Thread
+                println("FOOBQUERY(${vm.owner}) getPlayerState Started. Process ID: $currentProcessId, Instance: $currentInstanceNumber")
+
+                val usedIpAddress = vm.ipAddress ?: return@Thread
+
+                val endpoint =
+                    "query?player=true&" +
+                            "trcolumns=" +
+                            vm.playerAccess.getColumnList(false)
+
+                val response = vm.connector.getData(endpoint, vm)
+
+                if (!response.message.startsWith("{\"player\":"))
+                    println("FOOBQUERY(${vm.owner}) getPlayerState response: ${response.message}")
+                if (usedIpAddress != vm.ipAddress) return@Thread
+                if (vm !== appViewModel) return@Thread
+
+                if (response.message.startsWith("{\"player\":")) {
+                    val data = response.message
+                    if (data != "{}") {
+                        val json = JSONObject(data)
+                        listeners.forEach { t ->
+                            t(
+                                vm,
+                                usedIpAddress,
+                                playlistId,
+                                json
+                            )
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                if (e.message != null && e.message.equals("Unauthorized"))
+                    vm.errorHandler.logError(
+                        ErrorType.NETWORK,
+                        ErrorCode.AUTHORIZATION_ERROR,
+                        ErrorSource.HTTP_CONNECTOR,
+                        e
+                    )
+                else {
+                    e.printStackTrace()
+                    vm.errorHandler.logError(
+                        ErrorType.NETWORK,
+                        ErrorCode.CONNECTION_ERROR,
+                        ErrorSource.HTTP_CONNECTOR,
+                        e
+                    )
+                }
+            } finally {
+                getPlayerStateRunning = false
+            }
+        }.start()
+    }
+
     fun stop() {
         if (isListening) {
             println("FOOBQUERY(${vm.owner}) Stop initiated. Process ID: $currentProcessId, Instance: $currentInstanceNumber")
@@ -69,7 +129,7 @@ class QueryAccess(val vm: AppViewModel) {
                     var endpoint =
                         "query/updates?player=true&" +
                                 "trcolumns=" +
-                                vm.playerAccess.getColumnList(false)  +
+                                vm.playerAccess.getColumnList(false) +
                                 "&playlists=true"
                     if (playlistId.isNotEmpty())
                         endpoint += "&playlistItems=true&plref=$playlistId&plrange=0:1" +
@@ -93,7 +153,7 @@ class QueryAccess(val vm: AppViewModel) {
 
                         while (!endListening && !restart) {
                             // Also exit if ViewModel became stale mid-read
-                            if (vm !== com.deckerth.thomas.foobarremotecontroller2.viewmodel.appViewModel) {
+                            if (vm !== appViewModel) {
                                 restart = true
                                 break
                             }
@@ -107,7 +167,7 @@ class QueryAccess(val vm: AppViewModel) {
                             }
 
                             if (usedIpAddress != vm.ipAddress) restart = true
-                            if (vm !== com.deckerth.thomas.foobarremotecontroller2.viewmodel.appViewModel) restart = true
+                            if (vm !== appViewModel) restart = true
 
                             if (!endListening && !restart && line.startsWith("data: ")) {
                                 val data = line.removePrefix("data: ")
@@ -175,7 +235,6 @@ class QueryAccess(val vm: AppViewModel) {
             isListening = true
             start()
         }
-
     }
 }
 
@@ -204,18 +263,25 @@ fun analyzePlayer(
 ) {
     // Ignore updates from stale ViewModels (leaked after recreation / server switch)
     // which would otherwise cause notification to rapidly alternate between servers.
-    if (vm !== com.deckerth.thomas.foobarremotecontroller2.viewmodel.appViewModel) return
+    if (vm !== appViewModel) return
     val player = json.optJSONObject("player") ?: return
     val activeItem = player.optJSONObject("activeItem") ?: return
     val columns = activeItem.optJSONArray("columns") ?: return
     val playbackState = player.getString("playbackState")
-    if (columns.length() == 0 && playbackState == "playing" && vm.playerViewModel.playbackState == PlaybackState.PLAYING)
+    if (columns.length() == 0 && playbackState == "playing" && vm.playerViewModel.playbackState == PlaybackState.PLAYING) {
+        vm.queryAccess?.getPlayerState()
+        println("FOOBQUERY(${vm.owner}) Player: columns.length() == 0${columns.length()} playbackState == $playbackState")
         return
+    }
     println("FOOBQUERY(${vm.owner}) Player: $playbackState")
     println("FOOBQUERY(${vm.owner})  Current Title: ${columns.optString(0)}")
     println("FOOBQUERY(${vm.owner})    Duration: ${activeItem.optInt("duration")}")
     println("FOOBQUERY(${vm.owner})    Position: ${activeItem.optInt("position")}")
     vm.playerAccess.parsePlayerState(usedIpAddress, json)
+    if (vm.autoscrollRequest) {
+        vm.autoscrollRequest = false
+        vm.autoscroll = true
+    }
 }
 
 fun analyzePlaylists(

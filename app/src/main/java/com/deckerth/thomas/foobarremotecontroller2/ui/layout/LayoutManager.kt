@@ -9,7 +9,7 @@ import com.deckerth.thomas.foobarremotecontroller2.ui.mainActivity
 
 val layoutManager = LayoutManager()
 
-class LayoutManager  {
+class LayoutManager {
 
     private val classicLayout: Layout = createClassicLayout()
     private val modernLayout: Layout = createModernLayout()
@@ -32,8 +32,8 @@ class LayoutManager  {
 
     private fun createModernPlayerLayout(): LayoutDescription {
         val fields = LayoutDescription(ViewsWithLayout.PLAYER)
-        fields.items.add(LayoutItem(StandardLayoutItems.TITLE,  itemSize = ItemSize.TITLE_LARGE))
-        fields.items.add(LayoutItem(StandardLayoutItems.ALBUM,  itemSize = ItemSize.BODY_SMALL))
+        fields.items.add(LayoutItem(StandardLayoutItems.TITLE, itemSize = ItemSize.TITLE_LARGE))
+        fields.items.add(LayoutItem(StandardLayoutItems.ALBUM, itemSize = ItemSize.BODY_SMALL))
         fields.items.add(LayoutItem(StandardLayoutItems.PROGRESS))
         return fields
     }
@@ -49,8 +49,18 @@ class LayoutManager  {
     private fun createModernTitleLayout(): LayoutDescription {
         val fields = LayoutDescription(ViewsWithLayout.TITLE)
         fields.items.add(LayoutItem(StandardLayoutItems.TITLE, itemSize = ItemSize.TITLE_MEDIUM))
-        fields.items.add(LayoutItem(StandardLayoutItems.SMART_ARTIST, itemSize = ItemSize.BODY_SMALL))
-        if (!mainActivity!!.isTablet()) fields.items.add(LayoutItem(StandardLayoutItems.ALBUM, itemSize = ItemSize.BODY_SMALL))
+        fields.items.add(
+            LayoutItem(
+                StandardLayoutItems.SMART_ARTIST,
+                itemSize = ItemSize.BODY_SMALL
+            )
+        )
+        if (!mainActivity!!.isTablet()) fields.items.add(
+            LayoutItem(
+                StandardLayoutItems.ALBUM,
+                itemSize = ItemSize.BODY_SMALL
+            )
+        )
         return fields
     }
 
@@ -73,7 +83,13 @@ class LayoutManager  {
             )
         )
         fields.items.add(LayoutItem(StandardLayoutItems.TITLE, itemSize = ItemSize.BODY_SMALL))
-        fields.items.add(LayoutItem(StandardLayoutItems.ARTIST, itemSize = ItemSize.BODY_SMALL, maxLines = 10))
+        fields.items.add(
+            LayoutItem(
+                StandardLayoutItems.ARTIST,
+                itemSize = ItemSize.BODY_SMALL,
+                maxLines = 10
+            )
+        )
         fields.items.add(LayoutItem(StandardLayoutItems.PROGRESS))
         return fields
     }
@@ -89,8 +105,18 @@ class LayoutManager  {
     private fun createClassicTitleLayout(): LayoutDescription {
         val fields = LayoutDescription(ViewsWithLayout.TITLE)
         fields.items.add(LayoutItem(StandardLayoutItems.TITLE, itemSize = ItemSize.TITLE_MEDIUM))
-        fields.items.add(LayoutItem(StandardLayoutItems.SMART_ARTIST, itemSize = ItemSize.BODY_SMALL))
-        if (!mainActivity!!.isTablet()) fields.items.add(LayoutItem(StandardLayoutItems.ALBUM, itemSize = ItemSize.BODY_SMALL))
+        fields.items.add(
+            LayoutItem(
+                StandardLayoutItems.SMART_ARTIST,
+                itemSize = ItemSize.BODY_SMALL
+            )
+        )
+        if (!mainActivity!!.isTablet()) fields.items.add(
+            LayoutItem(
+                StandardLayoutItems.ALBUM,
+                itemSize = ItemSize.BODY_SMALL
+            )
+        )
         return fields
     }
 
@@ -110,11 +136,11 @@ class LayoutManager  {
         }
     }
 
-    fun getViewModesWith(fieldName : String) : List<ViewsWithLayout> {
+    fun getViewModesWith(fieldName: String): List<ViewsWithLayout> {
         return customLayout?.getViewModesWith(fieldName) ?: emptyList()
     }
 
-    fun removeFieldFromLayouts(fieldName : String) {
+    fun removeFieldFromLayouts(fieldName: String) {
         if (customLayout == null) return
         customLayout!!.removeFieldFromLayouts(fieldName)
         saveCustomLayout(mainActivity!!.baseContext, customLayout!!)

@@ -378,7 +378,7 @@ fun AlbumCard(
                 vm.playerAccess.playTrack(
                     album.tracks[0].details.playlistId, album.tracks[0].details.index
                 )
-            vm.autoscroll = true
+            vm.autoscrollRequest = true
         }
     }
 
@@ -506,7 +506,7 @@ fun TitleEntry(
                         vm.playerAccess.startPlayback()
                 else {
                     vm.playerAccess.playTrack(title.details.playlistId, title.details.index)
-                    vm.autoscroll = true
+                    vm.autoscrollRequest = true
                 }
             }
         }

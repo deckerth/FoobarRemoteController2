@@ -411,7 +411,10 @@ class MainActivity : ComponentActivity() {
                 }
                 composable("Layout editor") {
                     appBarLabel = stringResource(R.string.choose_layout_to_change)
-                    LayoutEditorMainPage(mainNavController = navController, appViewModel = appViewModel)
+                    LayoutEditorMainPage(
+                        mainNavController = navController,
+                        appViewModel = appViewModel
+                    )
                 }
                 composable("Browser") {
                     appBarLabel = stringResource(R.string.browser)
@@ -590,7 +593,10 @@ class MainActivity : ComponentActivity() {
                 }
                 composable("Layout editor") {
                     appBarLabel = stringResource(R.string.choose_layout_to_change)
-                    LayoutEditorMainPage(mainNavController = navController, appViewModel = appViewModel)
+                    LayoutEditorMainPage(
+                        mainNavController = navController,
+                        appViewModel = appViewModel
+                    )
                 }
                 composable("Browser") {
                     appBarLabel = stringResource(R.string.browser)

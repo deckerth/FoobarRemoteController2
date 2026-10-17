@@ -82,6 +82,7 @@ import com.deckerth.thomas.foobarremotecontroller2.viewmodel.AppViewModel
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.LayoutField
 import com.deckerth.thomas.foobarremotecontroller2.viewmodel.LayoutViewModel
 import kotlinx.coroutines.delay
+import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 fun LayoutEditorPage(
@@ -143,7 +144,7 @@ fun LayoutEditorPage(
                 // Keep card under finger: viewport moved, so shift totalDragOffset to match
                 totalDragOffset += actualScrolled
             }
-            delay(16L) // ~60 fps
+            delay(16L.milliseconds) // ~60 fps
         }
     }
 
@@ -329,6 +330,7 @@ fun LayoutEditorPage(
             } // end Card
             if (isClicked) {
                 if (item.layoutItem!!.item == StandardLayoutItems.PROGRESS) {
+                    // The player has a slider and not a real progress bar
                     if (layoutViewModel.currentView != ViewsWithLayout.PLAYER)
                         EditProgressBarProperties(
                             item,
@@ -368,7 +370,6 @@ fun LayoutEditorPage(
         }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditProperties(
     layoutField: LayoutField,
@@ -573,7 +574,6 @@ fun EditProperties(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditProgressBarProperties(
     layoutField: LayoutField,
